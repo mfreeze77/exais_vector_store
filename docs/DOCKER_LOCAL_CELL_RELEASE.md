@@ -33,9 +33,14 @@ admin UI through host loopback first, then proves access through a
 
 ```bash
 python scripts/release/seed-scale.py --cell local --documents 10000 --headings-per-doc 8
-python scripts/release/search-bench.py --cell local --vector-store-id <id-from-seed-scale> --queries 200 --p95-ms 500
+python scripts/release/search-bench.py --cell local --vector-store-id <id-from-seed-scale> --queries 200 --warmup-queries 100 --p95-ms 500 --pace-ms 800
 python scripts/release/qdrant-chaos-repair.py --cell local --documents 500
 ```
+
+The search benchmark warms repeated query embeddings before measurement and
+paces requests so a local proof does not bypass or trip the default API
+`120/min` rate limit. Cold external-provider query embedding latency should be
+recorded separately when comparing provider performance.
 
 The Qdrant repair command must prove actual repair work: it deletes real Qdrant
 points for the test vector store, shows the count drop, calls

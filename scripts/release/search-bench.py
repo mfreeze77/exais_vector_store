@@ -42,6 +42,8 @@ def main() -> None:
     parser.add_argument("--vector-store-id", required=True)
     parser.add_argument("--queries", type=int, default=200)
     parser.add_argument("--p95-ms", type=int, default=500)
+    parser.add_argument("--warmup-queries", type=int, default=0, help="Run unmeasured queries first to warm query embedding cache.")
+    parser.add_argument("--pace-ms", type=int, default=0, help="Sleep between measured requests so the proof respects API rate limits.")
     parser.add_argument("--inside-container", action="store_true")
     args = parser.parse_args()
     api = args.api_base or "http://localhost:18080"
@@ -71,6 +73,10 @@ def main() -> None:
                 str(args.queries),
                 "--p95-ms",
                 str(args.p95_ms),
+                "--warmup-queries",
+                str(args.warmup_queries),
+                "--pace-ms",
+                str(args.pace_ms),
             ]
             print("$ " + " ".join(cmd))
             proc = subprocess.run(cmd, input=script.encode("utf-8"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -82,8 +88,12 @@ def main() -> None:
             return
     latencies: list[int] = []
     errors = 0
-    for i in range(args.queries):
-        query = f"qdrant proof repairable index state document {i % 100}"
+    warmup_errors = 0
+    total = args.warmup_queries + args.queries
+    for i in range(total):
+        measuring = i >= args.warmup_queries
+        query_index = i - args.warmup_queries if measuring else i
+        query = f"qdrant proof repairable index state document {query_index % 100}"
         try:
             elapsed_ms, body = post_json(
                 f"{api}/api/v1/retrieval/search",
@@ -95,20 +105,31 @@ def main() -> None:
                 },
             )
             result_count = len(body.get("results", []))
-            latencies.append(elapsed_ms)
-            print(f"search {i + 1}/{args.queries}: {elapsed_ms}ms results={result_count}")
+            if measuring:
+                latencies.append(elapsed_ms)
+                print(f"search {query_index + 1}/{args.queries}: {elapsed_ms}ms results={result_count}")
+            else:
+                print(f"warmup {i + 1}/{args.warmup_queries}: {elapsed_ms}ms results={result_count}")
         except Exception as exc:
-            errors += 1
-            print(f"search {i + 1}/{args.queries}: ERROR {type(exc).__name__}: {exc}")
+            if measuring:
+                errors += 1
+                print(f"search {query_index + 1}/{args.queries}: ERROR {type(exc).__name__}: {exc}")
+            else:
+                warmup_errors += 1
+                print(f"warmup {i + 1}/{args.warmup_queries}: ERROR {type(exc).__name__}: {exc}")
+        if args.pace_ms > 0 and i < total - 1:
+            time.sleep(args.pace_ms / 1000.0)
     p50 = percentile(latencies, 50)
     p95 = percentile(latencies, 95)
     avg = int(statistics.mean(latencies)) if latencies else 0
+    print(f"warmup_queries={args.warmup_queries}")
+    print(f"warmup_errors={warmup_errors}")
     print(f"queries={args.queries}")
     print(f"errors={errors}")
     print(f"p50_ms={p50}")
     print(f"p95_ms={p95}")
     print(f"avg_ms={avg}")
-    if errors or p95 > args.p95_ms:
+    if warmup_errors or errors or p95 > args.p95_ms:
         raise SystemExit(1)
 
 

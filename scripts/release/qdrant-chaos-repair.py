@@ -184,7 +184,7 @@ FROM chunks c
 JOIN embeddings e ON e.chunk_id=c.id
 WHERE {chunk_where} AND c.active=true
   AND e.vector_collection IS NOT NULL AND e.vector_point_id IS NOT NULL
-ORDER BY c.created_at ASC
+ORDER BY c.created_at ASC, c.id ASC
 LIMIT {repair_batch};
 """, tuples_only=True))
     if not selected_points:

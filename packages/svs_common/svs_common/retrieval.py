@@ -1,5 +1,5 @@
 from __future__ import annotations
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from .sql import jsonb_text
@@ -11,10 +11,12 @@ from .providers import ProviderConfigurationError
 from .model_registry import resolve_embedding_profile, retrieval_profiles, model_registry
 from .qdrant_adapter import QdrantAdapter
 from .opensearch_adapter import OpenSearchAdapter
-from .hashing import query_hash
+from .hashing import query_hash, sha256_text
 from .ids import new_id
 from .chunking import estimate_tokens
 from .config import get_settings
+
+QUERY_EMBEDDING_CACHE_MAX = 2048
 
 def reciprocal_rank_fusion(result_lists: list[list[dict]], k: int = 60, weights: list[float] | None = None) -> list[dict]:
     scores, payloads = defaultdict(float), {}
@@ -31,6 +33,7 @@ class RetrievalService:
         self.settings = get_settings()
         self.qdrant = QdrantAdapter()
         self.opensearch = OpenSearchAdapter()
+        self._query_embedding_cache: OrderedDict[tuple, list[float]] = OrderedDict()
 
     async def search(self, db: Session, principal: Principal, req: SearchRequest) -> SearchResponse:
         scope = build_retrieval_scope(principal)
@@ -46,11 +49,20 @@ class RetrievalService:
             emb_profile = registry.get(embedding_profile_id)
             if not emb_profile:
                 raise ProviderConfigurationError(f"Unknown embedding profile: {embedding_profile_id}")
-            provider = provider_for(emb_profile.get("provider", "hash_mock"))
-            emb = await provider.embed([req.query], emb_profile.get("model", "deterministic-dev-hash"), int(emb_profile.get("dimensions", 1536)), input_type="query")
+            provider_name = emb_profile.get("provider", "hash_mock")
+            model = emb_profile.get("model", "deterministic-dev-hash")
+            dimensions = int(emb_profile.get("dimensions", 1536))
+            query_vector = await self._query_embedding(
+                scope,
+                embedding_profile_id,
+                req.query,
+                provider_name,
+                model,
+                dimensions,
+            )
             dense_lists.append(self.qdrant.search(
                 self.qdrant.collection_name(scope.business_instance_id, embedding_profile_id),
-                emb.data[0].embedding,
+                query_vector,
                 build_qdrant_filter(scope, filters),
                 int(profile.get("dense_top_k", req.top_k * 4)),
             ))
@@ -97,6 +109,35 @@ class RetrievalService:
         """), params).mappings().all()
         profile_ids = [r["embedding_profile_id"] for r in rows if r["embedding_profile_id"]]
         return profile_ids or [resolve_embedding_profile(req.mode or "markdown_docs_v1", scope.max_security_level)]
+
+    async def _query_embedding(self, scope, embedding_profile_id: str, query: str, provider_name: str, model: str, dimensions: int) -> list[float]:
+        cache = getattr(self, "_query_embedding_cache", None)
+        if cache is None:
+            cache = self._query_embedding_cache = OrderedDict()
+        key = (
+            scope.tenant_id,
+            scope.business_instance_id,
+            embedding_profile_id,
+            provider_name,
+            model,
+            dimensions,
+            sha256_text(query),
+        )
+        cached = cache.get(key)
+        if cached is not None:
+            cache.move_to_end(key)
+            return cached
+        provider = provider_for(provider_name, self.settings)
+        emb = await provider.embed([query], model, dimensions, input_type="query")
+        if provider_name != "hash_mock" and emb.provider == "hash_mock":
+            raise ProviderConfigurationError(
+                f"Embedding profile {embedding_profile_id} returned hash_mock vectors for real provider {provider_name}"
+            )
+        vector = list(emb.data[0].embedding)
+        cache[key] = vector
+        if len(cache) > QUERY_EMBEDDING_CACHE_MAX:
+            cache.popitem(last=False)
+        return vector
 
     def _postgres_sparse_search(self, db: Session, scope, query: str, filters: dict, limit: int) -> list[dict]:
         """Small-cell sparse retrieval fallback using Postgres generated tsvector."""

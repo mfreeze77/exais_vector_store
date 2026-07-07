@@ -20,6 +20,7 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-010 RunPod Marker PDF Ingestion](./WAVE-010-runpod-marker-pdf-ingestion.md)
 - [WAVE-011 Real Embedding Provider Gate](./WAVE-011-real-embedding-provider-gate.md)
 - [WAVE-012 Vector Store Delete RLS Soft-Delete](./WAVE-012-vector-store-delete-rls-soft-delete.md)
+- [WAVE-013 Real Embedding Scale Repair Regate](./WAVE-013-real-embedding-scale-repair-regate.md)
 
 ## Execution Model
 
