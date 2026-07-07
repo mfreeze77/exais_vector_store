@@ -28,6 +28,24 @@ exais-vector-store-local-api-1 localhost:5000/expertaiservices/exai-vector-store
 5 passed, 8 warnings in 1.78s
 ```
 
+## Wave 009 Current Snapshot
+
+```text
+localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate sha256:1b7623b810f64967af01008196b5393bd9b82551b70e4ff9ca9f4111dbe6ec70
+localhost:5000/expertaiservices/exai-vector-store-admin-ui:0.9.8-production-candidate sha256:4179f3841c703c7f6c4c6377db3c430f479cbe3aa5fc6f5bad3a2cd562584a69
+python -m pytest -q -rs --ignore=tests/integration
+46 passed, 2 warnings in 5.56s
+python -m pytest -q -rs tests/test_cell_access_proof_script.py tests/test_prod_env_preflight_script.py tests/test_qdrant_repair_all_script.py tests/test_qdrant_repair_proof_script.py tests/test_local_restore_drill_script.py tests/test_readyz.py tests/test_release_cell_network.py
+20 passed, 2 warnings in 6.03s
+{"ready":true,"db":true,"qdrant":true}
+200
+ACCESS_PATH=cell-network-fallback
+```
+
+The Wave 009 snapshot is a follow-up local-registry proof. It does not replace
+the original remove-local-tags proof above and does not claim Docker Hub or VPS
+launch.
+
 Docker Hub follow-up is mechanical only after this gate passes:
 
 ```bash

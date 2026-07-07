@@ -15,7 +15,7 @@ host/admin access proof, and doc/proof convergence.
 | W9-002 | Complete | Implementation | Add a repair-all drift operation that loops forced reindex batches or otherwise verifies Qdrant drift is resolved beyond a single ordered batch. |
 | W9-003 | Complete | Implementation | Add a secret-safe production env preflight that rejects placeholders, dev mode, bad registry/version settings, missing required variables, and port collisions without printing secret values. |
 | W9-004 | Complete | Test/Proof | Prove host/admin access on Windows Docker or document and automate the reliable fallback path for admin/API access when host loopback fails. |
-| W9-005 | Pending | Test/Proof | Converge stale docs/proof counts after Waves 007-009 so README, gate docs, and ticket proof all describe the current verified surface. |
+| W9-005 | Complete | Test/Proof | Converge stale docs/proof counts after Waves 007-009 so README, gate docs, and ticket proof all describe the current verified surface. |
 
 ## Out Of Scope
 
@@ -41,7 +41,7 @@ host/admin access proof, and doc/proof convergence.
   values.
 - [x] W9-004 records a reproducible admin/API access path for this Windows Docker
   environment.
-- [ ] W9-005 removes or annotates stale proof counts that conflict with current
+- [x] W9-005 removes or annotates stale proof counts that conflict with current
   Docker-cell evidence.
 
 ## Verification
@@ -94,7 +94,7 @@ python scripts/release/cell-access-proof.py --cell local --timeout-seconds 60
 - Live restore proof values:
   - `restore_readyz_status=200`
   - `restore_sql_counts_before_reindex={"active_chunks": 48, "active_jobs": 0, "failed_jobs": 0, "indexed_chunks": 48}`
-  - `restore_reindex_response={"action": "reindex_chunks", "details": {}, "ok": true, "processed": 48}`
+  - `restore_reindex_response processed=48`
   - `restore_qdrant_count=48`
   - `restore_search_results=5`
   - `restore_sql_counts_final={"active_chunks": 48, "active_jobs": 0, "failed_jobs": 0, "indexed_chunks": 48}`
@@ -179,3 +179,17 @@ python scripts/release/cell-access-proof.py --cell local --timeout-seconds 60
   - `ADMIN_UI_HOST_REASON=URLError`
   - `ADMIN_UI_CELL_NETWORK_STATUS=200`
   - `ACCESS_PATH=cell-network-fallback`
+- 2026-07-07 W9-005 converged current proof docs:
+  - `README.md`
+  - `VALIDATION.md`
+  - `docs/GATE_1_PUBLISH.md`
+  - `docs/GATE_2_SCALE.md`
+  - `docs/ARTIFACT_MANIFEST.md`
+  - `docs/COMPLETION_MATRIX_V0_9_8.md`
+  - `docs/V0_9_8_PATCH_REPORT.md`
+- Current non-integration pulled-image test count is
+  `46 passed, 2 warnings in 5.56s`; focused Wave 009 release tests are
+  `20 passed, 2 warnings in 6.03s`.
+- Current API route counts remain `FastAPI routes: 45` and `OpenAPI paths: 34`.
+- Updated docs explicitly keep Docker Hub push, DNS/TLS, real provider
+  credentials, and VPS launch outside the local proof claim.

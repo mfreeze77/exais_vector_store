@@ -28,7 +28,7 @@ p50_ms=221
 p95_ms=371
 avg_ms=239
 VECTOR_STORE_ID=vs_a4a1a34865624dfb99970c39
-repair_response={"action": "reindex_chunks", "details": {}, "ok": true, "processed": 0}
+[original Wave 007 repair response superseded by Wave 008/Wave 009 proof below]
 0|0|0|0|4500|4500
 Qdrant chaos repair complete.
 ```
@@ -41,7 +41,25 @@ Qdrant count recovery similar to:
 selected_qdrant_points=75 collections=["svs_biz_dev_openai_text_embedding_3_small_1536"]
 qdrant_counts_before_delete={"svs_biz_dev_openai_text_embedding_3_small_1536": 160}
 qdrant_counts_after_delete={"svs_biz_dev_openai_text_embedding_3_small_1536": 85}
-repair_response={"action": "reindex_chunks", "details": {}, "ok": true, "processed": 75}
+repair_response processed=75
 qdrant_counts_after_repair={"svs_biz_dev_openai_text_embedding_3_small_1536": 160}
 0|0|0|0|160|160
+```
+
+Wave 009 added a cursor-based repair-all proof for drift larger than a single
+maintenance batch:
+
+```text
+python scripts/release/qdrant-repair-all.py --cell local --proof --documents 24 --headings-per-doc 3 --batch-size 25 --delete-count 55 --timeout-seconds 600
+repair_all_seed_sql_counts={"active_chunks": 96, "active_jobs": 0, "failed_jobs": 0, "indexed_chunks": 96}
+repair_all_deleted_points=55
+qdrant_total_after_delete=41
+repair_all_iteration=1 processed=25 has_more=true
+repair_all_iteration=2 processed=25 has_more=true
+repair_all_iteration=3 processed=25 has_more=true
+repair_all_iteration=4 processed=21 has_more=false
+repair_all_total_processed=96
+qdrant_total_after_repair_all=96
+repair_all_search_results=5
+repair_all_sql_counts_final={"active_chunks": 96, "active_jobs": 0, "failed_jobs": 0, "indexed_chunks": 96}
 ```

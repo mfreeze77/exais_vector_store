@@ -33,6 +33,26 @@ PYTHONPATH=packages/svs_common:apps/api:apps/worker:apps/model_gateway:apps/inst
 
 The skipped test is the live Postgres suite gated by `SVS_RUN_INTEGRATION=1`. This container did not run Postgres/Qdrant services.
 
+## Wave 009 local Docker addendum
+
+After the original v0.9.8 patch gate, Wave 009 proved the local Docker cell with
+registry-pulled images and current repo tests:
+
+```text
+python -m pytest -q -rs --ignore=tests/integration
+46 passed, 2 warnings in 5.56s
+restore_readyz_status=200
+restore_qdrant_count=48
+repair_all_total_processed=96
+qdrant_total_after_repair_all=96
+API_CELL_NETWORK_STATUS=200
+ADMIN_UI_CELL_NETWORK_STATUS=200
+ACCESS_PATH=cell-network-fallback
+```
+
+This addendum is local Docker evidence only. Docker Hub push, DNS/TLS, real
+provider credentials, and VPS launch remain external deployment work.
+
 ## Live validation required
 
 Run the integration suite against both supported Postgres topologies before deploying a first customer cell:
