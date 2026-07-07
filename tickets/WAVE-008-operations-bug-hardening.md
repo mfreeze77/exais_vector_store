@@ -12,7 +12,7 @@ truthfulness and reusable operations scripts.
 | --- | --- | --- | --- |
 | W8-001 | Complete | Implementation | Remove hardcoded `local` cell network fallbacks from release proof scripts. |
 | W8-002 | Complete | Implementation | Make `/readyz` fail when required runtime dependencies are unavailable. |
-| W8-003 | Pending | Test/Proof | Prove repair endpoint can perform actual reindex work, not only report a clean state after Qdrant restart. |
+| W8-003 | Complete | Test/Proof | Prove repair endpoint can perform actual reindex work, not only report a clean state after Qdrant restart. |
 
 ## Acceptance Criteria
 
@@ -23,13 +23,19 @@ truthfulness and reusable operations scripts.
 - [x] `/healthz` remains a lightweight process/build endpoint and does not become a dependency gate.
 - [x] Unit tests cover dependency readiness behavior without requiring live Docker services.
 - [x] Container/cell proof confirms `/readyz` still returns HTTP `200` in the healthy pulled cell.
+- [x] Qdrant repair proof deletes real points for a vector store and shows the Qdrant count drops.
+- [x] `/api/v1/maintenance/reindex` returns non-zero `processed` for the deleted points.
+- [x] Qdrant repair proof shows the vector-store point count returns to its pre-delete count.
+- [x] Final SQL after repair shows zero failed jobs and zero active pending/failed/unindexed chunks.
 
 ## Verification
 
 ```bash
 PYTHONPATH=packages/svs_common;apps/api;apps/worker;apps/model_gateway;apps/instance_agent python -m compileall -f -q packages apps tests scripts
 docker run --rm -v "${PWD}:/work" -w /work --network exais-vector-store-local_default -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python -m pytest -q -rs tests/test_readyz.py tests/test_release_cell_network.py
+docker run --rm -v "${PWD}:/work" -w /work --network exais-vector-store-local_default -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python -m pytest -q -rs tests/test_qdrant_repair_proof_script.py
 python scripts/release/cell-smoke.py --cell local --worker-scale 4
+python scripts/release/qdrant-chaos-repair.py --cell local --documents 40 --headings-per-doc 3 --kill-delay-seconds 0.5 --outage-seconds 2 --repair-batch-size 75 --timeout-seconds 600
 ```
 
 ## Proof Notes
@@ -74,6 +80,40 @@ Unsafe SVS startup configuration occurrences: 0
 5 passed, 8 warnings in 1.83s
 ```
 
+- `python -m pytest -q -rs tests/test_qdrant_repair_proof_script.py` inside
+  the API image with the repo mounted:
+
+```text
+...                                                                      [100%]
+3 passed in 0.27s
+```
+
+- Combined focused Wave 008 test set:
+
+```text
+........                                                                 [100%]
+8 passed, 2 warnings in 4.18s
+```
+
+- `python scripts/release/qdrant-chaos-repair.py --cell local --documents 40
+  --headings-per-doc 3 --kill-delay-seconds 0.5 --outage-seconds 2
+  --repair-batch-size 75 --timeout-seconds 600` proved actual reindex work:
+
+```text
+VECTOR_STORE_ID=vs_3c7695972fe44f3f86581595
+completed |    40
+0|0|0
+selected_qdrant_points=75 collections=["svs_biz_dev_openai_text_embedding_3_small_1536"]
+qdrant_counts_before_delete={"svs_biz_dev_openai_text_embedding_3_small_1536": 160}
+qdrant_counts_after_delete={"svs_biz_dev_openai_text_embedding_3_small_1536": 85}
+{"ok":true,"action":"reindex_chunks","processed":75,"details":{}}
+200
+repair_response={"action": "reindex_chunks", "details": {}, "ok": true, "processed": 75}
+qdrant_counts_after_repair={"svs_biz_dev_openai_text_embedding_3_small_1536": 160}
+0|0|0|0|160|160
+Qdrant chaos repair complete.
+```
+
 - Qdrant interruption proof:
 
 ```text
@@ -112,5 +152,5 @@ exais-vector-store-local-worker-3          localhost:5000/expertaiservices/exai-
 exais-vector-store-local-worker-4          localhost:5000/expertaiservices/exai-vector-store-worker:0.9.8-production-candidate          Up 13 seconds (healthy)
 ```
 
-- W8-003 remains pending. The current fixes do not claim new repair/reindex
-  semantics beyond the prior Docker release gate proof.
+- Wave 008 is complete. Docker Hub push and VPS deployment remain outside this
+  wave by design.

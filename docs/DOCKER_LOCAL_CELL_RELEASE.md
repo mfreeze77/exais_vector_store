@@ -31,6 +31,11 @@ python scripts/release/search-bench.py --cell local --vector-store-id <id-from-s
 python scripts/release/qdrant-chaos-repair.py --cell local --documents 500
 ```
 
+The Qdrant repair command must prove actual repair work: it deletes real Qdrant
+points for the test vector store, shows the count drop, calls
+`/api/v1/maintenance/reindex` with `force=true`, and shows the count recover
+with a non-zero `processed` value.
+
 If a scale proof needs to be resumed without submitting another 10,000
 documents, use the generated vector store id:
 

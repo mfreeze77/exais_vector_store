@@ -9,7 +9,7 @@ compose files do not count.
 - [x] SQL output shows active chunks `>= 80000`.
 - [x] SQL output shows active chunks with `dense_index_status='indexed'` and `sparse_index_status='indexed'` `>= 80000`.
 - [x] `python scripts/release/search-bench.py --cell local --vector-store-id <id> --queries 200 --p95-ms 500` prints p50/p95, has `0` errors, and has p95 `< 500ms`.
-- [x] `python scripts/release/qdrant-chaos-repair.py --cell local --documents 500` kills Qdrant during queued ingest, restarts it, runs the reindex repair endpoint, and SQL shows `0` active chunks in pending/failed/unindexed status.
+- [x] `python scripts/release/qdrant-chaos-repair.py --cell local --documents 500` kills Qdrant during queued ingest, restarts it, deletes a bounded set of real Qdrant points, runs the reindex repair endpoint with `force=true`, proves Qdrant point counts recover, and SQL shows `0` active chunks in pending/failed/unindexed status.
 - [x] `docker-compose ... ps` output during this gate shows the cell services are pulled-image services, not local build services.
 
 ## Proof Snapshot
@@ -31,4 +31,17 @@ VECTOR_STORE_ID=vs_a4a1a34865624dfb99970c39
 repair_response={"action": "reindex_chunks", "details": {}, "ok": true, "processed": 0}
 0|0|0|0|4500|4500
 Qdrant chaos repair complete.
+```
+
+Wave 008 tightened the repair proof after the original Gate 2 run. Current
+`qdrant-chaos-repair.py` output must include a non-zero repair response and
+Qdrant count recovery similar to:
+
+```text
+selected_qdrant_points=75 collections=["svs_biz_dev_openai_text_embedding_3_small_1536"]
+qdrant_counts_before_delete={"svs_biz_dev_openai_text_embedding_3_small_1536": 160}
+qdrant_counts_after_delete={"svs_biz_dev_openai_text_embedding_3_small_1536": 85}
+repair_response={"action": "reindex_chunks", "details": {}, "ok": true, "processed": 75}
+qdrant_counts_after_repair={"svs_biz_dev_openai_text_embedding_3_small_1536": 160}
+0|0|0|0|160|160
 ```
