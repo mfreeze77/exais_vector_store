@@ -81,20 +81,33 @@ class RetrievalService:
         sparse_weight = float(profile.get("sparse_weight", 1.0))
         fused = reciprocal_rank_fusion([dense, sparse], int(profile.get("rrf_k", 60)), [dense_weight, sparse_weight])
         fused = fused[: int(profile.get("fused_top_k", max(req.top_k * 2, 20)))]
-        chunks = self._hydrate_and_acl(db, principal, fused, max(req.top_k, int(profile.get("context_top_k", req.top_k))))
+        chunks = self._hydrate_and_acl(db, principal, fused, max(req.top_k, int(profile.get("context_top_k", req.top_k))), filters)
         audit_id = self._audit(db, principal, req, [c.id for c in chunks])
         return SearchResponse(query=req.query, results=chunks[:req.top_k], audit_event_id=audit_id, retrieval_profile_id=profile_id)
 
     def _embedding_profiles_for_search(self, db: Session, scope, req: SearchRequest, filters: dict) -> list[str]:
         params = {"tenant_id": scope.tenant_id, "biz_id": scope.business_instance_id, "max_lvl": scope.max_security_level}
         extra = []
+        join_file_attrs = ""
+        file_attrs = filters.get("file_attribute_filters") or {}
+        if file_attrs:
+            join_file_attrs = """
+            JOIN vector_store_files vsf
+              ON vsf.document_id=c.document_id
+             AND vsf.vector_store_id=c.vector_store_id
+             AND vsf.tenant_id=c.tenant_id
+             AND vsf.business_instance_id=c.business_instance_id
+            """
+            extra.append("AND vsf.attributes @> CAST(:file_attr_filter AS jsonb)")
+            params["file_attr_filter"] = jsonb_param(file_attrs)
         for key, col in (("vector_store_id", "c.vector_store_id"), ("knowledge_base_id", "c.knowledge_base_id"), ("document_id", "c.document_id"), ("classification", "c.classification"), ("acl_bucket", "c.acl_bucket")):
             if filters.get(key):
                 extra.append(f"AND {col}=:{key}")
                 params[key] = filters[key]
-        rows = db.execute(text(f"""
+        rows = db.execute(jsonb_text(f"""
             SELECT e.embedding_profile_id, count(*) AS chunk_count
             FROM chunks c
+            {join_file_attrs}
             JOIN embeddings e
               ON e.chunk_id=c.id
              AND e.tenant_id=c.tenant_id
@@ -106,7 +119,7 @@ class RetrievalService:
             GROUP BY e.embedding_profile_id
             ORDER BY chunk_count DESC, e.embedding_profile_id
             LIMIT 8
-        """), params).mappings().all()
+        """, "file_attr_filter"), params).mappings().all()
         profile_ids = [r["embedding_profile_id"] for r in rows if r["embedding_profile_id"]]
         return profile_ids or [resolve_embedding_profile(req.mode or "markdown_docs_v1", scope.max_security_level)]
 
@@ -143,35 +156,65 @@ class RetrievalService:
         """Small-cell sparse retrieval fallback using Postgres generated tsvector."""
         params = {"tenant_id": scope.tenant_id, "biz_id": scope.business_instance_id, "max_lvl": scope.max_security_level, "query": query, "limit": limit}
         extra = []
-        for key, col in (("vector_store_id", "vector_store_id"), ("knowledge_base_id", "knowledge_base_id"), ("document_id", "document_id"), ("classification", "classification"), ("acl_bucket", "acl_bucket")):
+        join_file_attrs = ""
+        file_attrs = filters.get("file_attribute_filters") or {}
+        if file_attrs:
+            join_file_attrs = """
+            JOIN vector_store_files vsf
+              ON vsf.document_id=c.document_id
+             AND vsf.vector_store_id=c.vector_store_id
+             AND vsf.tenant_id=c.tenant_id
+             AND vsf.business_instance_id=c.business_instance_id
+            """
+            extra.append("AND vsf.attributes @> CAST(:file_attr_filter AS jsonb)")
+            params["file_attr_filter"] = jsonb_param(file_attrs)
+        for key, col in (("vector_store_id", "c.vector_store_id"), ("knowledge_base_id", "c.knowledge_base_id"), ("document_id", "c.document_id"), ("classification", "c.classification"), ("acl_bucket", "c.acl_bucket")):
             if filters.get(key):
                 extra.append(f"AND {col}=:{key}")
                 params[key] = filters[key]
-        rows = db.execute(text(f"""
-            SELECT id, document_id, document_version_id,
+        rows = db.execute(jsonb_text(f"""
+            SELECT c.id, c.document_id, c.document_version_id,
                    ts_rank_cd(search_vector, plainto_tsquery('english', :query)) AS score
-            FROM chunks
-            WHERE tenant_id=:tenant_id AND business_instance_id=:biz_id AND active=true
-              AND security_level <= :max_lvl
-              AND search_vector @@ plainto_tsquery('english', :query)
+            FROM chunks c
+            {join_file_attrs}
+            WHERE c.tenant_id=:tenant_id AND c.business_instance_id=:biz_id AND c.active=true
+              AND c.security_level <= :max_lvl
+              AND c.search_vector @@ plainto_tsquery('english', :query)
               {' '.join(extra)}
-            ORDER BY score DESC, created_at DESC
+            ORDER BY score DESC, c.created_at DESC
             LIMIT :limit
-        """), params).mappings().all()
+        """, "file_attr_filter"), params).mappings().all()
         return [{"id": r["id"], "score": float(r["score"] or 0), "payload": {"chunk_id": r["id"], "document_id": r["document_id"], "document_version_id": r["document_version_id"]}} for r in rows]
 
-    def _hydrate_and_acl(self, db: Session, principal: Principal, fused: list[dict], limit: int) -> list[ChunkRecord]:
+    def _hydrate_and_acl(self, db: Session, principal: Principal, fused: list[dict], limit: int, filters: dict | None = None) -> list[ChunkRecord]:
         scope = build_retrieval_scope(principal)
         ids = [x.get("payload", {}).get("chunk_id") or x["id"] for x in fused if x.get("payload")]
         if not ids:
             return []
-        rows = db.execute(text("""
-            SELECT id, document_id, document_version_id, ordinal, text, heading_path, page_start, page_end,
-                   metadata, security_level, classification, allowed_groups, allowed_roles
-            FROM chunks
-            WHERE id = ANY(:ids) AND tenant_id=:tenant_id AND business_instance_id=:biz_id
-              AND active=true AND security_level <= :max_lvl
-        """), {"ids": ids, "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "max_lvl": principal.max_security_level}).mappings().all()
+        filters = filters or {}
+        params = {"ids": ids, "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "max_lvl": principal.max_security_level}
+        join_file_attrs = ""
+        extra = ""
+        file_attrs = filters.get("file_attribute_filters") or {}
+        if file_attrs:
+            join_file_attrs = """
+            JOIN vector_store_files vsf
+              ON vsf.document_id=c.document_id
+             AND vsf.vector_store_id=c.vector_store_id
+             AND vsf.tenant_id=c.tenant_id
+             AND vsf.business_instance_id=c.business_instance_id
+            """
+            extra = "AND vsf.attributes @> CAST(:file_attr_filter AS jsonb)"
+            params["file_attr_filter"] = jsonb_param(file_attrs)
+        rows = db.execute(jsonb_text(f"""
+            SELECT c.id, c.document_id, c.document_version_id, c.ordinal, c.text, c.heading_path, c.page_start, c.page_end,
+                   c.metadata, c.security_level, c.classification, c.allowed_groups, c.allowed_roles
+            FROM chunks c
+            {join_file_attrs}
+            WHERE c.id = ANY(:ids) AND c.tenant_id=:tenant_id AND c.business_instance_id=:biz_id
+              AND c.active=true AND c.security_level <= :max_lvl
+              {extra}
+        """, "file_attr_filter"), params).mappings().all()
         score_map = {x.get("payload", {}).get("chunk_id") or x["id"]: x.get("score", 0.0) for x in fused}
         by_id = {}
         for r in rows:
@@ -196,7 +239,7 @@ class RetrievalService:
               :resource_id, :lvl, :query_hash, CAST(:metadata AS jsonb))
         """, 'metadata'), {"id": aud, "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "user_id": principal.user_id, "api_key_id": principal.api_key_id,
               "resource_id": req.vector_store_id, "lvl": principal.max_security_level, "query_hash": query_hash(req.query),
-              "metadata": jsonb_param({"top_k": req.top_k, "result_ids": result_ids})})
+              "metadata": jsonb_param({"top_k": req.top_k, "result_ids": result_ids, **(req.search_metadata or {})})})
         db.execute(jsonb_text("""
             INSERT INTO usage_events(id, tenant_id, business_instance_id, user_id, event_type, quantity, unit, metadata)
             VALUES (:id, :tenant_id, :biz_id, :user_id, 'retrieval.query', 1, 'query', CAST(:metadata AS jsonb))

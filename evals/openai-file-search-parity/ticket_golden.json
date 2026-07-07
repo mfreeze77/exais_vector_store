@@ -1,0 +1,46 @@
+{
+  "cases": [
+    {
+      "name": "runpod_marker_warmup_ticket",
+      "file": "tickets/WAVE-010-runpod-marker-pdf-ingestion.md",
+      "title": "WAVE-010 RunPod Marker PDF Ingestion",
+      "attributes": {
+        "topic": "runpod_marker",
+        "document_type": "ticket",
+        "source": "tickets"
+      },
+      "queries": [
+        {
+          "query": "Can you find RunPod Marker warmup retry and PDF ingestion proof?",
+          "rewrite_query": true,
+          "filters": {"type": "eq", "key": "topic", "value": "runpod_marker"},
+          "ranking_options": {"ranker": "auto", "score_threshold": 0.0},
+          "max_num_results": 5,
+          "min_results": 1,
+          "must_contain": ["RunPod", "Marker"]
+        }
+      ]
+    },
+    {
+      "name": "real_embedding_provider_ticket",
+      "file": "tickets/WAVE-011-real-embedding-provider-gate.md",
+      "title": "WAVE-011 Real Embedding Provider Gate",
+      "attributes": {
+        "topic": "real_embeddings",
+        "document_type": "ticket",
+        "source": "tickets"
+      },
+      "queries": [
+        {
+          "query": "What ticket proved real embeddings instead of hash mock fallback?",
+          "rewrite_query": true,
+          "filters": {"type": "eq", "key": "topic", "value": "real_embeddings"},
+          "ranking_options": {"ranker": "auto", "score_threshold": 0.0},
+          "max_num_results": 5,
+          "min_results": 1,
+          "must_contain": ["embedding", "hash_mock"]
+        }
+      ]
+    }
+  ]
+}

@@ -104,7 +104,42 @@ POST   /v1/vector_stores/{vector_store_id}/files
 POST   /v1/vector_stores/{vector_store_id}/search
 ```
 
-The API contract intentionally mimics OpenAI vector-store behavior where useful, but the source of truth remains SVS Postgres + Qdrant + OpenSearch + object storage.
+The API contract intentionally mimics OpenAI vector-store behavior where useful,
+but the source of truth remains SVS Postgres + Qdrant + OpenSearch + object
+storage.
+
+OpenAI-compatible search request:
+
+```json
+{
+  "query": "What did the Marker RunPod warmup ticket decide?",
+  "max_num_results": 10,
+  "filters": {"type": "eq", "key": "classification", "value": "tenant_private"},
+  "ranking_options": {"ranker": "auto"},
+  "include_content": true,
+  "include_metadata": true
+}
+```
+
+Current compatibility guardrails:
+
+- `max_num_results` maps to internal `top_k` and must be 1..50.
+- `top_k` is accepted as a deprecated ExAIS alias on this route for existing
+  local ops scripts.
+- Supported filter keys are `document_id`, `knowledge_base_id`,
+  `classification`, `acl_bucket`, and safe file attributes.
+- `rewrite_query=true` enables deterministic ExAIS query planning and returns
+  the effective query in `search_query`.
+- `ranking_options.score_threshold` filters normalized 0..1 compatibility
+  scores.
+- Unknown request fields, sensitive file-attribute filters, unsupported
+  comparison operators, and `or` filters return 422.
+
+Run the ticket-fixture parity harness against a live cell:
+
+```bash
+python scripts/release/openai-file-search-parity-eval.py --cell local
+```
 
 ## Examples
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from enum import IntEnum
 from typing import Any, Literal
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 class SecurityLevel(IntEnum):
     PUBLIC = 0
@@ -119,12 +119,36 @@ class SearchRequest(BaseModel):
     top_k: int = 10
     include_content: bool = True
     include_metadata: bool = True
+    search_metadata: dict[str, Any] = Field(default_factory=dict)
 
 class SearchResponse(BaseModel):
     query: str
     results: list[ChunkRecord]
     audit_event_id: str | None = None
     retrieval_profile_id: str | None = None
+
+class OpenAIVectorStoreRankingOptions(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    ranker: Literal['none', 'auto', 'default-2024-11-15'] = 'auto'
+    score_threshold: float | None = Field(default=None, ge=0, le=1)
+
+class OpenAIVectorStoreSearchRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    query: str
+    filters: dict[str, Any] | None = None
+    # Historical ExAIS planning docs used attribute_filter. Keep it as a
+    # compatibility alias while preferring OpenAI's filters field.
+    attribute_filter: dict[str, Any] | None = None
+    max_num_results: int = Field(default=10, ge=1, le=50)
+    top_k: int | None = Field(default=None, ge=1, le=50)
+    ranking_options: OpenAIVectorStoreRankingOptions | None = None
+    rewrite_query: bool = False
+    retrieval_profile_id: str | None = None
+    mode: str | None = None
+    include_content: bool = True
+    include_metadata: bool = True
 
 class ContextPackRequest(SearchRequest):
     max_context_tokens: int = 6000

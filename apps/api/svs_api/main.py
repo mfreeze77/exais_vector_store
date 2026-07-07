@@ -12,8 +12,16 @@ from svs_common.security import principal_from_dev_headers
 from svs_common.schemas import (
     Principal, VectorStoreCreateRequest, SearchRequest, ContextPackRequest, DocumentIngestRequest,
     VectorStoreResponse, IngestionPreviewRequest, ModelEndpointRequest, ModelEndpointResponse,
-    BakeoffRunRequest, ReindexRequest,
+    BakeoffRunRequest, ReindexRequest, OpenAIVectorStoreSearchRequest,
 )
+from svs_common.openai_compat import (
+    apply_openai_ranking_options,
+    merge_chunk_results,
+    OpenAICompatError,
+    openai_search_options_to_search_request_kwargs,
+    vector_store_search_results_page,
+)
+from svs_common.query_planner import plan_query
 from svs_common.vector_store_repo import VectorStoreRepository
 from svs_common.ingestion import IngestionService
 from svs_common.retrieval import RetrievalService
@@ -513,15 +521,57 @@ async def attach_file(vector_store_id: str, req: DocumentIngestRequest, principa
 
 
 @app.post('/v1/vector_stores/{vector_store_id}/search')
-async def vector_store_search(vector_store_id: str, req: SearchRequest, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
+async def vector_store_search(vector_store_id: str, req: OpenAIVectorStoreSearchRequest, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'retrieval:read')
-    req.vector_store_id = vector_store_id
-    result = await retrieval.search(db, principal, req)
+    try:
+        search_kwargs = openai_search_options_to_search_request_kwargs(req)
+    except OpenAICompatError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    query_plan = plan_query(req.query, rewrite_query=req.rewrite_query)
+    filters = dict(search_kwargs.pop('filters') or {})
+    filters['vector_store_id'] = vector_store_id
+    search_kwargs.pop('query', None)
+    metadata = dict(search_kwargs.pop('search_metadata') or {})
+    compat_meta = dict(metadata.get('openai_compat') or {})
+    compat_meta.update({
+        'effective_query': query_plan.effective_query,
+        'subqueries': query_plan.subqueries,
+        'rewritten': query_plan.rewritten,
+    })
+    metadata['openai_compat'] = compat_meta
+    result_lists = []
+    for subquery in query_plan.subqueries:
+        result = await retrieval.search(db, principal, SearchRequest(vector_store_id=vector_store_id, filters=filters, query=subquery, search_metadata=metadata, **search_kwargs))
+        result_lists.append(result.results)
+    chunks = merge_chunk_results(result_lists, req.top_k or req.max_num_results)
+    chunks = apply_openai_ranking_options(req, chunks)
+    file_lookup = _vector_store_file_lookup(db, principal, vector_store_id, [ch.document_id for ch in chunks])
     db.commit()
-    return {'object': 'vector_store.search_results.page', 'search_query': req.query, 'data': [
-        {'file_id': ch.document_id, 'score': ch.score, 'attributes': ch.metadata, 'content': [{'type': 'text', 'text': ch.text}] if req.include_content else []}
-        for ch in result.results
-    ]}
+    return vector_store_search_results_page(req, chunks, file_lookup, search_query=query_plan.effective_query)
+
+
+def _vector_store_file_lookup(db: Session, principal: Principal, vector_store_id: str, document_ids: list[str]) -> dict[str, dict[str, Any]]:
+    ids = sorted({doc_id for doc_id in document_ids if doc_id})
+    if not ids:
+        return {}
+    rows = db.execute(text('''
+        SELECT f.document_id, f.id AS file_id, d.filename, f.attributes
+        FROM vector_store_files f
+        JOIN documents d
+          ON d.id=f.document_id
+         AND d.tenant_id=f.tenant_id
+         AND d.business_instance_id=f.business_instance_id
+        WHERE f.tenant_id=:tenant_id AND f.business_instance_id=:biz_id
+          AND f.vector_store_id=:vs_id AND f.document_id = ANY(:document_ids)
+    '''), {'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id, 'vs_id': vector_store_id, 'document_ids': ids}).mappings().all()
+    return {
+        r['document_id']: {
+            'file_id': r['file_id'],
+            'filename': r['filename'],
+            'attributes': dict(r['attributes'] or {}),
+        }
+        for r in rows
+    }
 
 
 @app.get('/v1/vector_stores/{vector_store_id}/files')

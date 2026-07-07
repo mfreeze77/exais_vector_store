@@ -14,6 +14,7 @@ from .qdrant_adapter import QdrantAdapter
 from .opensearch_adapter import OpenSearchAdapter
 from .object_store import ObjectStore
 from .index_cleanup import enqueue_purge_stale_vectors
+from .openai_compat import file_attribute_payload, safe_file_attributes
 
 
 def embedding_profile_config(embedding_profile_id: str, registry: dict | None = None) -> dict:
@@ -214,6 +215,8 @@ class IngestionService:
         collection = self.qdrant.collection_name(principal.business_instance_id, embedding_profile_id)
         os_index = self.opensearch.index_name(principal.business_instance_id)
         acl_bucket = sha256_text("|".join(sorted(req.allowed_groups + req.allowed_roles)) or "default")[:16]
+        file_attrs = safe_file_attributes(req.attributes)
+        file_attr_payload = file_attribute_payload(req.attributes)
         points: list[dict] = []
         sparse_docs: list[tuple[str, dict]] = []
         chunk_ids: list[str] = []
@@ -253,7 +256,8 @@ class IngestionService:
                        "knowledge_base_id": req.knowledge_base_id, "vector_store_id": req.vector_store_id,
                        "document_id": doc_id, "document_version_id": docv_id, "chunk_id": chunk_id,
                        "security_level": req.security_level, "classification": req.classification,
-                       "acl_bucket": acl_bucket, "active": True, "embedding_profile_id": embedding_profile_id}
+                       "acl_bucket": acl_bucket, "active": True, "embedding_profile_id": embedding_profile_id,
+                       "file_attributes": file_attrs, **file_attr_payload}
             points.append({"id": qdrant_point_id, "vector": e.embedding, "payload": payload})
             sparse_docs.append((chunk_id, {**payload, "text": c.text, "heading_path": c.heading_path}))
 

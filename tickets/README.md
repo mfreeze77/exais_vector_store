@@ -21,6 +21,7 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-011 Real Embedding Provider Gate](./WAVE-011-real-embedding-provider-gate.md)
 - [WAVE-012 Vector Store Delete RLS Soft-Delete](./WAVE-012-vector-store-delete-rls-soft-delete.md)
 - [WAVE-013 Real Embedding Scale Repair Regate](./WAVE-013-real-embedding-scale-repair-regate.md)
+- [WAVE-014 OpenAI File Search Parity](./WAVE-014-openai-file-search-parity.md)
 
 ## Execution Model
 

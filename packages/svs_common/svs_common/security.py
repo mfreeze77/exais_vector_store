@@ -1,5 +1,6 @@
 from __future__ import annotations
 from fastapi import Header, HTTPException, status
+from .openai_compat import file_attribute_payload_key
 from .config import get_settings
 from .schemas import Principal, RetrievalScope, ChunkRecord
 
@@ -70,4 +71,6 @@ def build_qdrant_filter(scope: RetrievalScope, filters: dict | None = None) -> d
     for key in ["knowledge_base_id", "vector_store_id", "document_id", "classification", "acl_bucket"]:
         if filters.get(key):
             must.append({"key": key, "match": {"value": filters[key]}})
+    for key, value in (filters.get("file_attribute_filters") or {}).items():
+        must.append({"key": file_attribute_payload_key(key), "match": {"value": value}})
     return {"must": must}

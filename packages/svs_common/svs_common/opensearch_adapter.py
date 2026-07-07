@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any
 from .config import get_settings
+from .openai_compat import file_attribute_payload_key
 from .qdrant_adapter import IndexBackendUnavailable, IndexOperationError
 
 class OpenSearchAdapter:
@@ -41,6 +42,9 @@ class OpenSearchAdapter:
             self.client.indices.create(index=index, body={
                 "settings": {"index": {"number_of_shards": 1, "number_of_replicas": 0}},
                 "mappings": {
+                    "dynamic_templates": [
+                        {"file_attributes": {"match": "file_attr_*", "mapping": {"type": "keyword"}}}
+                    ],
                     "properties": {
                         "tenant_id": {"type": "keyword"},
                         "business_instance_id": {"type": "keyword"},
@@ -111,6 +115,8 @@ class OpenSearchAdapter:
         for key in ("vector_store_id", "knowledge_base_id", "document_id", "classification", "acl_bucket"):
             if scope_filter.get(key):
                 body["query"]["bool"]["filter"].append({"term": {key: scope_filter[key]}})
+        for key, value in (scope_filter.get("file_attribute_filters") or {}).items():
+            body["query"]["bool"]["filter"].append({"term": {file_attribute_payload_key(key): value}})
         try:
             hits = self.client.search(index=index, body=body).get("hits", {}).get("hits", [])
             return [{"id": h["_id"], "score": float(h.get("_score") or 0), "payload": h.get("_source", {})} for h in hits]

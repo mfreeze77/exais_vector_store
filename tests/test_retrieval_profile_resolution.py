@@ -47,6 +47,26 @@ def test_search_embedding_profile_comes_from_indexed_vector_store_chunks():
     assert db.params["max_lvl"] == 5
 
 
+def test_search_embedding_profile_filters_by_file_attributes():
+    service = RetrievalService.__new__(RetrievalService)
+    db = _Db([{"embedding_profile_id": "openai_text_embedding_3_small_1536"}])
+    principal = Principal(tenant_id="tenant", business_instance_id="biz-dev", max_security_level=5)
+    scope = build_retrieval_scope(principal)
+    req = SearchRequest(query="proof", vector_store_id="vs_scale", mode="markdown_docs_v1")
+
+    profiles = service._embedding_profiles_for_search(
+        db,
+        scope,
+        req,
+        {"vector_store_id": "vs_scale", "file_attribute_filters": {"region": "us"}},
+    )
+
+    assert profiles == ["openai_text_embedding_3_small_1536"]
+    assert "JOIN vector_store_files vsf" in db.sql
+    assert "vsf.attributes @> CAST(:file_attr_filter AS jsonb)" in db.sql
+    assert db.params["file_attr_filter"] == '{"region":"us"}'
+
+
 class _Provider:
     def __init__(self, provider="openai"):
         self.provider = provider
