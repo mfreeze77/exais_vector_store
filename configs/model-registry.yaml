@@ -21,6 +21,15 @@ models:
     model: voyage-context-3
     dimensions: 1024
     privacy: external_api
+    status: deprecated_contextual_endpoint_only
+    replacement: voyage_4_docs_1024
+
+  voyage_4_docs_1024:
+    provider: voyage
+    kind: embedding
+    model: voyage-4
+    dimensions: 1024
+    privacy: external_api
 
   voyage_code_3_or_qwen3_code_v1:
     provider: routing_alias

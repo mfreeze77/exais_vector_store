@@ -26,7 +26,7 @@ async def embeddings(req: EmbeddingRequest):
     provider_name = req.provider or profile.get("provider") or settings.default_embedding_provider
     model = req.model or profile.get("model") or settings.openai_embedding_model
     dimensions = req.dimensions or int(profile.get("dimensions", settings.openai_embedding_dimensions))
-    return await provider_for(provider_name).embed(texts, model, dimensions)
+    return await provider_for(provider_name).embed(texts, model, dimensions, input_type=req.input_type)
 
 @app.post("/internal/models/rerank", response_model=RerankResponse)
 async def rerank(req: RerankRequest):

@@ -1,10 +1,11 @@
 from __future__ import annotations
 from functools import lru_cache
+import os
 from pathlib import Path
 from typing import Any
 import yaml
 
-CONFIG_DIR = Path("/app/configs") if Path("/app/configs").exists() else Path("configs")
+CONFIG_DIR = Path(os.getenv("SVS_CONFIG_DIR") or ("configs" if Path("configs").exists() else "/app/configs"))
 
 def _load(path: Path) -> dict[str, Any]:
     if not path.exists():

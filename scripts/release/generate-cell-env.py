@@ -5,6 +5,44 @@ from pathlib import Path
 
 from release_common import DEFAULT_CELL, DEFAULT_REGISTRY_PREFIX, env_file, project_name, release_dir, version
 
+OPERATOR_IMPORT_KEYS = {
+    "DEFAULT_EMBEDDING_PROVIDER",
+    "OPENAI_API_KEY",
+    "OPENAI_EMBEDDING_MODEL",
+    "OPENAI_EMBEDDING_DIMENSIONS",
+    "TEI_ENDPOINT_URL",
+    "INFINITY_ENDPOINT_URL",
+    "RUNPOD_EMBEDDING_ENDPOINT_URL",
+    "RUNPOD_API_KEY",
+    "RUNPOD_ENDPOINT_ID",
+    "MARKER_RUNPOD_API_KEY",
+    "MARKER_RUNPOD_ENDPOINT_ID",
+    "MARKER_MODE",
+    "MARKER_TIMEOUT_SEC",
+    "MARKER_POLL_INTERVAL_SEC",
+    "MARKER_MAX_ATTEMPTS",
+    "MARKER_RETRY_BACKOFF_SEC",
+    "VOYAGE_API_KEY",
+    "COHERE_API_KEY",
+    "JINA_API_KEY",
+}
+
+
+def read_source_env(path: Path) -> dict[str, str]:
+    values: dict[str, str] = {}
+    if not path.exists():
+        raise FileNotFoundError(f"source env file not found: {path}")
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        value = value.strip()
+        if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
+            value = value[1:-1]
+        values[key.strip()] = value
+    return values
+
 
 def build_env(cell: str, registry_prefix: str, api_port: int) -> dict[str, str]:
     cell_env = env_file(cell).resolve().as_posix()
@@ -98,6 +136,15 @@ def build_env(cell: str, registry_prefix: str, api_port: int) -> dict[str, str]:
     }
 
 
+def import_operator_values(values: dict[str, str], source_values: dict[str, str]) -> list[str]:
+    imported: list[str] = []
+    for key in sorted(OPERATOR_IMPORT_KEYS):
+        if source_values.get(key):
+            values[key] = source_values[key]
+            imported.append(key)
+    return imported
+
+
 def write_env(path: Path, values: dict[str, str]) -> None:
     lines = [
         "# Generated local-cell env. Do not commit this file.",
@@ -115,14 +162,26 @@ def main() -> None:
     parser.add_argument("--cell", default=DEFAULT_CELL)
     parser.add_argument("--registry-prefix", default=DEFAULT_REGISTRY_PREFIX)
     parser.add_argument("--api-port", type=int, default=18080)
+    parser.add_argument(
+        "--source-env",
+        type=Path,
+        help="Optional operator env file whose provider/Marker secret values are copied into the generated cell env. Values are never printed.",
+    )
     args = parser.parse_args()
     values = build_env(args.cell, args.registry_prefix, args.api_port)
+    imported: list[str] = []
+    if args.source_env:
+        imported = import_operator_values(values, read_source_env(args.source_env))
     target = env_file(args.cell)
     write_env(target, values)
     print(f"Generated env file: {target}")
     print("Variable names written:")
     for key in sorted(values):
         print(f"- {key}")
+    if args.source_env:
+        print("Variable names imported from source env:")
+        for key in imported:
+            print(f"- {key}")
     print("No values printed.")
     print(f"Release directory: {release_dir(args.cell)}")
 

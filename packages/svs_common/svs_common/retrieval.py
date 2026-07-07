@@ -7,6 +7,7 @@ from .db import jsonb_param
 from .schemas import SearchRequest, SearchResponse, ChunkRecord, ContextPackRequest, ContextPackResponse, ContextCitation, Principal
 from .security import build_retrieval_scope, build_qdrant_filter, chunk_allowed_by_scope
 from .providers import provider_for
+from .providers import ProviderConfigurationError
 from .model_registry import resolve_embedding_profile, retrieval_profiles, model_registry
 from .qdrant_adapter import QdrantAdapter
 from .opensearch_adapter import OpenSearchAdapter
@@ -42,9 +43,11 @@ class RetrievalService:
         dense_lists = []
         registry = model_registry().get("models", {})
         for embedding_profile_id in self._embedding_profiles_for_search(db, scope, req, filters):
-            emb_profile = registry.get(embedding_profile_id, {})
+            emb_profile = registry.get(embedding_profile_id)
+            if not emb_profile:
+                raise ProviderConfigurationError(f"Unknown embedding profile: {embedding_profile_id}")
             provider = provider_for(emb_profile.get("provider", "hash_mock"))
-            emb = await provider.embed([req.query], emb_profile.get("model", "deterministic-dev-hash"), int(emb_profile.get("dimensions", 1536)))
+            emb = await provider.embed([req.query], emb_profile.get("model", "deterministic-dev-hash"), int(emb_profile.get("dimensions", 1536)), input_type="query")
             dense_lists.append(self.qdrant.search(
                 self.qdrant.collection_name(scope.business_instance_id, embedding_profile_id),
                 emb.data[0].embedding,

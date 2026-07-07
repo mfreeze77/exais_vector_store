@@ -154,6 +154,7 @@ class EmbeddingRequest(BaseModel):
     dimensions: int | None = None
     security_level: int = 1
     provider: str | None = None
+    input_type: Literal['query', 'document'] | None = None
 
 class EmbeddingData(BaseModel):
     object: str = 'embedding'
@@ -219,6 +220,8 @@ class ModelCandidate(BaseModel):
     model: str | None = None
     dimensions: int | None = None
     privacy: str = 'unknown'
+    configured: bool = True
+    required_env: list[str] = Field(default_factory=list)
     score: float = 0.0
     allowed: bool = True
     reasons: list[str] = Field(default_factory=list)

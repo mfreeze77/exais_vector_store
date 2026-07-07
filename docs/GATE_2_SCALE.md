@@ -4,15 +4,27 @@ This gate runs only after Gate 1 proves the cell boots from pulled registry
 images. All commands must use `infra/docker/compose.cell.yml`; source-build
 compose files do not count.
 
-- [x] `python scripts/release/seed-scale.py --cell local --documents 10000 --headings-per-doc 8` submits 10,000 documents through the queued file-batch path and uses real Qdrant.
-- [x] SQL output shows `0` `ingestion_jobs` in terminal `failed` status.
-- [x] SQL output shows active chunks `>= 80000`.
-- [x] SQL output shows active chunks with `dense_index_status='indexed'` and `sparse_index_status='indexed'` `>= 80000`.
-- [x] `python scripts/release/search-bench.py --cell local --vector-store-id <id> --queries 200 --p95-ms 500` prints p50/p95, has `0` errors, and has p95 `< 500ms`.
-- [x] `python scripts/release/qdrant-chaos-repair.py --cell local --documents 500` kills Qdrant during queued ingest, restarts it, deletes a bounded set of real Qdrant points, runs the reindex repair endpoint with `force=true`, proves Qdrant point counts recover, and SQL shows `0` active chunks in pending/failed/unindexed status.
+- [ ] `python scripts/release/seed-scale.py --cell local --documents 10000 --headings-per-doc 8` submits 10,000 documents through the queued file-batch path and uses real Qdrant with a real configured embedding provider.
+- [ ] SQL output shows `0` `ingestion_jobs` in terminal `failed` status.
+- [ ] SQL output shows active chunks `>= 80000`.
+- [ ] SQL output shows active chunks with `dense_index_status='indexed'` and `sparse_index_status='indexed'` `>= 80000`.
+- [ ] SQL output proves no active real embedding profile is backed by `hash_mock`.
+- [ ] `python scripts/release/search-bench.py --cell local --vector-store-id <id> --queries 200 --p95-ms 500` prints p50/p95, has `0` errors, and has p95 `< 500ms`.
+- [ ] `python scripts/release/qdrant-chaos-repair.py --cell local --documents 500` kills Qdrant during queued ingest, restarts it, deletes a bounded set of real Qdrant points, runs the reindex repair endpoint with `force=true`, proves Qdrant point counts recover, and SQL shows `0` active chunks in pending/failed/unindexed status.
 - [x] `docker-compose ... ps` output during this gate shows the cell services are pulled-image services, not local build services.
 
+## Current Status
+
+WAVE-011 invalidated the original semantic scale proof because the old scale,
+repair, and PDF proof vector stores were backed by `hash_mock` while carrying
+real embedding profile IDs. Those contaminated active chunks were quarantined
+and stale Qdrant points were deleted. Gate 2 must be rerun after WAVE-011 with
+the configured real provider path.
+
 ## Proof Snapshot
+
+The following snapshot is retained as historical queue/Qdrant operations proof
+only. It is not semantic embedding proof after WAVE-011.
 
 ```text
 VECTOR_STORE_ID=vs_221e9fa2ae704898912b1bd5

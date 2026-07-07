@@ -9,11 +9,27 @@ from .hashing import sha256_text
 from .chunking import choose_chunker
 from .model_registry import resolve_vectorization_profile, model_registry
 from .vectorization_router import build_ingestion_plan
-from .providers import provider_for
+from .providers import ProviderConfigurationError, provider_for
 from .qdrant_adapter import QdrantAdapter
 from .opensearch_adapter import OpenSearchAdapter
 from .object_store import ObjectStore
 from .index_cleanup import enqueue_purge_stale_vectors
+
+
+def embedding_profile_config(embedding_profile_id: str, registry: dict | None = None) -> dict:
+    profiles = registry if registry is not None else model_registry().get("models", {})
+    profile = profiles.get(embedding_profile_id)
+    if not profile:
+        raise ProviderConfigurationError(f"Unknown embedding profile: {embedding_profile_id}")
+    return profile
+
+
+def validate_embedding_provider_response(embedding_profile_id: str, expected_provider: str, actual_provider: str) -> None:
+    if expected_provider != "hash_mock" and actual_provider == "hash_mock":
+        raise ProviderConfigurationError(
+            f"Embedding profile {embedding_profile_id} returned hash_mock vectors for real provider {expected_provider}"
+        )
+
 
 class IngestionService:
     def __init__(self):
@@ -120,9 +136,10 @@ class IngestionService:
         mode_id, mode = resolve_vectorization_profile(req.filename, req.mime_type, req.mode, req.attributes)
         embedding_profile_id = plan.embedding_profile_id
         registry = model_registry().get("models", {})
-        emb_profile = registry.get(embedding_profile_id) or registry.get("openai_text_embedding_3_small_1536") or registry.get("hash_mock_1536") or {}
+        emb_profile = embedding_profile_config(embedding_profile_id, registry)
         dimensions = int(emb_profile.get("dimensions", 1536))
-        provider = provider_for(emb_profile.get("provider", "hash_mock"))
+        expected_provider = emb_profile.get("provider", "hash_mock")
+        provider = provider_for(expected_provider)
         model_name = emb_profile.get("model", "deterministic-dev-hash")
 
         version_target = self._find_version_target(db, principal, req, content_hash)
@@ -192,7 +209,8 @@ class IngestionService:
         parsed_chunks = choose_chunker(mode_id)(req.content)
         if not parsed_chunks:
             raise ValueError("No chunks produced from document content")
-        embeddings = await provider.embed([c.text for c in parsed_chunks], model_name, dimensions)
+        embeddings = await provider.embed([c.text for c in parsed_chunks], model_name, dimensions, input_type="document")
+        validate_embedding_provider_response(embedding_profile_id, expected_provider, embeddings.provider)
         collection = self.qdrant.collection_name(principal.business_instance_id, embedding_profile_id)
         os_index = self.opensearch.index_name(principal.business_instance_id)
         acl_bucket = sha256_text("|".join(sorted(req.allowed_groups + req.allowed_roles)) or "default")[:16]

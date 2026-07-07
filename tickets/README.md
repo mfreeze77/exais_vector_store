@@ -18,6 +18,8 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-008 Operations Bug Hardening](./WAVE-008-operations-bug-hardening.md)
 - [WAVE-009 Local Restore And Ops Preflight](./WAVE-009-local-restore-and-ops-preflight.md)
 - [WAVE-010 RunPod Marker PDF Ingestion](./WAVE-010-runpod-marker-pdf-ingestion.md)
+- [WAVE-011 Real Embedding Provider Gate](./WAVE-011-real-embedding-provider-gate.md)
+- [WAVE-012 Vector Store Delete RLS Soft-Delete](./WAVE-012-vector-store-delete-rls-soft-delete.md)
 
 ## Execution Model
 

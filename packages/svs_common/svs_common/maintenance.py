@@ -7,7 +7,7 @@ from .sql import jsonb_text
 from .db import jsonb_param
 
 from .schemas import MaintenanceResult, Principal, ReindexRequest
-from .providers import provider_for
+from .providers import ProviderConfigurationError, provider_for
 from .model_registry import model_registry
 from .qdrant_adapter import QdrantAdapter
 from .opensearch_adapter import OpenSearchAdapter
@@ -177,11 +177,13 @@ class MaintenanceService:
             by_profile.setdefault(r['embedding_profile_id'], []).append(r)
         processed = 0
         for profile_id, group in by_profile.items():
-            profile = model_registry().get('models', {}).get(profile_id, {})
+            profile = model_registry().get('models', {}).get(profile_id)
+            if not profile:
+                raise ProviderConfigurationError(f"Unknown embedding profile: {profile_id}")
             provider = provider_for(profile.get('provider', 'hash_mock'))
             model = profile.get('model') or group[0]['model_name']
             dimensions = int(profile.get('dimensions') or group[0]['dimensions'])
-            emb = await provider.embed([r['text'] for r in group], model, dimensions)
+            emb = await provider.embed([r['text'] for r in group], model, dimensions, input_type="document")
             collection = self.qdrant.collection_name(principal.business_instance_id, profile_id)
             points = []
             for r, e in zip(group, emb.data):

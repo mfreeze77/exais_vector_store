@@ -98,6 +98,10 @@ class VectorStoreRepository:
             WHERE id=:id AND tenant_id=:tenant_id AND business_instance_id=:biz_id
         '''), {'id': vector_store_id, 'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id})
         if result.rowcount:
+            # Chunk soft-delete is a tenant-scoped maintenance mutation. The RLS
+            # policy allows this only under the transaction-local system worker
+            # flag, while still requiring the tenant/business context.
+            db.execute(text("SELECT set_config('svs.system_worker', 'true', true)"))
             db.execute(text('''
                 UPDATE chunks
                 SET active=false, deleted_at=now(), dense_index_status='delete_queued', sparse_index_status='delete_queued'

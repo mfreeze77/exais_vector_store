@@ -6,7 +6,9 @@ from .sql import jsonb_text
 from .db import jsonb_param
 from .chunking import estimate_tokens, choose_chunker
 from .ids import new_id
+from .config import get_settings
 from .model_registry import resolve_vectorization_profile, vectorization_modes, model_registry, resolve_embedding_profile
+from .providers import provider_config_status
 from .schemas import DocumentIngestRequest, IngestionPlanResponse, ModelCandidate, Principal
 
 @dataclass
@@ -23,6 +25,17 @@ def _privacy_allowed(privacy: str, security_level: int, policy: RouterPolicy) ->
         return False, f'external provider denied above security level {policy.deny_external_above_security_level}'
     return True, None
 
+def _settings_is_local(settings) -> bool:
+    prop = getattr(settings, "is_local_env", None)
+    if isinstance(prop, bool):
+        return prop
+    env = str(getattr(settings, "svs_env", "local") or "").strip().lower()
+    return env in {"local", "dev", "development", "test", "testing", "ci"}
+
+def _mock_embedding_allowed(settings) -> bool:
+    default_provider = str(getattr(settings, "default_embedding_provider", "") or "").strip().lower()
+    return _settings_is_local(settings) and default_provider == "hash_mock"
+
 def _expand_profile_candidates(profile_id: str, registry: dict) -> list[str]:
     profiles = registry.get('models', {})
     seen: list[str] = []
@@ -37,7 +50,8 @@ def _expand_profile_candidates(profile_id: str, registry: dict) -> list[str]:
         add(profile_id)
     return seen
 
-def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest) -> IngestionPlanResponse:
+def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest, settings=None) -> IngestionPlanResponse:
+    settings = settings or get_settings()
     mode_id, mode = resolve_vectorization_profile(req.filename, req.mime_type, req.mode, req.attributes)
     registry = model_registry()
     policy_cfg = registry.get('policies', {})
@@ -60,6 +74,7 @@ def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest) -> In
         provider = p.get('provider', 'hash_mock')
         privacy = p.get('privacy', 'unknown')
         allowed, reason = _privacy_allowed(privacy, req.security_level, policy)
+        provider_status = provider_config_status(provider, settings)
         score = 100.0 - (idx * 7.5)
         reasons = []
         if candidate_id == preferred:
@@ -71,6 +86,15 @@ def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest) -> In
         if provider == 'hash_mock':
             reasons.append('development fallback only')
             score -= 30
+            if not _mock_embedding_allowed(settings):
+                allowed = False
+                reasons.append('hash_mock allowed only when local DEFAULT_EMBEDDING_PROVIDER=hash_mock')
+                score -= 100
+        if not provider_status.configured:
+            allowed = False
+            if provider_status.reason:
+                reasons.append(provider_status.reason)
+            score -= 100
         if not allowed and reason:
             reasons.append(reason)
             score -= 100
@@ -80,12 +104,15 @@ def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest) -> In
             model=p.get('model'),
             dimensions=p.get('dimensions'),
             privacy=privacy,
+            configured=provider_status.configured,
+            required_env=list(provider_status.required_env),
             score=round(score, 3),
             allowed=allowed,
             reasons=reasons,
         ))
     candidates.sort(key=lambda c: (c.allowed, c.score), reverse=True)
-    chosen = next((c.model_profile_id for c in candidates if c.allowed), policy.fallback_dev_embedding_profile)
+    chosen_candidate = next((c for c in candidates if c.allowed), None)
+    chosen = chosen_candidate.model_profile_id if chosen_candidate else preferred
     chunker = choose_chunker(mode_id)
     sample_chunks = chunker(req.content)
     warnings = []
@@ -95,6 +122,8 @@ def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest) -> In
         warnings.append('raw PDF JSON ingestion is not implemented; use multipart upload with RunPod Marker or pdf_markdown_external_v1')
     if req.security_level >= 4 and chosen == policy.fallback_dev_embedding_profile:
         warnings.append('high-security content fell back to dev model; configure private RunPod/TEI endpoint')
+    if not chosen_candidate:
+        warnings.append('no configured embedding provider candidate is allowed; ingestion will fail until provider env is configured')
     return IngestionPlanResponse(
         mode=mode_id,
         parser=mode.get('parser') or ','.join(mode.get('parser_candidates', [])) or None,
