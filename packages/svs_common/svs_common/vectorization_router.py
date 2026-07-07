@@ -92,7 +92,7 @@ def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest) -> In
     if mode.get('status') == 'research':
         warnings.append(f'mode {mode_id} is research; use external parser/bakeoff before production')
     if mode_id == 'raw_pdf_research_v1':
-        warnings.append('raw PDF parsing is not implemented; use pdf_markdown_external_v1 for current production PDFs')
+        warnings.append('raw PDF JSON ingestion is not implemented; use multipart upload with RunPod Marker or pdf_markdown_external_v1')
     if req.security_level >= 4 and chosen == policy.fallback_dev_embedding_profile:
         warnings.append('high-security content fell back to dev model; configure private RunPod/TEI endpoint')
     return IngestionPlanResponse(

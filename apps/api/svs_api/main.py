@@ -25,6 +25,17 @@ from svs_common.vectorization_router import build_ingestion_plan, persist_ingest
 from svs_common.maintenance import MaintenanceService
 from svs_common.bakeoff import BakeoffService
 from svs_common.index_cleanup import enqueue_purge_stale_vectors
+from svs_common.marker_client import (
+    MarkerRunpodClient,
+    MarkerRunpodError,
+    extract_markdown,
+    is_marker_pdf_upload,
+    markdown_filename_for_pdf,
+    marker_attribute_summary,
+    pdf_source_id,
+    sanitize_stem,
+)
+from svs_common.object_store import ObjectStore, ObjectStoreError
 
 settings = get_settings()
 settings.validate_runtime_guards()
@@ -75,6 +86,69 @@ def should_enqueue_ingest(req: DocumentIngestRequest) -> bool:
     if req.attributes.get('force_async') is True:
         return True
     return raw_len > settings.svs_ingest_inline_max_bytes
+
+
+def _source_pdf_object_key(principal: Principal, filename: str | None, pdf_bytes: bytes) -> str:
+    safe_name = f"{sanitize_stem(filename, 'uploaded-pdf')}.pdf"
+    return (
+        f"tenants/{principal.tenant_id}/business/{principal.business_instance_id}/"
+        f"source-pdfs/{pdf_source_id(pdf_bytes)}/{safe_name}"
+    )
+
+
+async def marker_pdf_upload_request(
+    *,
+    file: UploadFile,
+    content_bytes: bytes,
+    title: str | None,
+    mode: str,
+    vector_store_id: str | None,
+    knowledge_base_id: str | None,
+    security_level: int,
+    principal: Principal,
+) -> DocumentIngestRequest:
+    job_ids: list[str] = []
+    try:
+        output = await MarkerRunpodClient().process_pdf_bytes(
+            filename=file.filename or 'uploaded.pdf',
+            pdf_bytes=content_bytes,
+            job_id_callback=job_ids.append,
+        )
+    except MarkerRunpodError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    if output is None:
+        raise HTTPException(status_code=502, detail='Marker RunPod PDF conversion failed')
+    try:
+        markdown = extract_markdown(output)
+    except MarkerRunpodError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    source_key = _source_pdf_object_key(principal, file.filename, content_bytes)
+    try:
+        ObjectStore().put_bytes(source_key, content_bytes, file.content_type or 'application/pdf')
+    except ObjectStoreError as exc:
+        raise HTTPException(status_code=503, detail='Source PDF object-store write failed') from exc
+
+    attrs = marker_attribute_summary(
+        original_filename=file.filename,
+        pdf_bytes=content_bytes,
+        output=output,
+        job_id=job_ids[-1] if job_ids else None,
+        source_object_key=source_key,
+    )
+    return DocumentIngestRequest(
+        vector_store_id=vector_store_id,
+        knowledge_base_id=knowledge_base_id,
+        title=title or file.filename or 'uploaded PDF',
+        filename=markdown_filename_for_pdf(file.filename),
+        mime_type='text/markdown',
+        content=markdown,
+        mode='pdf_markdown_external_v1',
+        source_uri=f'object://{source_key}',
+        attributes=attrs,
+        security_level=security_level,
+        source_trust='external_pdf_parser',
+    )
 
 
 async def ingest_or_enqueue(req: DocumentIngestRequest, principal: Principal, db: Session):
@@ -183,8 +257,20 @@ async def upload_document(file: UploadFile = File(...), title: str | None = Form
     content_bytes = await file.read()
     if len(content_bytes) > settings.svs_request_body_limit_bytes:
         raise HTTPException(status_code=413, detail='Uploaded document exceeds configured body limit')
-    content = content_bytes.decode('utf-8', errors='replace')
-    req = DocumentIngestRequest(vector_store_id=vector_store_id, knowledge_base_id=knowledge_base_id, title=title or file.filename or 'uploaded document', filename=file.filename, mime_type=file.content_type, content=content, mode=mode, security_level=security_level)
+    if is_marker_pdf_upload(file.filename, file.content_type, mode):
+        req = await marker_pdf_upload_request(
+            file=file,
+            content_bytes=content_bytes,
+            title=title,
+            mode=mode,
+            vector_store_id=vector_store_id,
+            knowledge_base_id=knowledge_base_id,
+            security_level=security_level,
+            principal=principal,
+        )
+    else:
+        content = content_bytes.decode('utf-8', errors='replace')
+        req = DocumentIngestRequest(vector_store_id=vector_store_id, knowledge_base_id=knowledge_base_id, title=title or file.filename or 'uploaded document', filename=file.filename, mime_type=file.content_type, content=content, mode=mode, security_level=security_level)
     return await ingest_or_enqueue(req, principal, db)
 
 

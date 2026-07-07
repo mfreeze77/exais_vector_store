@@ -88,7 +88,7 @@ def pdf_markdown_external_chunks(md: str, max_tokens: int = 900, overlap_tokens:
     chunks = markdown_heading_chunks(md, max_tokens=max_tokens, overlap_tokens=overlap_tokens)
     current_page = None
     for ch in chunks:
-        marker = re.search(r'(?:<!--\s*page[:=]\s*(\d+)\s*-->|^\s*Page\s+(\d+)\s*$)', ch.text, re.I | re.M)
+        marker = re.search(r'(?:<!--\s*page[:=]\s*(\d+)\s*-->|^\s*Page\s+(\d+)\b)', ch.text, re.I | re.M)
         if marker:
             current_page = int(marker.group(1) or marker.group(2))
         ch.page_start = current_page

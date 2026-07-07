@@ -30,6 +30,9 @@ class ObjectStore:
 
     def put_text(self, key: str, text: str, content_type: str = 'text/plain') -> str:
         body = text.encode('utf-8')
+        return self.put_bytes(key, body, content_type)
+
+    def put_bytes(self, key: str, body: bytes, content_type: str = 'application/octet-stream') -> str:
         if self.client:
             try:
                 self.client.put_object(Bucket=self.settings.s3_bucket, Key=key, Body=body, ContentType=content_type)

@@ -71,6 +71,14 @@ class Settings(BaseSettings):
     infinity_endpoint_url: str | None = None
     runpod_embedding_endpoint_url: str | None = None
     runpod_api_key: str | None = None
+    runpod_endpoint_id: str | None = None
+    marker_runpod_api_key: str | None = None
+    marker_runpod_endpoint_id: str | None = None
+    marker_mode: str = 'remote'
+    marker_timeout_sec: int = 1800
+    marker_poll_interval_sec: int = 3
+    marker_max_attempts: int = 2
+    marker_retry_backoff_sec: int = 5
     voyage_api_key: str | None = None
     cohere_api_key: str | None = None
     jina_api_key: str | None = None

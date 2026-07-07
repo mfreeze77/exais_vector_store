@@ -56,6 +56,13 @@ Core body:
 }
 ```
 
+`POST /api/v1/documents/upload` accepts raw PDFs only when the external RunPod
+Marker parser is configured. PDF uploads with `mode=auto_detect_v1`,
+`mode=raw_pdf_research_v1`, or `mode=pdf_markdown_external_v1` are submitted to
+RunPod Marker and converted to a `pdf_markdown_external_v1` document before
+chunking/indexing. ExAIS stores the original PDF as a source artifact and stores
+only secret-safe parser metadata in document attributes.
+
 ## Retrieval
 
 ```http
