@@ -1,0 +1,39 @@
+apiVersion: svs/v1
+kind: Instance
+metadata:
+  instanceId: inst_expert_ai_services_prod
+  slug: expert-ai-services-prod
+  environment: production
+  ownerTenantId: ten_expert_ai_services
+  businessInstanceId: biz_expert_ai_services_main
+  labels: {customer_tier: business_small, isolation: business_micro_cell, region: fsn1}
+product:
+  version: 0.9.5-production-candidate
+  releaseChannel: stable
+runtime:
+  deploymentMode: shared_micro_cell
+  composeProjectName: svs_expert_ai_services_prod
+  domains: {api: api.expertaiservices.com, admin: admin.expertaiservices.com}
+storage:
+  postgres: {database: svs_inst_expert_ai_services_prod}
+  qdrant: {collectionPrefix: expert_ai_services_prod_}
+  opensearch: {indexPrefix: expert_ai_services_prod_}
+  object: {bucket: exai-vector-store-prod, prefix: instances/expert-ai-services-prod/}
+security:
+  maxSecurityLevel: 3
+  requirePreRetrievalFilter: true
+  requirePostRetrievalAclCheck: true
+  requireCitations: true
+  externalProvidersDeniedAboveSecurityLevel: 3
+retrieval:
+  defaultProfile: hybrid_rrf_secure_v2
+models:
+  allowedProviders: [openai, voyage, runpod_serverless, hash_mock]
+  preferredEmbeddingProfiles:
+    markdown_docs_v1: openai_text_embedding_3_small_1536
+    pdf_markdown_external_v1: voyage_context_3_docs_default
+    code_repo_v1: voyage_code_3_or_qwen3_code_v1
+backups:
+  schedule: daily
+  retentionDays: 30
+  requireRestoreDrillDays: 30

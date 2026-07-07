@@ -1,0 +1,22 @@
+{
+  "index_patterns": ["svs_chunks_*"],
+  "template": {
+    "settings": {"number_of_shards": 1, "number_of_replicas": 0},
+    "mappings": {
+      "properties": {
+        "tenant_id": {"type": "keyword"},
+        "business_instance_id": {"type": "keyword"},
+        "knowledge_base_id": {"type": "keyword"},
+        "vector_store_id": {"type": "keyword"},
+        "document_id": {"type": "keyword"},
+        "chunk_id": {"type": "keyword"},
+        "security_level": {"type": "integer"},
+        "classification": {"type": "keyword"},
+        "acl_bucket": {"type": "keyword"},
+        "active": {"type": "boolean"},
+        "heading_path": {"type": "keyword"},
+        "text": {"type": "text"}
+      }
+    }
+  }
+}

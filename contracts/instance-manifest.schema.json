@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "exai_vector_store Instance Manifest",
+  "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "product"],
+  "properties": {
+    "apiVersion": {"const": "svs/v1"},
+    "kind": {"const": "Instance"},
+    "metadata": {
+      "type": "object",
+      "required": ["instanceId", "businessInstanceId"],
+      "properties": {
+        "instanceId": {"type": "string"},
+        "tenantId": {"type": "string"},
+        "businessInstanceId": {"type": "string"},
+        "name": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "product": {"type": "object", "required": ["version"], "properties": {"version": {"type": "string"}}, "additionalProperties": true},
+    "runtime": {"type": "object", "additionalProperties": true},
+    "storage": {"type": "object", "additionalProperties": true},
+    "security": {"type": "object", "additionalProperties": true},
+    "retrieval": {"type": "object", "additionalProperties": true},
+    "models": {"type": "object", "additionalProperties": true},
+    "backups": {"type": "object", "additionalProperties": true}
+  },
+  "additionalProperties": false
+}

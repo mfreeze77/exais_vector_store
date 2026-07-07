@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "exai_vector_store Vectorization Mode",
+  "type": "object",
+  "required": ["parser", "chunker", "embedding_profile", "retrieval_profile"],
+  "properties": {
+    "parser": {"type": "string"},
+    "chunker": {"type": "string"},
+    "tokenizer": {"type": "string"},
+    "embedding_profile": {"type": "string"},
+    "sparse_profile": {"type": "string"},
+    "reranker_profile": {"type": "string"},
+    "retrieval_profile": {"type": "string"},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}

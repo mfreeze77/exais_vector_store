@@ -1,0 +1,7 @@
+levels:
+  0: {label: public, shared_index_allowed: true, external_api_allowed: true}
+  1: {label: tenant_private, shared_index_allowed: false, external_api_allowed: true}
+  2: {label: team_restricted, shared_index_allowed: false, external_api_allowed: true}
+  3: {label: confidential, shared_index_allowed: false, external_api_allowed: conditional, require_output_guard: true}
+  4: {label: regulated_sensitive, shared_index_allowed: false, external_api_allowed: false, require_private_model_backend: true, require_dedicated_storage_bucket: true}
+  5: {label: isolated_high_risk, shared_index_allowed: false, external_api_allowed: false, require_dedicated_data_plane: true, require_break_glass_audit: true}

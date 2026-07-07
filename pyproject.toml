@@ -1,0 +1,19 @@
+[project]
+name = "exai_vector_store"
+version = "0.9.8"
+requires-python = ">=3.12"
+description = "Expert AI Services self-hosted multi-tenant vector store production candidate"
+authors = [{name = "Expert AI Services", email = "mfrieson@expertaiservices.com"}]
+maintainers = [{name = "Expert AI Services", email = "mfrieson@expertaiservices.com"}]
+
+[project.urls]
+Homepage = "https://expertaiservices.com"
+
+[tool.exai.branding]
+project = "exai_vector_store"
+domain = "expertaiservices.com"
+builder = "mfrieson@expertaiservices.com"
+
+[tool.pytest.ini_options]
+pythonpath = ["packages/svs_common", "apps/api", "apps/worker", "apps/model_gateway", "apps/instance_agent"]
+testpaths = ["tests"]

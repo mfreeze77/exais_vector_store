@@ -1,0 +1,14 @@
+# Render per micro-production instance. Use pinned images, not latest.
+services:
+  api:
+    image: ${SVS_REGISTRY_PREFIX:-docker.io/expertaiservices}/exai-vector-store-api:${SVS_VERSION}
+    env_file: ${SVS_CELL_ENV_FILE:-.env.instance}
+    restart: unless-stopped
+  worker:
+    image: ${SVS_REGISTRY_PREFIX:-docker.io/expertaiservices}/exai-vector-store-worker:${SVS_VERSION}
+    env_file: ${SVS_CELL_ENV_FILE:-.env.instance}
+    restart: unless-stopped
+  model-gateway:
+    image: ${SVS_REGISTRY_PREFIX:-docker.io/expertaiservices}/exai-vector-store-model-gateway:${SVS_VERSION}
+    env_file: ${SVS_CELL_ENV_FILE:-.env.instance}
+    restart: unless-stopped

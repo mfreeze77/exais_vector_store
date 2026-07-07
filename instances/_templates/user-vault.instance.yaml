@@ -1,0 +1,26 @@
+apiVersion: svs/v1
+kind: Instance
+metadata:
+  instanceId: inst_mfrieson_vault_prod
+  slug: mfrieson-vault-prod
+  environment: production
+  ownerTenantId: ten_expert_ai_services
+  businessInstanceId: biz_mfrieson_vault
+  labels: {customer_tier: personal_vault, isolation: user_micro_cell}
+product:
+  version: 0.9.5-production-candidate
+  releaseChannel: stable
+runtime:
+  deploymentMode: shared_micro_cell
+  composeProjectName: svs_mfrieson_vault_prod
+security:
+  maxSecurityLevel: 4
+  requirePrivateModelBackendAbove: 4
+  requirePostRetrievalAclCheck: true
+retrieval:
+  defaultProfile: hybrid_rrf_secure_v2
+models:
+  allowedProviders: [openai, runpod_serverless, hash_mock]
+backups:
+  schedule: daily
+  retentionDays: 14

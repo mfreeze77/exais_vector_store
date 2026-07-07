@@ -1,0 +1,14 @@
+[Unit]
+Description=exai_vector_store Instance Agent
+After=docker.service
+Requires=docker.service
+
+[Service]
+WorkingDirectory=/opt/svs
+EnvironmentFile=/opt/svs/.env
+ExecStart=/usr/bin/docker compose --profile agent up instance-agent
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

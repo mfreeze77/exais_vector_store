@@ -1,0 +1,113 @@
+modes:
+  markdown_docs_v1:
+    label: Markdown docs
+    description: Heading-aware Markdown ingestion for docs, wikis, policies, notes.
+    parser: markdown_ast_v1
+    normalizer: markdown_semantic_clean_v1
+    tokenizer: provider_model_token_counter_v1
+    chunker: markdown_heading_hierarchy_v2
+    metadata_extractor: markdown_frontmatter_links_headings_v1
+    embedding_profile: openai_text_embedding_3_small_1536
+    sparse_profile: opensearch_bm25_docs_v1
+    reranker_profile: optional_voyage_or_qwen_reranker_v1
+    retrieval_profile: hybrid_rrf_secure_v2
+    eval_profile: docs_qa_retrieval_v1
+    default_security_level: 1
+    status: production
+
+  pdf_markdown_external_v1:
+    label: Large PDF already converted to Markdown
+    description: Consumes trusted PDF-to-Markdown output from your external pipeline. PDF extraction is stubbed.
+    parser: trusted_pdf_markdown_bundle_v1
+    normalizer: pdf_markdown_cleanup_v1
+    tokenizer: provider_model_token_counter_v1
+    chunker: markdown_heading_page_hybrid_v1
+    metadata_extractor: pdf_markdown_page_heading_citation_v1
+    embedding_profile: voyage_context_3_docs_default
+    sparse_profile: opensearch_bm25_pdf_markdown_v1
+    reranker_profile: qwen3_reranker_or_voyage_rerank_v1
+    retrieval_profile: hybrid_contextual_pdf_v1
+    eval_profile: pdf_qa_citation_v1
+    default_security_level: 2
+    status: external_pipeline_ready
+
+  raw_pdf_research_v1:
+    label: Raw PDF / OCR research mode
+    description: Experimental native PDF/OCR flow for scanned or visually complex PDFs.
+    parser_candidates: [user_external_pdf_to_md_v1, mistral_ocr_v3, docling_vlm_v1, marker_v1, pymupdf4llm_v1]
+    embedding_candidates: [jina_embeddings_v4_multimodal, cohere_embed_v4_multimodal, voyage_multimodal_3_5, text_embedding_3_large_text_only_after_md]
+    chunker: page_heading_visual_region_hybrid_v1
+    retrieval_profile: hybrid_multimodal_pdf_v1
+    eval_profile: visually_rich_pdf_retrieval_v1
+    default_security_level: 3
+    status: research
+
+  code_repo_v1:
+    label: Code repository
+    description: Symbol-aware indexing for functions, classes, routes, configs, tests, and errors.
+    parser: tree_sitter_symbol_graph_v1
+    normalizer: code_language_preserve_v1
+    tokenizer: model_specific_code_counter_v1
+    chunker: code_symbol_dependency_chunker_v2
+    metadata_extractor: git_repo_symbol_metadata_v1
+    embedding_profile: voyage_code_3_or_qwen3_code_v1
+    sparse_profile: opensearch_code_bm25_ngram_v1
+    reranker_profile: qwen3_reranker_code_v1
+    retrieval_profile: hybrid_code_symbol_rrf_v2
+    eval_profile: code_search_v1
+    default_security_level: 2
+    status: production_lite
+
+  tables_csv_json_v1:
+    label: Tables / CSV / JSON
+    description: Row/object-aware embeddings with schema summaries and exact lookup indexes.
+    parser: structured_record_parser_v1
+    normalizer: schema_value_summary_v1
+    tokenizer: provider_model_token_counter_v1
+    chunker: record_group_schema_chunker_v1
+    metadata_extractor: structured_schema_metadata_v1
+    embedding_profile: openai_text_embedding_3_small_1536
+    sparse_profile: opensearch_structured_keyword_v1
+    reranker_profile: lightweight_cross_encoder_v1
+    retrieval_profile: structured_hybrid_filter_first_v1
+    eval_profile: structured_lookup_v1
+    default_security_level: 2
+    status: production_lite
+
+  logs_errors_v1:
+    label: Logs / errors / stack traces
+    description: Exact-first retrieval for stack traces, error codes, service names, and event patterns.
+    parser: log_event_parser_v1
+    normalizer: stacktrace_preserve_v1
+    tokenizer: provider_model_token_counter_v1
+    chunker: event_window_chunker_v1
+    metadata_extractor: service_env_timestamp_metadata_v1
+    embedding_profile: bge_m3_or_openai_small_v1
+    sparse_profile: opensearch_logs_exact_ngram_v1
+    reranker_profile: disabled_by_default
+    retrieval_profile: sparse_first_then_semantic_v1
+    eval_profile: incident_lookup_v1
+    default_security_level: 3
+    status: production_lite
+
+  mixed_multimodal_v1:
+    label: Mixed multimodal document
+    description: Text, tables, charts, figures, screenshots, and visual layout.
+    parser: multimodal_document_parser_v1
+    normalizer: text_image_table_interleave_v1
+    tokenizer: multimodal_provider_counter_v1
+    chunker: visual_region_semantic_chunker_v1
+    embedding_profile: jina_or_cohere_multimodal_v1
+    sparse_profile: opensearch_multimodal_captions_v1
+    reranker_profile: multimodal_reranker_v1
+    retrieval_profile: hybrid_multimodal_secure_v1
+    eval_profile: multimodal_qa_citation_v1
+    default_security_level: 3
+    status: research
+
+  auto_detect_v1:
+    label: Auto detect
+    router: auto_detect_content_mode_v1
+    fallback_mode: markdown_docs_v1
+    default_security_level: 2
+    status: production_lite

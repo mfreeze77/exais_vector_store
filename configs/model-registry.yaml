@@ -1,0 +1,93 @@
+models:
+  openai_text_embedding_3_small_1536:
+    provider: openai
+    kind: embedding
+    model: text-embedding-3-small
+    dimensions: 1536
+    max_input_tokens: 8191
+    privacy: external_api
+
+  openai_text_embedding_3_large_3072:
+    provider: openai
+    kind: embedding
+    model: text-embedding-3-large
+    dimensions: 3072
+    max_input_tokens: 8191
+    privacy: external_api
+
+  voyage_context_3_docs_default:
+    provider: voyage
+    kind: embedding
+    model: voyage-context-3
+    dimensions: 1024
+    privacy: external_api
+
+  voyage_code_3_or_qwen3_code_v1:
+    provider: routing_alias
+    kind: embedding
+    candidates: [voyage_code_3, qwen3_embedding_local_4b, openai_text_embedding_3_large_3072]
+
+  voyage_code_3:
+    provider: voyage
+    kind: embedding
+    model: voyage-code-3
+    dimensions: 1024
+    privacy: external_api
+
+  jina_embeddings_v4_multimodal:
+    provider: jina
+    kind: embedding
+    model: jina-embeddings-v4
+    dimensions: 2048
+    privacy: external_api
+
+  cohere_embed_v4_multimodal:
+    provider: cohere
+    kind: embedding
+    model: embed-v4.0
+    dimensions: 1536
+    privacy: external_api
+
+  bge_m3_or_openai_small_v1:
+    provider: routing_alias
+    kind: embedding
+    candidates: [bge_m3_local, openai_text_embedding_3_small_1536]
+
+  jina_or_cohere_multimodal_v1:
+    provider: routing_alias
+    kind: embedding
+    candidates: [jina_embeddings_v4_multimodal, cohere_embed_v4_multimodal, openai_text_embedding_3_large_3072]
+
+  bge_m3_local:
+    provider: runpod_serverless_or_local
+    kind: embedding
+    model: BAAI/bge-m3
+    dimensions: 1024
+    privacy: private_gpu
+
+  qwen3_embedding_local_4b:
+    provider: runpod_serverless_or_local
+    kind: embedding
+    model: Qwen/Qwen3-Embedding-4B
+    dimensions: 2560
+    privacy: private_gpu
+
+  hash_mock_1536:
+    provider: hash_mock
+    kind: embedding
+    model: deterministic-dev-hash
+    dimensions: 1536
+    privacy: local_dev_only
+
+rerankers:
+  optional_voyage_or_qwen_reranker_v1:
+    candidates: [voyage_rerank_lite, qwen3_reranker_local, disabled]
+  disabled_by_default:
+    provider: disabled
+
+policies:
+  deny_external_above_security_level: 3
+  require_private_provider_above_security_level: 4
+  default_embedding_profile: openai_text_embedding_3_small_1536
+  fallback_private_embedding_profile: bge_m3_local
+  fallback_dev_embedding_profile: hash_mock_1536

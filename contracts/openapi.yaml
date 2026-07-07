@@ -1,0 +1,3531 @@
+openapi: 3.1.0
+info:
+  title: exai_vector_store API
+  version: 0.9.8-production-candidate
+paths:
+  /healthz:
+    get:
+      summary: Healthz
+      operationId: healthz_healthz_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /readyz:
+    get:
+      summary: Readyz
+      operationId: readyz_readyz_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /metrics:
+    get:
+      summary: Metrics
+      operationId: metrics_metrics_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+  /api/v1/vectorization/modes:
+    get:
+      summary: List Modes
+      operationId: list_modes_api_v1_vectorization_modes_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/models/registry:
+    get:
+      summary: List Models
+      operationId: list_models_api_v1_models_registry_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/retrieval/profiles:
+    get:
+      summary: List Profiles
+      operationId: list_profiles_api_v1_retrieval_profiles_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/ingestion/preview:
+    post:
+      summary: Ingestion Preview
+      operationId: ingestion_preview_api_v1_ingestion_preview_post
+      parameters:
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngestionPreviewRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/documents/ingest:
+    post:
+      summary: Ingest Document
+      operationId: ingest_document_api_v1_documents_ingest_post
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Idempotency-Key
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentIngestRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/documents/upload:
+    post:
+      summary: Upload Document
+      operationId: upload_document_api_v1_documents_upload_post
+      parameters:
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_upload_document_api_v1_documents_upload_post'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/jobs:
+    get:
+      summary: List Jobs
+      operationId: list_jobs_api_v1_jobs_get
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          title: Limit
+      - name: status
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/jobs/{job_id}:
+    get:
+      summary: Get Job
+      operationId: get_job_api_v1_jobs__job_id__get
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Job Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/jobs/{job_id}/retry:
+    post:
+      summary: Retry Job
+      operationId: retry_job_api_v1_jobs__job_id__retry_post
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Job Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/retrieval/search:
+    post:
+      summary: Search
+      operationId: search_api_v1_retrieval_search_post
+      parameters:
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/retrieval/context-pack:
+    post:
+      summary: Context Pack
+      operationId: context_pack_api_v1_retrieval_context_pack_post
+      parameters:
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContextPackRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/model-endpoints:
+    post:
+      summary: Create Model Endpoint
+      operationId: create_model_endpoint_api_v1_model_endpoints_post
+      parameters:
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelEndpointRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelEndpointResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: List Model Endpoints
+      operationId: list_model_endpoints_api_v1_model_endpoints_get
+      parameters:
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/model-endpoints/{endpoint_id}:
+    patch:
+      summary: Update Model Endpoint
+      operationId: update_model_endpoint_api_v1_model_endpoints__endpoint_id__patch
+      parameters:
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Endpoint Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Patch
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelEndpointResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/bakeoffs:
+    post:
+      summary: Create Bakeoff
+      operationId: create_bakeoff_api_v1_bakeoffs_post
+      parameters:
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BakeoffRunRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/bakeoffs/{run_id}:
+    get:
+      summary: Get Bakeoff
+      operationId: get_bakeoff_api_v1_bakeoffs__run_id__get
+      parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Run Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/maintenance/expire-vector-stores:
+    post:
+      summary: Expire Vector Stores
+      operationId: expire_vector_stores_api_v1_maintenance_expire_vector_stores_post
+      parameters:
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/maintenance/reindex:
+    post:
+      summary: Reindex
+      operationId: reindex_api_v1_maintenance_reindex_post
+      parameters:
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReindexRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/admin/usage:
+    get:
+      summary: Usage
+      operationId: usage_api_v1_admin_usage_get
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 100
+          title: Limit
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/admin/audit-events:
+    get:
+      summary: Audit Events
+      operationId: audit_events_api_v1_admin_audit_events_get
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 100
+          title: Limit
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/admin/tenants:
+    post:
+      summary: Create Tenant
+      operationId: create_tenant_api_v1_admin_tenants_post
+      parameters:
+      - name: name
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Name
+      - name: slug
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Slug
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/admin/api-keys:
+    post:
+      summary: Create Instance Api Key
+      operationId: create_instance_api_key_api_v1_admin_api_keys_post
+      parameters:
+      - name: label
+        in: query
+        required: false
+        schema:
+          type: string
+          default: default
+          title: Label
+      - name: scopes
+        in: query
+        required: false
+        schema:
+          type: string
+          default: retrieval:read,documents:write,vector_stores:write,vector_stores:read
+          title: Scopes
+      - name: max_security_level
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Max Security Level
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/vector_stores:
+    post:
+      summary: Create Vector Store
+      operationId: create_vector_store_v1_vector_stores_post
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Idempotency-Key
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VectorStoreCreateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VectorStoreResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: List Vector Stores
+      operationId: list_vector_stores_v1_vector_stores_get
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          title: Limit
+      - name: after
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: After
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/vector_stores/{vector_store_id}:
+    get:
+      summary: Get Vector Store
+      operationId: get_vector_store_v1_vector_stores__vector_store_id__get
+      parameters:
+      - name: vector_store_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vector Store Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      summary: Update Vector Store
+      operationId: update_vector_store_v1_vector_stores__vector_store_id__patch
+      parameters:
+      - name: vector_store_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vector Store Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Patch
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VectorStoreResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      summary: Delete Vector Store
+      operationId: delete_vector_store_v1_vector_stores__vector_store_id__delete
+      parameters:
+      - name: vector_store_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vector Store Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/vector_stores/{vector_store_id}/files:
+    post:
+      summary: Attach File
+      operationId: attach_file_v1_vector_stores__vector_store_id__files_post
+      parameters:
+      - name: vector_store_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vector Store Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentIngestRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: List Vector Store Files
+      operationId: list_vector_store_files_v1_vector_stores__vector_store_id__files_get
+      parameters:
+      - name: vector_store_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vector Store Id
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          title: Limit
+      - name: after
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: After
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/vector_stores/{vector_store_id}/search:
+    post:
+      summary: Vector Store Search
+      operationId: vector_store_search_v1_vector_stores__vector_store_id__search_post
+      parameters:
+      - name: vector_store_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vector Store Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/vector_stores/{vector_store_id}/files/{file_id}:
+    get:
+      summary: Get Vector Store File
+      operationId: get_vector_store_file_v1_vector_stores__vector_store_id__files__file_id__get
+      parameters:
+      - name: vector_store_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vector Store Id
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: File Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      summary: Update Vector Store File
+      operationId: update_vector_store_file_v1_vector_stores__vector_store_id__files__file_id__patch
+      parameters:
+      - name: vector_store_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vector Store Id
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: File Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Patch
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      summary: Delete Vector Store File
+      operationId: delete_vector_store_file_v1_vector_stores__vector_store_id__files__file_id__delete
+      parameters:
+      - name: vector_store_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vector Store Id
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: File Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/vector_stores/{vector_store_id}/files/{file_id}/content:
+    get:
+      summary: Get Vector Store File Content
+      operationId: get_vector_store_file_content_v1_vector_stores__vector_store_id__files__file_id__content_get
+      parameters:
+      - name: vector_store_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vector Store Id
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: File Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/vector_stores/{vector_store_id}/file_batches:
+    post:
+      summary: Create File Batch
+      operationId: create_file_batch_v1_vector_stores__vector_store_id__file_batches_post
+      parameters:
+      - name: vector_store_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vector Store Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Payload
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/vector_stores/{vector_store_id}/file_batches/{batch_id}:
+    get:
+      summary: Get File Batch
+      operationId: get_file_batch_v1_vector_stores__vector_store_id__file_batches__batch_id__get
+      parameters:
+      - name: vector_store_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vector Store Id
+      - name: batch_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Batch Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/vector_stores/{vector_store_id}/file_batches/{batch_id}/cancel:
+    post:
+      summary: Cancel File Batch
+      operationId: cancel_file_batch_v1_vector_stores__vector_store_id__file_batches__batch_id__cancel_post
+      parameters:
+      - name: vector_store_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vector Store Id
+      - name: batch_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Batch Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/vector_stores/{vector_store_id}/file_batches/{batch_id}/files:
+    get:
+      summary: List File Batch Files
+      operationId: list_file_batch_files_v1_vector_stores__vector_store_id__file_batches__batch_id__files_get
+      parameters:
+      - name: vector_store_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vector Store Id
+      - name: batch_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Batch Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: x-svs-tenant-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Tenant-Id
+      - name: x-svs-business-instance-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Business-Instance-Id
+      - name: x-svs-user-id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-User-Id
+      - name: x-svs-groups
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Groups
+      - name: x-svs-roles
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Svs-Roles
+      - name: x-svs-max-security-level
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: X-Svs-Max-Security-Level
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    BakeoffRunRequest:
+      properties:
+        name:
+          type: string
+          title: Name
+        mode:
+          type: string
+          title: Mode
+          default: markdown_docs_v1
+        model_profile_ids:
+          items:
+            type: string
+          type: array
+          title: Model Profile Ids
+        queries:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Queries
+        top_k:
+          type: integer
+          title: Top K
+          default: 10
+      type: object
+      required:
+      - name
+      - model_profile_ids
+      title: BakeoffRunRequest
+    Body_upload_document_api_v1_documents_upload_post:
+      properties:
+        file:
+          type: string
+          format: binary
+          title: File
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+        mode:
+          type: string
+          title: Mode
+          default: auto_detect_v1
+        vector_store_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Vector Store Id
+        knowledge_base_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Knowledge Base Id
+        security_level:
+          type: integer
+          title: Security Level
+          default: 1
+      type: object
+      required:
+      - file
+      title: Body_upload_document_api_v1_documents_upload_post
+    ContextPackRequest:
+      properties:
+        query:
+          type: string
+          title: Query
+        vector_store_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Vector Store Id
+        knowledge_base_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Knowledge Base Id
+        retrieval_profile_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Retrieval Profile Id
+        mode:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Mode
+        filters:
+          additionalProperties: true
+          type: object
+          title: Filters
+        top_k:
+          type: integer
+          title: Top K
+          default: 10
+        include_content:
+          type: boolean
+          title: Include Content
+          default: true
+        include_metadata:
+          type: boolean
+          title: Include Metadata
+          default: true
+        max_context_tokens:
+          type: integer
+          title: Max Context Tokens
+          default: 6000
+        require_citations:
+          type: boolean
+          title: Require Citations
+          default: true
+      type: object
+      required:
+      - query
+      title: ContextPackRequest
+    DocumentIngestRequest:
+      properties:
+        vector_store_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Vector Store Id
+        knowledge_base_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Knowledge Base Id
+        title:
+          type: string
+          title: Title
+        filename:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filename
+        mime_type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Mime Type
+        content:
+          type: string
+          title: Content
+        mode:
+          type: string
+          title: Mode
+          default: auto_detect_v1
+        source_uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source Uri
+        attributes:
+          additionalProperties: true
+          type: object
+          title: Attributes
+        security_level:
+          type: integer
+          title: Security Level
+          default: 1
+        classification:
+          type: string
+          title: Classification
+          default: tenant_private
+        allowed_groups:
+          items:
+            type: string
+          type: array
+          title: Allowed Groups
+        allowed_roles:
+          items:
+            type: string
+          type: array
+          title: Allowed Roles
+        source_trust:
+          type: string
+          title: Source Trust
+          default: user_upload
+      type: object
+      required:
+      - title
+      - content
+      title: DocumentIngestRequest
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    IngestionPreviewRequest:
+      properties:
+        vector_store_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Vector Store Id
+        knowledge_base_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Knowledge Base Id
+        title:
+          type: string
+          title: Title
+        filename:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filename
+        mime_type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Mime Type
+        content:
+          type: string
+          title: Content
+        mode:
+          type: string
+          title: Mode
+          default: auto_detect_v1
+        source_uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source Uri
+        attributes:
+          additionalProperties: true
+          type: object
+          title: Attributes
+        security_level:
+          type: integer
+          title: Security Level
+          default: 1
+        classification:
+          type: string
+          title: Classification
+          default: tenant_private
+        allowed_groups:
+          items:
+            type: string
+          type: array
+          title: Allowed Groups
+        allowed_roles:
+          items:
+            type: string
+          type: array
+          title: Allowed Roles
+        source_trust:
+          type: string
+          title: Source Trust
+          default: user_upload
+        persist:
+          type: boolean
+          title: Persist
+          default: true
+      type: object
+      required:
+      - title
+      - content
+      title: IngestionPreviewRequest
+    ModelEndpointRequest:
+      properties:
+        name:
+          type: string
+          title: Name
+        provider:
+          type: string
+          title: Provider
+        kind:
+          type: string
+          enum:
+          - embedding
+          - reranker
+          - tokenizer
+          - multimodal
+          title: Kind
+          default: embedding
+        base_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Base Url
+        model:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Model
+        dimensions:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Dimensions
+        privacy:
+          type: string
+          title: Privacy
+          default: external_api
+        security_max_level:
+          type: integer
+          title: Security Max Level
+          default: 3
+        status:
+          type: string
+          title: Status
+          default: active
+        config:
+          additionalProperties: true
+          type: object
+          title: Config
+      type: object
+      required:
+      - name
+      - provider
+      title: ModelEndpointRequest
+    ModelEndpointResponse:
+      properties:
+        name:
+          type: string
+          title: Name
+        provider:
+          type: string
+          title: Provider
+        kind:
+          type: string
+          enum:
+          - embedding
+          - reranker
+          - tokenizer
+          - multimodal
+          title: Kind
+          default: embedding
+        base_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Base Url
+        model:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Model
+        dimensions:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Dimensions
+        privacy:
+          type: string
+          title: Privacy
+          default: external_api
+        security_max_level:
+          type: integer
+          title: Security Max Level
+          default: 3
+        status:
+          type: string
+          title: Status
+          default: active
+        config:
+          additionalProperties: true
+          type: object
+          title: Config
+        id:
+          type: string
+          title: Id
+        created_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Updated At
+      type: object
+      required:
+      - name
+      - provider
+      - id
+      title: ModelEndpointResponse
+    ReindexRequest:
+      properties:
+        vector_store_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Vector Store Id
+        document_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Document Id
+        batch_size:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Batch Size
+        force:
+          type: boolean
+          title: Force
+          default: false
+      type: object
+      title: ReindexRequest
+    SearchRequest:
+      properties:
+        query:
+          type: string
+          title: Query
+        vector_store_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Vector Store Id
+        knowledge_base_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Knowledge Base Id
+        retrieval_profile_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Retrieval Profile Id
+        mode:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Mode
+        filters:
+          additionalProperties: true
+          type: object
+          title: Filters
+        top_k:
+          type: integer
+          title: Top K
+          default: 10
+        include_content:
+          type: boolean
+          title: Include Content
+          default: true
+        include_metadata:
+          type: boolean
+          title: Include Metadata
+          default: true
+      type: object
+      required:
+      - query
+      title: SearchRequest
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    VectorStoreCreateRequest:
+      properties:
+        name:
+          type: string
+          title: Name
+        knowledge_base_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Knowledge Base Id
+        attributes:
+          additionalProperties: true
+          type: object
+          title: Attributes
+        metadata:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Metadata
+        expires_after:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Expires After
+      type: object
+      required:
+      - name
+      title: VectorStoreCreateRequest
+    VectorStoreResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        object:
+          type: string
+          title: Object
+          default: vector_store
+        name:
+          type: string
+          title: Name
+        status:
+          type: string
+          title: Status
+          default: completed
+        usage_bytes:
+          type: integer
+          title: Usage Bytes
+          default: 0
+        attributes:
+          additionalProperties: true
+          type: object
+          title: Attributes
+        created_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Created At
+        expires_after:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Expires After
+        expires_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Expires At
+        last_active_at:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Last Active At
+      type: object
+      required:
+      - id
+      - name
+      title: VectorStoreResponse

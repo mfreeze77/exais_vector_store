@@ -1,0 +1,43 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --upgrade pip
+      - run: pip install -r apps/api/requirements.txt pytest
+      - run: PYTHONPATH=packages/svs_common:apps/api:apps/worker:apps/model_gateway:apps/instance_agent python -m compileall -f packages apps tests
+      - run: PYTHONPATH=packages/svs_common:apps/api:apps/worker:apps/model_gateway:apps/instance_agent pytest -q
+
+  postgres-rls-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --upgrade pip
+      - run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - run: pip install -r apps/api/requirements.txt pytest psycopg[binary]
+      - run: cp .env.example .env
+      - run: docker compose up -d postgres
+      - run: |
+          for i in {1..60}; do
+            if pg_isready -h localhost -p 5432 -U svs_owner -d svs; then exit 0; fi
+            sleep 2
+          done
+          docker compose logs postgres
+          exit 1
+      - run: |
+          PYTHONPATH=packages/svs_common:apps/api:apps/worker:apps/model_gateway:apps/instance_agent \
+          SVS_RUN_INTEGRATION=1 \
+          DATABASE_URL_MIGRATIONS=postgresql://svs_owner:svs_owner_dev_password@localhost:5432/svs \
+          DATABASE_URL=postgresql+psycopg://svs_app:svs_app_dev_password@localhost:5432/svs \
+          SVS_TEST_APP_DSN=postgresql://svs_app:svs_app_dev_password@localhost:5432/svs \
+          pytest -q tests/integration
+      - if: always()
+        run: docker compose logs postgres
+      - if: always()
+        run: docker compose down -v

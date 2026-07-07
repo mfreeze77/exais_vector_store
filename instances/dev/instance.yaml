@@ -1,0 +1,20 @@
+apiVersion: svs/v1
+kind: Instance
+metadata:
+  instanceId: inst_dev
+  slug: dev
+  environment: local
+  ownerTenantId: ten_dev
+  businessInstanceId: biz_dev
+product:
+  version: 0.9.5-production-candidate
+  releaseChannel: dev
+runtime:
+  deploymentMode: local
+  composeProjectName: svs_dev
+security:
+  maxSecurityLevel: 5
+retrieval:
+  defaultProfile: hybrid_rrf_secure_v2
+models:
+  allowedProviders: [hash_mock, openai, runpod_serverless]

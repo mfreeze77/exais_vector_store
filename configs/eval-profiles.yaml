@@ -1,0 +1,11 @@
+profiles:
+  docs_qa_retrieval_v1:
+    metrics: [recall_at_5, recall_at_10, mrr, ndcg_at_10, citation_hit_rate]
+    security_tests: [cross_tenant_leakage, security_level_violation]
+  pdf_qa_citation_v1:
+    metrics: [recall_at_10, page_citation_accuracy, answer_support_rate]
+    security_tests: [cross_tenant_leakage, confidential_quote_limit]
+  code_search_v1:
+    metrics: [symbol_hit_rate, exact_identifier_recall, recall_at_10]
+  incident_lookup_v1:
+    metrics: [exact_error_match_rate, service_filter_accuracy, recall_at_5]

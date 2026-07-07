@@ -1,0 +1,3 @@
+- hosts: svs_cells
+  become: true
+  roles: [base-hardening, docker-host, svs-cell, backup-agent]

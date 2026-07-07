@@ -1,0 +1,5 @@
+collections:
+  svs_default:
+    vectors: {size: 1536, distance: Cosine, on_disk: true}
+    hnsw_config: {m: 16, ef_construct: 128, on_disk: true}
+    payload_indexes: [tenant_id, business_instance_id, knowledge_base_id, vector_store_id, document_id, security_level, classification, acl_bucket, active, embedding_profile_id]
