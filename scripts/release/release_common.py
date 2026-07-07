@@ -45,6 +45,10 @@ def project_name(cell: str = DEFAULT_CELL) -> str:
     return f"exais-vector-store-{safe}"
 
 
+def compose_network_name(cell: str = DEFAULT_CELL) -> str:
+    return f"{project_name(cell)}_default"
+
+
 def normalize_registry_prefix(registry_prefix: str | None = None) -> str:
     return (registry_prefix or os.getenv("SVS_REGISTRY_PREFIX") or DEFAULT_REGISTRY_PREFIX).rstrip("/")
 

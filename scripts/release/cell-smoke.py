@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 
-from release_common import DEFAULT_CELL, api_base, compose_base, ensure_env, run
+from release_common import DEFAULT_CELL, api_base, compose_base, compose_network_name, ensure_env, run
 
 
 def main() -> None:
@@ -24,7 +24,7 @@ def main() -> None:
             "run",
             "--rm",
             "--network",
-            "exais-vector-store-local_default",
+            compose_network_name(args.cell),
             "curlimages/curl:8.10.1",
             "-fsS",
             "-w",

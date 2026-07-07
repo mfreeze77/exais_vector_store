@@ -12,6 +12,11 @@ import urllib.request
 DEFAULT_CELL = "local"
 
 
+def compose_network_name(cell: str) -> str:
+    safe = "".join(c if c.isalnum() else "-" for c in cell.lower()).strip("-") or DEFAULT_CELL
+    return f"exais-vector-store-{safe}_default"
+
+
 def post_json(url: str, payload: dict, timeout: int = 60) -> tuple[int, dict]:
     body = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(url, data=body, method="POST", headers={"Content-Type": "application/json"})
@@ -53,7 +58,7 @@ def main() -> None:
                 "--rm",
                 "-i",
                 "--network",
-                "exais-vector-store-local_default",
+                compose_network_name(args.cell),
                 "python:3.12-slim",
                 "python",
                 "-",

@@ -15,6 +15,7 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-005 v0.9.7 Live Postgres Portability](./WAVE-005-v0.9.7-live-postgres-portability.md)
 - [WAVE-006 v0.9.8 Worker Attempt Atomicity](./WAVE-006-v0.9.8-worker-attempt-atomicity.md)
 - [WAVE-007 Docker-First Local Cell Release Gate](./WAVE-007-docker-first-local-cell-release-gate.md)
+- [WAVE-008 Operations Bug Hardening](./WAVE-008-operations-bug-hardening.md)
 
 ## Execution Model
 

@@ -27,6 +27,15 @@ class QdrantAdapter:
             raise IndexBackendUnavailable(f"Qdrant unavailable during {operation}: {self.init_error or 'client not initialized'}")
         return False
 
+    def healthcheck(self) -> tuple[bool, str | None]:
+        if not self.client:
+            return False, self.init_error or "client not initialized"
+        try:
+            self.client.get_collections()
+            return True, None
+        except Exception as exc:
+            return False, str(exc)
+
     def collection_name(self, business_instance_id: str, embedding_profile_id: str = "default") -> str:
         safe_biz = business_instance_id.replace("-", "_").lower()
         safe_profile = embedding_profile_id.replace("-", "_").lower()

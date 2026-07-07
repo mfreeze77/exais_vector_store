@@ -25,7 +25,7 @@ def main() -> None:
     if args.vector_store_id:
         vector_store_id = args.vector_store_id
     else:
-        store = api_json("POST", f"{api}/v1/vector_stores", {"name": f"Scale Gate {int(time.time())}", "knowledge_base_id": "kb_dev"})
+        store = api_json("POST", f"{api}/v1/vector_stores", {"name": f"Scale Gate {int(time.time())}", "knowledge_base_id": "kb_dev"}, cell=args.cell)
         vector_store_id = store["id"]
     print(f"VECTOR_STORE_ID={vector_store_id}")
 
@@ -36,7 +36,7 @@ def main() -> None:
         for start in range(0, args.documents, args.batch_size):
             end = min(start + args.batch_size, args.documents)
             files = [scale_doc(i, args.headings_per_doc) for i in range(start, end)]
-            api_json("POST", f"{api}/v1/vector_stores/{vector_store_id}/file_batches", {"files": files}, timeout=300)
+            api_json("POST", f"{api}/v1/vector_stores/{vector_store_id}/file_batches", {"files": files}, timeout=300, cell=args.cell)
             submitted = end
             print(f"Submitted queued docs: {submitted}/{args.documents}")
 

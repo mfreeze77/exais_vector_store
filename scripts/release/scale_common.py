@@ -7,10 +7,10 @@ import urllib.error
 import urllib.request
 from urllib.parse import urlsplit, urlunsplit
 
-from release_common import compose_base, run
+from release_common import DEFAULT_CELL, compose_base, compose_network_name, run
 
 
-def api_json(method: str, url: str, payload: dict | None = None, timeout: int = 120) -> dict:
+def api_json(method: str, url: str, payload: dict | None = None, timeout: int = 120, *, cell: str = DEFAULT_CELL) -> dict:
     body = None if payload is None else json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(url, data=body, method=method, headers={"Content-Type": "application/json"})
     try:
@@ -27,10 +27,10 @@ def api_json(method: str, url: str, payload: dict | None = None, timeout: int = 
         raise
     except urllib.error.URLError as exc:
         print(f"{method} {url} -> host request failed: {exc}")
-        return api_json_via_cell_network(method, url, body, timeout)
+        return api_json_via_cell_network(method, url, body, timeout, cell=cell)
 
 
-def api_json_via_cell_network(method: str, url: str, body: bytes | None, timeout: int) -> dict:
+def api_json_via_cell_network(method: str, url: str, body: bytes | None, timeout: int, *, cell: str = DEFAULT_CELL) -> dict:
     parts = urlsplit(url)
     cell_url = urlunsplit((parts.scheme, "api:8080", parts.path, parts.query, parts.fragment))
     args = [
@@ -39,7 +39,7 @@ def api_json_via_cell_network(method: str, url: str, body: bytes | None, timeout
         "--rm",
         "-i",
         "--network",
-        "exais-vector-store-local_default",
+        compose_network_name(cell),
         "curlimages/curl:8.10.1",
         "-fsS",
         "-w",

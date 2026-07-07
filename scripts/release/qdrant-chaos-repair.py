@@ -21,14 +21,14 @@ def main() -> None:
     api = api_base(args.cell)
     base = compose_base(args.cell)
 
-    store = api_json("POST", f"{api}/v1/vector_stores", {"name": f"Qdrant Chaos Gate {int(time.time())}", "knowledge_base_id": "kb_dev"})
+    store = api_json("POST", f"{api}/v1/vector_stores", {"name": f"Qdrant Chaos Gate {int(time.time())}", "knowledge_base_id": "kb_dev"}, cell=args.cell)
     vector_store_id = store["id"]
     print(f"VECTOR_STORE_ID={vector_store_id}")
     files = [scale_doc(1_000_000 + i, args.headings_per_doc) for i in range(args.documents)]
     for item in files:
         item["vector_store_id"] = vector_store_id
         item["knowledge_base_id"] = "kb_dev"
-    api_json("POST", f"{api}/v1/vector_stores/{vector_store_id}/file_batches", {"files": files}, timeout=300)
+    api_json("POST", f"{api}/v1/vector_stores/{vector_store_id}/file_batches", {"files": files}, timeout=300, cell=args.cell)
 
     time.sleep(args.kill_delay_seconds)
     qdrant_container = f"{project_name(args.cell)}-qdrant-1"
@@ -57,7 +57,7 @@ SELECT
         if fields == [0, 0, 0]:
             break
         time.sleep(5)
-    repair = api_json("POST", f"{api}/api/v1/maintenance/reindex", {"vector_store_id": vector_store_id, "batch_size": 1000})
+    repair = api_json("POST", f"{api}/api/v1/maintenance/reindex", {"vector_store_id": vector_store_id, "batch_size": 1000}, cell=args.cell)
     print(f"repair_response={json.dumps(repair, sort_keys=True)}")
     final_counts = psql(args.cell, f"""
 SELECT

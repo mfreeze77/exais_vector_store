@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Any
-from fastapi import Depends, FastAPI, HTTPException, UploadFile, File, Form, Header, Body, Query
+from fastapi import Depends, FastAPI, HTTPException, Response, UploadFile, File, Form, Header, Body, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
@@ -97,14 +97,26 @@ def healthz():
     return {'ok': True, 'service': 'svs-api', 'version': settings.svs_product_version, 'sparse_backend': settings.svs_sparse_backend, 'dense_backend': settings.svs_dense_backend}
 
 
-@app.get('/readyz')
-def readyz(db: Session = Depends(get_session)):
+def readiness_payload(db: Session, qdrant_adapter) -> dict[str, Any]:
+    checks: dict[str, bool] = {}
     try:
         db.execute(text('SELECT 1'))
-        db_ok = True
+        checks['db'] = True
     except Exception:
-        db_ok = False
-    return {'ready': db_ok, 'db': db_ok}
+        checks['db'] = False
+    if settings.svs_dense_backend == 'qdrant' and settings.svs_index_strict:
+        qdrant_ok, _ = qdrant_adapter.healthcheck()
+        checks['qdrant'] = qdrant_ok
+    ready = all(checks.values())
+    return {'ready': ready, **checks}
+
+
+@app.get('/readyz')
+def readyz(response: Response, db: Session = Depends(get_session)):
+    payload = readiness_payload(db, retrieval.qdrant)
+    if not payload['ready']:
+        response.status_code = 503
+    return payload
 
 
 @app.get('/metrics', response_class=PlainTextResponse)
