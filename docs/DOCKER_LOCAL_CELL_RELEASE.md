@@ -14,6 +14,7 @@ python scripts/release/remove-local-app-images.py --registry-prefix localhost:50
 python scripts/release/cell-down.py --cell local --volumes
 python scripts/release/cell-up.py --cell local --worker-scale 4
 python scripts/release/cell-smoke.py --cell local
+python scripts/release/cell-access-proof.py --cell local
 ```
 
 The generated env command intentionally prints names only. Generated local env
@@ -22,6 +23,11 @@ files live under `.release/` and are ignored by git.
 Default local public ports are product-specific high ports: API `18080`, model
 gateway `18081`, admin UI `13080`, instance agent `18090`, Postgres `15432`,
 Redis `16379`, Qdrant `16333`/`16334`, and MinIO `19000`/`19001`.
+
+On Windows Docker hosts where `localhost` loopback is unavailable from Python or
+curl, use `cell-access-proof.py` as the reproducible fallback. It probes API and
+admin UI through host loopback first, then proves access through a
+`curlimages/curl` container on the compose network.
 
 ## Scale Gate
 

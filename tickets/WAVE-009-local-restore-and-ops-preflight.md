@@ -14,7 +14,7 @@ host/admin access proof, and doc/proof convergence.
 | W9-001 | Complete | Test/Proof | Add a local backup/restore drill that proves a restored cell can boot, answer `/readyz`, preserve SQL counts, rebuild/verify Qdrant, and serve search. |
 | W9-002 | Complete | Implementation | Add a repair-all drift operation that loops forced reindex batches or otherwise verifies Qdrant drift is resolved beyond a single ordered batch. |
 | W9-003 | Complete | Implementation | Add a secret-safe production env preflight that rejects placeholders, dev mode, bad registry/version settings, missing required variables, and port collisions without printing secret values. |
-| W9-004 | Pending | Test/Proof | Prove host/admin access on Windows Docker or document and automate the reliable fallback path for admin/API access when host loopback fails. |
+| W9-004 | Complete | Test/Proof | Prove host/admin access on Windows Docker or document and automate the reliable fallback path for admin/API access when host loopback fails. |
 | W9-005 | Pending | Test/Proof | Converge stale docs/proof counts after Waves 007-009 so README, gate docs, and ticket proof all describe the current verified surface. |
 
 ## Out Of Scope
@@ -39,7 +39,7 @@ host/admin access proof, and doc/proof convergence.
   after count/search proof is clean.
 - [x] W9-003 preflight prints variable names and issue classes only, never secret
   values.
-- [ ] W9-004 records a reproducible admin/API access path for this Windows Docker
+- [x] W9-004 records a reproducible admin/API access path for this Windows Docker
   environment.
 - [ ] W9-005 removes or annotates stale proof counts that conflict with current
   Docker-cell evidence.
@@ -52,6 +52,7 @@ docker run --rm -v "${PWD}:/work" -w /work --network exais-vector-store-local_de
 python scripts/release/local-restore-drill.py --source-cell restore-src --restore-cell restore --documents 12 --headings-per-doc 3 --source-port-base 28080 --restore-port-base 28180 --timeout-seconds 300
 python scripts/release/qdrant-repair-all.py --cell local --proof --documents 24 --headings-per-doc 3 --batch-size 25 --delete-count 55 --timeout-seconds 600
 python scripts/release/prod-env-preflight.py --env-file .env.production.example
+python scripts/release/cell-access-proof.py --cell local
 ```
 
 ## Reusable Commands
@@ -73,6 +74,12 @@ Production env preflight before VPS or customer-cell launch:
 
 ```bash
 python scripts/release/prod-env-preflight.py --env-file /opt/exais/vector-store/.env.cell
+```
+
+Windows Docker API/admin access proof:
+
+```bash
+python scripts/release/cell-access-proof.py --cell local --timeout-seconds 60
 ```
 
 ## Proof Notes
@@ -152,3 +159,23 @@ python scripts/release/prod-env-preflight.py --env-file /opt/exais/vector-store/
   - `FAIL LATEST_TAG SVS_VERSION`
   - `FAIL LOCAL_REGISTRY_PREFIX SVS_REGISTRY_PREFIX`
   - `FAIL PORT_COLLISION SVS_API_PORT,SVS_ADMIN_UI_PORT`
+- 2026-07-07 W9-004 added `scripts/release/cell-access-proof.py`,
+  `tests/test_cell_access_proof_script.py`, and a narrow Vite `allowedHosts`
+  config for `admin-ui`, `localhost`, and `127.0.0.1`.
+- `python scripts\release\build-images.py --service admin-ui` rebuilt the admin
+  UI image as
+  `sha256:4179f3841c703c7f6c4c6377db3c430f479cbe3aa5fc6f5bad3a2cd562584a69`.
+- `python scripts\release\publish-images.py --service admin-ui` pushed the
+  rebuilt tag and verified the manifest through the local registry container
+  fallback.
+- `python scripts\release\cell-up.py --cell local --worker-scale 4
+  --timeout-seconds 300` pulled the registry image and recreated the admin UI
+  container; compose showed all services healthy.
+- Live access proof:
+  - `API_HOST_STATUS=UNAVAILABLE`
+  - `API_HOST_REASON=URLError`
+  - `API_CELL_NETWORK_STATUS=200`
+  - `ADMIN_UI_HOST_STATUS=UNAVAILABLE`
+  - `ADMIN_UI_HOST_REASON=URLError`
+  - `ADMIN_UI_CELL_NETWORK_STATUS=200`
+  - `ACCESS_PATH=cell-network-fallback`
