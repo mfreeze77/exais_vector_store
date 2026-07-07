@@ -62,6 +62,7 @@ git clone <repo-url> /opt/exais/vector-store
 cd /opt/exais/vector-store
 cp .env.production.example /opt/exais/vector-store/.env.cell
 # Fill the placeholder values in /opt/exais/vector-store/.env.cell.
+python scripts/release/prod-env-preflight.py --env-file /opt/exais/vector-store/.env.cell
 SVS_CELL_ENV_FILE=/opt/exais/vector-store/.env.cell \
   docker-compose --env-file /opt/exais/vector-store/.env.cell \
   -f infra/docker/compose.cell.yml \

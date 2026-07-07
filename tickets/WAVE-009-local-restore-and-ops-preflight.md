@@ -13,7 +13,7 @@ host/admin access proof, and doc/proof convergence.
 | --- | --- | --- | --- |
 | W9-001 | Complete | Test/Proof | Add a local backup/restore drill that proves a restored cell can boot, answer `/readyz`, preserve SQL counts, rebuild/verify Qdrant, and serve search. |
 | W9-002 | Complete | Implementation | Add a repair-all drift operation that loops forced reindex batches or otherwise verifies Qdrant drift is resolved beyond a single ordered batch. |
-| W9-003 | Pending | Implementation | Add a secret-safe production env preflight that rejects placeholders, dev mode, bad registry/version settings, missing required variables, and port collisions without printing secret values. |
+| W9-003 | Complete | Implementation | Add a secret-safe production env preflight that rejects placeholders, dev mode, bad registry/version settings, missing required variables, and port collisions without printing secret values. |
 | W9-004 | Pending | Test/Proof | Prove host/admin access on Windows Docker or document and automate the reliable fallback path for admin/API access when host loopback fails. |
 | W9-005 | Pending | Test/Proof | Converge stale docs/proof counts after Waves 007-009 so README, gate docs, and ticket proof all describe the current verified surface. |
 
@@ -37,7 +37,7 @@ host/admin access proof, and doc/proof convergence.
 - [x] W9-001 drill proves restored search returns results from restored data.
 - [x] W9-002 repair-all proof starts from deliberate Qdrant drift and exits only
   after count/search proof is clean.
-- [ ] W9-003 preflight prints variable names and issue classes only, never secret
+- [x] W9-003 preflight prints variable names and issue classes only, never secret
   values.
 - [ ] W9-004 records a reproducible admin/API access path for this Windows Docker
   environment.
@@ -51,6 +51,7 @@ PYTHONPATH=packages/svs_common;apps/api;apps/worker;apps/model_gateway;apps/inst
 docker run --rm -v "${PWD}:/work" -w /work --network exais-vector-store-local_default -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python -m pytest -q -rs tests/test_local_restore_drill_script.py tests/test_readyz.py tests/test_release_cell_network.py tests/test_qdrant_repair_proof_script.py
 python scripts/release/local-restore-drill.py --source-cell restore-src --restore-cell restore --documents 12 --headings-per-doc 3 --source-port-base 28080 --restore-port-base 28180 --timeout-seconds 300
 python scripts/release/qdrant-repair-all.py --cell local --proof --documents 24 --headings-per-doc 3 --batch-size 25 --delete-count 55 --timeout-seconds 600
+python scripts/release/prod-env-preflight.py --env-file .env.production.example
 ```
 
 ## Reusable Commands
@@ -66,6 +67,12 @@ points before repair:
 
 ```bash
 python scripts/release/qdrant-repair-all.py --cell local --proof --documents 24 --headings-per-doc 3 --batch-size 25 --delete-count 55 --timeout-seconds 600
+```
+
+Production env preflight before VPS or customer-cell launch:
+
+```bash
+python scripts/release/prod-env-preflight.py --env-file /opt/exais/vector-store/.env.cell
 ```
 
 ## Proof Notes
@@ -116,3 +123,32 @@ python scripts/release/qdrant-repair-all.py --cell local --proof --documents 24 
   - `qdrant_total_after_repair_all=96`
   - `repair_all_search_results=5`
   - `repair_all_sql_counts_final={"active_chunks": 96, "active_jobs": 0, "failed_jobs": 0, "indexed_chunks": 96}`
+- 2026-07-07 W9-003 added `scripts/release/prod-env-preflight.py`,
+  `tests/test_prod_env_preflight_script.py`, and port/public API settings to
+  `.env.production.example`.
+- Focused preflight tests passed inside the registry-pulled API image:
+  `3 passed in 0.25s`.
+- `.env.production.example` preflight failed as expected while printing only
+  variable names and issue classes:
+  - `Issue count: 10`
+  - `FAIL PLACEHOLDER POSTGRES_PASSWORD`
+  - `FAIL PLACEHOLDER POSTGRES_APP_PASSWORD`
+  - `FAIL PLACEHOLDER DATABASE_URL`
+  - `FAIL PLACEHOLDER DATABASE_URL_SYNC`
+  - `FAIL PLACEHOLDER DATABASE_URL_MIGRATIONS`
+  - `FAIL PLACEHOLDER OPENSEARCH_PASSWORD`
+  - `FAIL PLACEHOLDER S3_ACCESS_KEY_ID`
+  - `FAIL PLACEHOLDER S3_SECRET_ACCESS_KEY`
+  - `FAIL PLACEHOLDER OPENAI_API_KEY`
+  - `FAIL PLACEHOLDER SVS_API_KEY_PEPPER`
+- Ignored proof env `.release/preflight/good.env` passed:
+  - `Issue count: 0`
+  - `PREFLIGHT PASS`
+- Ignored proof env `.release/preflight/bad.env` failed targeted checks without
+  printing values:
+  - `Issue count: 5`
+  - `FAIL DEV_MODE_ENABLED SVS_DEV_MODE`
+  - `FAIL BAD_VERSION SVS_VERSION`
+  - `FAIL LATEST_TAG SVS_VERSION`
+  - `FAIL LOCAL_REGISTRY_PREFIX SVS_REGISTRY_PREFIX`
+  - `FAIL PORT_COLLISION SVS_API_PORT,SVS_ADMIN_UI_PORT`
