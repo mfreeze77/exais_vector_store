@@ -129,7 +129,7 @@ class MaintenanceService:
 
     async def reindex_chunks(self, db: Session, principal: Principal, req: ReindexRequest) -> MaintenanceResult:
         batch = min(max(req.batch_size or self.settings.svs_reindex_batch_size, 1), 1000)
-        params = {'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id, 'limit': batch}
+        params = {'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id, 'limit': batch + 1}
         extra = []
         if req.vector_store_id:
             extra.append('AND c.vector_store_id=:vs_id')
@@ -137,18 +137,41 @@ class MaintenanceService:
         if req.document_id:
             extra.append('AND c.document_id=:doc_id')
             params['doc_id'] = req.document_id
+        if req.after_chunk_id:
+            cursor_extra = []
+            if req.vector_store_id:
+                cursor_extra.append('AND vector_store_id=:vs_id')
+            if req.document_id:
+                cursor_extra.append('AND document_id=:doc_id')
+            cursor = db.execute(text(f'''
+                SELECT created_at
+                FROM chunks
+                WHERE id=:after_chunk_id AND tenant_id=:tenant_id AND business_instance_id=:biz_id
+                  {' '.join(cursor_extra)}
+            '''), {**params, 'after_chunk_id': req.after_chunk_id}).mappings().first()
+            if not cursor:
+                return MaintenanceResult(
+                    action='reindex_chunks',
+                    processed=0,
+                    details={'batch_size': batch, 'has_more': False, 'last_chunk_id': None, 'cursor_missing': req.after_chunk_id},
+                )
+            params['after_chunk_id'] = req.after_chunk_id
+            params['after_created_at'] = cursor['created_at']
+            extra.append('AND (c.created_at > :after_created_at OR (c.created_at = :after_created_at AND c.id > :after_chunk_id))')
         status_clause = '' if req.force else "AND (c.dense_index_status <> 'indexed' OR c.sparse_index_status <> 'indexed')"
-        rows = db.execute(text(f'''
+        selected_rows = db.execute(text(f'''
             SELECT c.id, c.text, c.tenant_id, c.business_instance_id, c.knowledge_base_id, c.vector_store_id,
                    c.document_id, c.document_version_id, c.security_level, c.classification, c.acl_bucket,
                    e.embedding_profile_id, e.model_name, e.dimensions, e.vector_collection, e.vector_point_id
             FROM chunks c JOIN embeddings e ON e.chunk_id=c.id
             WHERE c.tenant_id=:tenant_id AND c.business_instance_id=:biz_id AND c.active=true
               {status_clause} {' '.join(extra)}
-            ORDER BY c.created_at ASC LIMIT :limit
+            ORDER BY c.created_at ASC, c.id ASC LIMIT :limit
         '''), params).mappings().all()
+        has_more = len(selected_rows) > batch
+        rows = selected_rows[:batch]
         if not rows:
-            return MaintenanceResult(action='reindex_chunks', processed=0)
+            return MaintenanceResult(action='reindex_chunks', processed=0, details={'batch_size': batch, 'has_more': False, 'last_chunk_id': None})
         by_profile: dict[str, list] = {}
         for r in rows:
             by_profile.setdefault(r['embedding_profile_id'], []).append(r)
@@ -183,9 +206,14 @@ class MaintenanceService:
                 WHERE id = ANY(:ids) AND tenant_id=:tenant_id AND business_instance_id=:biz_id
             '''), {'ids': [r['id'] for r in group], 'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id})
             processed += len(group)
+        last_chunk_id = rows[-1]['id']
         db.execute(jsonb_text('''
             INSERT INTO audit_events(id, tenant_id, business_instance_id, user_id, api_key_id, event_type, action, resource_type, metadata)
             VALUES (:id, :tenant_id, :biz_id, :user_id, :api_key_id, 'maintenance', 'reindex_chunks', 'chunk', CAST(:metadata AS jsonb))
         ''', 'metadata'), {'id': new_id('aud'), 'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id,
-              'user_id': principal.user_id, 'api_key_id': principal.api_key_id, 'metadata': jsonb_param({'processed': processed, 'request': req.model_dump()})})
-        return MaintenanceResult(action='reindex_chunks', processed=processed)
+              'user_id': principal.user_id, 'api_key_id': principal.api_key_id, 'metadata': jsonb_param({'processed': processed, 'request': req.model_dump(), 'has_more': has_more, 'last_chunk_id': last_chunk_id})})
+        return MaintenanceResult(
+            action='reindex_chunks',
+            processed=processed,
+            details={'batch_size': batch, 'has_more': has_more, 'last_chunk_id': last_chunk_id},
+        )

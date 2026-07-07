@@ -252,6 +252,7 @@ class BakeoffRunResponse(BaseModel):
 class ReindexRequest(BaseModel):
     vector_store_id: str | None = None
     document_id: str | None = None
+    after_chunk_id: str | None = None
     batch_size: int | None = None
     force: bool = False
 
