@@ -1,19 +1,28 @@
 # Frontend / Admin UI Scaffold
 
-The frontend is intentionally thin. It is not the security authority; it only selects modes and passes user/tenant context to the API.
+The frontend is intentionally thin. It is not the security authority; it selects modes, submits work, and decorates requests with the bearer credential that the API resolves into a principal.
 
 ## Current capabilities
 
 - Lists vectorization modes from `/api/v1/vectorization/modes`.
+- Verifies the admin session through `/api/v1/admin/session`.
 - Selects a mode such as `markdown_docs_v1`, `pdf_markdown_external_v1`, `code_repo_v1`, or `auto_detect_v1`.
 - Creates an OpenAI-compatible vector store through `/v1/vector_stores`.
 - Ingests Markdown/text content through `/api/v1/documents/ingest`.
 - Searches through `/api/v1/retrieval/search`.
-- Sends dev tenant/business/user/security headers for local testing.
+- Sends `Authorization: Bearer <api key>` for protected production requests.
 
 ## Production UI contract
 
-The production UI should not make provider/security decisions on its own. It should call the API with:
+The production UI must fail closed without a bearer credential. The admin API key is entered by the operator and stored in browser session storage under `svs_admin_api_key`; requests are centralized through `apps/admin_ui/src/auth.ts`, which adds:
+
+```http
+Authorization: Bearer svs_live_...
+```
+
+The API resolves that key through `get_request_principal` and `resolve_api_key_principal`, rejects inactive or expired keys, and applies route scopes through `ensure_scope`. Browser-selected tenant, business, user, role, group, or security-level values are not authoritative and are not sent by production UI requests.
+
+The UI should call the API with workload payloads such as:
 
 ```json
 {
@@ -34,9 +43,13 @@ The backend then resolves:
 mode -> parser -> chunker -> tokenizer/counter -> embedding profile -> sparse profile -> reranker -> retrieval profile -> security policy
 ```
 
+## Local dev headers
+
+The backend may still accept `x-svs-*` identity headers only when `SVS_DEV_MODE=true`. The admin UI only emits those headers while Vite is running in dev mode and an explicit flag such as `VITE_SVS_DEV_MODE=true` is set. Production builds without a bearer API key fail before issuing protected requests.
+
 ## Production hardening tickets
 
-- Replace dev headers with session/OIDC/API-key principal resolution.
+- Add OIDC/session exchange if a browser login provider is introduced.
 - Add instance switcher and business/user vault switcher.
 - Add upload progress and resumable ingest jobs.
 - Add source-system connection screens.

@@ -869,3 +869,32 @@ def test_resolve_api_key_principal_filters_inactive_or_revoked_keys():
     lookup_sql = db.calls[1][0]
     assert "status='active'" in lookup_sql
     assert "(expires_at IS NULL OR expires_at > now())" in lookup_sql
+
+
+def test_resolve_api_key_principal_returns_active_scoped_principal():
+    db = _Db(results=[
+        {},
+        {
+            "id": "key_active",
+            "tenant_id": "tenant",
+            "business_instance_id": "biz",
+            "user_id": None,
+            "scopes": ["api_keys:read", "role:owner"],
+            "max_security_level": 4,
+        },
+    ])
+
+    principal = resolve_api_key_principal(db, "Bearer svs_live_active")
+
+    assert principal == Principal(
+        tenant_id="tenant",
+        business_instance_id="biz",
+        user_id=None,
+        api_key_id="key_active",
+        groups=[],
+        roles=["owner"],
+        max_security_level=4,
+        scopes=["api_keys:read", "role:owner"],
+    )
+    assert db.calls[0][1]["key_hash"] != "svs_live_active"
+    assert "UPDATE api_keys SET last_used_at=now()" in db.calls[-1][0]

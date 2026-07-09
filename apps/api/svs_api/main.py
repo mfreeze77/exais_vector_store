@@ -171,6 +171,16 @@ app.add_middleware(
 )
 vs_repo, ingestion, retrieval, maintenance, bakeoff = VectorStoreRepository(), IngestionService(), RetrievalService(), MaintenanceService(), BakeoffService()
 
+ADMIN_UI_SESSION_SCOPES = [
+    'admin:read',
+    'api_keys:read',
+    'api_keys:write',
+    'documents:write',
+    'retrieval:read',
+    'vector_stores:read',
+    'vector_stores:write',
+]
+
 
 def should_enqueue_ingest(req: DocumentIngestRequest) -> bool:
     raw_len = len((req.content or '').encode('utf-8'))
@@ -1463,6 +1473,23 @@ async def reindex(req: ReindexRequest, principal: Principal = Depends(get_reques
     result = await maintenance.reindex_chunks(db, principal, req)
     db.commit()
     return result
+
+
+@app.get('/api/v1/admin/session')
+def admin_session(principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
+    ensure_scope(principal, ADMIN_UI_SESSION_SCOPES, any_of=True)
+    return {
+        'object': 'admin.session',
+        'authenticated': True,
+        'tenant_id': principal.tenant_id,
+        'business_instance_id': principal.business_instance_id,
+        'user_id': principal.user_id,
+        'api_key_id': principal.api_key_id,
+        'scopes': list(principal.scopes or []),
+        'roles': list(principal.roles or []),
+        'groups': list(principal.groups or []),
+        'max_security_level': principal.max_security_level,
+    }
 
 
 @app.get('/api/v1/admin/usage')
