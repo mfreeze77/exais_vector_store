@@ -87,8 +87,14 @@ Status legend:
 
 - SVS-070 Hetzner sizing — scaffolded.
 - SVS-071 Terraform/Ansible stubs — scaffolded.
-- SVS-072 Backups/restore runbooks — scaffolded.
-- SVS-073 Actual backup integrations — ready-to-build.
+- SVS-072 Backups/restore runbooks — implemented for repo-buildable backup
+  manifest/preflight workflow in `runbooks/backup-restore.md`; external restore
+  drill proof remains an operator gate.
+- SVS-073 Actual backup integrations — implemented for schema-versioned backup
+  artifact manifests covering Postgres metadata, Qdrant vectors, OpenSearch
+  sparse indexes, object/config/audit artifacts, and checksum metadata, with
+  nondestructive restore preflight validation. Real offsite target proof and
+  external restore drill evidence remain separate operator gates.
 - SVS-074 Observability stack — ready-to-build.
 
 ## EPIC-009 Evals/fine-tuning

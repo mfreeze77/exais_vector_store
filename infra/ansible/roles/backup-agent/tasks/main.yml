@@ -1,3 +1,53 @@
-- name: backup-agent scaffold
-  debug:
-    msg: "Install backup scripts, configure object storage, schedule restore drills."
+- name: Ensure backup agent wrapper directory exists
+  ansible.builtin.file:
+    path: "{{ svs_backup_agent_bin_dir | default('/opt/exais/bin') }}"
+    state: directory
+    mode: "0755"
+
+- name: Install backup instance wrapper
+  ansible.builtin.copy:
+    dest: "{{ svs_backup_agent_bin_dir | default('/opt/exais/bin') }}/svs-backup-instance"
+    mode: "0750"
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      cd "${SVS_REPO_ROOT:-{{ svs_repo_root | default('/opt/exais/vector-store') }}}"
+      exec bash scripts/backup-instance.sh "$@"
+
+- name: Install restore preflight wrapper
+  ansible.builtin.copy:
+    dest: "{{ svs_backup_agent_bin_dir | default('/opt/exais/bin') }}/svs-restore-preflight"
+    mode: "0750"
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      cd "${SVS_REPO_ROOT:-{{ svs_repo_root | default('/opt/exais/vector-store') }}}"
+      exec bash scripts/restore-instance.sh --preflight-only "$@"
+
+- name: Schedule instance backup command when enabled
+  ansible.builtin.cron:
+    name: exais instance backup
+    user: "{{ svs_backup_agent_user | default('root') }}"
+    minute: "{{ svs_backup_agent_minute | default('17') }}"
+    hour: "{{ svs_backup_agent_hour | default('3') }}"
+    job: >-
+      SVS_REPO_ROOT={{ svs_repo_root | default('/opt/exais/vector-store') }}
+      {{ svs_backup_agent_bin_dir | default('/opt/exais/bin') }}/svs-backup-instance
+      {{ svs_backup_instance_manifest | default('/opt/exais/vector-store/instances/expert-ai-services/prod/instance.yaml') }}
+      {{ svs_backup_dest_root | default('/var/backups/exais') }}
+  when: svs_backup_agent_schedule_enabled | default(false)
+
+- name: Schedule restore preflight command when enabled
+  ansible.builtin.cron:
+    name: exais restore preflight
+    user: "{{ svs_backup_agent_user | default('root') }}"
+    minute: "{{ svs_restore_preflight_minute | default('47') }}"
+    hour: "{{ svs_restore_preflight_hour | default('4') }}"
+    weekday: "{{ svs_restore_preflight_weekday | default('0') }}"
+    job: >-
+      SVS_REPO_ROOT={{ svs_repo_root | default('/opt/exais/vector-store') }}
+      test -n "{{ svs_restore_preflight_bundle | default('') }}" &&
+      {{ svs_backup_agent_bin_dir | default('/opt/exais/bin') }}/svs-restore-preflight
+      {{ svs_restore_preflight_bundle | default('') }}
+      {{ svs_restore_preflight_work_dir | default('/var/tmp/exais-restore-preflight') }}
+  when: svs_restore_preflight_schedule_enabled | default(false)

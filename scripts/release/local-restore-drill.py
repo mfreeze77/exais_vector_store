@@ -21,6 +21,7 @@ from release_common import (
     run,
     wait_for_services,
 )
+from backup_common import BackupArtifact, sha256_file, write_backup_manifest as write_shared_backup_manifest
 from scale_common import api_json, chunk_vector_store_where, job_vector_store_where, parse_int_row, psql
 
 
@@ -310,10 +311,130 @@ def restore_postgres(restore_cell: str, dump_path: Path) -> None:
     run(["docker", "exec", restore_postgres_container, "rm", "-f", "/tmp/svs.restore-drill.dump"])
 
 
+def write_json_file(path: Path, data: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def write_restore_drill_marker(path: Path, kind: str, message: str, data: dict | None = None) -> None:
+    payload = {
+        "kind": kind,
+        "capture_status": "restore_drill_marker",
+        "message": message,
+        "generated_at": int(time.time()),
+    }
+    if data:
+        payload["metadata"] = data
+    write_json_file(path, payload)
+
+
+def write_restore_drill_checksums(path: Path) -> Path:
+    checksum_path = path / "CHECKSUMS.sha256"
+    files = sorted(
+        candidate
+        for candidate in path.rglob("*")
+        if candidate.is_file() and candidate.name not in {"CHECKSUMS.sha256", "manifest.json"}
+    )
+    lines = [f"{sha256_file(candidate)}  ./{candidate.relative_to(path).as_posix()}\n" for candidate in files]
+    checksum_path.write_text("".join(lines), encoding="utf-8")
+    return checksum_path
+
+
 def write_backup_manifest(path: Path, data: dict) -> None:
     manifest = path / "restore-drill-manifest.json"
-    manifest.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    write_json_file(manifest, data)
     print(f"BACKUP_MANIFEST={manifest}")
+
+    write_restore_drill_marker(
+        path / "qdrant" / "rebuild-marker.json",
+        "qdrant_vectors",
+        "Local restore drill rebuilds Qdrant vectors from restored Postgres metadata through the maintenance reindex path.",
+        {"collections": data.get("collections", [])},
+    )
+    write_restore_drill_marker(
+        path / "opensearch" / "rebuild-marker.json",
+        "opensearch_sparse",
+        "Local restore drill rebuilds sparse indexes from restored Postgres metadata through the maintenance reindex path.",
+    )
+    write_restore_drill_marker(
+        path / "object-store" / "restore-drill-object-marker.json",
+        "object_store",
+        "Local restore drill fixture stores source documents through API ingestion and validates restored retrieval, not an external object-store copy.",
+    )
+    write_restore_drill_marker(
+        path / "config" / "restore-drill-config.json",
+        "config_metadata",
+        "Restore drill config metadata is represented by source/restore cell names and generated env file paths; secret values are not printed.",
+        {"source_cell": data.get("source_cell"), "restore_cell": data.get("restore_cell")},
+    )
+    write_restore_drill_marker(
+        path / "audit" / "restore-drill-audit-marker.json",
+        "audit_export",
+        "Local restore drill does not claim immutable external audit export proof.",
+    )
+    write_restore_drill_checksums(path)
+    shared_manifest = write_shared_backup_manifest(
+        path,
+        [
+            BackupArtifact(
+                kind="postgres_metadata",
+                relative_path="svs.dump",
+                required=True,
+                source="local_restore_drill_pg_dump",
+                notes="Postgres metadata dump used by the local restore drill.",
+                metadata={"capture_status": "captured"},
+            ),
+            BackupArtifact(
+                kind="qdrant_vectors",
+                relative_path="qdrant/rebuild-marker.json",
+                required=True,
+                source="maintenance_reindex_marker",
+                notes="Vector indexes are rebuilt during the local restore drill.",
+                metadata={"capture_status": "restore_drill_marker"},
+            ),
+            BackupArtifact(
+                kind="opensearch_sparse",
+                relative_path="opensearch/rebuild-marker.json",
+                required=True,
+                source="maintenance_reindex_marker",
+                notes="Sparse indexes are rebuilt during the local restore drill.",
+                metadata={"capture_status": "restore_drill_marker"},
+            ),
+            BackupArtifact(
+                kind="object_store",
+                relative_path="object-store/restore-drill-object-marker.json",
+                required=True,
+                source="restore_drill_marker",
+                notes="Object-store proof remains external to the local restore drill.",
+                metadata={"capture_status": "restore_drill_marker"},
+            ),
+            BackupArtifact(
+                kind="config_metadata",
+                relative_path="config/restore-drill-config.json",
+                required=True,
+                source="restore_drill_config_marker",
+                notes="Restore drill config marker contains no secret values.",
+                metadata={"capture_status": "restore_drill_marker"},
+            ),
+            BackupArtifact(
+                kind="audit_export",
+                relative_path="audit/restore-drill-audit-marker.json",
+                required=True,
+                source="restore_drill_marker",
+                notes="External immutable audit export proof remains a later operator gate.",
+                metadata={"capture_status": "restore_drill_marker"},
+            ),
+            BackupArtifact(
+                kind="checksum_metadata",
+                relative_path="CHECKSUMS.sha256",
+                required=True,
+                source="python_sha256",
+                notes="Checksum metadata for restore drill backup files.",
+                metadata={"capture_status": "captured"},
+            ),
+        ],
+    )
+    print(f"BACKUP_SHARED_MANIFEST={shared_manifest}")
 
 
 def main() -> None:

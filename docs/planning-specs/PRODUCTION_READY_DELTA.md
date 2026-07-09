@@ -676,6 +676,12 @@ Required alerts:
 | Config/secrets | encrypted GitOps backup | every change |
 | Audit exports | immutable object storage | daily |
 
+Repo-buildable RM-006 status: backup bundles now include a schema-versioned
+artifact manifest and restore preflight validates Postgres metadata, Qdrant
+vector, OpenSearch sparse, object/config/audit, and checksum artifacts without
+destructive restore. External/offsite target proof, live object-storage
+credentials, and full external restore drills remain separate operator gates.
+
 ### 11.2 Restore drills
 
 Monthly:

@@ -59,3 +59,11 @@ and DSNs with embedded passwords while reporting variable names only.
 `scripts/release/generate-cell-env.py --production --reference-source-env ...`
 imports only valid secret references. Live SOPS/Vault execution and customer
 host secret-manager proof remain operator proof gates.
+
+RM-006 closes the repo-buildable backup manifest and restore-preflight lane.
+`scripts/backup-instance.sh` now writes schema-versioned artifact manifests for
+Postgres metadata, Qdrant vectors, OpenSearch sparse indexes, object-store
+metadata, config metadata, audit exports, and checksum metadata. Restore
+preflight validates and enumerates those artifacts without requiring
+`DATABASE_URL_SYNC` or invoking `pg_restore`. Real offsite target proof and an
+external restore drill remain later operator gates.

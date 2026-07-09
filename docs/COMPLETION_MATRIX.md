@@ -10,7 +10,7 @@
 | Model routing | mode/model registries | provider-specific adapters/pricing |
 | RunPod | handler/Dockerfile | GPU image, warm pool, autoscaling |
 | Micro production | manifests/agent/scripts | signed releases, canaries |
-| Ops | Terraform/Ansible/runbooks | monitoring, real backup integrations |
+| Ops | Terraform/Ansible/runbooks; backup artifact manifests and restore preflight | monitoring, external/offsite restore proof |
 | Evals | metrics/schema + golden bakeoff metrics | live retrieval/provider fan-out runner |
 
 
@@ -51,4 +51,5 @@ Still not complete:
 - rollback locks, PITR, and future schema revisions beyond the frozen Alembic baseline
 - full OpenAPI contract. RM-002 generated proof records 49 paths (26 native, 23 OpenAI-compatible) and 77 schema components; the focused production-candidate contract/OpenAI suites passed with `137 passed`. OpenAI-compatible vector-store, file, file-batch, Responses, citation, and API-key surfaces are component-backed. Remaining gaps are explicit: most native success responses are untyped, and several JSON request bodies remain inline dictionaries or optional-body wrappers.
 - production observability dashboards
+- external/offsite restore drill against a real backup target
 - live bakeoff fan-out, fine-tuning, and multimodal research features
