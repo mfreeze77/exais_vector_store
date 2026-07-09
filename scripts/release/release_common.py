@@ -40,6 +40,10 @@ def env_file(cell: str = DEFAULT_CELL) -> Path:
     return release_dir(cell) / ".env.cell"
 
 
+def release_manifest_path(cell: str = DEFAULT_CELL) -> Path:
+    return release_dir(cell) / "release-manifest.json"
+
+
 def project_name(cell: str = DEFAULT_CELL) -> str:
     safe = "".join(c if c.isalnum() else "-" for c in cell.lower()).strip("-") or DEFAULT_CELL
     return f"exais-vector-store-{safe}"

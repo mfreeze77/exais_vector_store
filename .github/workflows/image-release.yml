@@ -1,0 +1,17 @@
+name: image-release
+
+on: [push, pull_request]
+
+jobs:
+  build-provenance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python scripts/release/build-images.py --registry-prefix localhost:5000/expertaiservices --manifest-output .release/image-build-manifest.json
+      - run: python scripts/release/provenance_common.py .release/image-build-manifest.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: image-build-manifest
+          path: .release/image-build-manifest.json

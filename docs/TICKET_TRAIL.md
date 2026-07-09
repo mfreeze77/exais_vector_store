@@ -11,8 +11,13 @@ Status legend:
 
 - SVS-001 Monorepo structure — scaffolded.
 - SVS-002 Docker Compose local stack — scaffolded.
-- SVS-003 Versioned image release model — ready-to-build.
-- SVS-004 CI image build/push with digests — ready-to-build.
+- SVS-003 Versioned image release model — implemented for the
+  `scripts/release/release_common.py:APP_IMAGES` app image set, build/publish
+  manifest emission, and pinned local-cell startup validation.
+- SVS-004 CI image build/push with digests — implemented for repo-buildable CI
+  image builds and digest/provenance manifest verification. External registry
+  credential proof, clean pull-by-digest evidence, VPS/customer-cell launch, and
+  Docker Hub claims remain separate operator proof gates.
 
 ## EPIC-002 Tenancy/security
 
@@ -66,7 +71,10 @@ Status legend:
 - SVS-061 Instance agent — scaffolded.
 - SVS-062 Fleet upgrade script — scaffolded.
 - SVS-063 Encrypted secrets workflow — ready-to-build.
-- SVS-064 Signed releases/digest pinning — ready-to-build.
+- SVS-064 Signed releases/digest pinning — implemented for local digest
+  provenance manifests and cell startup rejection of unpinned or unverifiable
+  app image metadata. Cryptographic signing and external registry proof remain
+  operator-dependent follow-up gates.
 
 ## EPIC-008 Production ops
 

@@ -20,6 +20,14 @@ python scripts/release/cell-access-proof.py --cell local
 The generated env command intentionally prints names only. Generated local env
 files live under `.release/` and are ignored by git.
 
+`build-images.py` writes `.release/image-build-manifest.json` for the full
+`APP_IMAGES` set. `publish-images.py` writes the cell-scoped
+`.release/cells/local/release-manifest.json` after registry manifest inspection.
+`cell-up.py` verifies that manifest before Docker pull/up and rejects missing
+metadata, `latest`, mismatched registry/version tags, missing app services, or
+images without `sha256` digest metadata. This proves local digest/provenance
+automation only; it is not Docker Hub, VPS, or customer-cell proof.
+
 Default local public ports are product-specific high ports: API `18080`, model
 gateway `18081`, admin UI `13080`, instance agent `18090`, Postgres `15432`,
 Redis `16379`, Qdrant `16333`/`16334`, and MinIO `19000`/`19001`.
@@ -63,6 +71,10 @@ docker login
 python scripts/release/build-images.py --registry-prefix docker.io/expertaiservices
 python scripts/release/publish-images.py --registry-prefix docker.io/expertaiservices
 ```
+
+External registry credential use, clean pull-by-digest evidence, and Docker
+Hub/private-registry operator proof remain separate proof gates. Do not mark a
+VPS or customer cell ready from the local manifest alone.
 
 ## VPS Cell Launch
 
