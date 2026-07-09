@@ -8,10 +8,7 @@ set -euo pipefail
 : "${DATABASE_URL_SYNC:=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}}"
 export DATABASE_URL_SYNC POSTGRES_DB POSTGRES_APP_USER POSTGRES_APP_PASSWORD
 
-for f in $(find db/migrations -maxdepth 1 -type f \( -name '*.sql' -o -name '*.sh' \) | sort); do
-  echo "Applying $f"
-  case "$f" in
-    *.sql) psql "$DATABASE_URL_SYNC" -v ON_ERROR_STOP=1 -f "$f" ;;
-    *.sh) bash "$f" ;;
-  esac
-done
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+python scripts/check-migration-drift.py
+python -m alembic -c alembic.ini upgrade head

@@ -778,6 +778,13 @@ Release rules:
 - rollback path documented for every release
 - index schema migrations use blue/green index aliases
 
+Migration discipline:
+
+- `scripts/migrate.sh` is the only supported schema entrypoint and runs `alembic upgrade head`.
+- The initial Alembic baseline preserves the existing SQL and role-management semantics but is intentionally not destructively reversible.
+- For a failed forward migration, restore the last verified database backup or snapshot, then rerun the release after fixing the revision. Once data has crossed a revision boundary, ship a new backward-compatible forward-fix revision; do not edit an applied revision or replay files from `db/migrations` directly.
+- The legacy `db/migrations` files remain frozen source material. The drift check fails if they change, if a new legacy file is added, or if a raw Compose/initdb or shell loop bypass is reintroduced.
+
 ---
 
 ## 13. Production build sequence, not MVP

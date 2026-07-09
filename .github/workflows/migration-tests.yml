@@ -1,0 +1,32 @@
+name: migration-tests
+
+on: [push, pull_request]
+
+jobs:
+  alembic:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: svs_owner
+          POSTGRES_PASSWORD: svs_owner_dev_password
+          POSTGRES_DB: svs
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U svs_owner -d svs"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --upgrade pip
+      - run: pip install -r apps/api/requirements.txt
+      - run: python scripts/check-migration-drift.py
+      - run: |
+          export DATABASE_URL_MIGRATIONS=postgresql://svs_owner:svs_owner_dev_password@localhost:5432/svs
+          bash scripts/migrate.sh
+          python -m alembic -c alembic.ini upgrade head
+      - run: pytest -q tests/test_migration_discipline.py

@@ -31,6 +31,13 @@ jobs:
           docker compose logs postgres
           exit 1
       - run: |
+          DATABASE_URL_MIGRATIONS=postgresql://svs_owner:svs_owner_dev_password@localhost:5432/svs \
+          DATABASE_URL_SYNC=postgresql://svs_owner:svs_owner_dev_password@localhost:5432/svs \
+          POSTGRES_APP_USER=svs_app \
+          POSTGRES_APP_PASSWORD=svs_app_dev_password \
+          POSTGRES_DB=svs \
+          bash scripts/migrate.sh
+      - run: |
           PYTHONPATH=packages/svs_common:apps/api:apps/worker:apps/model_gateway:apps/instance_agent \
           SVS_RUN_INTEGRATION=1 \
           DATABASE_URL_MIGRATIONS=postgresql://svs_owner:svs_owner_dev_password@localhost:5432/svs \
