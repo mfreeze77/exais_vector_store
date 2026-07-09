@@ -22,27 +22,27 @@ def valid_env() -> dict[str, str]:
         "SVS_CELL_ENV_FILE": "/opt/exais/vector-store/.env.cell",
         "SVS_DEV_MODE": "false",
         "POSTGRES_USER": "svs_owner",
-        "POSTGRES_PASSWORD": "owner-not-real-64-characters-aaaaaaaaaaaaaaaaaaaaaaaa",
+        "POSTGRES_PASSWORD": "sops://configs/cell-secrets.example.sops.yaml#POSTGRES_PASSWORD",
         "POSTGRES_DB": "svs",
         "POSTGRES_APP_USER": "svs_app",
-        "POSTGRES_APP_PASSWORD": "app-not-real-64-characters-bbbbbbbbbbbbbbbbbbbbbbbb",
-        "DATABASE_URL": "postgresql+psycopg://svs_app:app-pass@postgres:5432/svs",
-        "DATABASE_URL_SYNC": "postgresql://svs_owner:owner-pass@localhost:5432/svs",
-        "DATABASE_URL_MIGRATIONS": "postgresql://svs_owner:owner-pass@localhost:5432/svs",
+        "POSTGRES_APP_PASSWORD": "sops://configs/cell-secrets.example.sops.yaml#POSTGRES_APP_PASSWORD",
+        "DATABASE_URL": "sops://configs/cell-secrets.example.sops.yaml#DATABASE_URL",
+        "DATABASE_URL_SYNC": "sops://configs/cell-secrets.example.sops.yaml#DATABASE_URL_SYNC",
+        "DATABASE_URL_MIGRATIONS": "sops://configs/cell-secrets.example.sops.yaml#DATABASE_URL_MIGRATIONS",
         "REDIS_URL": "redis://redis:6379/0",
         "QDRANT_URL": "http://qdrant:6333",
         "QDRANT_COLLECTION_PREFIX": "svs_",
         "SVS_DENSE_BACKEND": "qdrant",
         "SVS_SPARSE_BACKEND": "postgres_fts",
         "S3_ENDPOINT_URL": "https://object-storage.internal.invalid",
-        "S3_ACCESS_KEY_ID": "access-not-real-aaaaaaaaaaaaaaaa",
-        "S3_SECRET_ACCESS_KEY": "secret-not-real-bbbbbbbbbbbbbbbb",
+        "S3_ACCESS_KEY_ID": "sops://configs/cell-secrets.example.sops.yaml#S3_ACCESS_KEY_ID",
+        "S3_SECRET_ACCESS_KEY": "sops://configs/cell-secrets.example.sops.yaml#S3_SECRET_ACCESS_KEY",
         "S3_BUCKET": "exai-vector-store-prod",
         "S3_REGION": "us-east-1",
         "DEFAULT_EMBEDDING_PROVIDER": "openai",
-        "OPENAI_API_KEY": "sk-not-real-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "OPENAI_API_KEY": "envref://OPENAI_API_KEY",
         "MODEL_GATEWAY_URL": "http://model-gateway:8081",
-        "SVS_API_KEY_PEPPER": "pepper-not-real-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "SVS_API_KEY_PEPPER": "age://configs/cell-secrets.example.sops.yaml#SVS_API_KEY_PEPPER",
         "SVS_ALLOWED_CORS_ORIGINS": "https://admin.internal.invalid,https://api.internal.invalid",
         "SVS_INDEX_STRICT": "true",
         "SVS_OBJECT_STORE_STRICT": "true",
@@ -71,6 +71,17 @@ def test_valid_production_env_passes_preflight():
     assert issues == []
 
 
+def test_preflight_rejects_plaintext_secret_values_and_embedded_url_passwords():
+    values = valid_env()
+    values["POSTGRES_PASSWORD"] = "owner-not-real-64-characters-aaaaaaaaaaaaaaaaaaaaaaaa"
+    values["DATABASE_URL"] = "postgresql+psycopg://svs_app:app-pass@postgres:5432/svs"
+
+    codes = issue_codes(prod_env_preflight.validate_env(values, "0.9.8-production-candidate"))
+
+    assert "PLAINTEXT_SECRET" in codes
+    assert "EMBEDDED_SECRET" in codes
+
+
 def test_preflight_rejects_dev_mode_placeholders_versions_and_ports():
     values = valid_env()
     values["SVS_DEV_MODE"] = "true"
@@ -97,3 +108,18 @@ def test_preflight_report_prints_names_not_secret_values():
     assert "OPENAI_API_KEY" in report
     assert "replace-with-owner-secret" not in report
     assert "sk-should-not-appear" not in report
+
+
+def test_reference_paths_with_example_do_not_trigger_placeholder_detection():
+    value = "sops://configs/cell-secrets.example.sops.yaml#POSTGRES_PASSWORD"
+
+    assert prod_env_preflight.has_placeholder("POSTGRES_PASSWORD", value) is False
+
+
+def test_database_url_reference_locator_is_not_parsed_as_runtime_dsn():
+    values = valid_env()
+    values["DATABASE_URL"] = "vault://kv/svs_owner/customer-001#DATABASE_URL"
+
+    issues = prod_env_preflight.validate_env(values, "0.9.8-production-candidate")
+
+    assert "RUNTIME_DSN_USES_OWNER" not in issue_codes(issues)

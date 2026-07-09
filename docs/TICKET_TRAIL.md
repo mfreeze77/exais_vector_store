@@ -70,7 +70,14 @@ Status legend:
 - SVS-060 Instance manifests — scaffolded.
 - SVS-061 Instance agent — scaffolded.
 - SVS-062 Fleet upgrade script — scaffolded.
-- SVS-063 Encrypted secrets workflow — ready-to-build.
+- SVS-063 Encrypted secrets workflow — implemented for repo-buildable
+  production secret-reference validation. `svs_common.secrets` accepts
+  SOPS/age, Vault, and `envref://` references; production preflight rejects
+  plaintext secret-bearing values and DSNs with embedded passwords while
+  reporting names only; `generate-cell-env.py --production` imports only valid
+  secret references; and `runbooks/encrypted-secrets.md` documents setup,
+  rotation, and rollback. Live SOPS/Vault execution and customer-host
+  secret-manager proof remain operator proof gates.
 - SVS-064 Signed releases/digest pinning — implemented for local digest
   provenance manifests and cell startup rejection of unpinned or unverifiable
   app image metadata. Cryptographic signing and external registry proof remain

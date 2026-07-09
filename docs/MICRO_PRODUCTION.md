@@ -12,7 +12,7 @@ Base product:
 
 Instance:
   instance.yaml
-  secrets.sops.yaml
+  secrets.sops.yaml or Vault/envref references
   retrieval profiles
   security policies
   storage prefixes
@@ -49,3 +49,13 @@ manifests with fixed version tags, OCI service/version labels, and `sha256`
 digest metadata; and local cell startup rejects unpinned or unverifiable app
 image sets before pull/up. External registry publication proof, customer/VPS
 startup evidence, and live operator credentials are later proof gates.
+
+RM-005 closes the repo-buildable encrypted-secret reference lane. Production
+cell env files use reference values such as
+`sops://configs/cell-secrets.example.sops.yaml#POSTGRES_PASSWORD`,
+`age://...#KEY`, `vault://kv/exais/customer-001#KEY`, or `envref://KEY`.
+`scripts/release/prod-env-preflight.py` rejects plaintext secret-bearing values
+and DSNs with embedded passwords while reporting variable names only.
+`scripts/release/generate-cell-env.py --production --reference-source-env ...`
+imports only valid secret references. Live SOPS/Vault execution and customer
+host secret-manager proof remain operator proof gates.

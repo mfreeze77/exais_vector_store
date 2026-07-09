@@ -391,7 +391,17 @@ Production requirements:
 - TLS everywhere externally.
 - mTLS or private-network service auth internally.
 - LUKS or equivalent disk encryption on dedicated servers.
-- Per-environment secrets stored in Vault/SOPS/age, not `.env` files in production.
+- Per-environment secrets stored in Vault/SOPS/age or injected through a
+  documented `envref://KEY` runtime contract, not plaintext `.env` files in
+  production.
+- Production env files carry only secret references for passwords, API keys,
+  access keys, peppers, tokens, and production DSNs. `prod-env-preflight.py`
+  validates `sops://...#KEY`, `age://...#KEY`, `vault://...#KEY`, and
+  `envref://KEY` references, rejects DSNs with embedded passwords, and reports
+  variable names only.
+- Rotation and rollback handling live in `runbooks/encrypted-secrets.md`.
+  Repo-buildable validation does not claim live SOPS/Vault access, DNS/TLS, or
+  customer-host secret-manager proof.
 - API keys stored hashed, never reversible.
 - Embedding provider keys scoped per environment and rotated.
 - Customer-managed key support later for enterprise tenants.

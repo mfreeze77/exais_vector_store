@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
 from release_common import ROOT, version
 
+sys.path.insert(0, str(ROOT / "packages" / "svs_common"))
+from svs_common.secrets import is_secret_key, looks_like_secret_reference, validate_secret_references
+
 
 LOCAL_ENVS = {"local", "dev", "development", "test", "testing", "ci"}
-SECRET_MARKERS = ("PASSWORD", "SECRET", "API_KEY", "TOKEN", "PEPPER", "ACCESS_KEY")
 PLACEHOLDER_MARKERS = (
     "replace-with",
     "change-me",
@@ -105,15 +108,13 @@ def is_blank(value: str | None) -> bool:
     return value is None or value.strip() == ""
 
 
-def is_secret_key(key: str) -> bool:
-    return any(marker in key.upper() for marker in SECRET_MARKERS)
-
-
 def has_placeholder(key: str, value: str | None) -> bool:
     if value is None:
         return False
     normalized = value.strip().lower()
     if not normalized:
+        return False
+    if looks_like_secret_reference(value):
         return False
     if is_secret_key(key) and normalized in {"admin", "password", "secret", "token", "key"}:
         return True
@@ -191,7 +192,8 @@ def validate_env(values: dict[str, str], expected_version: str, *, allow_local_r
 
     if (values.get("POSTGRES_APP_USER") or "") and values.get("POSTGRES_APP_USER") == values.get("POSTGRES_USER"):
         issues.append(Issue("APP_DB_ROLE_IS_OWNER", ("POSTGRES_APP_USER", "POSTGRES_USER")))
-    if "svs_owner" in (values.get("DATABASE_URL") or ""):
+    runtime_dsn = values.get("DATABASE_URL") or ""
+    if not looks_like_secret_reference(runtime_dsn) and "svs_owner" in runtime_dsn:
         issues.append(Issue("RUNTIME_DSN_USES_OWNER", ("DATABASE_URL",)))
 
     provider = (values.get("DEFAULT_EMBEDDING_PROVIDER") or "").strip().lower()
@@ -208,6 +210,9 @@ def validate_env(values: dict[str, str], expected_version: str, *, allow_local_r
             issues.append(Issue("PLACEHOLDER", (key,)))
         elif key in required_secret_keys and is_secret_key(key) and is_blank(value):
             issues.append(Issue("MISSING_SECRET", (key,)))
+
+    for issue in validate_secret_references(values, require_external=True):
+        issues.append(Issue(issue.code, issue.keys))
 
     issues.extend(validate_ports(values))
     return dedupe_issues(issues)

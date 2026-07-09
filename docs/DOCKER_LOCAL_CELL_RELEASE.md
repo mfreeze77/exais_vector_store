@@ -83,8 +83,12 @@ On a VPS with Docker and Compose installed:
 ```bash
 git clone <repo-url> /opt/exais/vector-store
 cd /opt/exais/vector-store
-cp .env.production.example /opt/exais/vector-store/.env.cell
-# Fill the placeholder values in /opt/exais/vector-store/.env.cell.
+python scripts/release/generate-cell-env.py \
+  --cell customer-001 \
+  --production \
+  --registry-prefix docker.io/expertaiservices \
+  --reference-source-env .env.production.example
+cp .release/cells/customer-001/.env.cell /opt/exais/vector-store/.env.cell
 python scripts/release/prod-env-preflight.py --env-file /opt/exais/vector-store/.env.cell
 SVS_CELL_ENV_FILE=/opt/exais/vector-store/.env.cell \
   docker-compose --env-file /opt/exais/vector-store/.env.cell \
@@ -95,3 +99,12 @@ SVS_CELL_ENV_FILE=/opt/exais/vector-store/.env.cell \
 
 Use a registry prefix such as `docker.io/expertaiservices` or a private registry
 namespace. Keep `SVS_VERSION` pinned to `VERSION`; do not use `latest` for cells.
+
+Production env files must carry secret references, not plaintext values.
+Accepted forms are documented in `runbooks/encrypted-secrets.md` and include
+`sops://...#KEY`, `age://...#KEY`, `vault://...#KEY`, and `envref://KEY`.
+`prod-env-preflight.py` validates those references and rejects plaintext
+passwords, API keys, access keys, peppers, tokens, and DSNs with embedded
+passwords while printing variable names only. Live SOPS/Vault reads, DNS/TLS,
+and customer-host proof remain operator proof gates outside the local release
+proof.

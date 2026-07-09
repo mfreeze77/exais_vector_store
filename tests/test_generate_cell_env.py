@@ -46,3 +46,51 @@ def test_write_output_lists_names_not_values(tmp_path, capsys):
     output = capsys.readouterr().out
     assert "OPENAI_API_KEY" in output
     assert "sk-should-not-print" not in output
+
+
+def test_production_reference_import_copies_only_valid_secret_references():
+    values = generate_cell_env.build_production_reference_env(
+        "customer-001",
+        "docker.io/expertaiservices",
+        18080,
+    )
+    imported, issues = generate_cell_env.import_operator_secret_references(
+        values,
+        {
+            "POSTGRES_PASSWORD": "sops://configs/cell-secrets.example.sops.yaml#POSTGRES_PASSWORD",
+            "DATABASE_URL": "vault://kv/exais/customer-001#DATABASE_URL",
+            "OPENAI_API_KEY": "envref://OPENAI_API_KEY",
+            "SVS_PUBLIC_API_BASE": "https://api.internal.invalid",
+            "UNRELATED_SECRET": "raw-should-fail",
+        },
+    )
+
+    assert issues
+    assert "POSTGRES_PASSWORD" in imported
+    assert "DATABASE_URL" in imported
+    assert "OPENAI_API_KEY" in imported
+    assert "SVS_PUBLIC_API_BASE" not in imported
+    assert "UNRELATED_SECRET" not in values
+    assert values["POSTGRES_PASSWORD"] == "sops://configs/cell-secrets.example.sops.yaml#POSTGRES_PASSWORD"
+
+
+def test_production_reference_import_reports_names_not_values():
+    values = generate_cell_env.build_production_reference_env(
+        "customer-001",
+        "docker.io/expertaiservices",
+        18080,
+    )
+    _imported, issues = generate_cell_env.import_operator_secret_references(
+        values,
+        {
+            "POSTGRES_PASSWORD": "raw-secret-should-not-appear",
+            "DATABASE_URL": "postgresql://svs_app:app-pass@postgres:5432/svs",
+        },
+    )
+
+    rendered = "\n".join(f"FAIL {issue.code} {','.join(issue.keys)}" for issue in issues)
+
+    assert "POSTGRES_PASSWORD" in rendered
+    assert "DATABASE_URL" in rendered
+    assert "raw-secret-should-not-appear" not in rendered
+    assert "app-pass" not in rendered
