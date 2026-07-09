@@ -84,6 +84,20 @@ models:
     dimensions: 1024
     privacy: private_gpu
 
+  bge_m3_tei_local:
+    provider: tei
+    kind: embedding
+    model: BAAI/bge-m3
+    dimensions: 1024
+    privacy: private_gpu
+
+  bge_m3_infinity_local:
+    provider: infinity
+    kind: embedding
+    model: BAAI/bge-m3
+    dimensions: 1024
+    privacy: private_gpu
+
   qwen3_embedding_local_4b:
     provider: runpod_serverless_or_local
     kind: embedding
@@ -105,7 +119,19 @@ models:
 
 rerankers:
   optional_voyage_or_qwen_reranker_v1:
-    candidates: [voyage_rerank_lite, qwen3_reranker_local, disabled]
+    candidates: [voyage_rerank_lite, qwen3_reranker_local, infinity_reranker_local, disabled]
+  qwen3_reranker_local:
+    provider: runpod_serverless_or_local
+    kind: reranker
+    model: Qwen/Qwen3-Reranker-4B
+    privacy: private_gpu
+    status: candidate_until_live_health_probe
+  infinity_reranker_local:
+    provider: infinity
+    kind: reranker
+    model: BAAI/bge-reranker-v2-m3
+    privacy: private_gpu
+    status: candidate_until_live_health_probe
   disabled_by_default:
     provider: disabled
 

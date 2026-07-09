@@ -1,0 +1,67 @@
+# Example private model endpoints for RM-011. Do not put secret values in this file.
+endpoints:
+  - name: qwen3-embedding-4b-private-us
+    provider: runpod_serverless_or_local
+    kind: embedding
+    supports: [embeddings]
+    base_url: https://api.runpod.ai/v2/<endpoint-id>/runsync
+    model: Qwen/Qwen3-Embedding-4B
+    dimensions: 2560
+    privacy: private_gpu
+    security_max_level: 5
+    region: us
+    model_revision: <pinned-model-revision>
+    auth_secret_ref: envref://RUNPOD_API_KEY
+    health_status: unknown
+    p95_latency_ms: null
+    routing_state: fallback
+    live_credential_proof: false
+
+  - name: qwen3-reranker-4b-private-us
+    provider: runpod_serverless_or_local
+    kind: reranker
+    supports: [rerank]
+    base_url: https://api.runpod.ai/v2/<endpoint-id>/runsync
+    model: Qwen/Qwen3-Reranker-4B
+    privacy: private_gpu
+    security_max_level: 5
+    region: us
+    model_revision: <pinned-model-revision>
+    auth_secret_ref: envref://RUNPOD_API_KEY
+    health_status: unknown
+    p95_latency_ms: null
+    routing_state: fallback
+    live_credential_proof: false
+
+  - name: bge-m3-tei-private-lan
+    provider: tei
+    kind: embedding
+    supports: [embeddings]
+    base_url: http://tei.internal:8080
+    model: BAAI/bge-m3
+    dimensions: 1024
+    privacy: private_gpu
+    security_max_level: 5
+    region: local
+    model_revision: <pinned-model-revision>
+    auth_secret_ref: null
+    health_status: unknown
+    p95_latency_ms: null
+    routing_state: fallback
+    live_credential_proof: false
+
+  - name: bge-reranker-infinity-private-lan
+    provider: infinity
+    kind: reranker
+    supports: [rerank]
+    base_url: http://infinity.internal:7997
+    model: BAAI/bge-reranker-v2-m3
+    privacy: private_gpu
+    security_max_level: 5
+    region: local
+    model_revision: <pinned-model-revision>
+    auth_secret_ref: null
+    health_status: unknown
+    p95_latency_ms: null
+    routing_state: fallback
+    live_credential_proof: false

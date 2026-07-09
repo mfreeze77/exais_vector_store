@@ -3,6 +3,7 @@ from enum import IntEnum
 from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator, model_validator
 from .openai_metadata import validate_openai_metadata
+from .secrets import parse_secret_reference
 
 class SecurityLevel(IntEnum):
     PUBLIC = 0
@@ -1003,6 +1004,49 @@ class RetrievalAnswerResponse(BaseModel):
     audit_event_id: str | None = None
     output_guard: dict[str, Any] | None = None
 
+
+_INLINE_SECRET_PREFIXES = ("sk-", "svs_live_", "bearer ", "basic ", "hf_", "rp_")
+_SECRET_CONFIG_KEY_PARTS = ("secret", "api_key", "token", "password", "authorization", "credential")
+_SECRET_CONFIG_FLAG_KEYS = {"live_credential_proof"}
+
+
+def _is_endpoint_secret_reference(value: str) -> bool:
+    if parse_secret_reference(value) is not None:
+        return True
+    return value.startswith("secret://") and len(value) > len("secret://") and not any(ch.isspace() for ch in value)
+
+
+def _validate_secret_reference_value(key: str, value: Any) -> Any:
+    if value is None or value == "":
+        return value
+    if not isinstance(value, str):
+        raise ValueError(f"{key} must use a secret reference string")
+    normalized = value.strip()
+    lowered = normalized.lower()
+    if _is_endpoint_secret_reference(normalized):
+        return normalized
+    if any(ch.isspace() for ch in normalized) or "=" in normalized:
+        raise ValueError(f"{key} must use a secret reference, not an inline secret value")
+    if lowered.startswith(_INLINE_SECRET_PREFIXES):
+        raise ValueError(f"{key} must use a secret reference, not an inline secret value")
+    raise ValueError(f"{key} must use a supported secret reference")
+
+
+def _validate_config_secret_references(value: Any, path: str = "config") -> None:
+    if isinstance(value, dict):
+        for key, nested in value.items():
+            nested_path = f"{path}.{key}"
+            key_text = str(key).lower()
+            if key_text in _SECRET_CONFIG_FLAG_KEYS:
+                continue
+            if any(part in key_text for part in _SECRET_CONFIG_KEY_PARTS) and not isinstance(nested, (dict, list)):
+                _validate_secret_reference_value(nested_path, nested)
+            else:
+                _validate_config_secret_references(nested, nested_path)
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            _validate_config_secret_references(item, f"{path}[{index}]")
+
 class EmbeddingRequest(BaseModel):
     input: list[str] | str
     model_profile_id: str | None = None
@@ -1029,6 +1073,9 @@ class RerankRequest(BaseModel):
     query: str
     documents: list[str]
     model_profile_id: str | None = None
+    model: str | None = None
+    provider: str | None = None
+    security_level: int = 1
     top_n: int | None = None
 
 class RerankResult(BaseModel):
@@ -1057,10 +1104,36 @@ class ModelEndpointRequest(BaseModel):
     base_url: str | None = None
     model: str | None = None
     dimensions: int | None = None
+    supports: list[str] = Field(default_factory=list)
     privacy: str = 'external_api'
     security_max_level: int = 3
     status: str = 'active'
+    health_status: str = 'unknown'
+    p95_latency_ms: int | None = Field(default=None, ge=0)
+    region: str | None = None
+    model_revision: str | None = None
+    auth_secret_ref: str | None = None
+    last_health_check_at: int | None = None
+    routing_state: str = 'unknown'
     config: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator('security_max_level')
+    @classmethod
+    def _security_max_level_in_range(cls, value: int) -> int:
+        if value < 0 or value > 5:
+            raise ValueError('security_max_level must be between 0 and 5')
+        return value
+
+    @field_validator('auth_secret_ref')
+    @classmethod
+    def _auth_secret_ref_is_reference(cls, value: str | None) -> str | None:
+        return _validate_secret_reference_value('auth_secret_ref', value)
+
+    @field_validator('config')
+    @classmethod
+    def _config_uses_secret_references(cls, value: dict[str, Any]) -> dict[str, Any]:
+        _validate_config_secret_references(value)
+        return value
 
 class ModelEndpointResponse(ModelEndpointRequest):
     id: str

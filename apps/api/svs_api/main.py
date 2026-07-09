@@ -65,6 +65,7 @@ from svs_common.vector_store_repo import (
 from svs_common.ingestion import IngestionService
 from svs_common.retrieval import RetrievalService
 from svs_common.model_registry import vectorization_modes, model_registry, retrieval_profiles
+from svs_common.provider_probe import ENDPOINT_METADATA_FIELDS, endpoint_response_payload, normalize_endpoint_payload
 from svs_common.ids import new_id
 from svs_common.auth import (
     resolve_api_key_principal,
@@ -1404,13 +1405,14 @@ async def retrieval_answer(req: RetrievalAnswerRequest, principal: Principal = D
 def create_model_endpoint(req: ModelEndpointRequest, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'models:write')
     endpoint_id = new_id('mdl')
+    payload = normalize_endpoint_payload(req.model_dump())
     db.execute(jsonb_text('''
         INSERT INTO model_endpoints(id, tenant_id, business_instance_id, name, provider, kind, base_url, model, dimensions,
           privacy, security_max_level, status, config)
         VALUES (:id, :tenant_id, :biz_id, :name, :provider, :kind, :base_url, :model, :dimensions, :privacy, :security_max_level, :status, CAST(:config AS jsonb))
-    ''', 'config'), {**req.model_dump(), 'id': endpoint_id, 'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id, 'config': jsonb_param(req.config)})
+    ''', 'config'), {**payload, 'id': endpoint_id, 'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id, 'config': jsonb_param(payload['config'])})
     db.commit()
-    return ModelEndpointResponse(id=endpoint_id, **req.model_dump())
+    return ModelEndpointResponse(**endpoint_response_payload({**payload, 'id': endpoint_id}))
 
 
 @app.get('/api/v1/model-endpoints')
@@ -1421,12 +1423,33 @@ def list_model_endpoints(principal: Principal = Depends(get_request_principal), 
                extract(epoch from created_at)::bigint created_at, extract(epoch from updated_at)::bigint updated_at
         FROM model_endpoints WHERE tenant_id=:tenant_id AND business_instance_id=:biz_id ORDER BY created_at DESC
     '''), {'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id}).mappings().all()
-    return _list_response([dict(r) for r in rows])
+    return _list_response([endpoint_response_payload(dict(r)) for r in rows])
 
 
 @app.patch('/api/v1/model-endpoints/{endpoint_id}', response_model=ModelEndpointResponse)
 def update_model_endpoint(endpoint_id: str, patch: dict[str, Any] = Body(default_factory=dict), principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'models:write')
+    patch = dict(patch or {})
+    metadata_patch = {k: patch.pop(k) for k in list(patch) if k in ENDPOINT_METADATA_FIELDS}
+    if metadata_patch or 'config' in patch:
+        existing = db.execute(
+            text('SELECT id, name, provider, kind, base_url, model, dimensions, privacy, security_max_level, status, config FROM model_endpoints WHERE id=:id AND tenant_id=:tenant_id AND business_instance_id=:biz_id'),
+            {'id': endpoint_id, 'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id},
+        ).mappings().first()
+        if not existing:
+            raise HTTPException(status_code=404, detail='Model endpoint not found')
+        merged_config = dict((patch.get('config') if 'config' in patch else existing['config']) or {})
+        for key, value in metadata_patch.items():
+            if value is not None:
+                merged_config[key] = value
+        normalized = normalize_endpoint_payload({'status': patch.get('status', existing['status']), 'config': merged_config})
+        patch['config'] = normalized['config']
+        if 'status' not in patch and normalized.get('status') and normalized['status'] != existing['status']:
+            patch['status'] = normalized['status']
+        try:
+            ModelEndpointRequest.model_validate(endpoint_response_payload({**dict(existing), **patch}))
+        except ValidationError as exc:
+            raise HTTPException(status_code=422, detail=exc.errors(include_context=False)) from exc
     allowed = {'name', 'provider', 'kind', 'base_url', 'model', 'dimensions', 'privacy', 'security_max_level', 'status', 'config'}
     fields, params = [], {'id': endpoint_id, 'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id}
     for k, v in patch.items():
@@ -1440,7 +1463,7 @@ def update_model_endpoint(endpoint_id: str, patch: dict[str, Any] = Body(default
     if not row:
         raise HTTPException(status_code=404, detail='Model endpoint not found')
     db.commit()
-    return ModelEndpointResponse(id=row['id'], name=row['name'], provider=row['provider'], kind=row['kind'], base_url=row['base_url'], model=row['model'], dimensions=row['dimensions'], privacy=row['privacy'], security_max_level=row['security_max_level'], status=row['status'], config=dict(row['config'] or {}))
+    return ModelEndpointResponse(**endpoint_response_payload(dict(row)))
 
 
 @app.post('/api/v1/bakeoffs')

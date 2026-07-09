@@ -71,6 +71,8 @@ class Settings(BaseSettings):
     model_gateway_url: str = 'http://localhost:8081'
     tei_endpoint_url: str | None = None
     infinity_endpoint_url: str | None = None
+    self_hosted_model_endpoint_url: str | None = None
+    self_hosted_model_api_key: str | None = None
     runpod_embedding_endpoint_url: str | None = None
     runpod_api_key: str | None = None
     runpod_endpoint_id: str | None = None

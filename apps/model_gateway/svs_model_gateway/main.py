@@ -1,9 +1,10 @@
 from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
+import httpx
 from svs_common.config import get_settings
 from svs_common.model_registry import estimate_embedding_cost, model_registry
-from svs_common.providers import provider_for
+from svs_common.providers import ProviderConfigurationError, provider_config_status, provider_for, provider_for_rerank
 from svs_common.schemas import EmbeddingRequest, EmbeddingResponse, RerankRequest, RerankResponse, RerankResult, TokenizeRequest, TokenizeResponse
 from svs_common.chunking import estimate_tokens
 
@@ -76,9 +77,7 @@ async def embeddings(req: EmbeddingRequest):
     dimensions = req.dimensions or int(profile.get("dimensions", settings.openai_embedding_dimensions))
     return await provider_for(provider_name).embed(texts, model, dimensions, input_type=req.input_type)
 
-@app.post("/internal/models/rerank", response_model=RerankResponse)
-async def rerank(req: RerankRequest):
-    # Local lexical fallback. Production rerankers can be routed through model endpoint/provider adapters.
+def _lexical_rerank(req: RerankRequest) -> RerankResponse:
     q = set(req.query.lower().split())
     results = []
     for i, doc in enumerate(req.documents):
@@ -88,6 +87,35 @@ async def rerank(req: RerankRequest):
     if req.top_n:
         results = results[: req.top_n]
     return RerankResponse(results=results, model="lexical-overlap-fallback", provider="local")
+
+
+def _configured_reranker(req: RerankRequest) -> tuple[str | None, str | None]:
+    rerankers = model_registry().get("rerankers", {})
+    profile = rerankers.get(req.model_profile_id or "", {})
+    if req.provider:
+        return req.provider, req.model or profile.get("model") or req.model_profile_id
+    provider = profile.get("provider")
+    if provider and provider != "disabled":
+        return provider, req.model or profile.get("model") or req.model_profile_id
+    for candidate_id in profile.get("candidates") or []:
+        candidate = rerankers.get(candidate_id, {})
+        candidate_provider = candidate.get("provider")
+        if not candidate_provider or candidate_provider == "disabled":
+            continue
+        if provider_config_status(candidate_provider).configured:
+            return candidate_provider, candidate.get("model") or candidate_id
+    return None, None
+
+
+@app.post("/internal/models/rerank", response_model=RerankResponse)
+async def rerank(req: RerankRequest):
+    provider_name, model = _configured_reranker(req)
+    if provider_name and model:
+        try:
+            return await provider_for_rerank(provider_name).rerank(req.query, req.documents, model, top_n=req.top_n)
+        except (ProviderConfigurationError, httpx.HTTPError, TimeoutError, OSError):
+            return _lexical_rerank(req)
+    return _lexical_rerank(req)
 
 @app.post("/internal/models/tokenize", response_model=TokenizeResponse)
 def tokenize(req: TokenizeRequest):

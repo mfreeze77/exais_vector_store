@@ -51,3 +51,9 @@ Use RunPod as an optional private GPU model backend behind `exai-vector-store-mo
 - Do not route high-security data to external providers if the instance policy requires local/private models.
 - Use model-cache volumes for startup speed, but do not use the model-cache volume as an application database.
 - Pin model revisions and container image digests.
+
+## RM-011 adapter status
+
+- Gateway adapters normalize RunPod serverless, TEI, Infinity, and OpenAI-compatible self-hosted embedding/rerank payloads into the internal response contracts.
+- Endpoint registration stores health status, p95 latency, region, model revision, routing state, and auth secret references in `model_endpoints.config`; failed health marks fallback state without adding database columns.
+- This is credential-free contract proof only. RM-014 owns live endpoint credentials, external health probes, and provider performance evidence.
