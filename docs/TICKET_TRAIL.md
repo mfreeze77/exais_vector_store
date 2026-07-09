@@ -37,7 +37,7 @@ Status legend:
 - SVS-031 External PDF-to-Markdown ingestion — scaffolded.
 - SVS-032 Raw PDF research mode — config scaffolded.
 - SVS-033 Code/table/log specialized parsers — implemented with code-symbol chunks, JSON/CSV/Markdown-table record chunks, log event-boundary chunks, and focused router/chunker proof.
-- SVS-034 Idempotent reindexing — implemented with cursor-aware repair, stable dense point/sparse doc replay, force/non-force selection proof, and repair-all script coverage.
+- SVS-034 Idempotent reindexing — implemented with cursor-aware repair, stable dense point/sparse doc replay, force/non-force selection proof, and repair-all script coverage. RM-001 reconciliation proof: `docker run --rm -v "${pwdPath}:/work" -w /work -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python -m pytest -q -rs tests/test_reindex_idempotency.py tests/test_index_cleanup.py tests/test_qdrant_repair_all_script.py tests/test_qdrant_repair_proof_script.py` -> `14 passed`.
 - SVS-035 Blue/green index versions — implemented with optional active index version suffixes for Qdrant/OpenSearch, default-name compatibility, and reindex collection/point metadata persistence proof.
 
 ## EPIC-005 Model gateway/router

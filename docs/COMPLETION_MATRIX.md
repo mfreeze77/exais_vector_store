@@ -42,9 +42,12 @@ Implemented after audit:
 - Minimal metrics endpoint.
 - Usage-event writes for retrieval and ingestion.
 
+Reindex repair is complete and reconciled: the API and queued worker use the shared `MaintenanceService.reindex_chunks` path to select non-indexed dense/sparse chunks, replay both backends, mark rows indexed, and support cursor-paginated force repair. Focused production-candidate proof passed with `14 passed`:
+
+`docker run --rm -v "${pwdPath}:/work" -w /work -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python -m pytest -q -rs tests/test_reindex_idempotency.py tests/test_index_cleanup.py tests/test_qdrant_repair_all_script.py tests/test_qdrant_repair_proof_script.py`
+
 Still not complete:
 
-- reindex repair worker
 - Alembic
 - full OpenAPI contract
 - production observability dashboards

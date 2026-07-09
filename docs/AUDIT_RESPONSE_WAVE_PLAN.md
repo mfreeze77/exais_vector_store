@@ -30,8 +30,7 @@ Status in this patch: partially implemented.
 
 Remaining Wave 2 work:
 
-- Add a repair/reindex job that picks up chunks where dense/sparse index status is not `indexed`.
-- Add qdrant/opensearch cleanup for orphaned points/docs after transaction rollback or partial backend writes.
+- Reindex repair and stale backend cleanup are reconciled as implemented through the existing API/worker maintenance path. Non-indexed dense/sparse chunks are selected by `MaintenanceService.reindex_chunks`, replayed to Qdrant/OpenSearch, marked indexed, and covered by cursor-paginated repair-all plus stale cleanup proof. Production-candidate proof command: `docker run --rm -v "${pwdPath}:/work" -w /work -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python -m pytest -q -rs tests/test_reindex_idempotency.py tests/test_index_cleanup.py tests/test_qdrant_repair_all_script.py tests/test_qdrant_repair_proof_script.py` -> `14 passed`.
 - Add idempotency keys at the API layer.
 - Add migration toolchain through Alembic instead of raw SQL loops.
 
