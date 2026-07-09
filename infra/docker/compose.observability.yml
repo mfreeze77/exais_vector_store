@@ -1,0 +1,56 @@
+# Local-cell observability overlay for infra/docker/compose.cell.yml.
+services:
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --storage.path=/alertmanager
+    ports:
+      - "${SVS_ALERTMANAGER_PORT:-19093}:9093"
+    volumes:
+      - ../../charts/exais-observability/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager-data:/alertmanager
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+    ports:
+      - "${SVS_PROMETHEUS_PORT:-19090}:9090"
+    volumes:
+      - ../../charts/exais-observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../../charts/exais-observability/rules:/etc/prometheus/rules:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      api:
+        condition: service_healthy
+      model-gateway:
+        condition: service_healthy
+      alertmanager:
+        condition: service_started
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_SECURITY_ADMIN_PASSWORD: ${SVS_GRAFANA_ADMIN_PASSWORD:-exais-local-observability}
+    ports:
+      - "${SVS_GRAFANA_PORT:-13000}:3000"
+    volumes:
+      - ../../charts/exais-observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../../charts/exais-observability/dashboards:/var/lib/grafana/dashboards/exais:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      prometheus:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  alertmanager-data:
+  prometheus-data:
+  grafana-data:

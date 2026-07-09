@@ -10,7 +10,7 @@
 | Model routing | mode/model registries | provider-specific adapters/pricing |
 | RunPod | handler/Dockerfile | GPU image, warm pool, autoscaling |
 | Micro production | manifests/agent/scripts | signed releases, canaries |
-| Ops | Terraform/Ansible/runbooks; backup artifact manifests and restore preflight | monitoring, external/offsite restore proof |
+| Ops | Terraform/Ansible/runbooks; backup artifact manifests and restore preflight; local observability stack | external production SLO/load proof, external/offsite restore proof |
 | Evals | metrics/schema + golden bakeoff metrics | live retrieval/provider fan-out runner |
 
 
@@ -41,6 +41,7 @@ Implemented after audit:
 - Real dependency-free code symbol chunker.
 - Minimal metrics endpoint.
 - Usage-event writes for retrieval and ingestion.
+- Local-cell observability overlay, dashboard, alert rules, and smoke proof for API, ingestion/worker, index, storage, security, cost, and backup metric visibility.
 
 Reindex repair is complete and reconciled: the API and queued worker use the shared `MaintenanceService.reindex_chunks` path to select non-indexed dense/sparse chunks, replay both backends, mark rows indexed, and support cursor-paginated force repair. Focused production-candidate proof passed with `14 passed`:
 
@@ -50,6 +51,6 @@ Still not complete:
 
 - rollback locks, PITR, and future schema revisions beyond the frozen Alembic baseline
 - full OpenAPI contract. RM-002 generated proof records 49 paths (26 native, 23 OpenAI-compatible) and 77 schema components; the focused production-candidate contract/OpenAI suites passed with `137 passed`. OpenAI-compatible vector-store, file, file-batch, Responses, citation, and API-key surfaces are component-backed. Remaining gaps are explicit: most native success responses are untyped, and several JSON request bodies remain inline dictionaries or optional-body wrappers.
-- production observability dashboards
+- external production-scale observability/SLO/load proof beyond local-cell metric visibility
 - external/offsite restore drill against a real backup target
 - live bakeoff fan-out, fine-tuning, and multimodal research features

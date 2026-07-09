@@ -95,7 +95,11 @@ Status legend:
   sparse indexes, object/config/audit artifacts, and checksum metadata, with
   nondestructive restore preflight validation. Real offsite target proof and
   external restore drill evidence remain separate operator gates.
-- SVS-074 Observability stack — ready-to-build.
+- SVS-074 Observability stack — implemented for local-cell Prometheus,
+  Grafana, and Alertmanager overlay wiring, API/model-gateway metric surfaces,
+  dashboard panels, alert rules, and smoke proof. External SLO/load proof,
+  production-scale observability, and customer-host deployment proof remain
+  separate gates.
 
 ## EPIC-009 Evals/fine-tuning
 

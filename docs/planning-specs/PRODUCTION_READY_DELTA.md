@@ -661,6 +661,15 @@ Required alerts:
 - unauthorized admin action
 - restore drill overdue
 
+Repo-buildable RM-007 status: the local Docker cell now has a
+Prometheus/Grafana/Alertmanager overlay, a provisioned dashboard, alert rules,
+API and model-gateway metric endpoints, and
+`scripts/release/observability-smoke.py` evidence collection for API,
+ingestion/worker, index, storage/object, security, cost, and backup metric
+visibility. This is local-cell observability proof only; it does not claim
+external SLO/load proof, customer-host deployment proof, or production-scale
+observability coverage.
+
 ---
 
 ## 11. Backup, restore, and disaster recovery changes

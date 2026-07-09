@@ -1,0 +1,92 @@
+groups:
+  - name: exais-local-cell
+    rules:
+      - alert: ExAISApiMetricsMissing
+        expr: absent(svs_api_build_info)
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: API metrics scrape is missing
+          description: Prometheus has no svs_api_build_info series for the local cell.
+
+      - alert: ExAISModelGatewayMetricsMissing
+        expr: absent(svs_model_gateway_build_info)
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Model gateway metrics scrape is missing
+          description: Prometheus has no svs_model_gateway_build_info series for the local cell.
+
+      - alert: ExAISIngestionQueueOld
+        expr: svs_ingestion_jobs_oldest_queued_age_seconds > 300
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Ingestion queue has stale work
+          description: The oldest queued ingestion job is older than 5 minutes.
+
+      - alert: ExAISWorkerFailuresPresent
+        expr: svs_worker_jobs_failed_total > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Worker job failures are present
+          description: At least one ingestion or maintenance job is in failed state.
+
+      - alert: ExAISIndexBacklog
+        expr: svs_chunks_index_pending > 0
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: Chunk index backlog is present
+          description: Dense or sparse chunk index status is not fully indexed.
+
+      - alert: ExAISObjectStoreTrackingMissing
+        expr: svs_object_store_documents_tracked_total == 0 and svs_vector_stores_active > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Active vector stores have no tracked object artifacts
+          description: Local metrics show active stores but no document-version object keys.
+
+      - alert: ExAISSecurityDeniedRetrieval
+        expr: svs_security_acl_denied_retrieval_total > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: ACL-denied retrieval attempts are visible
+          description: Retrieval audit events include denied attempts that need operator review.
+
+      - alert: ExAISBackupNeverCompleted
+        expr: svs_backup_bundle_last_success_timestamp_seconds == 0
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: No completed backup bundle is visible
+          description: The backup manifest metrics have not recorded a completed local bundle.
+
+      - alert: ExAISBackupStale
+        expr: time() - svs_backup_bundle_last_success_timestamp_seconds > 86400
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: Latest visible backup is older than 24 hours
+          description: Local backup freshness exceeds the daily backup expectation.
+
+      - alert: ExAISBackupManifestMissing
+        expr: svs_backup_manifest_available_total == 0
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: Backup manifest visibility is missing
+          description: No backup bundle row with manifest metadata is visible to metrics.

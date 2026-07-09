@@ -924,20 +924,122 @@ def readyz(response: Response, db: Session = Depends(get_session)):
     return payload
 
 
+OBSERVABILITY_METRIC_SQL: tuple[tuple[str, str], ...] = (
+    ('svs_ingestion_jobs_queued', "SELECT count(*) FROM ingestion_jobs WHERE status='queued'"),
+    ('svs_ingestion_jobs_running', "SELECT count(*) FROM ingestion_jobs WHERE status='running'"),
+    ('svs_ingestion_jobs_failed', "SELECT count(*) FROM ingestion_jobs WHERE status='failed'"),
+    (
+        'svs_ingestion_jobs_oldest_queued_age_seconds',
+        "SELECT coalesce(extract(epoch FROM (now() - min(created_at))), 0) FROM ingestion_jobs WHERE status='queued'",
+    ),
+    (
+        'svs_worker_jobs_running',
+        "SELECT count(*) FROM ingestion_jobs WHERE status='running' AND locked_by IS NOT NULL",
+    ),
+    ('svs_worker_jobs_completed_total', "SELECT count(*) FROM ingestion_jobs WHERE status='completed'"),
+    ('svs_worker_jobs_failed_total', "SELECT count(*) FROM ingestion_jobs WHERE status='failed'"),
+    (
+        'svs_worker_last_completed_timestamp_seconds',
+        "SELECT coalesce(max(extract(epoch FROM completed_at)), 0) FROM ingestion_jobs WHERE status='completed'",
+    ),
+    ('svs_vector_stores_active', "SELECT count(*) FROM vector_stores WHERE status IN ('active','completed')"),
+    (
+        'svs_chunks_index_pending',
+        "SELECT count(*) FROM chunks WHERE dense_index_status <> 'indexed' OR sparse_index_status <> 'indexed'",
+    ),
+    ('svs_chunks_dense_index_pending', "SELECT count(*) FROM chunks WHERE dense_index_status <> 'indexed'"),
+    ('svs_chunks_sparse_index_pending', "SELECT count(*) FROM chunks WHERE sparse_index_status <> 'indexed'"),
+    (
+        'svs_chunks_indexed_total',
+        "SELECT count(*) FROM chunks WHERE dense_index_status='indexed' AND sparse_index_status='indexed'",
+    ),
+    (
+        'svs_object_store_documents_tracked_total',
+        "SELECT count(*) FROM document_versions WHERE object_key IS NOT NULL OR parsed_object_key IS NOT NULL",
+    ),
+    (
+        'svs_object_store_bytes_tracked',
+        "SELECT coalesce(sum(usage_bytes), 0) FROM vector_store_files WHERE status <> 'cancelled'",
+    ),
+    ('svs_storage_vector_store_usage_bytes', "SELECT coalesce(sum(usage_bytes), 0) FROM vector_stores"),
+    ('svs_security_audit_events_denied_total', "SELECT count(*) FROM audit_events WHERE allowed=false"),
+    (
+        'svs_security_acl_denied_retrieval_total',
+        "SELECT count(*) FROM audit_events WHERE event_type='retrieval' AND allowed=false",
+    ),
+    (
+        'svs_usage_cost_estimate_usd_total',
+        "SELECT coalesce(sum(cost_estimate_usd), 0) FROM usage_events WHERE cost_estimate_usd IS NOT NULL",
+    ),
+    (
+        'svs_cost_events_with_estimate_total',
+        "SELECT count(*) FROM usage_events WHERE cost_estimate_usd IS NOT NULL",
+    ),
+    ('svs_usage_retrieval_queries_total', "SELECT count(*) FROM usage_events WHERE event_type='retrieval.query'"),
+    (
+        'svs_backup_bundle_success_total',
+        "SELECT count(*) FROM backup_bundles WHERE status IN ('completed','succeeded','success')",
+    ),
+    ('svs_backup_bundle_failed_total', "SELECT count(*) FROM backup_bundles WHERE status IN ('failed','error')"),
+    (
+        'svs_backup_bundle_last_success_timestamp_seconds',
+        "SELECT coalesce(max(extract(epoch FROM completed_at)), 0) FROM backup_bundles WHERE completed_at IS NOT NULL AND status IN ('completed','succeeded','success')",
+    ),
+    (
+        'svs_backup_freshness_age_seconds',
+        "SELECT coalesce(extract(epoch FROM (now() - max(completed_at))), 0) FROM backup_bundles WHERE completed_at IS NOT NULL AND status IN ('completed','succeeded','success')",
+    ),
+    (
+        'svs_backup_manifest_available_total',
+        "SELECT count(*) FROM backup_bundles WHERE manifest <> '{}'::jsonb",
+    ),
+    (
+        'svs_backup_manifest_artifacts_total',
+        "SELECT coalesce(sum(jsonb_array_length(CASE WHEN jsonb_typeof(manifest->'artifacts')='array' THEN manifest->'artifacts' ELSE '[]'::jsonb END)), 0) FROM backup_bundles",
+    ),
+)
+
+
+def _prometheus_label_value(value: Any) -> str:
+    return str(value).replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"')
+
+
+def _prometheus_metric_value(value: Any) -> str:
+    try:
+        numeric = float(value or 0)
+    except (TypeError, ValueError):
+        numeric = 0.0
+    if numeric.is_integer():
+        return str(int(numeric))
+    return f'{numeric:.10g}'
+
+
+def _prometheus_metric_line(name: str, value: Any, labels: dict[str, Any] | None = None) -> str:
+    if labels:
+        label_text = ','.join(f'{key}="{_prometheus_label_value(labels[key])}"' for key in sorted(labels))
+        return f'{name}{{{label_text}}} {_prometheus_metric_value(value)}'
+    return f'{name} {_prometheus_metric_value(value)}'
+
+
+def _metric_scalar(db: Session, sql: str) -> Any:
+    try:
+        return db.execute(text(sql)).scalar() or 0
+    except Exception:
+        return 0
+
+
 @app.get('/metrics', response_class=PlainTextResponse)
 def metrics(db: Session = Depends(get_session)):
-    lines = [f'svs_api_build_info{{version="{settings.svs_product_version}"}} 1']
-    for name, sql in {
-        'svs_ingestion_jobs_queued': "SELECT count(*) FROM ingestion_jobs WHERE status='queued'",
-        'svs_ingestion_jobs_failed': "SELECT count(*) FROM ingestion_jobs WHERE status='failed'",
-        'svs_vector_stores_active': "SELECT count(*) FROM vector_stores WHERE status IN ('active','completed')",
-        'svs_chunks_index_pending': "SELECT count(*) FROM chunks WHERE dense_index_status <> 'indexed' OR sparse_index_status <> 'indexed'",
-    }.items():
-        try:
-            value = db.execute(text(sql)).scalar() or 0
-            lines.append(f'{name} {int(value)}')
-        except Exception:
-            lines.append(f'{name} 0')
+    lines = [
+        _prometheus_metric_line('svs_api_build_info', 1, {'version': settings.svs_product_version}),
+        _prometheus_metric_line(
+            'svs_api_index_strict_enabled',
+            1 if settings.svs_index_strict else 0,
+            {'dense_backend': settings.svs_dense_backend, 'sparse_backend': settings.svs_sparse_backend},
+        ),
+    ]
+    for name, sql in OBSERVABILITY_METRIC_SQL:
+        lines.append(_prometheus_metric_line(name, _metric_scalar(db, sql)))
     return '\n'.join(lines) + '\n'
 
 

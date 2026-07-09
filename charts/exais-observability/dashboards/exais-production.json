@@ -1,0 +1,400 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "svs_api_build_info",
+          "legendFormat": "api {{version}}"
+        },
+        {
+          "expr": "svs_model_gateway_build_info",
+          "legendFormat": "model-gateway {{version}}"
+        }
+      ],
+      "title": "API And Gateway Build",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "svs_ingestion_jobs_queued",
+          "legendFormat": "queued"
+        },
+        {
+          "expr": "svs_ingestion_jobs_running",
+          "legendFormat": "running"
+        },
+        {
+          "expr": "svs_ingestion_jobs_failed",
+          "legendFormat": "failed"
+        },
+        {
+          "expr": "svs_ingestion_jobs_oldest_queued_age_seconds",
+          "legendFormat": "oldest queued age"
+        }
+      ],
+      "title": "Ingestion Queue",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "svs_worker_jobs_running",
+          "legendFormat": "running"
+        },
+        {
+          "expr": "svs_worker_jobs_completed_total",
+          "legendFormat": "completed"
+        },
+        {
+          "expr": "svs_worker_jobs_failed_total",
+          "legendFormat": "failed"
+        },
+        {
+          "expr": "svs_worker_last_completed_timestamp_seconds",
+          "legendFormat": "last completed"
+        }
+      ],
+      "title": "Worker Jobs",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "svs_chunks_index_pending",
+          "legendFormat": "pending"
+        },
+        {
+          "expr": "svs_chunks_dense_index_pending",
+          "legendFormat": "dense pending"
+        },
+        {
+          "expr": "svs_chunks_sparse_index_pending",
+          "legendFormat": "sparse pending"
+        },
+        {
+          "expr": "svs_chunks_indexed_total",
+          "legendFormat": "indexed"
+        }
+      ],
+      "title": "Index Health",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 6
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "svs_vector_stores_active",
+          "legendFormat": "active stores"
+        },
+        {
+          "expr": "svs_object_store_documents_tracked_total",
+          "legendFormat": "tracked objects"
+        },
+        {
+          "expr": "svs_object_store_bytes_tracked",
+          "legendFormat": "object bytes"
+        },
+        {
+          "expr": "svs_storage_vector_store_usage_bytes",
+          "legendFormat": "store usage bytes"
+        }
+      ],
+      "title": "Storage And Objects",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 6
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "svs_security_audit_events_denied_total",
+          "legendFormat": "denied audit events"
+        },
+        {
+          "expr": "svs_security_acl_denied_retrieval_total",
+          "legendFormat": "denied retrieval"
+        }
+      ],
+      "title": "Security Signals",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 6
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "svs_usage_cost_estimate_usd_total",
+          "legendFormat": "cost estimate USD"
+        },
+        {
+          "expr": "svs_cost_events_with_estimate_total",
+          "legendFormat": "priced events"
+        },
+        {
+          "expr": "svs_usage_retrieval_queries_total",
+          "legendFormat": "retrieval queries"
+        },
+        {
+          "expr": "svs_model_gateway_priced_embedding_profiles",
+          "legendFormat": "priced embedding profiles"
+        }
+      ],
+      "title": "Cost And Retrieval Usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 12
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "svs_backup_bundle_success_total",
+          "legendFormat": "successful bundles"
+        },
+        {
+          "expr": "svs_backup_bundle_failed_total",
+          "legendFormat": "failed bundles"
+        },
+        {
+          "expr": "svs_backup_bundle_last_success_timestamp_seconds",
+          "legendFormat": "last success timestamp"
+        },
+        {
+          "expr": "svs_backup_freshness_age_seconds",
+          "legendFormat": "freshness age"
+        },
+        {
+          "expr": "svs_backup_manifest_available_total",
+          "legendFormat": "manifests"
+        },
+        {
+          "expr": "svs_backup_manifest_artifacts_total",
+          "legendFormat": "manifest artifacts"
+        }
+      ],
+      "title": "Backup Freshness And Manifest Visibility",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": [
+    "exais",
+    "local-cell",
+    "rm-007"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "title": "ExAIS Local Cell Observability",
+  "uid": "exais-local-cell-observability",
+  "version": 1,
+  "weekStart": ""
+}
