@@ -7,6 +7,8 @@ import {
   getStoredAdminApiKey,
   storeAdminApiKey,
 } from './auth';
+import type {FleetBusinessInstance, FleetComponentVersion, FleetVersionReport} from './fleet';
+import {displayValue, fleetIssueCount, selectedFleetInstance} from './fleet';
 import './styles.css';
 
 type Modes = Record<string, any>;
@@ -34,9 +36,56 @@ function JsonBlock({value}: {value: ApiResult | null}) {
   return <pre>{JSON.stringify(value, null, 2)}</pre>;
 }
 
+function statusClass(status: string) {
+  return `badge status-${status}`;
+}
+
+function ComponentRows({components}: {components: FleetComponentVersion[]}) {
+  return <table>
+    <thead><tr><th>Service</th><th>Status</th><th>Declared</th><th>Running</th><th>Image</th><th>Digest</th></tr></thead>
+    <tbody>{components.map(component => <tr key={component.service}>
+      <td>{component.service}</td>
+      <td><span className={statusClass(component.status)}>{component.status}</span></td>
+      <td>{displayValue(component.declared_version)}</td>
+      <td>{displayValue(component.running_version)}</td>
+      <td className="mono">{displayValue(component.image || component.expected_image)}</td>
+      <td className="mono">{displayValue(component.digest)}</td>
+    </tr>)}</tbody>
+  </table>;
+}
+
+function DeploymentRows({deployments}: {deployments: FleetVersionReport['deployments']}) {
+  if (!deployments.length) return <p className="muted">No visible deployment records.</p>;
+  return <table>
+    <thead><tr><th>Deployment</th><th>Business</th><th>Status</th><th>From</th><th>To</th><th>Completed</th></tr></thead>
+    <tbody>{deployments.map(deployment => <tr key={deployment.id}>
+      <td className="mono">{deployment.id}</td>
+      <td className="mono">{displayValue(deployment.business_instance_id)}</td>
+      <td><span className="badge">{deployment.status}</span></td>
+      <td>{displayValue(deployment.from_version)}</td>
+      <td>{displayValue(deployment.to_version)}</td>
+      <td>{displayValue(deployment.completed_at || deployment.started_at || deployment.created_at)}</td>
+    </tr>)}</tbody>
+  </table>;
+}
+
+function FleetSummary({instance}: {instance: FleetBusinessInstance | null}) {
+  if (!instance) return <p className="muted">No business instance selected.</p>;
+  const issueCount = fleetIssueCount(instance);
+  return <div className="fleet-summary">
+    <div>
+      <h3>{instance.name}</h3>
+      <p className="muted">{instance.slug} | {displayValue(instance.latest_deployment?.to_version)} | {issueCount} flagged components</p>
+    </div>
+    <span className={statusClass(instance.verification_status)}>{instance.verification_status}</span>
+  </div>;
+}
+
 function App() {
   const [modes, setModes] = useState<Modes>({});
   const [session, setSession] = useState<ApiResult | null>(null);
+  const [fleet, setFleet] = useState<FleetVersionReport | null>(null);
+  const [selectedBusinessInstanceId, setSelectedBusinessInstanceId] = useState('');
   const [apiKey, setApiKey] = useState(getStoredAdminApiKey());
   const [mode, setMode] = useState('pdf_markdown_external_v1');
   const [title, setTitle] = useState('Expert AI Services knowledge document');
@@ -70,6 +119,27 @@ function App() {
     } finally {
       setBusy(false);
     }
+  }
+
+  async function refreshFleet(selection: string = selectedBusinessInstanceId) {
+    setBusy(true);
+    try {
+      const queryString = selection ? `?business_instance_id=${encodeURIComponent(selection)}` : '';
+      const res = await api(`/api/v1/admin/fleet/versions${queryString}`, undefined, apiKey) as FleetVersionReport;
+      setFleet(res);
+      setSelectedBusinessInstanceId(res.selected_business_instance_id || selection || res.business_instances[0]?.id || '');
+      setResult(res as unknown as ApiResult);
+    } catch (e) {
+      setFleet(null);
+      setResult(errorResult(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function selectFleetBusiness(value: string) {
+    setSelectedBusinessInstanceId(value);
+    refreshFleet(value);
   }
 
   async function createVectorStore() {
@@ -106,6 +176,8 @@ function App() {
     } catch (e) { setResult(errorResult(e)); } finally { setBusy(false); }
   }
 
+  const selectedFleet = selectedFleetInstance(fleet);
+
   return <main>
     <header>
       <h1>exai_vector_store</h1>
@@ -125,6 +197,22 @@ function App() {
         <p className="muted">Mode controls parser/chunker/tokenizer/embedding/rerank/retrieval defaults.</p>
         <JsonBlock value={modes[mode] || null} />
       </div>
+    </section>
+
+    <section className="card">
+      <h2>Fleet version</h2>
+      <div className="row">
+        <select value={selectedBusinessInstanceId} onChange={e => selectFleetBusiness(e.target.value)}>
+          {(fleet?.business_instances || []).map(instance => <option key={instance.id} value={instance.id}>{instance.name} ({instance.slug})</option>)}
+          {!fleet?.business_instances.length && <option value="">No instances loaded</option>}
+        </select>
+        <button disabled={busy} onClick={() => refreshFleet()}>Refresh fleet</button>
+      </div>
+      <p className="muted">{fleet?.evidence_note || 'Recorded control-plane state only.'}</p>
+      <FleetSummary instance={selectedFleet} />
+      {selectedFleet && <ComponentRows components={selectedFleet.components} />}
+      <h3>Deployment records</h3>
+      <DeploymentRows deployments={fleet?.deployments || []} />
     </section>
 
     <section className="card">

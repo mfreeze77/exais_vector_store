@@ -99,6 +99,7 @@ from svs_common.marker_client import (
     sanitize_stem,
 )
 from svs_common.object_store import ObjectStore, ObjectStoreError
+from svs_common.fleet import FleetVersionReport, build_fleet_version_report
 
 settings = get_settings()
 settings.validate_runtime_guards()
@@ -1490,6 +1491,51 @@ def admin_session(principal: Principal = Depends(get_request_principal), db: Ses
         'groups': list(principal.groups or []),
         'max_security_level': principal.max_security_level,
     }
+
+
+@app.get('/api/v1/admin/fleet/versions', response_model=FleetVersionReport)
+def admin_fleet_versions(
+    business_instance_id: str | None = Query(default=None),
+    deployment_limit: int = Query(default=25, ge=1, le=200),
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
+    ensure_scope(principal, ['admin:read', 'fleet:read'], any_of=True)
+    business_rows = db.execute(text('''
+        SELECT id, name, slug, deployment_mode, isolation_level, config, status,
+               extract(epoch from created_at)::bigint created_at
+        FROM business_instances
+        WHERE tenant_id=:tenant_id
+        ORDER BY name ASC, id ASC
+    '''), {'tenant_id': principal.tenant_id}).mappings().all()
+    visible_business_ids = {row['id'] for row in business_rows}
+    selected_business_id = business_instance_id or principal.business_instance_id
+    if business_instance_id and business_instance_id not in visible_business_ids:
+        raise HTTPException(status_code=404, detail='Business instance not visible')
+    deployment_rows = db.execute(text('''
+        SELECT id, instance_id, business_instance_id, from_version, to_version, image_digests,
+               status, extract(epoch from started_at)::bigint started_at,
+               extract(epoch from completed_at)::bigint completed_at, manifest,
+               extract(epoch from created_at)::bigint created_at
+        FROM instance_deployments
+        WHERE tenant_id=:tenant_id
+          AND (:selected_business_id IS NULL
+               OR business_instance_id=:selected_business_id
+               OR business_instance_id IS NULL)
+        ORDER BY coalesce(completed_at, started_at, created_at) DESC, id DESC
+        LIMIT :limit
+    '''), {
+        'tenant_id': principal.tenant_id,
+        'selected_business_id': selected_business_id or None,
+        'limit': deployment_limit,
+    }).mappings().all()
+    return build_fleet_version_report(
+        tenant_id=principal.tenant_id,
+        product_version=settings.svs_product_version,
+        business_rows=business_rows,
+        deployment_rows=deployment_rows,
+        selected_business_instance_id=selected_business_id,
+    )
 
 
 @app.get('/api/v1/admin/usage')

@@ -67,3 +67,22 @@ metadata, config metadata, audit exports, and checksum metadata. Restore
 preflight validates and enumerates those artifacts without requiring
 `DATABASE_URL_SYNC` or invoking `pg_restore`. Real offsite target proof and an
 external restore drill remain later operator gates.
+
+## Fleet/version admin visibility
+
+RM-009 exposes a repo-buildable read contract for fleet version evidence through
+`/api/v1/admin/fleet/versions`. The route uses the production admin principal,
+`db_for_principal`, and `admin:read` or `fleet:read`; it reads
+`business_instances` and `instance_deployments` under their existing RLS
+policies. `business_instances` remains tenant-scoped, while deployment records
+remain tenant plus `business_instance_id` scoped with tenant-level records
+visible only when the table policy permits them.
+
+The report normalizes the five application components from
+`scripts/release/release_common.py:APP_IMAGES` and existing release manifest
+metadata from `scripts/release/provenance_common.py`. The admin UI can show the
+selected business instance, declared component versions, image references,
+digests, latest visible deployment records, and per-component `current`,
+`stale`, or `unverifiable` status. Missing deployment rows, missing digests,
+non-completed deployment statuses, or absent running-version evidence are
+reported as unverifiable instead of implied live VPS proof.
