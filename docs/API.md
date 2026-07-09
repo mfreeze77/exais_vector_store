@@ -5,8 +5,7 @@ The API has two layers:
 1. **Native SVS API** for ingestion, mode routing, retrieval, admin, model registry, and instance operations.
 2. **OpenAI-compatible vector-store API** for clients that expect `/v1/vector_stores`-style behavior.
 
-Generated `/openapi.json` currently contains 49 paths, split between 26 native
-routes and 23 OpenAI-compatible routes, with 77 schema components. The
+Generated `/openapi.json` currently contains 51 paths and 81 schema components. The
 OpenAI-compatible surfaces described below have named request/response
 components and focused regression proof. Full contract closure remains
 explicitly pending for mostly untyped native success responses and several
@@ -145,6 +144,7 @@ a numeric estimate. Unknown or unpriced profiles return
 
 ```http
 POST /api/v1/bakeoffs
+GET  /api/v1/bakeoffs
 GET  /api/v1/bakeoffs/{run_id}
 ```
 
@@ -155,8 +155,15 @@ candidate: `recall_at_k`, `precision_at_k`, `mrr`, `ndcg_at_k`, leakage counts,
 and per-query metric detail. Result rows may be strings or objects carrying
 `id`, `chunk_id`, and/or `document_id`; expected and forbidden chunk/document
 IDs are both honored. If no judged candidate results are supplied, the runner
-keeps the existing deterministic proxy score so the API remains usable before a
-live retrieval/provider fan-out worker is attached.
+keeps the existing deterministic proxy score so the API remains usable without
+fixture or provider result rows.
+
+Set `execution_mode` to `live` to fan the same query set through the internal
+bakeoff retrieval runner for each candidate profile. Live runs capture per-query
+result IDs, result counts, latency, error status, registry-derived cost metadata,
+golden retrieval metrics, and selection/rejection policy output. The default
+runner is deterministic fixture-backed for credential-free proof; real provider
+proof still requires operator API credentials and an approved live command.
 
 ## Ingestion
 

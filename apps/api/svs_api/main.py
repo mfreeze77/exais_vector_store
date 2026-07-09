@@ -1451,6 +1451,13 @@ def create_bakeoff(req: BakeoffRunRequest, principal: Principal = Depends(get_re
     return result
 
 
+@app.get('/api/v1/bakeoffs')
+def list_bakeoffs(limit: int = 20, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
+    ensure_scope(principal, ['evals:read', 'evals:write', 'models:write'], any_of=True)
+    data, has_more = bakeoff.list_runs(db, principal, limit=limit)
+    return _list_response(data, has_more)
+
+
 @app.get('/api/v1/bakeoffs/{run_id}')
 def get_bakeoff(run_id: str, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, ['evals:read', 'evals:write', 'models:write'], any_of=True)

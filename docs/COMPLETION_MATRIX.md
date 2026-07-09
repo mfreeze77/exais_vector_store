@@ -11,7 +11,7 @@
 | RunPod | handler/Dockerfile | GPU image, warm pool, autoscaling |
 | Micro production | manifests/agent/scripts | signed releases, canaries |
 | Ops | Terraform/Ansible/runbooks; backup artifact manifests and restore preflight; local observability stack | external production SLO/load proof, external/offsite restore proof |
-| Evals | metrics/schema + golden bakeoff metrics | live retrieval/provider fan-out runner |
+| Evals | metrics/schema + golden bakeoff metrics + deterministic live fan-out runner | live provider credential proof, fine-tuning, multimodal research |
 
 
 ## Frontend
@@ -53,4 +53,4 @@ Still not complete:
 - full OpenAPI contract. RM-002 generated proof records 49 paths (26 native, 23 OpenAI-compatible) and 77 schema components; the focused production-candidate contract/OpenAI suites passed with `137 passed`. OpenAI-compatible vector-store, file, file-batch, Responses, citation, and API-key surfaces are component-backed. Remaining gaps are explicit: most native success responses are untyped, and several JSON request bodies remain inline dictionaries or optional-body wrappers.
 - external production-scale observability/SLO/load proof beyond local-cell metric visibility
 - external/offsite restore drill against a real backup target
-- live bakeoff fan-out, fine-tuning, and multimodal research features
+- operator live-provider bakeoff proof, fine-tuning, and multimodal research features

@@ -1104,9 +1104,16 @@ class IngestionPlanResponse(BaseModel):
 class BakeoffRunRequest(BaseModel):
     name: str
     mode: str = 'markdown_docs_v1'
+    execution_mode: Literal['deterministic', 'live', 'live_retrieval'] = 'deterministic'
     model_profile_ids: list[str]
     queries: list[dict[str, Any]] = Field(default_factory=list)
     top_k: int = Field(default=10, ge=1, le=100)
+    golden_set_id: str | None = None
+    vector_store_id: str | None = None
+    knowledge_base_id: str | None = None
+    retrieval_profile_id: str | None = None
+    metrics: list[str] = Field(default_factory=list)
+    selection_policy: dict[str, Any] = Field(default_factory=dict)
 
 class BakeoffRunResponse(BaseModel):
     id: str

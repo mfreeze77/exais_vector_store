@@ -119,10 +119,29 @@ def test_bakeoff_create_run_keeps_proxy_fallback_without_candidate_results():
     response = service.create_run(_Db(), _principal(), req)
 
     assert response.metrics["metric_source"] == "proxy"
+    assert response.metrics["selection_status"] == "selected"
     assert response.results[0]["result_source"] == "proxy"
     assert response.results[0]["judged_query_count"] == 0
     assert response.results[0]["recall_proxy"] == 1.0
     assert response.results[0]["score"] > 0
+
+
+def test_bakeoff_selection_policy_can_reject_best_candidate():
+    service = BakeoffService()
+    req = BakeoffRunRequest(
+        name="golden",
+        model_profile_ids=["hash_mock_1536", "openai_text_embedding_3_small_1536"],
+        queries=_golden_queries(),
+        top_k=2,
+        selection_policy={"require_no_leakage": True},
+    )
+
+    response = service.create_run(_Db(), _principal(), req)
+
+    assert response.metrics["best_model_profile_id"] == "hash_mock_1536"
+    assert response.metrics["winner_model_profile_id"] is None
+    assert response.metrics["selection_status"] == "rejected"
+    assert "leakage_present" in response.metrics["rejection_reasons"]
 
 
 def test_bakeoff_top_k_is_bounded_for_metrics():
