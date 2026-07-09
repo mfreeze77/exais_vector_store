@@ -30,6 +30,7 @@ Status legend:
 - SVS-022 Search vector store — implemented for OpenAI-shaped search, hybrid ranking options, request-scoped `ranker: none`, query planning, citation output, direct search response OpenAPI component coverage, direct search `next_page` cursor paging, and safe metadata filter parity including list and range comparisons.
 - SVS-023 File batches — implemented with OpenAI create/retrieve/cancel/list-files parity, named OpenAPI response components for file batches and batch file pages, and focused proof.
 - SVS-024 Expiration policies — implemented for strict OpenAI `expires_after` request validation, `last_active_at` activity refresh, fail-closed retrieval, and maintenance sweeper proof for expired row marking plus stale-vector cleanup enqueue.
+- RM-002 OpenAPI contract reconciliation — OpenAI-compatible vector-store, file, file-batch, Responses, citation, and API-key surfaces have named generated request/response components and pass focused contract proof. The production-candidate image currently generates 49 paths (26 native and 23 OpenAI-compatible) with 77 schema components; `tests/test_openapi_contract.py` and the focused OpenAI route suites pass with `137 passed`. The full contract remains incomplete: most native success responses are still untyped, and several JSON request bodies remain inline dictionaries or optional-body wrappers. These are explicit follow-up gaps, not reopened OpenAI parity work.
 
 ## EPIC-004 Ingestion/indexing
 

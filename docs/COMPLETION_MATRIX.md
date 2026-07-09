@@ -2,7 +2,7 @@
 
 | Area | Scaffolded | Production hardening next |
 |---|---|---|
-| API | FastAPI native + OpenAI-compatible routes | remaining OpenAI contract breadth, pagination tuning, rate-limit tuning |
+| API | FastAPI native + OpenAI-compatible routes; OpenAI-compatible named-component contract proof | native success response/request component typing, several inline OpenAI request bodies, pagination tuning, rate-limit tuning |
 | DB | schema + RLS | Alembic, rollback locks, PITR |
 | Ingestion | markdown + PDF-MD stub | resumability, dedupe, parser plugins |
 | Retrieval | dense+sparse+RRF+ACL+context | rerankers, expansion, latency tuning |
@@ -49,6 +49,6 @@ Reindex repair is complete and reconciled: the API and queued worker use the sha
 Still not complete:
 
 - Alembic
-- full OpenAPI contract
+- full OpenAPI contract. RM-002 generated proof records 49 paths (26 native, 23 OpenAI-compatible) and 77 schema components; the focused production-candidate contract/OpenAI suites passed with `137 passed`. OpenAI-compatible vector-store, file, file-batch, Responses, citation, and API-key surfaces are component-backed. Remaining gaps are explicit: most native success responses are untyped, and several JSON request bodies remain inline dictionaries or optional-body wrappers.
 - production observability dashboards
 - live bakeoff fan-out, fine-tuning, and multimodal research features

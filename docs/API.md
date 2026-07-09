@@ -5,6 +5,19 @@ The API has two layers:
 1. **Native SVS API** for ingestion, mode routing, retrieval, admin, model registry, and instance operations.
 2. **OpenAI-compatible vector-store API** for clients that expect `/v1/vector_stores`-style behavior.
 
+Generated `/openapi.json` currently contains 49 paths, split between 26 native
+routes and 23 OpenAI-compatible routes, with 77 schema components. The
+OpenAI-compatible surfaces described below have named request/response
+components and focused regression proof. Full contract closure remains
+explicitly pending for mostly untyped native success responses and several
+inline or optional-body JSON request schemas.
+
+Specifically, the native health/readiness/metrics, registry/profile,
+ingestion/jobs, retrieval, bakeoff, maintenance, and admin route families do
+not yet expose stable success response components. Inline request schemas
+remain on native model-endpoint patch, OpenAI vector-store file attach/update,
+and file-batch create; vector-store create/update retain optional-body wrappers.
+
 The generated `/openapi.json` includes named OpenAI-compatible request and
 response components for vector-store search and Responses
 create/retrieve/cancel/delete/input-token/compact/input-items routes. The

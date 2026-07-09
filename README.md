@@ -70,8 +70,26 @@ docker run --rm -v "${PWD}:/work" -w /work --network exais-vector-store-local_de
   localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate \
   python -m pytest -q -rs --ignore=tests/integration
 46 passed, 2 warnings
-FastAPI routes: 45
-OpenAPI paths: 34
+Generated OpenAPI paths: 49 (26 native, 23 OpenAI-compatible)
+Generated schema components: 77
+```
+
+The generated contract proves named request/response components for the
+OpenAI-compatible vector-store, file, file-batch, Responses, citation, and
+API-key surfaces. Full contract closure is still pending: most native success
+responses are untyped, and several JSON request bodies remain inline
+dictionaries or optional-body wrappers. The focused production-candidate proof
+is recorded below.
+
+The remaining untyped native success responses are the health/readiness/
+metrics, registry/profile, ingestion/jobs, retrieval, bakeoff, maintenance,
+and admin route families. Inline request schemas remain on native model-endpoint
+patch, OpenAI vector-store file attach/update, and file-batch create; vector
+store create/update also retain optional-body wrappers.
+
+```text
+docker run --rm -v "${pwdPath}:/work" -w /work -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python -m pytest -q -rs tests/test_openapi_contract.py tests/test_openai_compat_search.py tests/test_openai_responses_routes.py
+137 passed, 2 warnings
 ```
 
 Wave 009 local Docker proof also booted a registry-pulled cell, returned
