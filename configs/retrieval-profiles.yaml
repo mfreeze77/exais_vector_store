@@ -6,6 +6,13 @@ profiles:
     context_top_k: 12
     fusion: reciprocal_rank_fusion
     rrf_k: 60
+    reranker: local_lexical_overlap_v1
+    rerank_candidate_top_k: 20
+    rerank_weight: 0.65
+    rerank_fusion_weight: 0.35
+    rerank_exact_phrase_bonus: 0.2
+    diversity: lexical_mmr_v1
+    diversity_lambda: 0.82
     require_pre_filter: true
     require_post_acl_check: true
     expand_neighbors: true
@@ -21,10 +28,73 @@ profiles:
     fusion: reciprocal_rank_fusion
     rrf_k: 60
     expand_parent_sections: true
+    parent_section_max_chunks: 12
     expand_neighbors: true
     neighbor_window: 2
     require_page_citations: true
     require_post_acl_check: true
+
+  hybrid_multimodal_pdf_v1:
+    dense_top_k: 140
+    sparse_top_k: 120
+    fused_top_k: 70
+    context_top_k: 16
+    fusion: reciprocal_rank_fusion
+    rrf_k: 60
+    reranker: local_lexical_overlap_v1
+    rerank_candidate_top_k: 30
+    rerank_weight: 0.62
+    rerank_fusion_weight: 0.38
+    rerank_exact_phrase_bonus: 0.15
+    diversity: lexical_mmr_v1
+    diversity_lambda: 0.78
+    expand_parent_sections: true
+    parent_section_max_chunks: 16
+    expand_neighbors: true
+    neighbor_window: 2
+    require_page_citations: true
+    require_post_acl_check: true
+    require_citations: true
+    output_guard: pii_secret_citation_guard_v1
+
+  hybrid_multimodal_secure_v1:
+    dense_top_k: 120
+    sparse_top_k: 120
+    fused_top_k: 60
+    context_top_k: 14
+    fusion: reciprocal_rank_fusion
+    rrf_k: 60
+    reranker: local_lexical_overlap_v1
+    rerank_candidate_top_k: 28
+    rerank_weight: 0.6
+    rerank_fusion_weight: 0.4
+    rerank_exact_phrase_bonus: 0.15
+    diversity: lexical_mmr_v1
+    diversity_lambda: 0.8
+    expand_parent_sections: true
+    parent_section_max_chunks: 14
+    expand_neighbors: true
+    neighbor_window: 1
+    require_pre_filter: true
+    require_post_acl_check: true
+    require_citations: true
+    output_guard: pii_secret_citation_guard_v1
+
+  hybrid_rrf_model_gateway_rerank_v1:
+    dense_top_k: 80
+    sparse_top_k: 80
+    fused_top_k: 40
+    context_top_k: 12
+    fusion: reciprocal_rank_fusion
+    rrf_k: 60
+    reranker: model_gateway_rerank_v1
+    reranker_profile_id: optional_voyage_or_qwen_reranker_v1
+    rerank_candidate_top_k: 20
+    rerank_weight: 0.7
+    rerank_fusion_weight: 0.3
+    require_pre_filter: true
+    require_post_acl_check: true
+    require_citations: true
 
   hybrid_code_symbol_rrf_v2:
     dense_top_k: 60

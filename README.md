@@ -22,7 +22,7 @@ Internal package names, service IDs, headers, metrics, and environment variables
 - Intelligent vectorization preview router with scored model candidates and security-aware provider filtering.
 - Provider abstraction for OpenAI, Voyage, Cohere, TEI, Infinity, RunPod/local, and deterministic hash development embeddings.
 - Durable ingestion jobs with async threshold, dedupe, versioning, per-chunk index status, and reindex repair.
-- OpenAI-compatible vector store CRUD, files, file content, file batches, batch cancel, search, update, delete, and pagination metadata.
+- OpenAI-compatible files plus vector store CRUD, files, file content, file batches, batch cancel, search, Responses file-search citations, native context citation markers, update, delete, and pagination metadata.
 - Maintenance APIs for expiration sweeps and reindex.
 - Admin usage/audit APIs and Prometheus-compatible `/metrics`.
 - Instance agent, `svsctl.py`, backup/restore/fleet-upgrade scripts.

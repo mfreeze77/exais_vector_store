@@ -1,7 +1,10 @@
 from types import SimpleNamespace
 
-from svs_common.schemas import Principal, DocumentIngestRequest
+from svs_common.chunking import estimate_tokens
+from svs_common.model_registry import estimate_embedding_cost, model_registry
+from svs_common.schemas import Principal, DocumentIngestRequest, EmbeddingRequest
 from svs_common.vectorization_router import build_ingestion_plan
+from svs_model_gateway.main import estimate_cost
 
 
 def settings(**overrides):
@@ -112,3 +115,78 @@ def test_pdf_markdown_external_uses_supported_voyage_embedding_profile():
     assert voyage.model == 'voyage-4'
     assert voyage.configured is True
     assert voyage.required_env == ['VOYAGE_API_KEY']
+
+
+def test_openai_profile_exposes_per_million_cost_metadata():
+    registry = model_registry()
+    cost = registry['models']['openai_text_embedding_3_small_1536']['cost']
+
+    assert cost['unit'] == '1m_input_tokens'
+    assert cost['currency'] == 'USD'
+    assert cost['input_per_1m_tokens_usd'] == 0.02
+
+
+def test_cost_estimator_returns_priced_profile():
+    estimate = estimate_embedding_cost('openai_text_embedding_3_small_1536', 1_500_000)
+
+    assert estimate['model_profile_id'] == 'openai_text_embedding_3_small_1536'
+    assert estimate['provider'] == 'openai'
+    assert estimate['model'] == 'text-embedding-3-small'
+    assert estimate['estimated_tokens'] == 1_500_000
+    assert estimate['estimated_cost_usd'] == 0.03
+    assert estimate['currency'] == 'USD'
+    assert estimate['unit'] == '1m_input_tokens'
+    assert estimate['reason'] is None
+
+
+def test_cost_estimator_returns_unpriced_reason_without_guessing():
+    estimate = estimate_embedding_cost('voyage_4_docs_1024', 10_000)
+
+    assert estimate['model_profile_id'] == 'voyage_4_docs_1024'
+    assert estimate['provider'] == 'voyage'
+    assert estimate['estimated_cost_usd'] is None
+    assert estimate['reason'] == 'cost_unavailable'
+
+
+def test_cost_estimator_returns_unknown_reason_without_guessing():
+    estimate = estimate_embedding_cost('missing_embedding_profile', 10_000)
+
+    assert estimate['model_profile_id'] == 'missing_embedding_profile'
+    assert estimate['estimated_cost_usd'] is None
+    assert estimate['reason'] == 'unknown_model_profile'
+
+
+def test_model_gateway_estimate_cost_route_uses_registry_costs():
+    text = 'alpha beta gamma delta'
+    estimate = estimate_cost(EmbeddingRequest(input=text, model_profile_id='openai_text_embedding_3_small_1536'))
+
+    assert estimate['estimated_tokens'] == estimate_tokens(text)
+    assert estimate['model_profile_id'] == 'openai_text_embedding_3_small_1536'
+    assert estimate['provider'] == 'openai'
+    assert estimate['model'] == 'text-embedding-3-small'
+    assert estimate['estimated_cost_usd'] == round((estimate_tokens(text) / 1_000_000) * 0.02, 10)
+    assert estimate['currency'] == 'USD'
+
+
+def test_plan_candidates_include_cost_hints_without_reordering():
+    p = Principal(tenant_id='t', business_instance_id='b', max_security_level=3, scopes=['*'])
+    req = DocumentIngestRequest(title='doc', filename='doc.md', content='# Doc\nalpha beta gamma', security_level=1)
+
+    plan = build_ingestion_plan(p, req, settings=settings(openai_api_key='sk-test-not-real'))
+
+    assert [c.model_profile_id for c in plan.candidates] == [
+        'openai_text_embedding_3_small_1536',
+        'hash_mock_1536',
+        'bge_m3_local',
+    ]
+    openai = plan.candidates[0]
+    assert openai.estimated_input_tokens == plan.estimated_tokens
+    assert openai.estimated_cost_usd == round((plan.estimated_tokens / 1_000_000) * 0.02, 10)
+    assert openai.cost_currency == 'USD'
+    assert openai.cost_unit == '1m_input_tokens'
+    assert openai.cost_per_1m_tokens_usd == 0.02
+    assert openai.cost_reason is None
+
+    local = next(c for c in plan.candidates if c.model_profile_id == 'bge_m3_local')
+    assert local.estimated_cost_usd is None
+    assert local.cost_reason == 'cost_unavailable'

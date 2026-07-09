@@ -6,6 +6,11 @@ models:
     dimensions: 1536
     max_input_tokens: 8191
     privacy: external_api
+    cost:
+      currency: USD
+      unit: 1m_input_tokens
+      input_per_1m_tokens_usd: 0.02
+      source: https://developers.openai.com/api/docs/guides/embeddings#embedding-models
 
   openai_text_embedding_3_large_3072:
     provider: openai
@@ -14,6 +19,11 @@ models:
     dimensions: 3072
     max_input_tokens: 8191
     privacy: external_api
+    cost:
+      currency: USD
+      unit: 1m_input_tokens
+      input_per_1m_tokens_usd: 0.13
+      source: https://developers.openai.com/api/docs/guides/embeddings#embedding-models
 
   voyage_context_3_docs_default:
     provider: voyage
@@ -87,6 +97,11 @@ models:
     model: deterministic-dev-hash
     dimensions: 1536
     privacy: local_dev_only
+    cost:
+      currency: USD
+      unit: 1m_input_tokens
+      input_per_1m_tokens_usd: 0.0
+      source: local_dev
 
 rerankers:
   optional_voyage_or_qwen_reranker_v1:

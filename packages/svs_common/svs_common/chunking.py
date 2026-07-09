@@ -97,6 +97,141 @@ def pdf_markdown_external_chunks(md: str, max_tokens: int = 900, overlap_tokens:
         ch.metadata['chunker'] = 'pdf_markdown_external_chunks'
     return chunks
 
+def _record_group_chunks(
+    records: list[dict[str, Any]],
+    keys: list[str],
+    *,
+    max_records_per_chunk: int = 25,
+    chunker: str,
+    heading_path: list[str],
+    base_metadata: dict[str, Any] | None = None,
+    ordinal_start: int = 0,
+    prefix_lines: list[str] | None = None,
+    metadata_factory: Any | None = None,
+) -> list[ParsedChunk]:
+    ordered_keys = list(dict.fromkeys(keys))
+    chunks: list[ParsedChunk] = []
+    ordinal = ordinal_start
+    for start in range(0, len(records), max_records_per_chunk):
+        group = records[start:start + max_records_per_chunk]
+        lines = list(prefix_lines or [])
+        lines.extend([
+            f'Schema fields: {", ".join(ordered_keys)}',
+            f'Record range: {start + 1}-{start + len(group)}',
+        ])
+        for idx, record in enumerate(group, start=start + 1):
+            items = ' | '.join(f'{k}: {record.get(k, "")}' for k in ordered_keys if k in record)
+            lines.append(f'Record {idx}: {items}')
+        text = '\n'.join(lines)
+        metadata = {
+            'chunker': chunker,
+            'record_start': start + 1,
+            'record_end': start + len(group),
+            'record_count': len(group),
+            'schema_fields': ordered_keys,
+            'text_hash': sha256_text(text),
+        }
+        metadata.update(base_metadata or {})
+        if metadata_factory:
+            metadata.update(metadata_factory(start, group))
+        chunks.append(ParsedChunk(
+            ordinal=ordinal,
+            text=text,
+            heading_path=heading_path,
+            token_count=estimate_tokens(text),
+            metadata=metadata,
+        ))
+        ordinal += 1
+    return chunks
+
+def _split_markdown_table_row(line: str) -> list[str]:
+    raw = line.strip()
+    if '|' not in raw:
+        return []
+    if raw.startswith('|'):
+        raw = raw[1:]
+    if raw.endswith('|'):
+        raw = raw[:-1]
+    cells = [re.sub(r'\s+', ' ', cell.strip()) for cell in raw.split('|')]
+    return cells if len(cells) > 1 else []
+
+def _is_markdown_table_separator(line: str) -> bool:
+    cells = _split_markdown_table_row(line)
+    if len(cells) < 2:
+        return False
+    return all(re.match(r'^:?-{3,}:?$', cell.replace(' ', '')) for cell in cells)
+
+def _markdown_table_caption(lines: list[str], header_index: int) -> str | None:
+    idx = header_index - 1
+    while idx >= 0 and not lines[idx].strip():
+        idx -= 1
+    if idx < 0:
+        return None
+    candidate = lines[idx].strip().strip('#').strip()
+    if not candidate or '|' in candidate or _is_markdown_table_separator(candidate):
+        return None
+    return candidate
+
+def _markdown_table_blocks(content: str) -> list[dict[str, Any]]:
+    lines = content.splitlines()
+    fenced = [False for _ in lines]
+    in_fence = False
+    for idx, line in enumerate(lines):
+        if re.match(r'^\s*(```|~~~)', line):
+            fenced[idx] = True
+            in_fence = not in_fence
+            continue
+        fenced[idx] = in_fence
+
+    tables: list[dict[str, Any]] = []
+    idx = 0
+    while idx < len(lines) - 1:
+        if fenced[idx] or fenced[idx + 1] or not _is_markdown_table_separator(lines[idx + 1]):
+            idx += 1
+            continue
+        headers = _split_markdown_table_row(lines[idx])
+        if len(headers) < 2:
+            idx += 1
+            continue
+        row_start = idx + 2
+        row_idx = row_start
+        rows: list[dict[str, str]] = []
+        while row_idx < len(lines) and not fenced[row_idx] and lines[row_idx].strip() and '|' in lines[row_idx]:
+            cells = _split_markdown_table_row(lines[row_idx])
+            if len(cells) < 2 or _is_markdown_table_separator(lines[row_idx]):
+                break
+            record = {headers[col]: cells[col] if col < len(cells) else '' for col in range(len(headers))}
+            rows.append(record)
+            row_idx += 1
+        if rows:
+            tables.append({
+                'headers': headers,
+                'rows': rows,
+                'caption': _markdown_table_caption(lines, idx),
+                'table_start_line': idx + 1,
+                'row_start_line': row_start + 1,
+                'table_end_line': row_idx,
+            })
+            idx = row_idx
+            continue
+        idx += 1
+    return tables
+
+def _delimited_records(content: str) -> list[dict[str, Any]]:
+    nonblank = [line for line in content.splitlines() if line.strip()]
+    if len(nonblank) < 2:
+        return []
+    header = nonblank[0]
+    delimiter = '\t' if '\t' in header else ',' if ',' in header else ';' if ';' in header else None
+    if delimiter is None:
+        return []
+    reader = csv.DictReader(io.StringIO(content), delimiter=delimiter)
+    fieldnames = [name for name in (reader.fieldnames or []) if name]
+    if len(fieldnames) < 2:
+        return []
+    records = [dict(row) for row in reader if any(value not in (None, '') for value in row.values())]
+    return records
+
 def code_symbol_chunks(code: str, max_tokens: int = 900, overlap_tokens: int = 80) -> list[ParsedChunk]:
     """Dependency-free symbol-aware code chunker.
 
@@ -160,6 +295,7 @@ def structured_record_chunks(content: str, max_records_per_chunk: int = 25) -> l
     stripped = content.strip()
     if not stripped:
         return []
+    content_type = 'json'
     try:
         obj = json.loads(stripped)
         if isinstance(obj, list):
@@ -179,31 +315,56 @@ def structured_record_chunks(content: str, max_records_per_chunk: int = 25) -> l
         else:
             records = [{'value': obj}]
     except Exception:
-        try:
-            reader = csv.DictReader(io.StringIO(content))
-            records = [dict(row) for row in reader]
-        except Exception:
-            records = []
+        tables = _markdown_table_blocks(content)
+        if tables:
+            chunks: list[ParsedChunk] = []
+            for table_index, table in enumerate(tables, start=1):
+                caption = table.get('caption') or f'table_{table_index}'
+                prefix = [f'Markdown table {table_index}: {caption}']
+                chunks.extend(_record_group_chunks(
+                    table['rows'],
+                    table['headers'],
+                    max_records_per_chunk=max_records_per_chunk,
+                    chunker='markdown_table_record_chunks',
+                    heading_path=['markdown_table', str(caption)],
+                    base_metadata={
+                        'content_type': 'markdown_table',
+                        'table_index': table_index,
+                        'table_caption': table.get('caption'),
+                        'table_start_line': table['table_start_line'],
+                        'table_end_line': table['table_end_line'],
+                    },
+                    ordinal_start=len(chunks),
+                    prefix_lines=prefix,
+                    metadata_factory=lambda start, group, table=table: {
+                        'row_start': start + 1,
+                        'row_end': start + len(group),
+                        'line_start': table['row_start_line'] + start,
+                        'line_end': table['row_start_line'] + start + len(group) - 1,
+                    },
+                ))
+            return chunks
+        records = _delimited_records(content)
+        content_type = 'csv'
     if not records:
         return markdown_heading_chunks(content)
     keys = sorted({k for r in records for k in r.keys()})
-    chunks: list[ParsedChunk] = []
-    ordinal = 0
-    for start in range(0, len(records), max_records_per_chunk):
-        group = records[start:start + max_records_per_chunk]
-        lines = [f'Schema fields: {", ".join(keys)}', f'Record range: {start + 1}-{start + len(group)}']
-        for idx, record in enumerate(group, start=start + 1):
-            items = '; '.join(f'{k}: {record.get(k)}' for k in keys if k in record)
-            lines.append(f'Record {idx}: {items}')
-        text = '\n'.join(lines)
-        chunks.append(ParsedChunk(ordinal=ordinal, text=text, heading_path=['structured_records'], token_count=estimate_tokens(text), metadata={'chunker': 'structured_record_chunks', 'record_start': start + 1, 'record_end': start + len(group), 'schema_fields': keys, 'text_hash': sha256_text(text)}))
-        ordinal += 1
-    return chunks
+    return _record_group_chunks(
+        records,
+        keys,
+        max_records_per_chunk=max_records_per_chunk,
+        chunker='structured_record_chunks',
+        heading_path=['structured_records'],
+        base_metadata={'content_type': content_type},
+    )
 
-def log_event_chunks(content: str, max_lines: int = 80, overlap_lines: int = 10) -> list[ParsedChunk]:
-    lines = content.splitlines()
-    if not lines:
-        return []
+def _severity_from_text(text: str) -> str | None:
+    for token in ('FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'):
+        if re.search(rf'\b{token}\b', text):
+            return token
+    return None
+
+def _fixed_log_window_chunks(lines: list[str], max_lines: int, overlap_lines: int) -> list[ParsedChunk]:
     chunks: list[ParsedChunk] = []
     ordinal = 0
     start = 0
@@ -212,16 +373,59 @@ def log_event_chunks(content: str, max_lines: int = 80, overlap_lines: int = 10)
         end = min(len(lines), start + max_lines)
         block = '\n'.join(lines[start:end]).strip()
         if block:
-            sev = None
-            for token in ('FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'):
-                if token in block:
-                    sev = token
-                    break
+            sev = _severity_from_text(block)
             chunks.append(ParsedChunk(ordinal=ordinal, text=block, heading_path=['logs', sev or 'events'], token_count=estimate_tokens(block), metadata={'chunker': 'log_event_chunks', 'line_start': start + 1, 'line_end': end, 'severity': sev, 'timestamp_or_level_detected': bool(ts_re.search(block)), 'text_hash': sha256_text(block)}))
             ordinal += 1
         if end == len(lines):
             break
         start = max(end - overlap_lines, start + 1)
+    return chunks
+
+def log_event_chunks(content: str, max_lines: int = 80, overlap_lines: int = 10) -> list[ParsedChunk]:
+    lines = content.splitlines()
+    if not lines:
+        return []
+    event_start_re = re.compile(r'^\s*(?:\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}:\d{2}(?:[.,]\d+)?(?:Z|[+-]\d{2}:?\d{2})?\b|\[(?:ERROR|WARN|INFO|DEBUG|TRACE|FATAL)\]\b|(?:ERROR|WARN|INFO|DEBUG|TRACE|FATAL)\b)')
+    starts = [idx for idx, line in enumerate(lines) if event_start_re.search(line)]
+    if not starts:
+        return _fixed_log_window_chunks(lines, max_lines=max_lines, overlap_lines=overlap_lines)
+
+    events: list[tuple[int, int, str | None]] = []
+    for event_idx, start_line in enumerate(starts):
+        end_line = starts[event_idx + 1] if event_idx + 1 < len(starts) else len(lines)
+        block = '\n'.join(lines[start_line:end_line])
+        events.append((start_line, end_line, _severity_from_text(block)))
+
+    chunks: list[ParsedChunk] = []
+    ordinal = 0
+    event_index = 0
+    while event_index < len(events):
+        chunk_start_event = event_index
+        chunk_end_event = event_index
+        line_total = 0
+        while chunk_end_event < len(events):
+            event_lines = events[chunk_end_event][1] - events[chunk_end_event][0]
+            if line_total and line_total + event_lines > max_lines:
+                break
+            line_total += event_lines
+            chunk_end_event += 1
+            if event_lines >= max_lines:
+                break
+        start_line = events[chunk_start_event][0]
+        end_line = events[chunk_end_event - 1][1]
+        block = '\n'.join(lines[start_line:end_line]).strip()
+        if block:
+            sev = _severity_from_text(block)
+            chunks.append(ParsedChunk(ordinal=ordinal, text=block, heading_path=['logs', sev or 'events'], token_count=estimate_tokens(block), metadata={'chunker': 'log_event_chunks', 'line_start': start_line + 1, 'line_end': end_line, 'event_start': chunk_start_event + 1, 'event_end': chunk_end_event, 'event_count': chunk_end_event - chunk_start_event, 'severity': sev, 'timestamp_or_level_detected': True, 'text_hash': sha256_text(block)}))
+            ordinal += 1
+        if chunk_end_event >= len(events):
+            break
+        overlap_start = chunk_end_event
+        remaining = overlap_lines
+        while overlap_start > chunk_start_event + 1 and remaining > 0:
+            overlap_start -= 1
+            remaining -= events[overlap_start][1] - events[overlap_start][0]
+        event_index = max(overlap_start, chunk_start_event + 1)
     return chunks
 
 def choose_chunker(mode: str):

@@ -4,6 +4,8 @@ from .openai_compat import file_attribute_payload_key
 from .config import get_settings
 from .schemas import Principal, RetrievalScope, ChunkRecord
 
+QDRANT_RANGE_OPERATORS = {"gt": "gt", "gte": "gte", "lt": "lt", "lte": "lte"}
+
 def principal_from_dev_headers(
     x_svs_tenant_id: str | None = None,
     x_svs_business_instance_id: str | None = None,
@@ -73,4 +75,36 @@ def build_qdrant_filter(scope: RetrievalScope, filters: dict | None = None) -> d
             must.append({"key": key, "match": {"value": filters[key]}})
     for key, value in (filters.get("file_attribute_filters") or {}).items():
         must.append({"key": file_attribute_payload_key(key), "match": {"value": value}})
-    return {"must": must}
+    must_not = []
+    for not_filter in filters.get("file_attribute_not_filters") or []:
+        must_not.append({
+            "key": file_attribute_payload_key(str(not_filter["key"])),
+            "match": {"value": not_filter["value"]},
+        })
+    for not_any_filter in filters.get("file_attribute_not_any") or []:
+        attr_key = file_attribute_payload_key(str(not_any_filter["key"]))
+        for value in not_any_filter.get("values") or []:
+            must_not.append({"key": attr_key, "match": {"value": value}})
+    for range_filter in filters.get("file_attribute_ranges") or []:
+        value = range_filter.get("value")
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            must.append({
+                "key": file_attribute_payload_key(str(range_filter["key"])),
+                "range": {QDRANT_RANGE_OPERATORS[str(range_filter["op"])]: value},
+            })
+    result = {"must": must}
+    if must_not:
+        result["must_not"] = must_not
+    file_attr_any = filters.get("file_attribute_filter_any") or []
+    if file_attr_any:
+        result["should"] = [
+            {
+                "must": [
+                    {"key": file_attribute_payload_key(key), "match": {"value": value}}
+                    for key, value in option.items()
+                ]
+            }
+            for option in file_attr_any
+            if option
+        ]
+    return result

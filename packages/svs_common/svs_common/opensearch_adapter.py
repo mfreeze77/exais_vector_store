@@ -1,8 +1,11 @@
 from __future__ import annotations
 from typing import Any
 from .config import get_settings
+from .index_versions import index_version_suffix, safe_index_part
 from .openai_compat import file_attribute_payload_key
 from .qdrant_adapter import IndexBackendUnavailable, IndexOperationError
+
+OPENSEARCH_RANGE_OPERATORS = {"gt": "gt", "gte": "gte", "lt": "lt", "lte": "lte"}
 
 class OpenSearchAdapter:
     def __init__(self):
@@ -31,7 +34,23 @@ class OpenSearchAdapter:
         return False
 
     def index_name(self, business_instance_id: str) -> str:
-        return f"{self.settings.opensearch_index_prefix}chunks_{business_instance_id.replace('-', '_').lower()}"
+        safe_biz = safe_index_part(business_instance_id)
+        return f"{self.settings.opensearch_index_prefix}chunks_{safe_biz}{index_version_suffix(self.settings)}"
+
+    def _text_query(self, query: str) -> dict[str, Any]:
+        query = str(query or "").strip()
+        if not query:
+            return {"match_none": {}}
+        return {
+            "bool": {
+                "should": [
+                    {"match_phrase": {"text": {"query": query, "boost": 3.0}}},
+                    {"match": {"text": {"query": query, "operator": "and", "boost": 1.5}}},
+                    {"match": {"text": {"query": query}}},
+                ],
+                "minimum_should_match": 1,
+            }
+        }
 
     def ensure_index(self, index: str) -> None:
         if not self._require_client("ensure_index"):
@@ -102,7 +121,7 @@ class OpenSearchAdapter:
             "size": limit,
             "query": {
                 "bool": {
-                    "must": [{"match": {"text": query}}],
+                    "must": [self._text_query(query)],
                     "filter": [
                         {"term": {"tenant_id": scope_filter["tenant_id"]}},
                         {"term": {"business_instance_id": scope_filter["business_instance_id"]}},
@@ -117,6 +136,44 @@ class OpenSearchAdapter:
                 body["query"]["bool"]["filter"].append({"term": {key: scope_filter[key]}})
         for key, value in (scope_filter.get("file_attribute_filters") or {}).items():
             body["query"]["bool"]["filter"].append({"term": {file_attribute_payload_key(key): value}})
+        must_not = body["query"]["bool"].setdefault("must_not", [])
+        for not_filter in scope_filter.get("file_attribute_not_filters") or []:
+            field = file_attribute_payload_key(str(not_filter["key"]))
+            body["query"]["bool"]["filter"].append({"exists": {"field": field}})
+            must_not.append({"term": {field: not_filter["value"]}})
+        for not_any_filter in scope_filter.get("file_attribute_not_any") or []:
+            field = file_attribute_payload_key(str(not_any_filter["key"]))
+            body["query"]["bool"]["filter"].append({"exists": {"field": field}})
+            must_not.append({"terms": {field: list(not_any_filter.get("values") or [])}})
+        if not must_not:
+            body["query"]["bool"].pop("must_not", None)
+        for range_filter in scope_filter.get("file_attribute_ranges") or []:
+            body["query"]["bool"]["filter"].append({
+                "range": {
+                    file_attribute_payload_key(str(range_filter["key"])): {
+                        OPENSEARCH_RANGE_OPERATORS[str(range_filter["op"])]: range_filter["value"]
+                    }
+                }
+            })
+        file_attr_any = scope_filter.get("file_attribute_filter_any") or []
+        if file_attr_any:
+            body["query"]["bool"]["filter"].append({
+                "bool": {
+                    "should": [
+                        {
+                            "bool": {
+                                "filter": [
+                                    {"term": {file_attribute_payload_key(key): value}}
+                                    for key, value in option.items()
+                                ]
+                            }
+                        }
+                        for option in file_attr_any
+                        if option
+                    ],
+                    "minimum_should_match": 1,
+                }
+            })
         try:
             hits = self.client.search(index=index, body=body).get("hits", {}).get("hits", [])
             return [{"id": h["_id"], "score": float(h.get("_score") or 0), "payload": h.get("_source", {})} for h in hits]

@@ -2,7 +2,7 @@
 
 | Area | Scaffolded | Production hardening next |
 |---|---|---|
-| API | FastAPI native + OpenAI-compatible routes | auth, pagination, idempotency, rate limits |
+| API | FastAPI native + OpenAI-compatible routes | remaining OpenAI contract breadth, pagination tuning, rate-limit tuning |
 | DB | schema + RLS | Alembic, rollback locks, PITR |
 | Ingestion | markdown + PDF-MD stub | resumability, dedupe, parser plugins |
 | Retrieval | dense+sparse+RRF+ACL+context | rerankers, expansion, latency tuning |
@@ -11,7 +11,7 @@
 | RunPod | handler/Dockerfile | GPU image, warm pool, autoscaling |
 | Micro production | manifests/agent/scripts | signed releases, canaries |
 | Ops | Terraform/Ansible/runbooks | monitoring, real backup integrations |
-| Evals | metrics/schema | full bakeoff runner |
+| Evals | metrics/schema + golden bakeoff metrics | live retrieval/provider fan-out runner |
 
 
 ## Frontend
@@ -45,9 +45,7 @@ Implemented after audit:
 Still not complete:
 
 - reindex repair worker
-- expiration sweeper
 - Alembic
-- idempotency keys
 - full OpenAPI contract
 - production observability dashboards
-- bakeoff/fine-tuning/multimodal research features
+- live bakeoff fan-out, fine-tuning, and multimodal research features

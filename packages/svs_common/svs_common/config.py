@@ -38,6 +38,7 @@ class Settings(BaseSettings):
     # Production consistency defaults. Strict dense indexing is intentionally on;
     # sparse search defaults to Postgres FTS so mini/micro cells do not need a JVM.
     svs_index_strict: bool = True
+    svs_index_version: str = ''
     svs_dense_backend: str = 'qdrant'
     svs_sparse_backend: str = 'postgres_fts'  # postgres_fts | opensearch
     svs_ingest_inline_max_bytes: int = 262144
@@ -48,6 +49,7 @@ class Settings(BaseSettings):
     # Operational controls.
     svs_default_rate_limit_per_minute: int = 120
     svs_admin_rate_limit_per_minute: int = 30
+    svs_vector_store_file_add_rate_limit_per_minute: int = 300
     svs_idempotency_ttl_hours: int = 24
     svs_request_body_limit_bytes: int = 50 * 1024 * 1024
     svs_allowed_cors_origins: str = 'http://localhost:3000,http://localhost:8080'

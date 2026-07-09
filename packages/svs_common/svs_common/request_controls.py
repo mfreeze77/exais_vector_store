@@ -52,6 +52,40 @@ def enforce_rate_limit(db: Session, principal: Principal, bucket: str, limit_per
     if 'system' in principal.scopes:
         return
     subject = principal.api_key_id or principal.user_id or 'anonymous'
+    _enforce_rate_limit_for_subject(db, principal, subject, bucket, limit, detail=f'Rate limit exceeded for {bucket}: {limit}/minute')
+
+
+def enforce_resource_rate_limit(
+    db: Session,
+    principal: Principal,
+    *,
+    resource_id: str,
+    bucket: str,
+    limit_per_minute: int,
+    resource_label: str,
+) -> None:
+    if 'system' in principal.scopes:
+        return
+    subject = f'resource:{resource_id}'
+    _enforce_rate_limit_for_subject(
+        db,
+        principal,
+        subject,
+        bucket,
+        limit_per_minute,
+        detail=f'Rate limit exceeded for {resource_label} {resource_id}: {limit_per_minute}/minute',
+    )
+
+
+def _enforce_rate_limit_for_subject(
+    db: Session,
+    principal: Principal,
+    subject: str,
+    bucket: str,
+    limit: int,
+    *,
+    detail: str,
+) -> None:
     minute = datetime.now(timezone.utc).replace(second=0, microsecond=0)
     row = db.execute(text('''
         INSERT INTO rate_limit_counters(id, tenant_id, business_instance_id, subject_id, bucket, window_start, count)
@@ -62,4 +96,4 @@ def enforce_rate_limit(db: Session, principal: Principal, bucket: str, limit_per
     '''), {'id': new_id('rl'), 'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id,
           'subject_id': subject, 'bucket': bucket, 'window_start': minute}).mappings().first()
     if row and int(row['count']) > limit:
-        raise HTTPException(status_code=429, detail=f'Rate limit exceeded for {bucket}: {limit}/minute')
+        raise HTTPException(status_code=429, detail=detail)

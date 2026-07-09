@@ -1,7 +1,8 @@
 from __future__ import annotations
 from enum import IntEnum
 from typing import Any, Literal
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator, model_validator
+from .openai_metadata import validate_openai_metadata
 
 class SecurityLevel(IntEnum):
     PUBLIC = 0
@@ -31,24 +32,274 @@ class RetrievalScope(BaseModel):
     allowed_knowledge_base_ids: list[str] = Field(default_factory=list)
     allowed_vector_store_ids: list[str] = Field(default_factory=list)
 
+
+def _validate_vector_store_expires_after(value: Any) -> dict[str, Any] | None:
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise ValueError('expires_after must be an object')
+    extra_fields = sorted(set(value) - {'anchor', 'days'})
+    if extra_fields:
+        raise ValueError('expires_after supports only anchor and days')
+    if value.get('anchor') != 'last_active_at':
+        raise ValueError("expires_after.anchor must be 'last_active_at'")
+    days = value.get('days')
+    if isinstance(days, bool) or not isinstance(days, int) or days <= 0:
+        raise ValueError('expires_after.days must be a positive integer')
+    return {'anchor': 'last_active_at', 'days': days}
+
+
+def _validate_vector_store_metadata(value: Any) -> dict[str, str] | None:
+    if value is None:
+        return None
+    return validate_openai_metadata(value, context='vector store metadata')
+
+
+def validate_openai_chunking_strategy(value: Any, *, context: str = 'chunking_strategy') -> dict[str, Any] | None:
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise ValueError(f'{context} must be an object')
+    kind = value.get('type')
+    if kind == 'auto':
+        extra_fields = sorted(set(value) - {'type'})
+        if extra_fields:
+            raise ValueError(f'{context} auto strategy supports only type')
+        return {'type': 'auto'}
+    if kind != 'static':
+        raise ValueError(f"{context}.type must be 'auto' or 'static'")
+
+    allowed_fields = {'type', 'max_chunk_size_tokens', 'chunk_overlap_tokens'}
+    extra_fields = sorted(set(value) - allowed_fields)
+    if extra_fields:
+        raise ValueError(f'{context} static strategy supports only type, max_chunk_size_tokens, and chunk_overlap_tokens')
+
+    normalized: dict[str, Any] = {'type': 'static'}
+    max_tokens = value.get('max_chunk_size_tokens')
+    if max_tokens is not None:
+        if isinstance(max_tokens, bool) or not isinstance(max_tokens, int) or max_tokens < 100 or max_tokens > 4096:
+            raise ValueError(f'{context}.max_chunk_size_tokens must be between 100 and 4096 inclusive')
+        normalized['max_chunk_size_tokens'] = max_tokens
+
+    overlap_tokens = value.get('chunk_overlap_tokens')
+    if overlap_tokens is not None:
+        if isinstance(overlap_tokens, bool) or not isinstance(overlap_tokens, int) or overlap_tokens < 0:
+            raise ValueError(f'{context}.chunk_overlap_tokens must be a non-negative integer')
+        effective_max = max_tokens if max_tokens is not None else 800
+        if overlap_tokens > effective_max / 2:
+            raise ValueError(f'{context}.chunk_overlap_tokens must not exceed max_chunk_size_tokens / 2')
+        normalized['chunk_overlap_tokens'] = overlap_tokens
+    return normalized
+
+
 class VectorStoreCreateRequest(BaseModel):
-    name: str
+    model_config = ConfigDict(extra='forbid')
+
+    name: str | None = None
+    description: str | None = None
+    file_ids: list[str] = Field(default_factory=list)
     knowledge_base_id: str | None = None
     attributes: dict[str, Any] = Field(default_factory=dict)
     metadata: dict[str, Any] | None = None
     expires_after: dict[str, Any] | None = None
+    chunking_strategy: dict[str, Any] | None = None
+
+    @field_validator('expires_after', mode='before')
+    @classmethod
+    def validate_expires_after(cls, value: Any) -> dict[str, Any] | None:
+        return _validate_vector_store_expires_after(value)
+
+    @field_validator('attributes', 'metadata', mode='before')
+    @classmethod
+    def validate_metadata(cls, value: Any) -> dict[str, str] | None:
+        return _validate_vector_store_metadata(value)
+
+    @field_validator('chunking_strategy', mode='before')
+    @classmethod
+    def validate_chunking_strategy(cls, value: Any) -> dict[str, Any] | None:
+        return validate_openai_chunking_strategy(value)
+
+class VectorStoreUpdateRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    name: str | None = None
+    description: str | None = None
+    attributes: dict[str, Any] | None = None
+    metadata: dict[str, Any] | None = None
+    expires_after: dict[str, Any] | None = None
+    chunking_strategy: dict[str, Any] | None = None
+
+    @field_validator('expires_after', mode='before')
+    @classmethod
+    def validate_expires_after(cls, value: Any) -> dict[str, Any] | None:
+        return _validate_vector_store_expires_after(value)
+
+    @field_validator('attributes', 'metadata', mode='before')
+    @classmethod
+    def validate_metadata(cls, value: Any) -> dict[str, str] | None:
+        return _validate_vector_store_metadata(value)
+
+    @field_validator('chunking_strategy', mode='before')
+    @classmethod
+    def validate_chunking_strategy(cls, value: Any) -> dict[str, Any] | None:
+        return validate_openai_chunking_strategy(value)
 
 class VectorStoreResponse(BaseModel):
     id: str
     object: str = 'vector_store'
-    name: str
+    name: str | None = None
+    description: str | None = None
     status: str = 'completed'
+    bytes: int = 0
     usage_bytes: int = 0
+    file_counts: dict[str, int] = Field(default_factory=lambda: {'in_progress': 0, 'completed': 0, 'failed': 0, 'cancelled': 0, 'total': 0})
     attributes: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
     created_at: int | None = None
     expires_after: dict[str, Any] | None = None
     expires_at: int | None = None
     last_active_at: int | None = None
+
+
+class VectorStoreListResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    object: str = 'list'
+    data: list[VectorStoreResponse] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: bool = False
+
+
+class VectorStoreDeletedResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str
+    object: str = 'vector_store.deleted'
+    deleted: bool
+
+
+class OpenAIFile(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str
+    object: str = 'file'
+    bytes: int = 0
+    created_at: int | None = None
+    filename: str
+    purpose: str
+    expires_at: int | None = None
+    status: str | None = None
+    status_details: str | None = None
+
+
+class OpenAIFileListResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    object: str = 'list'
+    data: list[OpenAIFile] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: bool = False
+
+
+class OpenAIFileDeletedResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str
+    object: str = 'file'
+    deleted: bool
+
+
+class OpenAIVectorStoreFileLastError(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    code: str | None = None
+    message: str | None = None
+
+
+class OpenAIVectorStoreFile(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str
+    object: str = 'vector_store.file'
+    vector_store_id: str
+    status: str | None = None
+    usage_bytes: int = 0
+    created_at: int | None = None
+    last_error: OpenAIVectorStoreFileLastError | dict[str, Any] | None = None
+    attributes: dict[str, Any] = Field(default_factory=dict)
+    chunking_strategy: dict[str, Any] | None = None
+
+
+class OpenAIVectorStoreFileListResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    object: str = 'list'
+    data: list[OpenAIVectorStoreFile] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: bool = False
+
+
+class OpenAIVectorStoreFileDeletedResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str
+    object: str = 'vector_store.file.deleted'
+    deleted: bool = True
+
+
+class OpenAIVectorStoreFileContentItem(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: str | None = None
+    text: str | None = None
+    heading_path: list[str] | None = None
+    page_start: int | None = None
+    page_end: int | None = None
+
+
+class OpenAIVectorStoreFileContentResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    object: str = 'vector_store.file_content'
+    data: list[OpenAIVectorStoreFileContentItem] = Field(default_factory=list)
+    has_more: bool | None = None
+    next_page: str | None = None
+
+
+class OpenAIVectorStoreFileBatchCounts(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    in_progress: int = 0
+    completed: int = 0
+    failed: int = 0
+    cancelled: int = 0
+    total: int = 0
+
+
+class OpenAIVectorStoreFileBatch(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str
+    object: str = 'vector_store.file_batch'
+    vector_store_id: str
+    status: str
+    file_counts: OpenAIVectorStoreFileBatchCounts | dict[str, int]
+    created_at: int | None = None
+    completed_at: int | None = None
+
+
+class OpenAIVectorStoreFileBatchFilesPage(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    object: str = 'list'
+    data: list[OpenAIVectorStoreFile] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: bool = False
+
 
 class DocumentIngestRequest(BaseModel):
     vector_store_id: str | None = None
@@ -96,6 +347,10 @@ class ChunkRecord(BaseModel):
     id: str
     document_id: str
     document_version_id: str | None = None
+    file_id: str | None = None
+    title: str | None = None
+    filename: str | None = None
+    source_uri: str | None = None
     ordinal: int
     text: str
     heading_path: list[str] = Field(default_factory=list)
@@ -108,6 +363,8 @@ class ChunkRecord(BaseModel):
     allowed_roles: list[str] = Field(default_factory=list)
     score: float | None = None
     source: str | None = None
+    annotations: list[dict[str, Any]] = Field(default_factory=list)
+    citation: dict[str, Any] | None = None
 
 class SearchRequest(BaseModel):
     query: str
@@ -127,16 +384,43 @@ class SearchResponse(BaseModel):
     audit_event_id: str | None = None
     retrieval_profile_id: str | None = None
 
+class OpenAIVectorStoreHybridSearchOptions(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    embedding_weight: float | None = Field(default=None, ge=0)
+    text_weight: float | None = Field(default=None, ge=0)
+
+    @model_validator(mode='before')
+    @classmethod
+    def normalize_rrf_aliases(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        normalized = dict(value)
+        if 'rrf_embedding_weight' in normalized and 'embedding_weight' not in normalized:
+            normalized['embedding_weight'] = normalized.pop('rrf_embedding_weight')
+        if 'rrf_text_weight' in normalized and 'text_weight' not in normalized:
+            normalized['text_weight'] = normalized.pop('rrf_text_weight')
+        return normalized
+
+    @model_validator(mode='after')
+    def require_nonzero_weight(self):
+        embedding = self.embedding_weight if self.embedding_weight is not None else 0.0
+        text = self.text_weight if self.text_weight is not None else 0.0
+        if embedding <= 0 and text <= 0:
+            raise ValueError('hybrid_search requires embedding_weight or text_weight greater than zero')
+        return self
+
 class OpenAIVectorStoreRankingOptions(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
     ranker: Literal['none', 'auto', 'default-2024-11-15'] = 'auto'
     score_threshold: float | None = Field(default=None, ge=0, le=1)
+    hybrid_search: OpenAIVectorStoreHybridSearchOptions | None = None
 
 class OpenAIVectorStoreSearchRequest(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
-    query: str
+    query: str | list[str]
     filters: dict[str, Any] | None = None
     # Historical ExAIS planning docs used attribute_filter. Keep it as a
     # compatibility alias while preferring OpenAI's filters field.
@@ -145,10 +429,531 @@ class OpenAIVectorStoreSearchRequest(BaseModel):
     top_k: int | None = Field(default=None, ge=1, le=50)
     ranking_options: OpenAIVectorStoreRankingOptions | None = None
     rewrite_query: bool = False
+    next_page: str | None = None
     retrieval_profile_id: str | None = None
     mode: str | None = None
     include_content: bool = True
     include_metadata: bool = True
+
+    @field_validator('query', mode='before')
+    @classmethod
+    def validate_query(cls, value: Any) -> Any:
+        if not isinstance(value, list):
+            return value
+        if not value:
+            raise ValueError('query array must contain at least one string')
+        normalized: list[str] = []
+        for item in value:
+            if not isinstance(item, str):
+                raise ValueError('query array entries must be strings')
+            stripped = item.strip()
+            if not stripped:
+                raise ValueError('query array entries must be non-empty strings')
+            normalized.append(stripped)
+        return normalized
+
+
+OPENAI_RESPONSES_FILE_SEARCH_DEFAULT_MAX_NUM_RESULTS = 20
+
+
+class OpenAIResponseFileSearchTool(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: str = Field(default='file_search', description='OpenAI Responses tool type. ExAIS currently implements file_search.')
+    vector_store_ids: list[str] = Field(default_factory=list)
+    filters: dict[str, Any] | None = None
+    max_num_results: int = Field(default=OPENAI_RESPONSES_FILE_SEARCH_DEFAULT_MAX_NUM_RESULTS, ge=1, le=50)
+    ranking_options: dict[str, Any] | None = None
+
+
+class OpenAIResponseRequest(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    model: str | None = None
+    input: Any = None
+    tools: list[OpenAIResponseFileSearchTool] | None = None
+    tool_choice: Any = None
+    include: list[str] | str | None = None
+    previous_response_id: str | None = None
+    conversation: Any = None
+    instructions: str | None = None
+    store: bool | None = None
+    stream: Any = Field(default=None, description='Boolean stream flag; compatibility validation is performed by the route.')
+    stream_options: dict[str, Any] | None = None
+    background: bool | None = None
+    metadata: dict[str, Any] | None = None
+    max_output_tokens: int | None = None
+    max_tool_calls: int | None = None
+    parallel_tool_calls: bool | None = None
+    reasoning: dict[str, Any] | None = None
+    text: dict[str, Any] | None = None
+    temperature: float | None = None
+    top_p: float | None = None
+    truncation: str | None = None
+    user: str | None = None
+
+    def to_compat_payload(self) -> dict[str, Any]:
+        return self.model_dump(mode='python', exclude_unset=True)
+
+
+class OpenAIResponseInputTokensRequest(OpenAIResponseRequest):
+    pass
+
+
+class OpenAIResponseCompactRequest(OpenAIResponseRequest):
+    pass
+
+
+class OpenAIFileCitationAnnotation(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    type: Literal['file_citation']
+    index: int = Field(ge=0)
+    file_id: str = Field(min_length=1)
+    filename: str = Field(min_length=1)
+
+    @field_validator('file_id', 'filename')
+    @classmethod
+    def _non_blank_citation_string(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError('must be a non-empty string')
+        return value
+
+
+class OpenAIMessageFileCitation(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    file_id: str = Field(min_length=1)
+
+    @field_validator('file_id')
+    @classmethod
+    def _non_blank_file_id(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError('must be a non-empty string')
+        return value
+
+
+class OpenAIMessageFileCitationAnnotation(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    type: Literal['file_citation']
+    start_index: int = Field(ge=0)
+    end_index: int = Field(ge=0)
+    text: str = Field(min_length=1)
+    file_citation: OpenAIMessageFileCitation
+
+    @model_validator(mode='after')
+    def _span_matches_text(self) -> OpenAIMessageFileCitationAnnotation:
+        if self.end_index != self.start_index + len(self.text):
+            raise ValueError('end_index must equal start_index plus citation text length')
+        return self
+
+
+class OpenAIVectorStoreSearchContent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['text']
+    text: str = ''
+    annotations: list[OpenAIFileCitationAnnotation] = Field(default_factory=list)
+
+
+class OpenAIVectorStoreSearchCitation(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: str | None = None
+    index: int | None = None
+    file_id: str | None = None
+    filename: str | None = None
+    chunk_id: str | None = None
+    document_id: str | None = None
+    title: str | None = None
+    url: str | None = None
+    page_start: int | None = None
+    page_end: int | None = None
+    heading_path: list[str] | None = None
+    score: float | None = None
+    marker: str | None = None
+    start_index: int | None = Field(default=None, ge=0)
+    end_index: int | None = Field(default=None, ge=0)
+    model_source_id: str | None = None
+    model_marker: str | None = None
+    annotation: OpenAIFileCitationAnnotation | None = None
+    message_annotation: OpenAIMessageFileCitationAnnotation | None = None
+
+
+class OpenAIVectorStoreSearchResult(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    file_id: str | None = None
+    filename: str | None = None
+    score: float | None = None
+    attributes: dict[str, Any] = Field(default_factory=dict)
+    content: list[OpenAIVectorStoreSearchContent | dict[str, Any]] = Field(default_factory=list)
+    annotations: list[OpenAIFileCitationAnnotation] = Field(default_factory=list)
+    citation: OpenAIVectorStoreSearchCitation | dict[str, Any] | None = None
+    citations: list[OpenAIVectorStoreSearchCitation | dict[str, Any]] = Field(default_factory=list)
+    output_guard: dict[str, Any] | None = None
+
+
+class OpenAIVectorStoreSearchResultsPage(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    object: str = 'vector_store.search_results.page'
+    search_query: str | list[str] | None = None
+    data: list[OpenAIVectorStoreSearchResult] = Field(default_factory=list)
+    citations: list[OpenAIVectorStoreSearchCitation | dict[str, Any]] = Field(default_factory=list)
+    has_more: bool = False
+    next_page: str | None = None
+
+
+class OpenAIResponseFileSearchResult(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    file_id: str | None = None
+    filename: str | None = None
+    score: float | None = None
+    text: str | None = None
+    attributes: dict[str, Any] = Field(default_factory=dict)
+
+
+class OpenAIResponseFileSearchCallItem(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['file_search_call']
+    id: str | None = None
+    status: str | None = None
+    queries: list[str] = Field(default_factory=list)
+    results: list[OpenAIResponseFileSearchResult] | None = None
+    search_results: list[OpenAIResponseFileSearchResult] | None = None
+
+
+class OpenAIResponseOutputTextContent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['output_text']
+    text: str = ''
+    annotations: list[OpenAIFileCitationAnnotation] = Field(default_factory=list)
+
+
+class OpenAIResponseMessageItem(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['message']
+    id: str | None = None
+    status: str | None = None
+    role: str | None = None
+    content: list[OpenAIResponseOutputTextContent | dict[str, Any]] = Field(default_factory=list)
+
+
+class OpenAINativeCitation(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    annotation: OpenAIFileCitationAnnotation | None = None
+    message_annotation: OpenAIMessageFileCitationAnnotation | None = None
+    marker: str | None = None
+    start_index: int | None = Field(default=None, ge=0)
+    end_index: int | None = Field(default=None, ge=0)
+    model_source_id: str | None = None
+    model_marker: str | None = None
+
+
+class OpenAIResponseUsage(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    input_tokens: int | None = None
+    input_tokens_details: dict[str, Any] | None = None
+    output_tokens: int | None = None
+    output_tokens_details: dict[str, Any] | None = None
+    total_tokens: int | None = None
+
+
+class OpenAIResponseObject(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str
+    object: str = 'response'
+    created_at: int | None = None
+    status: str | None = None
+    completed_at: int | None = None
+    background: bool | None = None
+    error: Any = None
+    incomplete_details: Any = None
+    instructions: str | None = None
+    max_output_tokens: int | None = None
+    max_tool_calls: int | None = None
+    model: str | None = None
+    output: list[OpenAIResponseFileSearchCallItem | OpenAIResponseMessageItem | dict[str, Any]] = Field(default_factory=list)
+    parallel_tool_calls: bool | None = None
+    previous_response_id: str | None = None
+    reasoning: dict[str, Any] | None = None
+    service_tier: str | None = None
+    store: bool | None = None
+    temperature: float | None = None
+    text: dict[str, Any] | None = None
+    tool_choice: Any = None
+    tools: list[dict[str, Any]] = Field(default_factory=list)
+    top_logprobs: int | None = None
+    top_p: float | None = None
+    truncation: str | None = None
+    usage: OpenAIResponseUsage | dict[str, Any] | None = None
+    user: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    citations: list[OpenAINativeCitation] = Field(default_factory=list)
+    output_guard: dict[str, Any] | None = None
+
+
+class OpenAIResponseCreatedEvent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['response.created']
+    sequence_number: int | None = Field(default=None, ge=0)
+    response: OpenAIResponseObject
+
+
+class OpenAIResponseInProgressEvent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['response.in_progress']
+    sequence_number: int | None = Field(default=None, ge=0)
+    response: OpenAIResponseObject
+
+
+class OpenAIResponseOutputItemAddedEvent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['response.output_item.added']
+    sequence_number: int | None = Field(default=None, ge=0)
+    output_index: int = Field(ge=0)
+    item: OpenAIResponseFileSearchCallItem | OpenAIResponseMessageItem | dict[str, Any]
+
+
+class OpenAIResponseFileSearchCallInProgressEvent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['response.file_search_call.in_progress']
+    sequence_number: int | None = Field(default=None, ge=0)
+    item_id: str
+    output_index: int = Field(ge=0)
+
+
+class OpenAIResponseFileSearchCallSearchingEvent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['response.file_search_call.searching']
+    sequence_number: int | None = Field(default=None, ge=0)
+    item_id: str
+    output_index: int = Field(ge=0)
+
+
+class OpenAIResponseFileSearchCallCompletedEvent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['response.file_search_call.completed']
+    sequence_number: int | None = Field(default=None, ge=0)
+    item_id: str
+    output_index: int = Field(ge=0)
+
+
+class OpenAIResponseContentPartAddedEvent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['response.content_part.added']
+    sequence_number: int | None = Field(default=None, ge=0)
+    item_id: str
+    output_index: int = Field(ge=0)
+    content_index: int = Field(ge=0)
+    part: OpenAIResponseOutputTextContent | dict[str, Any]
+
+
+class OpenAIResponseOutputTextDeltaEvent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['response.output_text.delta']
+    sequence_number: int | None = Field(default=None, ge=0)
+    item_id: str
+    output_index: int = Field(ge=0)
+    content_index: int = Field(ge=0)
+    delta: str
+    obfuscation: str | None = None
+
+
+class OpenAIResponseOutputTextAnnotationAddedEvent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['response.output_text.annotation.added']
+    sequence_number: int | None = Field(default=None, ge=0)
+    item_id: str
+    output_index: int = Field(ge=0)
+    content_index: int = Field(ge=0)
+    annotation_index: int = Field(ge=0)
+    annotation: OpenAIFileCitationAnnotation
+
+
+class OpenAIResponseOutputTextDoneEvent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['response.output_text.done']
+    sequence_number: int | None = Field(default=None, ge=0)
+    item_id: str
+    output_index: int = Field(ge=0)
+    content_index: int = Field(ge=0)
+    text: str
+
+
+class OpenAIResponseContentPartDoneEvent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['response.content_part.done']
+    sequence_number: int | None = Field(default=None, ge=0)
+    item_id: str
+    output_index: int = Field(ge=0)
+    content_index: int = Field(ge=0)
+    part: OpenAIResponseOutputTextContent | dict[str, Any]
+
+
+class OpenAIResponseOutputItemDoneEvent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['response.output_item.done']
+    sequence_number: int | None = Field(default=None, ge=0)
+    output_index: int = Field(ge=0)
+    item: OpenAIResponseFileSearchCallItem | OpenAIResponseMessageItem | dict[str, Any]
+
+
+class OpenAIResponseCompletedEvent(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: Literal['response.completed']
+    sequence_number: int | None = Field(default=None, ge=0)
+    response: OpenAIResponseObject
+
+
+class OpenAIResponseStreamEvent(RootModel[
+    OpenAIResponseCreatedEvent
+    | OpenAIResponseInProgressEvent
+    | OpenAIResponseOutputItemAddedEvent
+    | OpenAIResponseFileSearchCallInProgressEvent
+    | OpenAIResponseFileSearchCallSearchingEvent
+    | OpenAIResponseFileSearchCallCompletedEvent
+    | OpenAIResponseContentPartAddedEvent
+    | OpenAIResponseOutputTextDeltaEvent
+    | OpenAIResponseOutputTextAnnotationAddedEvent
+    | OpenAIResponseOutputTextDoneEvent
+    | OpenAIResponseContentPartDoneEvent
+    | OpenAIResponseOutputItemDoneEvent
+    | OpenAIResponseCompletedEvent
+]):
+    pass
+
+
+class OpenAIResponseInputTokensResponse(BaseModel):
+    object: str = 'response.input_tokens'
+    input_tokens: int
+
+
+class OpenAIResponseCompactionResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str
+    object: str = 'response.compaction'
+    created_at: int | None = None
+    output: list[dict[str, Any]] = Field(default_factory=list)
+    usage: OpenAIResponseUsage | dict[str, Any] | None = None
+
+
+class OpenAIResponseDeletedResponse(BaseModel):
+    id: str
+    object: str = 'response'
+    deleted: bool
+
+
+class OpenAIResponseInputItemsPage(BaseModel):
+    object: str = 'list'
+    data: list[dict[str, Any]] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: bool = False
+
+
+class OpenAIProjectApiKey(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    object: str = 'organization.project.api_key'
+    redacted_value: str
+    name: str
+    created_at: int | None = None
+    last_used_at: int | None = None
+    id: str
+    owner: dict[str, Any] = Field(default_factory=dict)
+
+
+class OpenAIProjectApiKeyListResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    object: str = 'list'
+    data: list[OpenAIProjectApiKey] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: bool = False
+
+
+class OpenAIProjectApiKeyDeletedResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str
+    object: str = 'organization.project.api_key.deleted'
+    deleted: bool = True
+
+
+class OpenAIAdminApiKey(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    object: str = 'organization.admin_api_key'
+    id: str
+    name: str
+    redacted_value: str
+    created_at: int | None = None
+    expires_at: int | None = None
+    last_used_at: int | None = None
+    owner: dict[str, Any] = Field(default_factory=dict)
+
+
+class OpenAIAdminApiKeyCreateRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    name: str = Field(min_length=1)
+    expires_in_seconds: int | None = Field(default=None, ge=1, le=31536000)
+
+    @field_validator('name')
+    @classmethod
+    def _strip_nonblank_name(cls, value: str) -> str:
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError('name must be a non-empty string')
+        return stripped
+
+
+class OpenAIAdminApiKeyCreateResponse(OpenAIAdminApiKey):
+    value: str
+
+
+class OpenAIAdminApiKeyListResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    object: str = 'list'
+    data: list[OpenAIAdminApiKey] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: bool = False
+
+
+class OpenAIAdminApiKeyDeletedResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str
+    object: str = 'organization.admin_api_key.deleted'
+    deleted: bool = True
+
 
 class ContextPackRequest(SearchRequest):
     max_context_tokens: int = 6000
@@ -157,11 +962,23 @@ class ContextPackRequest(SearchRequest):
 class ContextCitation(BaseModel):
     chunk_id: str
     document_id: str
+    file_id: str | None = None
     title: str | None = None
     filename: str | None = None
+    url: str | None = None
     page_start: int | None = None
     page_end: int | None = None
     heading_path: list[str] = Field(default_factory=list)
+    annotation: dict[str, Any] | None = None
+    message_annotation: OpenAIMessageFileCitationAnnotation | None = None
+    marker: str | None = None
+    model_source_id: str | None = None
+    model_marker: str | None = None
+    model_locator: str | None = None
+    context_relation: str | None = None
+    source_chunk_id: str | None = None
+    neighbor_offset: int | None = None
+    parent_heading_path: list[str] = Field(default_factory=list)
 
 class ContextPackResponse(BaseModel):
     query: str
@@ -170,6 +987,21 @@ class ContextPackResponse(BaseModel):
     chunks: list[ChunkRecord]
     token_estimate: int
     audit_event_id: str | None = None
+
+class RetrievalAnswerRequest(ContextPackRequest):
+    max_answer_sources: int = Field(default=5, ge=1, le=20)
+    answer_style: Literal['extractive'] = 'extractive'
+
+class RetrievalAnswerResponse(BaseModel):
+    query: str
+    answer: str
+    citations: list[ContextCitation]
+    chunks: list[ChunkRecord]
+    context: str
+    answer_style: str = 'extractive'
+    token_estimate: int
+    audit_event_id: str | None = None
+    output_guard: dict[str, Any] | None = None
 
 class EmbeddingRequest(BaseModel):
     input: list[str] | str
@@ -249,6 +1081,12 @@ class ModelCandidate(BaseModel):
     score: float = 0.0
     allowed: bool = True
     reasons: list[str] = Field(default_factory=list)
+    estimated_input_tokens: int | None = None
+    estimated_cost_usd: float | None = None
+    cost_currency: str | None = None
+    cost_unit: str | None = None
+    cost_per_1m_tokens_usd: float | None = None
+    cost_reason: str | None = None
 
 class IngestionPlanResponse(BaseModel):
     id: str | None = None
@@ -268,7 +1106,7 @@ class BakeoffRunRequest(BaseModel):
     mode: str = 'markdown_docs_v1'
     model_profile_ids: list[str]
     queries: list[dict[str, Any]] = Field(default_factory=list)
-    top_k: int = 10
+    top_k: int = Field(default=10, ge=1, le=100)
 
 class BakeoffRunResponse(BaseModel):
     id: str

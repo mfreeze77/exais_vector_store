@@ -186,8 +186,11 @@ class MaintenanceService:
             emb = await provider.embed([r['text'] for r in group], model, dimensions, input_type="document")
             collection = self.qdrant.collection_name(principal.business_instance_id, profile_id)
             points = []
+            point_ids_by_chunk: dict[str, str] = {}
             for r, e in zip(group, emb.data):
-                points.append({'id': r['vector_point_id'] or point_uuid(r['id']), 'vector': e.embedding, 'payload': {
+                point_id = r['vector_point_id'] or point_uuid(r['id'])
+                point_ids_by_chunk[r['id']] = point_id
+                points.append({'id': point_id, 'vector': e.embedding, 'payload': {
                     'tenant_id': r['tenant_id'], 'business_instance_id': r['business_instance_id'], 'knowledge_base_id': r['knowledge_base_id'],
                     'vector_store_id': r['vector_store_id'], 'document_id': r['document_id'], 'document_version_id': r['document_version_id'],
                     'chunk_id': r['id'], 'security_level': r['security_level'], 'classification': r['classification'], 'acl_bucket': r['acl_bucket'],
@@ -207,6 +210,29 @@ class MaintenanceService:
                 UPDATE chunks SET dense_index_status='indexed', sparse_index_status='indexed', last_index_error=NULL, indexed_at=now()
                 WHERE id = ANY(:ids) AND tenant_id=:tenant_id AND business_instance_id=:biz_id
             '''), {'ids': [r['id'] for r in group], 'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id})
+            case_parts = []
+            point_params = {}
+            for index, r in enumerate(group):
+                chunk_param = f"chunk_id_{index}"
+                point_param = f"point_id_{index}"
+                case_parts.append(f"WHEN :{chunk_param} THEN :{point_param}")
+                point_params[chunk_param] = r['id']
+                point_params[point_param] = point_ids_by_chunk[r['id']]
+            db.execute(text(f'''
+                UPDATE embeddings
+                SET vector_collection=:collection,
+                    vector_point_id=CASE chunk_id {' '.join(case_parts)} ELSE vector_point_id END,
+                    status='active'
+                WHERE chunk_id = ANY(:ids) AND tenant_id=:tenant_id AND business_instance_id=:biz_id
+                  AND embedding_profile_id=:profile_id
+            '''), {
+                'ids': [r['id'] for r in group],
+                'tenant_id': principal.tenant_id,
+                'biz_id': principal.business_instance_id,
+                'profile_id': profile_id,
+                'collection': collection,
+                **point_params,
+            })
             processed += len(group)
         last_chunk_id = rows[-1]['id']
         db.execute(jsonb_text('''

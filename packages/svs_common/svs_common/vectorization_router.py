@@ -7,7 +7,7 @@ from .db import jsonb_param
 from .chunking import estimate_tokens, choose_chunker
 from .ids import new_id
 from .config import get_settings
-from .model_registry import resolve_vectorization_profile, vectorization_modes, model_registry, resolve_embedding_profile
+from .model_registry import resolve_vectorization_profile, vectorization_modes, model_registry, resolve_embedding_profile, estimate_embedding_cost
 from .providers import provider_config_status
 from .schemas import DocumentIngestRequest, IngestionPlanResponse, ModelCandidate, Principal
 
@@ -69,12 +69,14 @@ def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest, setti
         candidate_ids.append(policy.fallback_dev_embedding_profile)
     profiles = registry.get('models', {})
     candidates: list[ModelCandidate] = []
+    estimated_tokens = estimate_tokens(req.content)
     for idx, candidate_id in enumerate(candidate_ids):
         p = profiles.get(candidate_id, {})
         provider = p.get('provider', 'hash_mock')
         privacy = p.get('privacy', 'unknown')
         allowed, reason = _privacy_allowed(privacy, req.security_level, policy)
         provider_status = provider_config_status(provider, settings)
+        cost = estimate_embedding_cost(candidate_id, estimated_tokens, registry=registry)
         score = 100.0 - (idx * 7.5)
         reasons = []
         if candidate_id == preferred:
@@ -109,6 +111,12 @@ def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest, setti
             score=round(score, 3),
             allowed=allowed,
             reasons=reasons,
+            estimated_input_tokens=cost.get('estimated_tokens'),
+            estimated_cost_usd=cost.get('estimated_cost_usd'),
+            cost_currency=cost.get('currency'),
+            cost_unit=cost.get('unit'),
+            cost_per_1m_tokens_usd=cost.get('input_per_1m_tokens_usd'),
+            cost_reason=cost.get('reason'),
         ))
     candidates.sort(key=lambda c: (c.allowed, c.score), reverse=True)
     chosen_candidate = next((c for c in candidates if c.allowed), None)
@@ -131,7 +139,7 @@ def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest, setti
         embedding_profile_id=chosen,
         retrieval_profile_id=mode.get('retrieval_profile', 'hybrid_rrf_secure_v2'),
         candidates=candidates,
-        estimated_tokens=estimate_tokens(req.content),
+        estimated_tokens=estimated_tokens,
         estimated_chunks=len(sample_chunks),
         warnings=warnings,
     )

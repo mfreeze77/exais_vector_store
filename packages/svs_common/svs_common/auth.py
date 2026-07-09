@@ -1,5 +1,5 @@
 from __future__ import annotations
-import hashlib, secrets
+import hashlib, secrets, time
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
@@ -8,6 +8,7 @@ from .ids import new_id
 from .schemas import Principal
 
 PREFIX = "svs_live_"
+DEFAULT_API_KEY_SCOPES = ["retrieval:read", "documents:write", "vector_stores:write"]
 
 def generate_api_key() -> str:
     return PREFIX + secrets.token_urlsafe(32)
@@ -21,12 +22,97 @@ def bearer_token(authorization: str | None) -> str:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing bearer token")
     return authorization.split(" ", 1)[1].strip()
 
-def create_api_key(db: Session, principal: Principal, label: str, scopes: list[str] | None = None, max_security_level: int | None = None) -> dict:
+def api_key_metadata_from_row(row) -> dict:
+    payload = {
+        "id": row["id"],
+        "object": "api_key",
+        "label": row["label"],
+        "scopes": list(row["scopes"] or []),
+        "max_security_level": row["max_security_level"],
+        "status": row["status"],
+        "created_at": row.get("created_at"),
+        "last_used_at": row.get("last_used_at"),
+        "expires_at": row.get("expires_at"),
+    }
+    return {key: value for key, value in payload.items() if value is not None}
+
+
+def openai_project_api_key_from_metadata(metadata: dict, *, owner_user_id: str | None = None) -> dict:
+    key_id = str(metadata["id"])
+    redacted_tail = key_id[-6:] if len(key_id) > 6 else key_id
+    payload = {
+        "object": "organization.project.api_key",
+        "redacted_value": f"{PREFIX}...{redacted_tail}",
+        "name": metadata.get("label") or key_id,
+        "created_at": metadata.get("created_at"),
+        "last_used_at": metadata.get("last_used_at"),
+        "id": key_id,
+        "owner": {
+            "type": "user",
+            "user": {
+                "id": owner_user_id or "user_unknown",
+            },
+        },
+    }
+    return {key: value for key, value in payload.items() if value is not None}
+
+
+def openai_admin_api_key_from_metadata(metadata: dict, *, owner_user_id: str | None = None) -> dict:
+    key_id = str(metadata["id"])
+    redacted_tail = key_id[-6:] if len(key_id) > 6 else key_id
+    payload = {
+        "object": "organization.admin_api_key",
+        "id": key_id,
+        "name": metadata.get("label") or key_id,
+        "redacted_value": f"{PREFIX}...{redacted_tail}",
+        "created_at": metadata.get("created_at"),
+        "expires_at": metadata.get("expires_at"),
+        "last_used_at": metadata.get("last_used_at"),
+        "owner": {
+            "type": "user",
+            "object": "organization.user",
+            "id": owner_user_id or "user_unknown",
+            "role": "owner",
+        },
+    }
+    return {key: value for key, value in payload.items() if value is not None}
+
+
+def openai_admin_api_key_create_response(
+    created: dict,
+    *,
+    created_at: int,
+    owner_user_id: str | None = None,
+) -> dict:
+    payload = openai_admin_api_key_from_metadata(
+        {
+            "id": created["id"],
+            "label": created.get("label"),
+            "created_at": created_at,
+            "expires_at": created.get("expires_at"),
+        },
+        owner_user_id=owner_user_id,
+    )
+    payload["value"] = created["api_key"]
+    return payload
+
+
+def _validate_api_key_expires_at(expires_at: int | None) -> int | None:
+    if expires_at is None:
+        return None
+    if isinstance(expires_at, bool) or expires_at <= int(time.time()):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="expires_at must be a future Unix timestamp")
+    return int(expires_at)
+
+def create_api_key(db: Session, principal: Principal, label: str, scopes: list[str] | None = None, max_security_level: int | None = None, expires_at: int | None = None) -> dict:
+    effective_expires_at = _validate_api_key_expires_at(expires_at)
     raw = generate_api_key()
     key_id = new_id("key")
+    effective_scopes = list(scopes) if scopes is not None else list(DEFAULT_API_KEY_SCOPES)
+    effective_max_level = max_security_level if max_security_level is not None else principal.max_security_level
     db.execute(text("""
-        INSERT INTO api_keys(id, tenant_id, business_instance_id, user_id, key_hash, label, scopes, max_security_level, status)
-        VALUES (:id, :tenant_id, :biz_id, :user_id, :key_hash, :label, :scopes, :max_level, 'active')
+        INSERT INTO api_keys(id, tenant_id, business_instance_id, user_id, key_hash, label, scopes, max_security_level, expires_at, status)
+        VALUES (:id, :tenant_id, :biz_id, :user_id, :key_hash, :label, :scopes, :max_level, to_timestamp(CAST(:expires_at AS double precision)), 'active')
     """), {
         "id": key_id,
         "tenant_id": principal.tenant_id,
@@ -34,10 +120,93 @@ def create_api_key(db: Session, principal: Principal, label: str, scopes: list[s
         "user_id": principal.user_id,
         "key_hash": api_key_hash(raw),
         "label": label,
-        "scopes": scopes or ["retrieval:read", "documents:write", "vector_stores:write"],
-        "max_level": max_security_level if max_security_level is not None else principal.max_security_level,
+        "scopes": effective_scopes,
+        "max_level": effective_max_level,
+        "expires_at": effective_expires_at,
     })
-    return {"id": key_id, "api_key": raw, "label": label, "scopes": scopes or [], "max_security_level": max_security_level if max_security_level is not None else principal.max_security_level}
+    result = {"id": key_id, "api_key": raw, "label": label, "scopes": effective_scopes, "max_security_level": effective_max_level}
+    if effective_expires_at is not None:
+        result["expires_at"] = effective_expires_at
+    return result
+
+def list_api_keys(
+    db: Session,
+    principal: Principal,
+    limit: int = 20,
+    *,
+    after: str | None = None,
+    status: str | None = None,
+    order: str = "desc",
+) -> tuple[list[dict], bool]:
+    limit = min(max(limit, 1), 100)
+    order = "asc" if order == "asc" else "desc"
+    params = {"tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "limit": limit + 1}
+    status_clause = ""
+    if status is not None:
+        status_clause = "AND status=:status"
+        params["status"] = status
+    after_clause = ""
+    if after:
+        after_row = db.execute(text("""
+            SELECT id, created_at
+            FROM api_keys
+            WHERE id=:after AND tenant_id=:tenant_id AND business_instance_id IS NOT DISTINCT FROM :biz_id
+              """ + status_clause + """
+            LIMIT 1
+        """), {**params, "after": after}).mappings().first()
+        if after_row:
+            after_op = ">" if order == "asc" else "<"
+            after_clause = f"AND (created_at {after_op} :after_created_at OR (created_at=:after_created_at AND id {after_op} :after_id))"
+            params["after_created_at"] = after_row["created_at"]
+            params["after_id"] = after_row["id"]
+    rows = db.execute(text("""
+        SELECT id, label, scopes, max_security_level, status,
+               extract(epoch from created_at)::bigint AS created_at,
+               extract(epoch from last_used_at)::bigint AS last_used_at,
+               extract(epoch from expires_at)::bigint AS expires_at
+        FROM api_keys
+        WHERE tenant_id=:tenant_id AND business_instance_id IS NOT DISTINCT FROM :biz_id
+          """ + status_clause + """
+          """ + after_clause + """
+        ORDER BY created_at """ + order.upper() + """, id """ + order.upper() + """
+        LIMIT :limit
+    """), params).mappings().all()
+    has_more = len(rows) > limit
+    return [api_key_metadata_from_row(row) for row in rows[:limit]], has_more
+
+def get_api_key(db: Session, principal: Principal, api_key_id: str, *, status: str | None = None) -> dict | None:
+    params = {"id": api_key_id, "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id}
+    status_clause = ""
+    if status is not None:
+        status_clause = "AND status=:status"
+        params["status"] = status
+    row = db.execute(text("""
+        SELECT id, label, scopes, max_security_level, status,
+               extract(epoch from created_at)::bigint AS created_at,
+               extract(epoch from last_used_at)::bigint AS last_used_at,
+               extract(epoch from expires_at)::bigint AS expires_at
+        FROM api_keys
+        WHERE id=:id AND tenant_id=:tenant_id AND business_instance_id IS NOT DISTINCT FROM :biz_id
+          """ + status_clause + """
+        LIMIT 1
+    """), params).mappings().first()
+    if not row:
+        return None
+    return api_key_metadata_from_row(row)
+
+def revoke_api_key(db: Session, principal: Principal, api_key_id: str) -> dict | None:
+    row = db.execute(text("""
+        UPDATE api_keys
+        SET status='revoked'
+        WHERE id=:id AND tenant_id=:tenant_id AND business_instance_id IS NOT DISTINCT FROM :biz_id
+        RETURNING id, label, scopes, max_security_level, status,
+                  extract(epoch from created_at)::bigint AS created_at,
+                  extract(epoch from last_used_at)::bigint AS last_used_at,
+                  extract(epoch from expires_at)::bigint AS expires_at
+    """), {"id": api_key_id, "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id}).mappings().first()
+    if not row:
+        return None
+    return api_key_metadata_from_row(row)
 
 def resolve_api_key_principal(db: Session, authorization: str | None) -> Principal:
     raw = bearer_token(authorization)

@@ -15,6 +15,10 @@ from .opensearch_adapter import OpenSearchAdapter
 from .object_store import ObjectStore
 from .index_cleanup import enqueue_purge_stale_vectors
 from .openai_compat import file_attribute_payload, safe_file_attributes
+from .vector_store_repo import refresh_vector_store_activity, require_active_vector_store
+
+OPENAI_FILE_ID_ATTRIBUTE = "_openai_file_id"
+VECTOR_STORE_FILE_CHUNKING_STRATEGY_ATTRIBUTE = "_openai_chunking_strategy"
 
 
 def embedding_profile_config(embedding_profile_id: str, registry: dict | None = None) -> dict:
@@ -59,10 +63,14 @@ class IngestionService:
         if existing:
             return existing["id"]
         vsf_id = new_id("vsf")
+        file_attrs = {
+            k: v for k, v in req.attributes.items()
+            if not k.startswith("_") or k == VECTOR_STORE_FILE_CHUNKING_STRATEGY_ATTRIBUTE
+        }
         db.execute(jsonb_text("""
             INSERT INTO vector_store_files(id, tenant_id, business_instance_id, vector_store_id, document_id, file_batch_id, status, attributes, usage_bytes, completed_at)
             VALUES (:id, :tenant_id, :biz_id, :vs_id, :doc_id, :file_batch_id, :status, CAST(:attrs AS jsonb), :bytes, now())
-        """, 'attrs'), {"id": vsf_id, "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "vs_id": req.vector_store_id, "doc_id": document_id, "file_batch_id": req.attributes.get("_file_batch_id"), "status": status, "attrs": jsonb_param({k: v for k, v in req.attributes.items() if not k.startswith("_")}), "bytes": len(req.content.encode())})
+        """, 'attrs'), {"id": vsf_id, "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "vs_id": req.vector_store_id, "doc_id": document_id, "file_batch_id": req.attributes.get("_file_batch_id"), "status": status, "attrs": jsonb_param(file_attrs), "bytes": len(req.content.encode())})
         return vsf_id
 
     def _find_exact_duplicate(self, db: Session, principal: Principal, req: DocumentIngestRequest, content_hash: str):
@@ -126,12 +134,18 @@ class IngestionService:
         """), params).mappings().first()
 
     async def ingest_now(self, db: Session, principal: Principal, req: DocumentIngestRequest) -> IngestionJobResponse:
+        if req.vector_store_id:
+            require_active_vector_store(db, principal, req.vector_store_id)
         content_hash = sha256_text(req.content)
 
-        exact = self._find_exact_duplicate(db, principal, req, content_hash)
-        if exact:
-            vsf_id = self._link_vector_store_file(db, principal, req, exact["id"], status="completed")
-            return IngestionJobResponse(id=new_id("job"), status="deduplicated", document_id=exact["id"], vector_store_file_id=vsf_id)
+        if not req.attributes.get(OPENAI_FILE_ID_ATTRIBUTE):
+            exact = self._find_exact_duplicate(db, principal, req, content_hash)
+            if exact:
+                vsf_id = self._link_vector_store_file(db, principal, req, exact["id"], status="completed")
+                if req.vector_store_id:
+                    if not refresh_vector_store_activity(db, principal, req.vector_store_id):
+                        require_active_vector_store(db, principal, req.vector_store_id)
+                return IngestionJobResponse(id=new_id("job"), status="deduplicated", document_id=exact["id"], vector_store_file_id=vsf_id)
 
         plan = build_ingestion_plan(principal, req)
         mode_id, mode = resolve_vectorization_profile(req.filename, req.mime_type, req.mode, req.attributes)
@@ -295,8 +309,6 @@ class IngestionService:
         vsf_id = self._link_vector_store_file(db, principal, req, doc_id, status="completed")
         # Keep vector-store usage/materialized activity current for billing and expiration.
         if req.vector_store_id:
-            db.execute(text("""
-                UPDATE vector_stores SET last_active_at=now(), usage_bytes=usage_bytes + :bytes, updated_at=now()
-                WHERE id=:vs_id AND tenant_id=:tenant_id AND business_instance_id=:biz_id
-            """), {"bytes": len(req.content.encode()), "vs_id": req.vector_store_id, "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id})
+            if not refresh_vector_store_activity(db, principal, req.vector_store_id, usage_bytes_delta=len(req.content.encode())):
+                require_active_vector_store(db, principal, req.vector_store_id)
         return IngestionJobResponse(id=new_id("job"), status="completed", document_id=doc_id, vector_store_file_id=vsf_id)

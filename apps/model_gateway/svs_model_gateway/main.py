@@ -1,7 +1,7 @@
 from __future__ import annotations
 from fastapi import FastAPI
 from svs_common.config import get_settings
-from svs_common.model_registry import model_registry
+from svs_common.model_registry import estimate_embedding_cost, model_registry
 from svs_common.providers import provider_for
 from svs_common.schemas import EmbeddingRequest, EmbeddingResponse, RerankRequest, RerankResponse, RerankResult, TokenizeRequest, TokenizeResponse
 from svs_common.chunking import estimate_tokens
@@ -49,4 +49,10 @@ def tokenize(req: TokenizeRequest):
 def estimate_cost(req: EmbeddingRequest):
     texts = req.input if isinstance(req.input, list) else [req.input]
     tokens = sum(estimate_tokens(t) for t in texts)
-    return {"estimated_tokens": tokens, "estimated_cost_usd": None, "note": "Wire per-provider pricing table here."}
+    return estimate_embedding_cost(
+        req.model_profile_id,
+        tokens,
+        provider=req.provider,
+        model=req.model,
+        dimensions=req.dimensions,
+    )

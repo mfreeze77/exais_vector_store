@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any
 from .config import get_settings
+from .index_versions import index_version_suffix, safe_index_part
 
 class IndexBackendUnavailable(RuntimeError):
     pass
@@ -37,9 +38,9 @@ class QdrantAdapter:
             return False, str(exc)
 
     def collection_name(self, business_instance_id: str, embedding_profile_id: str = "default") -> str:
-        safe_biz = business_instance_id.replace("-", "_").lower()
-        safe_profile = embedding_profile_id.replace("-", "_").lower()
-        return f"{self.settings.qdrant_collection_prefix}{safe_biz}_{safe_profile}"
+        safe_biz = safe_index_part(business_instance_id)
+        safe_profile = safe_index_part(embedding_profile_id)
+        return f"{self.settings.qdrant_collection_prefix}{safe_biz}_{safe_profile}{index_version_suffix(self.settings)}"
 
     def ensure_collection(self, collection: str, dimensions: int) -> None:
         if not self._require_client("ensure_collection"):
