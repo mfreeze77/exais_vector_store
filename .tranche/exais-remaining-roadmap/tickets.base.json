@@ -1,0 +1,258 @@
+{
+  "canonical_goal": "Close the post-WAVE-108 ExAIS remaining roadmap to production-readiness governance by reconciling stale tracker claims, finishing repo-buildable release/ops/model/admin gaps, and separating external deployment proof gates without reopening the completed OpenAI parity train.",
+  "tickets": [
+    {
+      "id": "RM-001",
+      "title": "Reconcile reindex repair status",
+      "goal": "Resolve the stale tracker disagreement where the current trail/README describe reindex repair as implemented while the completion matrix still lists the reindex repair worker as incomplete.",
+      "acceptance": "A focused proof demonstrates that non-indexed dense and sparse chunks are discovered, repaired or replayed through the worker/maintenance path, marked indexed, and cleaned up from stale backend state; the roadmap docs agree on the resulting status and cite the proof command.",
+      "suspected_files": [
+        "docs/TICKET_TRAIL.md",
+        "docs/COMPLETION_MATRIX.md",
+        "docs/AUDIT_RESPONSE_WAVE_PLAN.md",
+        "apps/api",
+        "apps/worker",
+        "scripts/release/qdrant-chaos-repair.py",
+        "tests"
+      ]
+    },
+    {
+      "id": "RM-002",
+      "title": "Reconcile OpenAPI contract status",
+      "goal": "Resolve the stale tracker disagreement where OpenAI-compatible parity work is broadly recorded as implemented while the matrix still calls out the full OpenAPI contract as incomplete.",
+      "acceptance": "Generated OpenAPI output covers every documented native and OpenAI-compatible route with stable request/response components, a regression check fails on contract drift, and the roadmap docs agree on whether any explicit contract gaps remain.",
+      "suspected_files": [
+        "docs/TICKET_TRAIL.md",
+        "docs/COMPLETION_MATRIX.md",
+        "README.md",
+        "apps/api",
+        "tests"
+      ]
+    },
+    {
+      "id": "RM-003",
+      "title": "Enforce Alembic migration discipline",
+      "goal": "Replace ad hoc raw SQL migration loops with an Alembic-governed migration path suitable for production snapshots, rollback planning, and CI enforcement.",
+      "acceptance": "Alembic is the authoritative migration entrypoint, production-like upgrade checks run in CI, rollback or forward-fix rules are documented, and migration drift/raw-loop bypasses are caught by a repeatable check.",
+      "suspected_files": [
+        "docs/COMPLETION_MATRIX.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        "alembic.ini",
+        "migrations",
+        "scripts/migrate.sh",
+        ".github/workflows",
+        "tests"
+      ]
+    },
+    {
+      "id": "RM-004",
+      "title": "Automate image provenance release",
+      "goal": "Finish the versioned image release lane with CI image builds, digest publication, digest pinning, and signed release verification for micro-production cells.",
+      "acceptance": "CI builds the versioned API, worker, model-gateway, admin-ui, and instance-agent images, emits a digest manifest, signs or records verifiable provenance for each image, and cell startup/upgrade rejects unpinned or unverifiable images.",
+      "suspected_files": [
+        "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+        "docs/MICRO_PRODUCTION.md",
+        "docs/TICKET_TRAIL.md",
+        ".github/workflows",
+        "scripts/release",
+        "infra/docker",
+        "apps/instance_agent"
+      ]
+    },
+    {
+      "id": "RM-005",
+      "title": "Implement encrypted secrets workflow",
+      "goal": "Turn the production secrets lane from env-file placeholders into an encrypted, auditable workflow for customer cells.",
+      "acceptance": "A production cell can be configured from encrypted SOPS/age or Vault-backed secrets, preflight validates secret references without printing secret values, plaintext production secrets are rejected, and rotation/runbook steps are documented.",
+      "suspected_files": [
+        "docs/MICRO_PRODUCTION.md",
+        "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        ".env.production.example",
+        "scripts/release/prod-env-preflight.py",
+        "configs",
+        "runbooks"
+      ]
+    },
+    {
+      "id": "RM-006",
+      "title": "Wire backup integrations",
+      "goal": "Implement the actual backup integrations behind the existing backup/restore runbooks for metadata, vectors, sparse indexes, object storage, configs, and audit artifacts.",
+      "acceptance": "Backup commands write verifiable artifacts to a configured object/offsite target for Postgres, Qdrant, OpenSearch, MinIO/object storage, config/secrets metadata, and audit exports; restore preflight can enumerate and validate those artifacts without restoring them.",
+      "suspected_files": [
+        "docs/COMPLETION_MATRIX.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        "docs/MICRO_PRODUCTION.md",
+        "scripts/release",
+        "scripts",
+        "infra/docker",
+        "runbooks"
+      ]
+    },
+    {
+      "id": "RM-007",
+      "title": "Ship observability dashboards",
+      "goal": "Promote the minimal metrics hook into production observability dashboards and alert rules for API, ingestion, retrieval, indexes, storage, security, cost, and backup freshness.",
+      "acceptance": "Prometheus-compatible metrics are scraped by a local cell observability stack, dashboards expose the production-ready delta's required panels, alert rules cover the documented failure modes, and a smoke test proves at least one API, worker, index, and backup metric is visible.",
+      "suspected_files": [
+        "docs/COMPLETION_MATRIX.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        "apps/api",
+        "apps/worker",
+        "apps/model_gateway",
+        "infra/docker",
+        "charts",
+        "runbooks"
+      ]
+    },
+    {
+      "id": "RM-008",
+      "title": "Harden admin sessions",
+      "goal": "Replace dev-header admin UI identity with production auth/session or API-key principal resolution while keeping the backend as the security authority.",
+      "acceptance": "The admin UI no longer depends on dev tenant/business/user headers in production mode, session/OIDC/API-key principal context is resolved by the API, unauthorized admin flows fail closed, and UI/API tests cover login/session expiry and principal-scoped requests.",
+      "suspected_files": [
+        "docs/FRONTEND_ADMIN_UI.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        "apps/admin_ui/src/main.tsx",
+        "apps/api",
+        "packages/svs_common",
+        "tests"
+      ]
+    },
+    {
+      "id": "RM-009",
+      "title": "Expose fleet version UI",
+      "goal": "Complete the admin production contract for instance switching and fleet/version visibility across micro-production cells.",
+      "acceptance": "An authorized admin can select an instance/business vault, view running component versions and image digests, see upgrade/deployment records, and identify cells that are behind or unverifiable without relying on shell access.",
+      "suspected_files": [
+        "docs/FRONTEND_ADMIN_UI.md",
+        "docs/MICRO_PRODUCTION.md",
+        "apps/admin_ui/src/main.tsx",
+        "apps/api",
+        "apps/instance_agent",
+        "scripts/release",
+        "tests"
+      ]
+    },
+    {
+      "id": "RM-010",
+      "title": "Implement live bakeoff fan-out",
+      "goal": "Finish the eval lane that must run live retrieval/provider fan-out before any fine-tuning work is promoted.",
+      "acceptance": "A bakeoff run can fan out the same golden query set across multiple retrieval/model candidates, persist comparable quality/latency/cost metrics, select or reject a winner by policy, and prove with deterministic test providers plus a documented live-provider command.",
+      "suspected_files": [
+        "docs/COMPLETION_MATRIX.md",
+        "docs/planning-specs/INTELLIGENT_VECTORIZATION_ROUTER.md",
+        "apps/api",
+        "apps/model_gateway",
+        "evals",
+        "configs",
+        "tests"
+      ]
+    },
+    {
+      "id": "RM-011",
+      "title": "Implement private endpoint adapters",
+      "goal": "Finish private model endpoint adapters for RunPod, TEI, Infinity, and compatible self-hosted embedding/rerank backends behind the model gateway.",
+      "acceptance": "Registered private endpoints expose health, p95 latency, max security level, region, model revision, and auth secret references; embedding/rerank calls normalize through the gateway contract; failed health disables routing or triggers policy fallback.",
+      "suspected_files": [
+        "docs/planning-specs/RUNPOD_MODEL_ENDPOINT.md",
+        "docs/planning-specs/INTELLIGENT_VECTORIZATION_ROUTER.md",
+        "apps/model_gateway",
+        "apps/api",
+        "configs/runpod-endpoints.example.yaml",
+        "infra/runpod",
+        "tests"
+      ]
+    },
+    {
+      "id": "RM-012",
+      "title": "Prove external registry push",
+      "goal": "Capture the operator-dependent proof that versioned images can be pushed to Docker Hub or a private external registry after credentials are available.",
+      "acceptance": "With operator-supplied registry credentials, the documented push command publishes the versioned image set, records immutable digests, proves pull-by-digest from a clean environment, and stores the proof output without claiming VPS readiness.",
+      "suspected_files": [
+        "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+        "docs/COMPLETION_MATRIX_V0_9_8.md",
+        "README.md",
+        "scripts/release/build-images.py",
+        "scripts/release/publish-images.py",
+        "runbooks"
+      ]
+    },
+    {
+      "id": "RM-013",
+      "title": "Prove customer cell launch",
+      "goal": "Capture the operator-dependent proof that a chosen VPS or customer micro-production cell can run the externally published images.",
+      "acceptance": "On the target VPS/customer host, the runbook pulls pinned images, boots the compose cell with production preflight passing, proves API/admin/worker/model-gateway readiness, runs smoke retrieval, and records raw host/topology evidence.",
+      "suspected_files": [
+        "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+        "docs/MICRO_PRODUCTION.md",
+        "docs/COMPLETION_MATRIX_V0_9_8.md",
+        ".env.production.example",
+        "infra/docker/compose.cell.yml",
+        "scripts/release",
+        "runbooks"
+      ]
+    },
+    {
+      "id": "RM-014",
+      "title": "Validate real providers",
+      "goal": "Capture the operator-dependent proof that real provider credentials and endpoints work for OpenAI, RunPod, TEI, Infinity, and other approved providers.",
+      "acceptance": "With live credentials/endpoints supplied, provider integration tests execute embedding and rerank calls through the gateway, enforce security-level routing policy, record latency/error/cost metadata, and identify any provider that remains unavailable or unapproved.",
+      "suspected_files": [
+        "docs/COMPLETION_MATRIX_V0_9_8.md",
+        "docs/planning-specs/INTELLIGENT_VECTORIZATION_ROUTER.md",
+        "docs/planning-specs/RUNPOD_MODEL_ENDPOINT.md",
+        "apps/model_gateway",
+        "configs",
+        "tests/integration",
+        "runbooks"
+      ]
+    },
+    {
+      "id": "RM-015",
+      "title": "Prove external restore drill",
+      "goal": "Capture the operator-dependent proof that backups can restore an external micro-production cell or staging clone, not only a local Docker environment.",
+      "acceptance": "Using a real backup target and external cell topology, the runbook restores metadata, object artifacts, one Qdrant collection, one OpenSearch index, and config/secrets references, then runs retrieval/eval smoke checks against the restored environment.",
+      "suspected_files": [
+        "docs/COMPLETION_MATRIX_V0_9_8.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+        "scripts/release",
+        "runbooks",
+        "infra/docker"
+      ]
+    },
+    {
+      "id": "RM-016",
+      "title": "Run corpus-scale load tests",
+      "goal": "Capture the operator-dependent proof that the target corpus and workload meet the production latency, freshness, and indexing objectives.",
+      "acceptance": "Against the selected corpus or a documented production-scale surrogate, ingestion and retrieval load tests report throughput, p95 search latency, p95 context-pack latency, queue freshness, index growth, provider latency, and failure modes against the documented SLO targets.",
+      "suspected_files": [
+        "docs/COMPLETION_MATRIX_V0_9_8.md",
+        "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        "load-tests",
+        "scripts/release/seed-scale.py",
+        "scripts/release/search-bench.py",
+        "evals",
+        "runbooks"
+      ]
+    },
+    {
+      "id": "RM-017",
+      "title": "Prove DNS TLS secrets wiring",
+      "goal": "Capture the operator-dependent proof that production DNS, TLS, and external secrets-manager wiring are correctly attached to the launched cell.",
+      "acceptance": "For the chosen domain/cell, DNS resolves to the target host, HTTPS/TLS health checks pass without wildcard dev allowances, secrets-manager references resolve through preflight without value disclosure, and rollback/rotation steps are documented.",
+      "suspected_files": [
+        "README.md",
+        "docs/MICRO_PRODUCTION.md",
+        "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        "terraform",
+        "ansible",
+        "scripts/release/prod-env-preflight.py",
+        "runbooks"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,807 @@
+{
+  "end_goal": "Close the post-WAVE-108 ExAIS remaining roadmap to production-readiness governance by reconciling stale tracker claims, finishing repo-buildable release/ops/model/admin gaps, and separating external deployment proof gates without reopening the completed OpenAI parity train.",
+  "shared_functions": [
+    {
+      "name": "all_image_tags",
+      "signature": "all_image_tags(registry_prefix: str | None = None, product_version: str | None = None) -> list[str]",
+      "owner_file": "scripts/release/release_common.py",
+      "is_new": false,
+      "used_by": ["RM-004", "RM-012", "RM-013"]
+    },
+    {
+      "name": "write_release_manifest",
+      "signature": "write_release_manifest(images: list[ImageDigest], destination: Path) -> Path",
+      "owner_file": "scripts/release/provenance_common.py",
+      "is_new": true,
+      "used_by": ["RM-004", "RM-012", "RM-013"]
+    },
+    {
+      "name": "verify_release_manifest",
+      "signature": "verify_release_manifest(manifest_path: Path, *, require_digests: bool = True) -> ReleaseManifestReport",
+      "owner_file": "scripts/release/provenance_common.py",
+      "is_new": true,
+      "used_by": ["RM-004", "RM-012", "RM-013"]
+    },
+    {
+      "name": "validate_env",
+      "signature": "validate_env(values: dict[str, str], expected_version: str, *, allow_local_registry: bool = False) -> list[Issue]",
+      "owner_file": "scripts/release/prod-env-preflight.py",
+      "is_new": false,
+      "used_by": ["RM-005", "RM-013", "RM-014", "RM-017"]
+    },
+    {
+      "name": "validate_secret_references",
+      "signature": "validate_secret_references(values: Mapping[str, str], *, require_external: bool = True) -> list[SecretIssue]",
+      "owner_file": "packages/svs_common/svs_common/secrets.py",
+      "is_new": true,
+      "used_by": ["RM-005", "RM-013", "RM-017"]
+    },
+    {
+      "name": "write_backup_manifest",
+      "signature": "write_backup_manifest(bundle_dir: Path, artifacts: Sequence[BackupArtifact]) -> Path",
+      "owner_file": "scripts/release/backup_common.py",
+      "is_new": true,
+      "used_by": ["RM-006", "RM-015"]
+    },
+    {
+      "name": "validate_backup_manifest",
+      "signature": "validate_backup_manifest(manifest_path: Path, *, require_external: bool = False) -> BackupManifestReport",
+      "owner_file": "scripts/release/backup_common.py",
+      "is_new": true,
+      "used_by": ["RM-006", "RM-015"]
+    },
+    {
+      "name": "readiness_payload",
+      "signature": "readiness_payload(db: Session, qdrant_adapter) -> dict[str, Any]",
+      "owner_file": "apps/api/svs_api/main.py",
+      "is_new": false,
+      "used_by": ["RM-007", "RM-013"]
+    },
+    {
+      "name": "get_request_principal",
+      "signature": "get_request_principal(authorization: str | None = Header(default=None), x_svs_tenant_id: str | None = Header(default=None), x_svs_business_instance_id: str | None = Header(default=None), x_svs_user_id: str | None = Header(default=None), x_svs_groups: str | None = Header(default=None), x_svs_roles: str | None = Header(default=None), x_svs_max_security_level: int | None = Header(default=None), db: Session = Depends(get_session)) -> Principal",
+      "owner_file": "apps/api/svs_api/main.py",
+      "is_new": false,
+      "used_by": ["RM-008", "RM-009"]
+    },
+    {
+      "name": "record_fleet_version",
+      "signature": "record_fleet_version(report: FleetVersionReport, db: Session | None = None) -> FleetVersionReport",
+      "owner_file": "packages/svs_common/svs_common/fleet.py",
+      "is_new": true,
+      "used_by": ["RM-004", "RM-009", "RM-013"]
+    },
+    {
+      "name": "BakeoffService.create_run",
+      "signature": "BakeoffService.create_run(self, db: Session, principal: Principal, req: BakeoffRunRequest) -> BakeoffRunResponse",
+      "owner_file": "packages/svs_common/svs_common/bakeoff.py",
+      "is_new": false,
+      "used_by": ["RM-010", "RM-014"]
+    },
+    {
+      "name": "probe_provider_endpoint",
+      "signature": "probe_provider_endpoint(provider: str, request: ProviderProbeRequest, settings: Any | None = None) -> ProviderProbeResult",
+      "owner_file": "packages/svs_common/svs_common/provider_probe.py",
+      "is_new": true,
+      "used_by": ["RM-010", "RM-011", "RM-014"]
+    },
+    {
+      "name": "provider_for",
+      "signature": "provider_for(provider_name: str, settings: Any | None = None) -> EmbeddingProvider",
+      "owner_file": "packages/svs_common/svs_common/providers.py",
+      "is_new": false,
+      "used_by": ["RM-011", "RM-014"]
+    },
+    {
+      "name": "collect_observability_evidence",
+      "signature": "collect_observability_evidence(api_base: str, prometheus_url: str, *, cell: str) -> ObservabilityEvidence",
+      "owner_file": "scripts/release/observability-smoke.py",
+      "is_new": true,
+      "used_by": ["RM-007", "RM-013", "RM-016"]
+    }
+  ],
+  "file_modification_map": [
+    {
+      "file": "README.md",
+      "ticket_ids": ["RM-002", "RM-012", "RM-017"],
+      "is_new": false,
+      "what": "Reconcile OpenAPI/deployment proof language and keep Docker Hub/VPS/DNS/TLS claims explicitly external-proof scoped."
+    },
+    {
+      "file": ".env.production.example",
+      "ticket_ids": ["RM-005", "RM-013", "RM-017"],
+      "is_new": false,
+      "what": "Replace plaintext-production placeholders with secret-reference examples and public URL/DNS/TLS fields required by customer cell proof."
+    },
+    {
+      "file": ".github/workflows/ci.yml",
+      "ticket_ids": ["RM-003", "RM-004"],
+      "is_new": false,
+      "what": "Keep existing CI as the integration anchor while delegating migration and image-release expansion to dedicated workflow entries."
+    },
+    {
+      "file": ".github/workflows/migration-tests.yml",
+      "ticket_ids": ["RM-003"],
+      "is_new": true,
+      "what": "Add production-like Alembic upgrade/drift checks without mixing migration authority into the general CI job."
+    },
+    {
+      "file": ".github/workflows/image-release.yml",
+      "ticket_ids": ["RM-004"],
+      "is_new": true,
+      "what": "Build versioned app images, emit digest/provenance manifests, and verify pinned image metadata."
+    },
+    {
+      "file": "alembic.ini",
+      "ticket_ids": ["RM-003"],
+      "is_new": true,
+      "what": "Introduce Alembic as the authoritative migration entrypoint."
+    },
+    {
+      "file": "migrations/env.py",
+      "ticket_ids": ["RM-003"],
+      "is_new": true,
+      "what": "Configure Alembic runtime, metadata imports, and production DSN handling."
+    },
+    {
+      "file": "migrations/versions/001_initial_schema.py",
+      "ticket_ids": ["RM-003"],
+      "is_new": true,
+      "what": "Convert existing SQL schema into an Alembic baseline revision while preserving RLS semantics."
+    },
+    {
+      "file": "scripts/check-migration-drift.py",
+      "ticket_ids": ["RM-003"],
+      "is_new": true,
+      "what": "Fail CI when raw migration loops or schema drift bypass Alembic."
+    },
+    {
+      "file": "scripts/migrate.sh",
+      "ticket_ids": ["RM-003"],
+      "is_new": false,
+      "what": "Route migration execution through Alembic and retain raw SQL only as legacy source material."
+    },
+    {
+      "file": "db/migrations/001_initial.sql",
+      "ticket_ids": ["RM-003"],
+      "is_new": false,
+      "what": "Use as conversion source for the Alembic baseline; do not extend directly after RM-003."
+    },
+    {
+      "file": "db/migrations/005_production_waves.sql",
+      "ticket_ids": ["RM-003", "RM-006"],
+      "is_new": false,
+      "what": "Preserve production-wave tables such as backup_bundles while moving schema authority to Alembic."
+    },
+    {
+      "file": "tests/integration/test_postgres_rls_and_worker.py",
+      "ticket_ids": ["RM-003"],
+      "is_new": false,
+      "what": "Extend production-like migration/RLS proof to run after Alembic upgrade."
+    },
+    {
+      "file": "tests/test_migration_discipline.py",
+      "ticket_ids": ["RM-003"],
+      "is_new": true,
+      "what": "Add regression coverage that rejects raw-loop migration bypasses and validates the Alembic entrypoint."
+    },
+    {
+      "file": "docs/TICKET_TRAIL.md",
+      "ticket_ids": ["RM-001", "RM-002", "RM-004", "RM-005", "RM-006"],
+      "is_new": false,
+      "what": "Record reconciled proof status for reindex/OpenAPI and repo-buildable production roadmap closures."
+    },
+    {
+      "file": "docs/COMPLETION_MATRIX.md",
+      "ticket_ids": ["RM-001", "RM-002", "RM-003", "RM-006", "RM-007", "RM-010"],
+      "is_new": false,
+      "what": "Align stale remaining-gap rows with proof outcomes without reopening completed OpenAI parity work."
+    },
+    {
+      "file": "docs/AUDIT_RESPONSE_WAVE_PLAN.md",
+      "ticket_ids": ["RM-001"],
+      "is_new": false,
+      "what": "Cite the reindex repair proof or retain a specific failing gap if proof exposes one."
+    },
+    {
+      "file": "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+      "ticket_ids": ["RM-003", "RM-005", "RM-006", "RM-007", "RM-015", "RM-016", "RM-017"],
+      "is_new": false,
+      "what": "Keep migration, secrets, backup, observability, SLO, restore, DNS, and TLS requirements aligned with repo proof and operator gates."
+    },
+    {
+      "file": "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+      "ticket_ids": ["RM-004", "RM-005", "RM-012", "RM-013", "RM-015", "RM-017"],
+      "is_new": false,
+      "what": "Document local registry, external registry, VPS/customer cell, external restore, DNS/TLS, and secrets-manager proof boundaries."
+    },
+    {
+      "file": "docs/MICRO_PRODUCTION.md",
+      "ticket_ids": ["RM-004", "RM-005", "RM-006", "RM-009", "RM-013", "RM-017"],
+      "is_new": false,
+      "what": "Update micro-production image, secrets, backup, fleet/version, customer launch, and external cell governance language."
+    },
+    {
+      "file": "docs/FRONTEND_ADMIN_UI.md",
+      "ticket_ids": ["RM-008", "RM-009"],
+      "is_new": false,
+      "what": "Separate production admin auth/session requirements from fleet/version UI contract."
+    },
+    {
+      "file": "docs/planning-specs/INTELLIGENT_VECTORIZATION_ROUTER.md",
+      "ticket_ids": ["RM-010", "RM-011", "RM-014"],
+      "is_new": false,
+      "what": "Keep bakeoff fan-out, provider allowlists, and security-level provider routing under one router contract."
+    },
+    {
+      "file": "docs/planning-specs/RUNPOD_MODEL_ENDPOINT.md",
+      "ticket_ids": ["RM-011", "RM-014"],
+      "is_new": false,
+      "what": "Align RunPod/private endpoint implementation and live-provider proof expectations."
+    },
+    {
+      "file": "docs/COMPLETION_MATRIX_V0_9_8.md",
+      "ticket_ids": ["RM-012", "RM-013", "RM-014", "RM-015", "RM-016", "RM-017"],
+      "is_new": false,
+      "what": "Track operator-dependent proof gates separately from repo-buildable implementation closure."
+    },
+    {
+      "file": "apps/api/svs_api/main.py",
+      "ticket_ids": ["RM-001", "RM-002", "RM-007", "RM-008", "RM-010", "RM-011"],
+      "is_new": false,
+      "what": "Keep API maintenance, OpenAPI, readiness/metrics, principal resolution, bakeoff, and model-endpoint routes under existing API authority."
+    },
+    {
+      "file": "packages/svs_common/svs_common/maintenance.py",
+      "ticket_ids": ["RM-001"],
+      "is_new": false,
+      "what": "Use existing reindex_chunks repair path as the proof target; only change if proof reveals a real repair gap."
+    },
+    {
+      "file": "apps/worker/svs_worker/main.py",
+      "ticket_ids": ["RM-001", "RM-007"],
+      "is_new": false,
+      "what": "Keep queued reindex dispatch and worker metrics/freshness evidence aligned."
+    },
+    {
+      "file": "scripts/release/qdrant-repair-all.py",
+      "ticket_ids": ["RM-001"],
+      "is_new": false,
+      "what": "Use cursor-paginated repair-all command as reindex proof evidence."
+    },
+    {
+      "file": "scripts/release/qdrant-chaos-repair.py",
+      "ticket_ids": ["RM-001"],
+      "is_new": false,
+      "what": "Use existing chaos repair script for stale backend cleanup proof if needed."
+    },
+    {
+      "file": "tests/test_reindex_idempotency.py",
+      "ticket_ids": ["RM-001"],
+      "is_new": false,
+      "what": "Keep dense/sparse replay idempotency as the regression proof for reconciliation."
+    },
+    {
+      "file": "packages/svs_common/svs_common/schemas.py",
+      "ticket_ids": ["RM-002", "RM-011"],
+      "is_new": false,
+      "what": "Keep OpenAPI response components and model endpoint request/response contracts centralized."
+    },
+    {
+      "file": "tests/test_openapi_contract.py",
+      "ticket_ids": ["RM-002"],
+      "is_new": false,
+      "what": "Use generated OpenAPI regression checks as the status reconciliation proof."
+    },
+    {
+      "file": "scripts/release/release_common.py",
+      "ticket_ids": ["RM-004", "RM-009", "RM-012", "RM-013"],
+      "is_new": false,
+      "what": "Own the versioned application image set and shared release naming helpers."
+    },
+    {
+      "file": "scripts/release/build-images.py",
+      "ticket_ids": ["RM-004", "RM-012"],
+      "is_new": false,
+      "what": "Build the versioned image set for provenance and external registry proof."
+    },
+    {
+      "file": "scripts/release/publish-images.py",
+      "ticket_ids": ["RM-004", "RM-012"],
+      "is_new": false,
+      "what": "Publish images, inspect manifests, and feed digest/provenance reporting."
+    },
+    {
+      "file": "scripts/release/remove-local-app-images.py",
+      "ticket_ids": ["RM-012"],
+      "is_new": false,
+      "what": "Support clean pull-by-digest proof for external registry publication."
+    },
+    {
+      "file": "scripts/release/provenance_common.py",
+      "ticket_ids": ["RM-004", "RM-012", "RM-013"],
+      "is_new": true,
+      "what": "Own release digest manifest creation, verification, and provenance report parsing."
+    },
+    {
+      "file": "tests/test_image_provenance_release.py",
+      "ticket_ids": ["RM-004", "RM-012"],
+      "is_new": true,
+      "what": "Prove digest manifest generation and external registry proof formatting without credentials."
+    },
+    {
+      "file": "infra/docker/compose.cell.yml",
+      "ticket_ids": ["RM-004", "RM-007", "RM-013", "RM-015"],
+      "is_new": false,
+      "what": "Consume pinned app images, attach observability, and preserve cell topology for launch/restore proof."
+    },
+    {
+      "file": "scripts/release/prod-env-preflight.py",
+      "ticket_ids": ["RM-005", "RM-013", "RM-014", "RM-017"],
+      "is_new": false,
+      "what": "Validate production env and provider/secret references without printing secret values."
+    },
+    {
+      "file": "scripts/release/generate-cell-env.py",
+      "ticket_ids": ["RM-005"],
+      "is_new": false,
+      "what": "Import operator values by reference and refuse plaintext production secret material."
+    },
+    {
+      "file": "packages/svs_common/svs_common/secrets.py",
+      "ticket_ids": ["RM-005", "RM-013", "RM-017"],
+      "is_new": true,
+      "what": "Centralize SOPS/age/Vault-style secret reference validation for preflight and launch proof."
+    },
+    {
+      "file": "configs/cell-secrets.example.sops.yaml",
+      "ticket_ids": ["RM-005", "RM-017"],
+      "is_new": true,
+      "what": "Provide non-secret encrypted-secret reference examples for customer cell configuration."
+    },
+    {
+      "file": "tests/test_prod_env_preflight_script.py",
+      "ticket_ids": ["RM-005"],
+      "is_new": false,
+      "what": "Extend redaction and plaintext-secret rejection coverage."
+    },
+    {
+      "file": "tests/test_secret_reference_workflow.py",
+      "ticket_ids": ["RM-005", "RM-017"],
+      "is_new": true,
+      "what": "Prove secret references are required and values are never emitted in reports."
+    },
+    {
+      "file": "runbooks/encrypted-secrets.md",
+      "ticket_ids": ["RM-005", "RM-017"],
+      "is_new": true,
+      "what": "Document encrypted secret setup, validation, rotation, and rollback proof collection."
+    },
+    {
+      "file": "scripts/backup-instance.sh",
+      "ticket_ids": ["RM-006", "RM-015"],
+      "is_new": false,
+      "what": "Extend local bundle capture toward object/offsite target artifacts and manifest metadata."
+    },
+    {
+      "file": "scripts/restore-instance.sh",
+      "ticket_ids": ["RM-006", "RM-015"],
+      "is_new": false,
+      "what": "Validate backup manifests and enumerate external restore requirements before destructive restore steps."
+    },
+    {
+      "file": "scripts/release/local-restore-drill.py",
+      "ticket_ids": ["RM-006", "RM-015"],
+      "is_new": false,
+      "what": "Reuse local restore proof as baseline while external restore remains operator-dependent."
+    },
+    {
+      "file": "infra/ansible/roles/backup-agent/tasks/main.yml",
+      "ticket_ids": ["RM-006"],
+      "is_new": false,
+      "what": "Wire backup-agent install/schedule hooks to the implemented backup commands."
+    },
+    {
+      "file": "scripts/release/backup_common.py",
+      "ticket_ids": ["RM-006", "RM-015"],
+      "is_new": true,
+      "what": "Own backup artifact manifests, checksum validation, and restore preflight reports."
+    },
+    {
+      "file": "tests/test_backup_integrations.py",
+      "ticket_ids": ["RM-006"],
+      "is_new": true,
+      "what": "Prove backup manifest creation and restore preflight enumeration without external target credentials."
+    },
+    {
+      "file": "runbooks/backup-restore.md",
+      "ticket_ids": ["RM-006", "RM-015"],
+      "is_new": true,
+      "what": "Document repo-buildable backup integration proof and first external restore drill gate."
+    },
+    {
+      "file": "apps/model_gateway/svs_model_gateway/main.py",
+      "ticket_ids": ["RM-007", "RM-011", "RM-014"],
+      "is_new": false,
+      "what": "Expose gateway health, embedding/rerank adapter behavior, and live provider evidence surfaces."
+    },
+    {
+      "file": "infra/docker/compose.observability.yml",
+      "ticket_ids": ["RM-007"],
+      "is_new": true,
+      "what": "Add local-cell Prometheus/Grafana or compatible observability stack wiring."
+    },
+    {
+      "file": "charts/exais-observability/dashboards/exais-production.json",
+      "ticket_ids": ["RM-007"],
+      "is_new": true,
+      "what": "Define production dashboard panels for API, ingestion, retrieval, indexes, storage, security, cost, and backup freshness."
+    },
+    {
+      "file": "charts/exais-observability/rules/exais-alerts.yaml",
+      "ticket_ids": ["RM-007"],
+      "is_new": true,
+      "what": "Define alert rules for documented production failure modes."
+    },
+    {
+      "file": "scripts/release/observability-smoke.py",
+      "ticket_ids": ["RM-007", "RM-013", "RM-016"],
+      "is_new": true,
+      "what": "Collect API, worker, index, backup, and load-test metric visibility evidence."
+    },
+    {
+      "file": "tests/test_readyz.py",
+      "ticket_ids": ["RM-007"],
+      "is_new": false,
+      "what": "Keep readiness payload strict-index behavior covered while adding metric-readiness assertions if needed."
+    },
+    {
+      "file": "tests/test_observability_config.py",
+      "ticket_ids": ["RM-007"],
+      "is_new": true,
+      "what": "Validate dashboard/rule files and smoke-test metric names."
+    },
+    {
+      "file": "runbooks/observability.md",
+      "ticket_ids": ["RM-007"],
+      "is_new": true,
+      "what": "Document observability stack launch, smoke proof, and alert verification."
+    },
+    {
+      "file": "apps/admin_ui/src/main.tsx",
+      "ticket_ids": ["RM-008", "RM-009"],
+      "is_new": false,
+      "what": "Remove production dependence on dev headers and mount auth/session plus fleet/version UI flows."
+    },
+    {
+      "file": "apps/admin_ui/src/auth.ts",
+      "ticket_ids": ["RM-008"],
+      "is_new": true,
+      "what": "Centralize admin UI session/API-key principal handling and fail-closed request decoration."
+    },
+    {
+      "file": "packages/svs_common/svs_common/auth.py",
+      "ticket_ids": ["RM-008"],
+      "is_new": false,
+      "what": "Keep API-key principal and scope enforcement as the backend authority for admin flows."
+    },
+    {
+      "file": "tests/test_auth_scopes.py",
+      "ticket_ids": ["RM-008"],
+      "is_new": false,
+      "what": "Extend API-key principal and scope regression coverage for admin production mode."
+    },
+    {
+      "file": "tests/test_admin_auth_sessions.py",
+      "ticket_ids": ["RM-008"],
+      "is_new": true,
+      "what": "Prove login/session expiry and unauthorized admin requests fail closed."
+    },
+    {
+      "file": "apps/admin_ui/src/fleet.ts",
+      "ticket_ids": ["RM-009"],
+      "is_new": true,
+      "what": "Own fleet instance switching, version/digest display, and behind/unverifiable state rendering."
+    },
+    {
+      "file": "packages/svs_common/svs_common/fleet.py",
+      "ticket_ids": ["RM-009", "RM-013"],
+      "is_new": true,
+      "what": "Define fleet version/deployment report records shared by admin UI and customer cell launch proof."
+    },
+    {
+      "file": "apps/instance_agent/svs_instance_agent/main.py",
+      "ticket_ids": ["RM-009", "RM-013"],
+      "is_new": false,
+      "what": "Expose deploy/rollback/version evidence for authorized fleet UI and launched cell proof."
+    },
+    {
+      "file": "scripts/svsctl.py",
+      "ticket_ids": ["RM-009"],
+      "is_new": false,
+      "what": "Surface fleet upgrade/version evidence through the existing CLI path."
+    },
+    {
+      "file": "tests/test_fleet_version_contract.py",
+      "ticket_ids": ["RM-009"],
+      "is_new": true,
+      "what": "Validate fleet version report shape, digest status, and admin-facing stale/unverifiable states."
+    },
+    {
+      "file": "packages/svs_common/svs_common/bakeoff.py",
+      "ticket_ids": ["RM-010"],
+      "is_new": false,
+      "what": "Extend bakeoff run records to support live fan-out metrics while preserving deterministic golden-query behavior."
+    },
+    {
+      "file": "packages/svs_common/svs_common/evals.py",
+      "ticket_ids": ["RM-010"],
+      "is_new": false,
+      "what": "Keep golden retrieval metric computation as the deterministic baseline for bakeoff comparisons."
+    },
+    {
+      "file": "configs/eval-profiles.yaml",
+      "ticket_ids": ["RM-010", "RM-016"],
+      "is_new": false,
+      "what": "Define golden query/load-test profiles used by live bakeoff and corpus-scale proof."
+    },
+    {
+      "file": "configs/model-registry.yaml",
+      "ticket_ids": ["RM-010", "RM-011", "RM-014"],
+      "is_new": false,
+      "what": "Own provider/model policy, routing thresholds, and private fallback profiles."
+    },
+    {
+      "file": "scripts/release/live-bakeoff.py",
+      "ticket_ids": ["RM-010", "RM-014"],
+      "is_new": true,
+      "what": "Run deterministic and live-provider bakeoff fan-out and record comparable quality/latency/cost metrics."
+    },
+    {
+      "file": "tests/test_bakeoff.py",
+      "ticket_ids": ["RM-010"],
+      "is_new": false,
+      "what": "Extend bakeoff regression coverage for winner selection/rejection policy."
+    },
+    {
+      "file": "tests/test_live_bakeoff.py",
+      "ticket_ids": ["RM-010", "RM-014"],
+      "is_new": true,
+      "what": "Prove live bakeoff fan-out with deterministic fake providers and command-output formatting."
+    },
+    {
+      "file": "packages/svs_common/svs_common/providers.py",
+      "ticket_ids": ["RM-011", "RM-014"],
+      "is_new": false,
+      "what": "Central provider factory and private endpoint adapter normalization point."
+    },
+    {
+      "file": "packages/svs_common/svs_common/provider_probe.py",
+      "ticket_ids": ["RM-010", "RM-011", "RM-014"],
+      "is_new": true,
+      "what": "Own provider endpoint health, p95 latency, security-level, region, revision, and auth-reference probe results."
+    },
+    {
+      "file": "configs/runpod-endpoints.example.yaml",
+      "ticket_ids": ["RM-011", "RM-014"],
+      "is_new": true,
+      "what": "Provide non-secret private endpoint examples for RunPod/TEI/Infinity-compatible backends."
+    },
+    {
+      "file": "infra/runpod/handler.py",
+      "ticket_ids": ["RM-011"],
+      "is_new": false,
+      "what": "Keep RunPod worker contract aligned with gateway private endpoint adapters."
+    },
+    {
+      "file": "tests/test_embedding_providers.py",
+      "ticket_ids": ["RM-011", "RM-014"],
+      "is_new": false,
+      "what": "Extend configured-provider and no-hash-fallback proofs for private/live providers."
+    },
+    {
+      "file": "tests/test_private_endpoint_adapters.py",
+      "ticket_ids": ["RM-011"],
+      "is_new": true,
+      "what": "Prove adapter normalization, health-disable behavior, and policy fallback without live credentials."
+    },
+    {
+      "file": "runbooks/external-registry-push.md",
+      "ticket_ids": ["RM-012"],
+      "is_new": true,
+      "what": "Operator proof gate for Docker Hub/private registry push, digest capture, clean pull-by-digest, and explicit non-VPS claim."
+    },
+    {
+      "file": "runbooks/customer-cell-launch.md",
+      "ticket_ids": ["RM-013"],
+      "is_new": true,
+      "what": "Operator proof gate for selected VPS/customer cell launch using externally published pinned images."
+    },
+    {
+      "file": "scripts/release/cell-up.py",
+      "ticket_ids": ["RM-013"],
+      "is_new": false,
+      "what": "Run pull/start/health flow for customer cell proof."
+    },
+    {
+      "file": "scripts/release/cell-smoke.py",
+      "ticket_ids": ["RM-013"],
+      "is_new": false,
+      "what": "Run API/admin/worker/model-gateway and retrieval smoke proof for launched cell."
+    },
+    {
+      "file": "scripts/release/cell-access-proof.py",
+      "ticket_ids": ["RM-013", "RM-017"],
+      "is_new": false,
+      "what": "Collect host/network/API/admin access proof for customer cell and DNS/TLS wiring."
+    },
+    {
+      "file": "runbooks/live-provider-validation.md",
+      "ticket_ids": ["RM-014"],
+      "is_new": true,
+      "what": "Operator proof gate for real OpenAI/RunPod/TEI/Infinity credentials and endpoint validation."
+    },
+    {
+      "file": "runbooks/external-restore-drill.md",
+      "ticket_ids": ["RM-015"],
+      "is_new": true,
+      "what": "Operator proof gate for restoring an external cell or staging clone from real backup targets."
+    },
+    {
+      "file": "scripts/release/seed-scale.py",
+      "ticket_ids": ["RM-016"],
+      "is_new": false,
+      "what": "Seed target corpus or documented surrogate through the real ingestion path."
+    },
+    {
+      "file": "scripts/release/search-bench.py",
+      "ticket_ids": ["RM-016"],
+      "is_new": false,
+      "what": "Compute latency percentiles and fail on SLO threshold breach."
+    },
+    {
+      "file": "scripts/release/scale_common.py",
+      "ticket_ids": ["RM-016"],
+      "is_new": false,
+      "what": "Share scale fixture generation and SQL count parsing across load proof scripts."
+    },
+    {
+      "file": "load-tests/corpus-scale.yml",
+      "ticket_ids": ["RM-016"],
+      "is_new": true,
+      "what": "Operator proof gate configuration for target corpus workload and SLO thresholds."
+    },
+    {
+      "file": "runbooks/corpus-scale-load-tests.md",
+      "ticket_ids": ["RM-016"],
+      "is_new": true,
+      "what": "Operator proof gate for corpus-scale ingestion/retrieval load testing and report capture."
+    },
+    {
+      "file": "tests/test_release_cell_network.py",
+      "ticket_ids": ["RM-016"],
+      "is_new": false,
+      "what": "Keep release/load scripts cell-name agnostic."
+    },
+    {
+      "file": "infra/caddy/Caddyfile",
+      "ticket_ids": ["RM-017"],
+      "is_new": false,
+      "what": "Record current HTTP reverse-proxy scaffold and future TLS/domain proof handoff."
+    },
+    {
+      "file": "infra/terraform/hetzner-cloud/main.tf",
+      "ticket_ids": ["RM-017"],
+      "is_new": false,
+      "what": "Use target host output as DNS/TLS proof input without claiming DNS wiring from Terraform alone."
+    },
+    {
+      "file": "infra/ansible/playbook.yml",
+      "ticket_ids": ["RM-017"],
+      "is_new": false,
+      "what": "Apply host roles used by external cell proof while keeping DNS/TLS/secrets validation explicit."
+    },
+    {
+      "file": "infra/ansible/roles/base-hardening/tasks/main.yml",
+      "ticket_ids": ["RM-017"],
+      "is_new": false,
+      "what": "Align firewall/SSH/HTTP/HTTPS role expectations with DNS/TLS proof gate."
+    },
+    {
+      "file": "runbooks/dns-tls-secrets.md",
+      "ticket_ids": ["RM-017"],
+      "is_new": true,
+      "what": "Operator proof gate for DNS resolution, HTTPS/TLS health, external secret-manager references, and rollback/rotation steps."
+    },
+    {
+      "file": "tests/test_local_restore_drill_script.py",
+      "ticket_ids": ["RM-015"],
+      "is_new": false,
+      "what": "Keep local restore drill fixture coverage as the baseline for external restore proof packaging."
+    }
+  ],
+  "anti_duplication_rules": [
+    "Keep RM-001 and RM-002 as reconciliation/proof tickets unless the proof commands expose a real implementation gap; do not reopen completed WAVE-015 through WAVE-108 behavior under this tranche.",
+    "Route all reindex repair proof through packages/svs_common/svs_common/maintenance.py:reindex_chunks and the existing worker/API maintenance path; do not create a second indexing repair worker or ad hoc dense/sparse replay path.",
+    "Keep OpenAPI contract behavior in packages/svs_common/svs_common/schemas.py plus apps/api/svs_api/main.py:custom_openapi and tests/test_openapi_contract.py; do not add route-local schema hacks that bypass named components.",
+    "Make Alembic the only migration authority after RM-003; do not add new raw SQL migration loops, and do not parallelize migration/RLS work that touches scripts/migrate.sh, db/migrations/*, migrations/*, .github/workflows/*, or tests/integration/test_postgres_rls_and_worker.py.",
+    "Keep release image enumeration in scripts/release/release_common.py and digest/provenance handling in scripts/release/provenance_common.py; do not duplicate APP_IMAGES or image tag construction in build, publish, launch, or proof scripts.",
+    "Serialize deployment work that touches release_common.py, build-images.py, publish-images.py, compose.cell.yml, prod-env-preflight.py, or .env.production.example; image provenance, encrypted secrets, customer launch, and DNS/TLS proof must land in an explicit order.",
+    "Validate production secrets through scripts/release/prod-env-preflight.py and packages/svs_common/svs_common/secrets.py; do not print secret values, write plaintext production secrets, or invent per-script secret parsing.",
+    "Serialize API-key, admin auth, and tenant-isolation changes that touch apps/api/svs_api/main.py, packages/svs_common/svs_common/auth.py, apps/admin_ui/src/main.tsx, or apps/admin_ui/src/auth.ts; the backend principal remains the security authority.",
+    "Serialize provider-routing changes across configs/model-registry.yaml, packages/svs_common/svs_common/providers.py, packages/svs_common/svs_common/provider_probe.py, apps/model_gateway/svs_model_gateway/main.py, and apps/api/svs_api/main.py; bakeoff, private endpoints, and live provider proof must share one probe/result contract.",
+    "Route backup and restore artifact metadata through scripts/release/backup_common.py; do not add unmanifested bundles, unchecked object copies, or restore scripts that skip checksum/preflight validation.",
+    "Route observability evidence through infra/docker/compose.observability.yml, charts/exais-observability/*, and scripts/release/observability-smoke.py; do not create one-off metric names that dashboards and alerts cannot scrape.",
+    "Treat RM-012 through RM-017 as proof/runbook gates; do not mark those tickets implemented without operator-supplied registry credentials, target host, live provider credentials, external backup target, production-scale corpus, DNS control, TLS path, and secret-manager wiring as applicable."
+  ],
+  "tickets": [
+    {
+      "id": "RM-001",
+      "expected_output": "Reindex repair status is reconciled by running the existing API/worker maintenance proof against non-indexed dense and sparse chunks, updating docs only when the proof passes, and filing a concrete implementation gap only if the proof fails."
+    },
+    {
+      "id": "RM-002",
+      "expected_output": "Generated OpenAPI contract proof and tests establish the current native/OpenAI route coverage; README, ticket trail, and completion matrix agree without reopening the completed OpenAI parity train."
+    },
+    {
+      "id": "RM-003",
+      "expected_output": "Alembic owns schema migration, production-like upgrade/RLS checks run in CI, rollback or forward-fix discipline is documented, and raw-loop migration bypasses fail a repeatable drift check."
+    },
+    {
+      "id": "RM-004",
+      "expected_output": "CI can build the full versioned app image set, emit digest/provenance manifests, and validate pinned image metadata for local micro-production cells without claiming external registry proof."
+    },
+    {
+      "id": "RM-005",
+      "expected_output": "Production cell configuration accepts encrypted secret references, rejects plaintext placeholders, validates references without value disclosure, and documents rotation and rollback handling."
+    },
+    {
+      "id": "RM-006",
+      "expected_output": "Backup commands produce verifiable manifests for metadata, vectors, sparse indexes, object/config/audit artifacts, and restore preflight can enumerate and validate those artifacts without destructive restore."
+    },
+    {
+      "id": "RM-007",
+      "expected_output": "A local cell observability stack scrapes API, worker, index, storage, security, cost, and backup metrics; dashboards, alerts, and a smoke command prove key metrics are visible."
+    },
+    {
+      "id": "RM-008",
+      "expected_output": "Admin UI production requests use session/OIDC/API-key principal context resolved by the API, dev headers fail closed outside dev mode, and UI/API tests cover unauthorized, expired, and scoped requests."
+    },
+    {
+      "id": "RM-009",
+      "expected_output": "Authorized admins can switch instance/business context, view running component versions and image digests, inspect deployment records, and identify stale or unverifiable cells without shell access."
+    },
+    {
+      "id": "RM-010",
+      "expected_output": "Bakeoff runs fan out a golden query set across retrieval/model candidates, persist comparable quality/latency/cost metrics, apply selection/rejection policy, and expose deterministic plus live-provider commands."
+    },
+    {
+      "id": "RM-011",
+      "expected_output": "Private RunPod, TEI, Infinity, and compatible endpoint adapters normalize embedding/rerank calls through the gateway and expose health, latency, security level, region, revision, and auth-reference status."
+    },
+    {
+      "id": "RM-012",
+      "expected_output": "Operator proof gate records external registry credentials, versioned image push, immutable digests, clean pull-by-digest evidence, and an explicit statement that VPS/customer readiness is not claimed by this proof alone."
+    },
+    {
+      "id": "RM-013",
+      "expected_output": "Operator proof gate records a chosen VPS/customer host pulling pinned external images, passing production preflight, booting the cell, proving API/admin/worker/model-gateway readiness, and running retrieval smoke."
+    },
+    {
+      "id": "RM-014",
+      "expected_output": "Operator proof gate records live OpenAI, RunPod, TEI, Infinity, and approved provider checks through the gateway, including routing policy, latency/error/cost metadata, and explicit unavailable/unapproved providers."
+    },
+    {
+      "id": "RM-015",
+      "expected_output": "Operator proof gate records an external cell or staging clone restore from a real backup target, including metadata, object artifacts, one Qdrant collection, one OpenSearch index, config/secrets references, and retrieval/eval smoke."
+    },
+    {
+      "id": "RM-016",
+      "expected_output": "Operator proof gate records target corpus or documented surrogate load-test results for ingestion throughput, p95 search/context latency, freshness, index growth, provider latency, and failure modes against SLOs."
+    },
+    {
+      "id": "RM-017",
+      "expected_output": "Operator proof gate records DNS resolution, HTTPS/TLS health without dev wildcards, external secret-manager reference validation without disclosure, and rollback/rotation steps for the chosen production domain/cell."
+    }
+  ]
+}

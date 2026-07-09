@@ -1,0 +1,1244 @@
+{
+  "canonical_goal": "Close the post-WAVE-108 ExAIS remaining roadmap to production-readiness governance by reconciling stale tracker claims, finishing repo-buildable release/ops/model/admin gaps, and separating external deployment proof gates without reopening the completed OpenAI parity train.",
+  "tickets": [
+    {
+      "id": "RM-001",
+      "title": "Reconcile reindex repair status",
+      "goal": "Resolve the stale tracker disagreement where the current trail/README describe reindex repair as implemented while the completion matrix still lists the reindex repair worker as incomplete.",
+      "acceptance": "A focused proof demonstrates that non-indexed dense and sparse chunks are discovered, repaired or replayed through the worker/maintenance path, marked indexed, and cleaned up from stale backend state; the roadmap docs agree on the resulting status and cite the proof command.",
+      "suspected_files": [
+        "docs/TICKET_TRAIL.md",
+        "docs/COMPLETION_MATRIX.md",
+        "docs/AUDIT_RESPONSE_WAVE_PLAN.md",
+        "apps/api",
+        "apps/worker",
+        "scripts/release/qdrant-chaos-repair.py",
+        "tests"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/TICKET_TRAIL.md",
+          "symbol": "SVS-034 Idempotent reindexing",
+          "note": "Current tracker trail says cursor-aware repair, dense/sparse replay, force/non-force proof, and repair-all coverage are implemented."
+        },
+        {
+          "file": "docs/COMPLETION_MATRIX.md",
+          "symbol": "reindex repair worker",
+          "note": "Matrix still lists the repair worker as not done or not fully proven, creating the status disagreement."
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "reindex",
+          "note": "FastAPI maintenance endpoint calls MaintenanceService.reindex_chunks and commits the repair result."
+        },
+        {
+          "file": "packages/svs_common/svs_common/maintenance.py",
+          "symbol": "async def reindex_chunks",
+          "note": "Selects non-indexed chunks unless force is set, replays dense Qdrant and sparse OpenSearch paths, and marks chunks indexed."
+        },
+        {
+          "file": "apps/worker/svs_worker/main.py",
+          "symbol": "process_once",
+          "note": "Worker dispatches queued reindex_chunks jobs through the same maintenance service path."
+        },
+        {
+          "file": "scripts/release/qdrant-repair-all.py",
+          "symbol": "repair_all",
+          "note": "Release proof script forces cursor-paginated reindex calls until the API reports no remaining rows."
+        },
+        {
+          "file": "tests/test_reindex_idempotency.py",
+          "symbol": "test_reindex_chunks_replays_stable_dense_and_sparse_ids",
+          "note": "Unit proof covers stable dense point replay, sparse replay, and final indexed status update."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "tracker-reconciliation-proof",
+          "source": "docs/TICKET_TRAIL.md + docs/COMPLETION_MATRIX.md",
+          "applies_to": "RM-001"
+        },
+        {
+          "name": "cursor-repair-loop",
+          "source": "scripts/release/qdrant-repair-all.py:repair_all",
+          "applies_to": "RM-001"
+        }
+      ],
+      "flags": [
+        {
+          "name": "status_disagreement",
+          "note": "Implementation and proof appear present, but completion docs must cite the exact command/output before the matrix is flipped."
+        }
+      ]
+    },
+    {
+      "id": "RM-002",
+      "title": "Reconcile OpenAPI contract status",
+      "goal": "Resolve the stale tracker disagreement where OpenAI-compatible parity work is broadly recorded as implemented while the matrix still calls out the full OpenAPI contract as incomplete.",
+      "acceptance": "Generated OpenAPI output covers every documented native and OpenAI-compatible route with stable request/response components, a regression check fails on contract drift, and the roadmap docs agree on whether any explicit contract gaps remain.",
+      "suspected_files": [
+        "docs/TICKET_TRAIL.md",
+        "docs/COMPLETION_MATRIX.md",
+        "README.md",
+        "apps/api",
+        "tests"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/TICKET_TRAIL.md",
+          "symbol": "SVS-020 Create/list/get/delete vector stores",
+          "note": "Trail records named OpenAPI response components and OpenAI-compatible vector-store route coverage."
+        },
+        {
+          "file": "docs/COMPLETION_MATRIX.md",
+          "symbol": "full OpenAPI contract",
+          "note": "Matrix still lists the full contract as a remaining gap."
+        },
+        {
+          "file": "README.md",
+          "symbol": "OpenAPI paths: 34",
+          "note": "README records a current OpenAPI path count as release evidence."
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "custom_openapi",
+          "note": "Custom generator installs OpenAI response stream event schema and text/event-stream content into the schema."
+        },
+        {
+          "file": "packages/svs_common/svs_common/schemas.py",
+          "symbol": "OpenAIResponseStreamEvent",
+          "note": "Response stream and OpenAI-compatible payload models are defined as schema components."
+        },
+        {
+          "file": "tests/test_openapi_contract.py",
+          "symbol": "test_vector_store_routes_use_named_openapi_response_components",
+          "note": "Regression check verifies named OpenAPI components for vector-store routes."
+        },
+        {
+          "file": "tests/test_openapi_contract.py",
+          "symbol": "test_responses_json_routes_use_named_response_components",
+          "note": "Regression check verifies Responses JSON and stream route component coverage."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "schema-contract-regression",
+          "source": "tests/test_openapi_contract.py",
+          "applies_to": "RM-002"
+        }
+      ],
+      "flags": [
+        {
+          "name": "do_not_reopen_openai_parity_train",
+          "note": "This ticket should reconcile generated-contract evidence and docs; new parity behavior belongs outside this tranche unless the contract check exposes a real gap."
+        }
+      ]
+    },
+    {
+      "id": "RM-003",
+      "title": "Enforce Alembic migration discipline",
+      "goal": "Replace ad hoc raw SQL migration loops with an Alembic-governed migration path suitable for production snapshots, rollback planning, and CI enforcement.",
+      "acceptance": "Alembic is the authoritative migration entrypoint, production-like upgrade checks run in CI, rollback or forward-fix rules are documented, and migration drift/raw-loop bypasses are caught by a repeatable check.",
+      "suspected_files": [
+        "docs/COMPLETION_MATRIX.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        "alembic.ini",
+        "migrations",
+        "scripts/migrate.sh",
+        ".github/workflows",
+        "tests"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/COMPLETION_MATRIX.md",
+          "symbol": "DB | schema + RLS | Alembic, rollback locks, PITR",
+          "note": "Completion matrix identifies Alembic and rollback discipline as remaining DB production work."
+        },
+        {
+          "file": "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+          "symbol": "migration-tests.yml",
+          "note": "Production delta calls for production-like migration tests and documented rollback paths."
+        },
+        {
+          "file": "scripts/migrate.sh",
+          "symbol": "for f in $(find db/migrations",
+          "note": "Current migration entrypoint applies sorted SQL and shell files directly with psql/bash."
+        },
+        {
+          "file": "db/migrations/001_initial.sql",
+          "symbol": "CREATE TABLE IF NOT EXISTS tenants",
+          "note": "Existing schema source is raw SQL, not Alembic revisions."
+        },
+        {
+          "file": "db/migrations/005_production_waves.sql",
+          "symbol": "CREATE TABLE IF NOT EXISTS backup_bundles",
+          "note": "Later production tables are also managed by raw SQL migrations today."
+        },
+        {
+          "file": ".github/workflows/ci.yml",
+          "symbol": "postgres-rls-integration",
+          "note": "CI boots Postgres and runs integration tests, providing the place to add Alembic upgrade checks."
+        },
+        {
+          "file": "tests/integration/test_postgres_rls_and_worker.py",
+          "symbol": "test_every_rls_table_is_forced",
+          "note": "Integration proof already validates migrated schema/RLS state and can remain a production-like migration check."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "migration-authority-shift",
+          "source": "scripts/migrate.sh",
+          "applies_to": "RM-003"
+        }
+      ],
+      "flags": [
+        {
+          "name": "future_path_not_a_code_ref",
+          "note": "alembic.ini and migrations/ are suspected future paths in the base ticket; current grounding is the existing db/migrations plus scripts/migrate.sh."
+        }
+      ]
+    },
+    {
+      "id": "RM-004",
+      "title": "Automate image provenance release",
+      "goal": "Finish the versioned image release lane with CI image builds, digest publication, digest pinning, and signed release verification for micro-production cells.",
+      "acceptance": "CI builds the versioned API, worker, model-gateway, admin-ui, and instance-agent images, emits a digest manifest, signs or records verifiable provenance for each image, and cell startup/upgrade rejects unpinned or unverifiable images.",
+      "suspected_files": [
+        "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+        "docs/MICRO_PRODUCTION.md",
+        "docs/TICKET_TRAIL.md",
+        ".github/workflows",
+        "scripts/release",
+        "infra/docker",
+        "apps/instance_agent"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/TICKET_TRAIL.md",
+          "symbol": "SVS-004 CI image build/push with digests",
+          "note": "Trail marks CI image build/push with digests as ready-to-build."
+        },
+        {
+          "file": "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+          "symbol": "## Local Registry Gate",
+          "note": "Release doc currently proves local registry-pulled images and separates external registry/VPS claims."
+        },
+        {
+          "file": "docs/MICRO_PRODUCTION.md",
+          "symbol": "push to registry",
+          "note": "Micro-production doc defines the versioned API, worker, model-gateway, admin-ui, and instance-agent image set."
+        },
+        {
+          "file": "scripts/release/release_common.py",
+          "symbol": "APP_IMAGES",
+          "note": "Single release image registry lists all application image names and Dockerfiles."
+        },
+        {
+          "file": "scripts/release/build-images.py",
+          "symbol": "main",
+          "note": "Current image builder tags by VERSION and applies OCI version/service labels."
+        },
+        {
+          "file": "scripts/release/publish-images.py",
+          "symbol": "inspect_manifest",
+          "note": "Current publisher pushes tags and verifies registry manifests, but does not emit signed provenance."
+        },
+        {
+          "file": "infra/docker/compose.cell.yml",
+          "symbol": "image: ${SVS_REGISTRY_PREFIX",
+          "note": "Cell compose consumes registry-prefixed, version-pinned app images."
+        },
+        {
+          "file": ".github/workflows/ci.yml",
+          "symbol": "python",
+          "note": "Existing CI validates Python/tests only; image build/provenance automation would extend workflow coverage."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "image-set-registry",
+          "source": "scripts/release/release_common.py:APP_IMAGES",
+          "applies_to": "RM-004"
+        },
+        {
+          "name": "provenance-gap",
+          "source": "scripts/release/publish-images.py:inspect_manifest",
+          "applies_to": "RM-004"
+        }
+      ],
+      "flags": [
+        {
+          "name": "operator_registry_boundary",
+          "note": "External push proof still depends on registry credentials; repo-buildable work should stop at digest/provenance automation and verification hooks."
+        }
+      ]
+    },
+    {
+      "id": "RM-005",
+      "title": "Implement encrypted secrets workflow",
+      "goal": "Turn the production secrets lane from env-file placeholders into an encrypted, auditable workflow for customer cells.",
+      "acceptance": "A production cell can be configured from encrypted SOPS/age or Vault-backed secrets, preflight validates secret references without printing secret values, plaintext production secrets are rejected, and rotation/runbook steps are documented.",
+      "suspected_files": [
+        "docs/MICRO_PRODUCTION.md",
+        "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        ".env.production.example",
+        "scripts/release/prod-env-preflight.py",
+        "configs",
+        "runbooks"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/TICKET_TRAIL.md",
+          "symbol": "SVS-063 Encrypted secrets workflow",
+          "note": "Trail marks encrypted secrets workflow as ready-to-build."
+        },
+        {
+          "file": "docs/MICRO_PRODUCTION.md",
+          "symbol": "secrets.sops.yaml",
+          "note": "Micro-production doc names encrypted secret material as part of the per-instance bundle."
+        },
+        {
+          "file": "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+          "symbol": "Encryption and secrets",
+          "note": "Production delta requires Vault/SOPS/age instead of production .env files."
+        },
+        {
+          "file": ".env.production.example",
+          "symbol": "Production example",
+          "note": "Current production sample still contains placeholder secret values and warns not to commit real secrets."
+        },
+        {
+          "file": "scripts/release/prod-env-preflight.py",
+          "symbol": "validate_env",
+          "note": "Preflight validates required variables, placeholders, local envs, dev mode, provider settings, and redacts values from reports."
+        },
+        {
+          "file": "scripts/release/generate-cell-env.py",
+          "symbol": "import_operator_values",
+          "note": "Current generator imports selected operator-provided provider/Marker values without printing values."
+        },
+        {
+          "file": "tests/test_prod_env_preflight_script.py",
+          "symbol": "test_preflight_report_prints_names_not_secret_values",
+          "note": "Regression proof ensures secret values are not printed in preflight reports."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "secret-safe-reporting",
+          "source": "scripts/release/prod-env-preflight.py:render_report",
+          "applies_to": "RM-005"
+        }
+      ],
+      "flags": [
+        {
+          "name": "future_path_not_a_code_ref",
+          "note": "runbooks/ is a future documentation lane; current grounding is docs plus preflight/generation scripts."
+        }
+      ]
+    },
+    {
+      "id": "RM-006",
+      "title": "Wire backup integrations",
+      "goal": "Implement the actual backup integrations behind the existing backup/restore runbooks for metadata, vectors, sparse indexes, object storage, configs, and audit artifacts.",
+      "acceptance": "Backup commands write verifiable artifacts to a configured object/offsite target for Postgres, Qdrant, OpenSearch, MinIO/object storage, config/secrets metadata, and audit exports; restore preflight can enumerate and validate those artifacts without restoring them.",
+      "suspected_files": [
+        "docs/COMPLETION_MATRIX.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        "docs/MICRO_PRODUCTION.md",
+        "scripts/release",
+        "scripts",
+        "infra/docker",
+        "runbooks"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/TICKET_TRAIL.md",
+          "symbol": "SVS-073 Actual backup integrations",
+          "note": "Trail marks actual backup integrations as ready-to-build while backup/restore runbooks are scaffolded."
+        },
+        {
+          "file": "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+          "symbol": "Backup, restore, and disaster recovery changes",
+          "note": "Production delta defines Postgres, Qdrant, OpenSearch, object storage, config/secrets, and audit export backup requirements."
+        },
+        {
+          "file": "scripts/backup-instance.sh",
+          "symbol": "MANIFEST=${1:?Usage: scripts/backup-instance.sh instances/expert-ai-services/prod/instance.yaml [dest-root]}",
+          "note": "Current script creates local bundle directories, optional pg_dump, Qdrant snapshot response, OpenSearch index list, object file listing, checksums, and tarball."
+        },
+        {
+          "file": "scripts/restore-instance.sh",
+          "symbol": "BUNDLE=${1:?Usage: scripts/restore-instance.sh backups/<bundle>.tar.gz [restore-dir]}",
+          "note": "Current restore verifies checksums and restores Postgres dump, while Qdrant/OpenSearch restores are still cluster-specific manual work."
+        },
+        {
+          "file": "scripts/release/local-restore-drill.py",
+          "symbol": "backup_postgres",
+          "note": "Local restore drill currently captures and restores a Postgres dump inside Docker cells."
+        },
+        {
+          "file": "infra/ansible/roles/backup-agent/tasks/main.yml",
+          "symbol": "backup-agent scaffold",
+          "note": "Ansible role is a scaffold for installing backup scripts and scheduling restore drills."
+        },
+        {
+          "file": "db/migrations/005_production_waves.sql",
+          "symbol": "backup_bundles",
+          "note": "Schema has a backup_bundles table that can record backup metadata and status."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "local-bundle-to-offsite-integration",
+          "source": "scripts/backup-instance.sh",
+          "applies_to": "RM-006"
+        }
+      ],
+      "flags": [
+        {
+          "name": "future_path_not_a_code_ref",
+          "note": "runbooks/ is not the current source of truth; use existing docs/scripts and add runbook work later through Wave 3 if needed."
+        }
+      ]
+    },
+    {
+      "id": "RM-007",
+      "title": "Ship observability dashboards",
+      "goal": "Promote the minimal metrics hook into production observability dashboards and alert rules for API, ingestion, retrieval, indexes, storage, security, cost, and backup freshness.",
+      "acceptance": "Prometheus-compatible metrics are scraped by a local cell observability stack, dashboards expose the production-ready delta's required panels, alert rules cover the documented failure modes, and a smoke test proves at least one API, worker, index, and backup metric is visible.",
+      "suspected_files": [
+        "docs/COMPLETION_MATRIX.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        "apps/api",
+        "apps/worker",
+        "apps/model_gateway",
+        "infra/docker",
+        "charts",
+        "runbooks"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/COMPLETION_MATRIX.md",
+          "symbol": "production observability dashboards",
+          "note": "Completion matrix identifies dashboards as a remaining production gap while minimal metrics are implemented."
+        },
+        {
+          "file": "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+          "symbol": "Observability",
+          "note": "Production delta lists API, worker, index, object storage, security, cost, backup freshness, and restore overdue signals."
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "metrics",
+          "note": "Current API exposes a small Prometheus-compatible text endpoint with build, jobs, vector store, and chunk index metrics."
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "readiness_payload",
+          "note": "Readiness checks DB and strict Qdrant status for health gating."
+        },
+        {
+          "file": "apps/model_gateway/svs_model_gateway/main.py",
+          "symbol": "healthz",
+          "note": "Model gateway has a health endpoint but no detailed metric surface."
+        },
+        {
+          "file": "apps/worker/svs_worker/main.py",
+          "symbol": "process_once",
+          "note": "Worker processes ingestion and maintenance jobs but does not expose worker metrics yet."
+        },
+        {
+          "file": "infra/docker/compose.cell.yml",
+          "symbol": "services",
+          "note": "Cell compose defines app/infra healthchecks but no Prometheus/Grafana/alerting service yet."
+        },
+        {
+          "file": "tests/test_readyz.py",
+          "symbol": "test_readyz_payload_requires_qdrant_when_strict_dense_indexing",
+          "note": "Readiness tests prove current health semantics."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "metrics-hook-to-dashboard-stack",
+          "source": "apps/api/svs_api/main.py:metrics",
+          "applies_to": "RM-007"
+        }
+      ],
+      "flags": [
+        {
+          "name": "future_path_not_a_code_ref",
+          "note": "charts/ and runbooks/ are future packaging/docs lanes; current grounding is API metrics, compose healthchecks, and production delta requirements."
+        }
+      ]
+    },
+    {
+      "id": "RM-008",
+      "title": "Harden admin sessions",
+      "goal": "Replace dev-header admin UI identity with production auth/session or API-key principal resolution while keeping the backend as the security authority.",
+      "acceptance": "The admin UI no longer depends on dev tenant/business/user headers in production mode, session/OIDC/API-key principal context is resolved by the API, unauthorized admin flows fail closed, and UI/API tests cover login/session expiry and principal-scoped requests.",
+      "suspected_files": [
+        "docs/FRONTEND_ADMIN_UI.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        "apps/admin_ui/src/main.tsx",
+        "apps/api",
+        "packages/svs_common",
+        "tests"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/FRONTEND_ADMIN_UI.md",
+          "symbol": "Replace dev headers with session/OIDC/API-key principal resolution",
+          "note": "Frontend production hardening list names the exact auth/session gap."
+        },
+        {
+          "file": "apps/admin_ui/src/main.tsx",
+          "symbol": "headers",
+          "note": "Current UI sends x-svs dev tenant/business/user/groups/roles/security headers from localStorage defaults."
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "get_request_principal",
+          "note": "Backend resolves Authorization bearer tokens first and only accepts dev headers when SVS dev mode is enabled."
+        },
+        {
+          "file": "packages/svs_common/svs_common/auth.py",
+          "symbol": "resolve_api_key_principal",
+          "note": "API-key principal resolution validates bearer tokens and active, unexpired API keys."
+        },
+        {
+          "file": "packages/svs_common/svs_common/auth.py",
+          "symbol": "ensure_scope",
+          "note": "Backend scope enforcement is the existing security authority for protected admin/API flows."
+        },
+        {
+          "file": "tests/test_auth_scopes.py",
+          "symbol": "test_resolve_api_key_principal_filters_inactive_or_revoked_keys",
+          "note": "Auth regression covers fail-closed resolution for inactive or revoked keys."
+        },
+        {
+          "file": "tests/test_auth_scopes.py",
+          "symbol": "test_list_api_key_route_requires_read_or_write_scope",
+          "note": "Admin API-key route proof covers scope-gated access."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "backend-authoritative-principal",
+          "source": "apps/api/svs_api/main.py:get_request_principal",
+          "applies_to": "RM-008"
+        }
+      ],
+      "flags": [
+        {
+          "name": "production_mode_fail_closed",
+          "note": "UI work must not move security decisions to the browser; API principal resolution and scopes remain authoritative."
+        }
+      ]
+    },
+    {
+      "id": "RM-009",
+      "title": "Expose fleet version UI",
+      "goal": "Complete the admin production contract for instance switching and fleet/version visibility across micro-production cells.",
+      "acceptance": "An authorized admin can select an instance/business vault, view running component versions and image digests, see upgrade/deployment records, and identify cells that are behind or unverifiable without relying on shell access.",
+      "suspected_files": [
+        "docs/FRONTEND_ADMIN_UI.md",
+        "docs/MICRO_PRODUCTION.md",
+        "apps/admin_ui/src/main.tsx",
+        "apps/api",
+        "apps/instance_agent",
+        "scripts/release",
+        "tests"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/FRONTEND_ADMIN_UI.md",
+          "symbol": "Add instance switcher and business/user vault switcher",
+          "note": "Frontend production contract names the missing instance/vault switcher and fleet version dashboard."
+        },
+        {
+          "file": "docs/MICRO_PRODUCTION.md",
+          "symbol": "instance-agent pulls version",
+          "note": "Micro-production doc defines the registry-to-agent versioned image update lane."
+        },
+        {
+          "file": "apps/admin_ui/src/main.tsx",
+          "symbol": "App",
+          "note": "Current UI has dev instance context inputs but no fleet/version or deployment record view."
+        },
+        {
+          "file": "apps/instance_agent/svs_instance_agent/main.py",
+          "symbol": "deploy",
+          "note": "Instance agent deploy route pulls and boots compose for a requested manifest/version."
+        },
+        {
+          "file": "apps/instance_agent/svs_instance_agent/main.py",
+          "symbol": "rollback",
+          "note": "Rollback route reuses deployment of a previously pinned version."
+        },
+        {
+          "file": "scripts/svsctl.py",
+          "symbol": "fleet-upgrade",
+          "note": "CLI loops instance manifests to deploy a requested version, but this is shell-driven rather than UI-visible."
+        },
+        {
+          "file": "scripts/release/release_common.py",
+          "symbol": "image_tag",
+          "note": "Release helper derives versioned image tags that should surface in fleet/version UI."
+        },
+        {
+          "file": "db/migrations/001_initial.sql",
+          "symbol": "instance_deployments",
+          "note": "Schema includes instance deployment records with image_digests and status."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "shell-proof-to-admin-dashboard",
+          "source": "scripts/svsctl.py:fleet-upgrade",
+          "applies_to": "RM-009"
+        }
+      ],
+      "flags": [
+        {
+          "name": "control_plane_gap",
+          "note": "Schema and agent/CLI exist, but the API/UI contract for fleet listing, image digest state, and unverifiable cells is not yet complete."
+        }
+      ]
+    },
+    {
+      "id": "RM-010",
+      "title": "Implement live bakeoff fan-out",
+      "goal": "Finish the eval lane that must run live retrieval/provider fan-out before any fine-tuning work is promoted.",
+      "acceptance": "A bakeoff run can fan out the same golden query set across multiple retrieval/model candidates, persist comparable quality/latency/cost metrics, select or reject a winner by policy, and prove with deterministic test providers plus a documented live-provider command.",
+      "suspected_files": [
+        "docs/COMPLETION_MATRIX.md",
+        "docs/planning-specs/INTELLIGENT_VECTORIZATION_ROUTER.md",
+        "apps/api",
+        "apps/model_gateway",
+        "evals",
+        "configs",
+        "tests"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/COMPLETION_MATRIX.md",
+          "symbol": "live bakeoff fan-out",
+          "note": "Completion matrix lists live bakeoff fan-out as remaining eval work."
+        },
+        {
+          "file": "docs/planning-specs/INTELLIGENT_VECTORIZATION_ROUTER.md",
+          "symbol": "Run model bakeoff",
+          "note": "Router spec defines model bakeoff API shape, metrics, and policy intent."
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "create_bakeoff",
+          "note": "API endpoint persists bakeoff runs through BakeoffService."
+        },
+        {
+          "file": "packages/svs_common/svs_common/bakeoff.py",
+          "symbol": "def create_run",
+          "note": "Current service scores candidates using golden result metrics or proxy fallback; it does not live fan out provider calls."
+        },
+        {
+          "file": "packages/svs_common/svs_common/evals.py",
+          "symbol": "golden_retrieval_metrics",
+          "note": "Reusable metrics compute recall, precision, MRR, NDCG, and leakage from candidate results."
+        },
+        {
+          "file": "configs/eval-profiles.yaml",
+          "symbol": "profiles",
+          "note": "Eval profile config names retrieval and security metrics by workload type."
+        },
+        {
+          "file": "configs/model-registry.yaml",
+          "symbol": "models",
+          "note": "Model registry supplies the candidate model profile IDs used by current bakeoff runs."
+        },
+        {
+          "file": "tests/test_bakeoff.py",
+          "symbol": "test_bakeoff_create_run_uses_golden_metrics_when_results_are_present",
+          "note": "Regression proof covers deterministic golden-metric scoring across two candidates."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "deterministic-first-live-second",
+          "source": "tests/test_bakeoff.py",
+          "applies_to": "RM-010"
+        }
+      ],
+      "flags": [
+        {
+          "name": "future_path_not_a_code_ref",
+          "note": "evals/ is a suspected future folder; current grounding is configs/eval-profiles.yaml plus BakeoffService and tests."
+        }
+      ]
+    },
+    {
+      "id": "RM-011",
+      "title": "Implement private endpoint adapters",
+      "goal": "Finish private model endpoint adapters for RunPod, TEI, Infinity, and compatible self-hosted embedding/rerank backends behind the model gateway.",
+      "acceptance": "Registered private endpoints expose health, p95 latency, max security level, region, model revision, and auth secret references; embedding/rerank calls normalize through the gateway contract; failed health disables routing or triggers policy fallback.",
+      "suspected_files": [
+        "docs/planning-specs/RUNPOD_MODEL_ENDPOINT.md",
+        "docs/planning-specs/INTELLIGENT_VECTORIZATION_ROUTER.md",
+        "apps/model_gateway",
+        "apps/api",
+        "configs/runpod-endpoints.example.yaml",
+        "infra/runpod",
+        "tests"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/planning-specs/RUNPOD_MODEL_ENDPOINT.md",
+          "symbol": "RunPod Model Endpoint Supplement",
+          "note": "Supplement defines RunPod as optional private GPU backend behind the model gateway."
+        },
+        {
+          "file": "docs/planning-specs/INTELLIGENT_VECTORIZATION_ROUTER.md",
+          "symbol": "RunPod worker contract",
+          "note": "Router spec covers RunPod, TEI, Infinity, and custom endpoint routing requirements."
+        },
+        {
+          "file": "apps/model_gateway/svs_model_gateway/main.py",
+          "symbol": "embeddings",
+          "note": "Gateway normalizes embedding requests through provider_for and EmbeddingResponse."
+        },
+        {
+          "file": "apps/model_gateway/svs_model_gateway/main.py",
+          "symbol": "rerank",
+          "note": "Current rerank route is a local lexical fallback; production private rerank adapters remain to be wired."
+        },
+        {
+          "file": "packages/svs_common/svs_common/providers.py",
+          "symbol": "GenericEndpointEmbeddingProvider",
+          "note": "Generic /embeddings endpoint adapter is the current base for TEI/Infinity/RunPod-compatible embedding calls."
+        },
+        {
+          "file": "packages/svs_common/svs_common/providers.py",
+          "symbol": "provider_config_status",
+          "note": "Provider status reports required env names without secret values for OpenAI, TEI, Infinity, and RunPod."
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "create_model_endpoint",
+          "note": "API can register model endpoints with provider, base_url, model, dimensions, privacy, security_max_level, status, and config."
+        },
+        {
+          "file": "packages/svs_common/svs_common/schemas.py",
+          "symbol": "ModelEndpointRequest",
+          "note": "Current endpoint schema lacks explicit p95, region, revision, health, and secret-reference fields required by this ticket."
+        },
+        {
+          "file": "infra/runpod/handler.py",
+          "symbol": "handler",
+          "note": "RunPod fallback handler returns OpenAI-like embedding data for serverless proof work."
+        },
+        {
+          "file": "tests/test_embedding_providers.py",
+          "symbol": "test_provider_status_reports_required_env_names_without_values",
+          "note": "Regression proof covers secret-safe provider configuration status."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "gateway-normalized-provider-adapter",
+          "source": "apps/model_gateway/svs_model_gateway/main.py:embeddings",
+          "applies_to": "RM-011"
+        }
+      ],
+      "flags": [
+        {
+          "name": "future_path_not_a_code_ref",
+          "note": "configs/runpod-endpoints.example.yaml is a suspected future path; existing grounding is configs/model-registry.yaml, provider code, and infra/runpod."
+        }
+      ]
+    },
+    {
+      "id": "RM-012",
+      "title": "Prove external registry push",
+      "goal": "Capture the operator-dependent proof that versioned images can be pushed to Docker Hub or a private external registry after credentials are available.",
+      "acceptance": "With operator-supplied registry credentials, the documented push command publishes the versioned image set, records immutable digests, proves pull-by-digest from a clean environment, and stores the proof output without claiming VPS readiness.",
+      "suspected_files": [
+        "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+        "docs/COMPLETION_MATRIX_V0_9_8.md",
+        "README.md",
+        "scripts/release/build-images.py",
+        "scripts/release/publish-images.py",
+        "runbooks"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+          "symbol": "## Docker Hub Push",
+          "note": "Release doc separates the external push command from local registry proof and VPS readiness."
+        },
+        {
+          "file": "docs/COMPLETION_MATRIX_V0_9_8.md",
+          "symbol": "Push the versioned image set to Docker Hub or another external registry",
+          "note": "v0.9.8 matrix explicitly marks external registry push as remaining operator-dependent work."
+        },
+        {
+          "file": "README.md",
+          "symbol": "Docker Hub or VPS",
+          "note": "README states local Docker proof is not an external registry or VPS release claim."
+        },
+        {
+          "file": "scripts/release/build-images.py",
+          "symbol": "main",
+          "note": "Build command can tag the versioned image set for an external registry prefix."
+        },
+        {
+          "file": "scripts/release/publish-images.py",
+          "symbol": "main",
+          "note": "Publisher pushes each APP_IMAGES tag and inspects manifests."
+        },
+        {
+          "file": "scripts/release/release_common.py",
+          "symbol": "all_image_tags",
+          "note": "Helper enumerates all versioned app image tags for a registry prefix."
+        },
+        {
+          "file": "scripts/release/remove-local-app-images.py",
+          "symbol": "main",
+          "note": "Clean pull proof can remove locally built app images before pulling from registry."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "operator-proof-ticket",
+          "source": "docs/COMPLETION_MATRIX_V0_9_8.md",
+          "applies_to": "RM-012"
+        }
+      ],
+      "flags": [
+        {
+          "name": "operator_dependent",
+          "note": "Requires Docker Hub or private registry credentials; do not claim VPS readiness from this ticket."
+        },
+        {
+          "name": "future_path_not_a_code_ref",
+          "note": "runbooks/ is future handoff material; current grounding is the release doc and scripts."
+        }
+      ]
+    },
+    {
+      "id": "RM-013",
+      "title": "Prove customer cell launch",
+      "goal": "Capture the operator-dependent proof that a chosen VPS or customer micro-production cell can run the externally published images.",
+      "acceptance": "On the target VPS/customer host, the runbook pulls pinned images, boots the compose cell with production preflight passing, proves API/admin/worker/model-gateway readiness, runs smoke retrieval, and records raw host/topology evidence.",
+      "suspected_files": [
+        "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+        "docs/MICRO_PRODUCTION.md",
+        "docs/COMPLETION_MATRIX_V0_9_8.md",
+        ".env.production.example",
+        "infra/docker/compose.cell.yml",
+        "scripts/release",
+        "runbooks"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+          "symbol": "VPS Cell Launch",
+          "note": "Release doc gives the VPS/customer host launch lane after the local registry gate."
+        },
+        {
+          "file": "docs/MICRO_PRODUCTION.md",
+          "symbol": "VPS launch claim",
+          "note": "Micro-production doc keeps local and VPS/customer launch claims separate."
+        },
+        {
+          "file": "docs/COMPLETION_MATRIX_V0_9_8.md",
+          "symbol": "Target VPS/Docker Hub validation still required",
+          "note": "Matrix records that local Docker proof does not claim external deployment."
+        },
+        {
+          "file": ".env.production.example",
+          "symbol": "SVS_PUBLIC_API_BASE",
+          "note": "Production env example includes public API/admin URLs and non-local registry expectations for launched cells."
+        },
+        {
+          "file": "infra/docker/compose.cell.yml",
+          "symbol": "services",
+          "note": "Cell compose defines the API, worker, model-gateway, admin-ui, instance-agent, and stateful services to boot."
+        },
+        {
+          "file": "scripts/release/prod-env-preflight.py",
+          "symbol": "main",
+          "note": "Preflight should pass before a production/customer cell launch."
+        },
+        {
+          "file": "scripts/release/cell-up.py",
+          "symbol": "main",
+          "note": "Cell boot script pulls and starts registry images, then waits for service health."
+        },
+        {
+          "file": "scripts/release/cell-smoke.py",
+          "symbol": "main",
+          "note": "Smoke script proves API readiness, unsafe config absence, compile/test pass, and integration test behavior in a cell."
+        },
+        {
+          "file": "scripts/release/cell-access-proof.py",
+          "symbol": "access_targets",
+          "note": "Access proof checks API/admin through host loopback or Docker cell-network fallback."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "external-cell-proof",
+          "source": "docs/DOCKER_LOCAL_CELL_RELEASE.md:VPS Cell Launch",
+          "applies_to": "RM-013"
+        }
+      ],
+      "flags": [
+        {
+          "name": "operator_dependent",
+          "note": "Requires selected VPS/customer host, network access, and externally published images."
+        },
+        {
+          "name": "future_path_not_a_code_ref",
+          "note": "runbooks/ remains future proof packaging; code_refs use existing docs/scripts/compose."
+        }
+      ]
+    },
+    {
+      "id": "RM-014",
+      "title": "Validate real providers",
+      "goal": "Capture the operator-dependent proof that real provider credentials and endpoints work for OpenAI, RunPod, TEI, Infinity, and other approved providers.",
+      "acceptance": "With live credentials/endpoints supplied, provider integration tests execute embedding and rerank calls through the gateway, enforce security-level routing policy, record latency/error/cost metadata, and identify any provider that remains unavailable or unapproved.",
+      "suspected_files": [
+        "docs/COMPLETION_MATRIX_V0_9_8.md",
+        "docs/planning-specs/INTELLIGENT_VECTORIZATION_ROUTER.md",
+        "docs/planning-specs/RUNPOD_MODEL_ENDPOINT.md",
+        "apps/model_gateway",
+        "configs",
+        "tests/integration",
+        "runbooks"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/COMPLETION_MATRIX_V0_9_8.md",
+          "symbol": "Run provider integration tests for real OpenAI/RunPod/TEI/Infinity endpoints",
+          "note": "v0.9.8 matrix lists live provider validation as a remaining external proof."
+        },
+        {
+          "file": "docs/planning-specs/INTELLIGENT_VECTORIZATION_ROUTER.md",
+          "symbol": "instance provider allowlist",
+          "note": "Router spec requires provider allowlists and security-level routing policy."
+        },
+        {
+          "file": "docs/planning-specs/RUNPOD_MODEL_ENDPOINT.md",
+          "symbol": "RunPod Model Endpoint Supplement",
+          "note": "RunPod supplement defines the private GPU endpoint role behind the model gateway."
+        },
+        {
+          "file": "apps/model_gateway/svs_model_gateway/main.py",
+          "symbol": "embeddings",
+          "note": "Live embedding proofs should traverse the gateway embedding route."
+        },
+        {
+          "file": "apps/model_gateway/svs_model_gateway/main.py",
+          "symbol": "estimate_cost",
+          "note": "Gateway already exposes estimated cost metadata for embedding requests."
+        },
+        {
+          "file": "packages/svs_common/svs_common/providers.py",
+          "symbol": "provider_for",
+          "note": "Provider factory resolves OpenAI, Voyage, Cohere, TEI/Jina, RunPod, Infinity, and hash_mock behavior."
+        },
+        {
+          "file": "configs/model-registry.yaml",
+          "symbol": "policies",
+          "note": "Registry policy defines external provider deny thresholds and private fallback profile."
+        },
+        {
+          "file": "scripts/release/prod-env-preflight.py",
+          "symbol": "PROVIDER_REQUIREMENTS",
+          "note": "Preflight maps selected providers to required live endpoint/API-key variables without printing secret values."
+        },
+        {
+          "file": "tests/test_embedding_providers.py",
+          "symbol": "test_openai_provider_missing_key_fails_instead_of_hashing",
+          "note": "Regression proof prevents accidental hash fallback for unconfigured real providers."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "live-provider-proof",
+          "source": "apps/model_gateway/svs_model_gateway/main.py:embeddings",
+          "applies_to": "RM-014"
+        }
+      ],
+      "flags": [
+        {
+          "name": "operator_dependent",
+          "note": "Requires live provider credentials/endpoints and should record unavailable or unapproved providers instead of guessing."
+        },
+        {
+          "name": "future_path_not_a_code_ref",
+          "note": "runbooks/ is future operator proof packaging; tests/integration exists but current provider proof is mostly unit-gated."
+        }
+      ]
+    },
+    {
+      "id": "RM-015",
+      "title": "Prove external restore drill",
+      "goal": "Capture the operator-dependent proof that backups can restore an external micro-production cell or staging clone, not only a local Docker environment.",
+      "acceptance": "Using a real backup target and external cell topology, the runbook restores metadata, object artifacts, one Qdrant collection, one OpenSearch index, and config/secrets references, then runs retrieval/eval smoke checks against the restored environment.",
+      "suspected_files": [
+        "docs/COMPLETION_MATRIX_V0_9_8.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+        "scripts/release",
+        "runbooks",
+        "infra/docker"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/COMPLETION_MATRIX_V0_9_8.md",
+          "symbol": "Run backup/restore drills on the first external micro-production cell",
+          "note": "v0.9.8 matrix separates local restore pass from first external cell restore proof."
+        },
+        {
+          "file": "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+          "symbol": "Monthly restore drill",
+          "note": "Production delta requires restoring Postgres, Qdrant, OpenSearch, object storage/config references, and retrieval evals."
+        },
+        {
+          "file": "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+          "symbol": "local registry-pulled cell",
+          "note": "Release doc explicitly limits existing restore evidence to local Docker unless external proof is captured."
+        },
+        {
+          "file": "scripts/release/local-restore-drill.py",
+          "symbol": "main",
+          "note": "Current drill proves local source and restore Docker cells with Postgres dump, reindex, Qdrant count, readiness, and search."
+        },
+        {
+          "file": "scripts/release/local-restore-drill.py",
+          "symbol": "restore_postgres",
+          "note": "Current restore path replays pg_restore into the restore cell."
+        },
+        {
+          "file": "scripts/backup-instance.sh",
+          "symbol": "MANIFEST=${1:?Usage: scripts/backup-instance.sh instances/expert-ai-services/prod/instance.yaml [dest-root]}",
+          "note": "Backup bundle captures metadata/checksums and limited Qdrant/OpenSearch/object metadata."
+        },
+        {
+          "file": "scripts/restore-instance.sh",
+          "symbol": "BUNDLE=${1:?Usage: scripts/restore-instance.sh backups/<bundle>.tar.gz [restore-dir]}",
+          "note": "Restore script verifies local bundle checksums and Postgres, leaving index restoration to cluster-specific APIs."
+        },
+        {
+          "file": "infra/docker/compose.cell.yml",
+          "symbol": "volumes",
+          "note": "External restore proof must distinguish named Docker volumes and external object/index backends."
+        },
+        {
+          "file": "tests/test_local_restore_drill_script.py",
+          "symbol": "test_restore_doc_contains_token_in_each_section",
+          "note": "Current unit coverage validates deterministic local restore drill fixture generation."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "local-drill-to-external-drill",
+          "source": "scripts/release/local-restore-drill.py",
+          "applies_to": "RM-015"
+        }
+      ],
+      "flags": [
+        {
+          "name": "operator_dependent",
+          "note": "Requires a real backup target and external cell/staging topology; local Docker restore evidence is not sufficient."
+        },
+        {
+          "name": "future_path_not_a_code_ref",
+          "note": "runbooks/ should capture the proof procedure, but existing grounding is docs/scripts/compose."
+        }
+      ]
+    },
+    {
+      "id": "RM-016",
+      "title": "Run corpus-scale load tests",
+      "goal": "Capture the operator-dependent proof that the target corpus and workload meet the production latency, freshness, and indexing objectives.",
+      "acceptance": "Against the selected corpus or a documented production-scale surrogate, ingestion and retrieval load tests report throughput, p95 search latency, p95 context-pack latency, queue freshness, index growth, provider latency, and failure modes against the documented SLO targets.",
+      "suspected_files": [
+        "docs/COMPLETION_MATRIX_V0_9_8.md",
+        "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        "load-tests",
+        "scripts/release/seed-scale.py",
+        "scripts/release/search-bench.py",
+        "evals",
+        "runbooks"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/COMPLETION_MATRIX_V0_9_8.md",
+          "symbol": "Run corpus-scale ingestion and retrieval load tests",
+          "note": "v0.9.8 matrix lists corpus-scale load tests as remaining external proof."
+        },
+        {
+          "file": "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+          "symbol": "SLOs and recovery objectives",
+          "note": "Production delta defines freshness, latency, indexing, and workload objectives to test against."
+        },
+        {
+          "file": "scripts/release/seed-scale.py",
+          "symbol": "main",
+          "note": "Scale gate seeds queued file batches through the real API path and waits for SQL/indexed chunk counts."
+        },
+        {
+          "file": "scripts/release/search-bench.py",
+          "symbol": "percentile",
+          "note": "Search benchmark computes p50/p95/avg latency and fails when p95 exceeds the supplied threshold."
+        },
+        {
+          "file": "scripts/release/scale_common.py",
+          "symbol": "scale_doc",
+          "note": "Scale fixture generator creates documents with unique retrieval terms and async ingestion attributes."
+        },
+        {
+          "file": "scripts/release/scale_common.py",
+          "symbol": "parse_int_row",
+          "note": "Helper parses machine-readable SQL count rows for proof scripts."
+        },
+        {
+          "file": "configs/eval-profiles.yaml",
+          "symbol": "profiles",
+          "note": "Eval profile metrics can be combined with load tests for quality plus latency proof."
+        },
+        {
+          "file": "tests/test_release_cell_network.py",
+          "symbol": "test_release_scripts_do_not_hardcode_local_cell_network",
+          "note": "Regression proof keeps release benchmark scripts cell-name agnostic."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "scale-seed-plus-search-bench",
+          "source": "scripts/release/seed-scale.py + scripts/release/search-bench.py",
+          "applies_to": "RM-016"
+        }
+      ],
+      "flags": [
+        {
+          "name": "operator_dependent",
+          "note": "Requires selected corpus or documented production-scale surrogate plus target-cell capacity."
+        },
+        {
+          "name": "future_path_not_a_code_ref",
+          "note": "load-tests/, evals/, and runbooks/ are future packaging lanes; current grounding is release scale scripts and eval config."
+        }
+      ]
+    },
+    {
+      "id": "RM-017",
+      "title": "Prove DNS TLS secrets wiring",
+      "goal": "Capture the operator-dependent proof that production DNS, TLS, and external secrets-manager wiring are correctly attached to the launched cell.",
+      "acceptance": "For the chosen domain/cell, DNS resolves to the target host, HTTPS/TLS health checks pass without wildcard dev allowances, secrets-manager references resolve through preflight without value disclosure, and rollback/rotation steps are documented.",
+      "suspected_files": [
+        "README.md",
+        "docs/MICRO_PRODUCTION.md",
+        "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+        "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+        "terraform",
+        "ansible",
+        "scripts/release/prod-env-preflight.py",
+        "runbooks"
+      ],
+      "code_refs": [
+        {
+          "file": "README.md",
+          "symbol": "DNS/TLS/secrets manager wiring",
+          "note": "README lists DNS/TLS/secrets manager wiring as remaining deployment-specific work."
+        },
+        {
+          "file": "docs/MICRO_PRODUCTION.md",
+          "symbol": "Micro-production means many isolated instances",
+          "note": "Micro-production doc frames per-cell/domain/secret concerns as external deployment proof, not local Docker proof."
+        },
+        {
+          "file": "docs/DOCKER_LOCAL_CELL_RELEASE.md",
+          "symbol": "VPS Cell Launch",
+          "note": "VPS launch lane is where production DNS/TLS/secrets wiring proof belongs."
+        },
+        {
+          "file": "docs/planning-specs/PRODUCTION_READY_DELTA.md",
+          "symbol": "Encryption and secrets",
+          "note": "Production delta requires TLS externally and Vault/SOPS/age secret storage."
+        },
+        {
+          "file": "infra/caddy/Caddyfile",
+          "symbol": ":80",
+          "note": "Current Caddy scaffold is HTTP reverse proxy only; production TLS/domain behavior is not proved here."
+        },
+        {
+          "file": "infra/terraform/hetzner-cloud/main.tf",
+          "symbol": "hcloud_server.svs",
+          "note": "Terraform scaffold can provision a cloud cell host and output its IPv4 address, but does not wire DNS/TLS."
+        },
+        {
+          "file": "infra/ansible/playbook.yml",
+          "symbol": "roles",
+          "note": "Ansible playbook applies base-hardening, Docker host, svs-cell, and backup-agent roles to cell hosts."
+        },
+        {
+          "file": "infra/ansible/roles/base-hardening/tasks/main.yml",
+          "symbol": "base-hardening scaffold",
+          "note": "Base-hardening role is currently a scaffold for firewall/SSH/HTTP/HTTPS host rules."
+        },
+        {
+          "file": "scripts/release/prod-env-preflight.py",
+          "symbol": "validate_env",
+          "note": "Preflight catches wildcard CORS, local registry, dev mode, placeholder secrets, TLS verification disablement, and object-store strictness."
+        },
+        {
+          "file": ".env.production.example",
+          "symbol": "SVS_ALLOWED_CORS_ORIGINS",
+          "note": "Production example names API/admin origins and secret placeholders that must come from the external secret workflow."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "operator-proof-ticket",
+          "source": "README.md + docs/DOCKER_LOCAL_CELL_RELEASE.md",
+          "applies_to": "RM-017"
+        }
+      ],
+      "flags": [
+        {
+          "name": "operator_dependent",
+          "note": "Requires chosen domain, DNS provider/control, certificate/TLS path, and external secret manager."
+        },
+        {
+          "name": "future_path_not_a_code_ref",
+          "note": "runbooks/ remains future proof packaging; terraform/ansible are grounded through existing infra paths under infra/."
+        }
+      ]
+    }
+  ]
+}
