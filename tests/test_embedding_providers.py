@@ -5,6 +5,7 @@ from types import SimpleNamespace
 import pytest
 
 from svs_common.providers import (
+    GenericEndpointEmbeddingProvider,
     HashEmbeddingProvider,
     ProviderConfigurationError,
     provider_config_status,
@@ -95,6 +96,17 @@ def test_runpod_serverless_alias_and_self_hosted_provider_status():
     assert self_hosted.required_env == ("SELF_HOSTED_MODEL_ENDPOINT_URL",)
     assert self_hosted.auth_secret_ref == "envref://SELF_HOSTED_MODEL_API_KEY"
     assert "runtime-value-not-returned" not in repr(self_hosted)
+
+
+def test_huggingface_tei_alias_uses_tei_endpoint():
+    runtime_settings = settings(tei_endpoint_url="http://tei.internal:8080")
+    status = provider_config_status("huggingface_tei", settings=runtime_settings)
+    provider = provider_for("huggingface_tei", settings=runtime_settings)
+
+    assert status.configured is True
+    assert status.required_env == ("TEI_ENDPOINT_URL",)
+    assert isinstance(provider, GenericEndpointEmbeddingProvider)
+    assert provider.provider == "huggingface_tei"
 
 
 def test_ingestion_rejects_unknown_embedding_profile():

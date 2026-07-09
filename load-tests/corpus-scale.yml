@@ -1,0 +1,56 @@
+# RM-016 corpus-scale load-test proof package.
+# This config is a repo-local checklist/template; it does not assert that a live
+# corpus-scale run has happened.
+
+rm_id: RM-016
+proof_status: packaged_operator_dependent
+cell:
+  id: "<cell-id>"
+  api_base: "<api-base>"
+  prometheus_url: "<prometheus-url>"
+  env_file: "<cell-env>"
+  worker_scale: "<worker-count>"
+  registry_image_version: "0.9.8-production-candidate"
+corpus:
+  type: "selected_corpus_or_documented_surrogate"
+  name: "<corpus-name>"
+  source: "<redacted-source>"
+  documents: "<document-count>"
+  bytes: "<byte-count>"
+  headings_per_doc: "<surrogate-headings-per-doc>"
+  expected_chunks: "<expected-chunk-count>"
+  surrogate_rationale: "<required-if-real-corpus-not-used>"
+slo_targets:
+  p95_search_latency_ms: 500
+  p95_context_pack_latency_ms: 2000
+  queue_freshness_normal_seconds: 300
+  queue_freshness_priority_seconds: 30
+required_metrics:
+  ingestion_throughput_docs_per_min: required
+  ingestion_throughput_chunks_per_min: required
+  p95_search_latency_ms: required
+  p95_context_pack_latency_ms: required
+  queue_freshness_oldest_age_seconds: required
+  index_growth_qdrant_points: required
+  index_growth_opensearch_docs: required
+  object_store_bytes_written: required
+  provider_latency_p95_ms: required
+  failure_modes: required
+commands:
+  preflight: "python scripts/release/prod-env-preflight.py --env-file <cell-env>"
+  access: "python scripts/release/cell-access-proof.py --cell <cell-id>"
+  observability: "python scripts/release/observability-smoke.py --cell <cell-id> --api-base <api-base> --prometheus-url <prometheus-url>"
+  seed_surrogate: "python scripts/release/seed-scale.py --cell <cell-id> --documents <documents> --headings-per-doc <headings-per-doc> --batch-size <batch-size> --timeout-seconds <seconds>"
+  search_p95: "python scripts/release/search-bench.py --cell <cell-id> --vector-store-id <vector-store-id> --queries <queries> --warmup-queries <warmup> --p95-ms 500 --pace-ms <pace-ms>"
+  context_pack_p95: "curl -fsS -w '\\ntime_total=%{time_total}\\nhttp_code=%{http_code}\\n' -H 'Content-Type: application/json' -X POST <api-base>/api/v1/retrieval/context-pack --data '{\"vector_store_id\":\"<vector-store-id>\",\"query\":\"<representative-query>\",\"top_k\":5,\"max_context_tokens\":4000}'"
+failure_modes:
+  provider_throttle_or_5xx: required
+  provider_unavailable: required
+  queue_backlog: required
+  qdrant_unavailable: required
+  opensearch_unavailable: required
+  object_store_write_failure: required
+  rate_limiting: required
+result_packet:
+  vector_store_id: "<vector-store-id>"
+  operator_verdict: "incomplete_until_live_run_attached"

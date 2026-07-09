@@ -15,9 +15,20 @@
 ## Remaining v1.0 work
 
 - Run v0.9.8 live integration suite in CI/topology A and topology B.
-- Run provider integration tests for real OpenAI/RunPod/TEI/Infinity endpoints.
+- Run provider integration tests for real OpenAI/RunPod/TEI/Infinity endpoints
+  with `scripts/release/live-provider-validation.py`; credentials/endpoints are
+  still operator-supplied external proof.
 - Run backup/restore drills on the first external micro-production cell. Local
-  restore drill now passes under Wave 009.
-- Run corpus-scale ingestion and retrieval load tests.
+  restore drill now passes under Wave 009; external proof packaging is in
+  `runbooks/external-restore-drill.md`.
+- Run corpus-scale ingestion and retrieval load tests. Repo-local proof
+  packaging is in `runbooks/corpus-scale-load-tests.md` and
+  `load-tests/corpus-scale.yml`.
+- Wire and prove DNS/TLS/secrets manager for the chosen domain/cell. Repo-local
+  proof packaging is in `runbooks/dns-tls-secrets.md`.
 - Push the versioned image set to Docker Hub or another external registry after
-  operator credentials are available.
+  operator credentials are available, using `runbooks/external-registry-push.md`
+  to store push-manifest and clean pull-by-digest evidence.
+- Launch the first selected VPS/customer cell with pinned external images, using
+  `runbooks/customer-cell-launch.md` to store production preflight, cell-up,
+  smoke, access, and raw host/topology evidence.

@@ -69,7 +69,7 @@ def provider_config_status(provider_name: str, settings: Any | None = None) -> P
         return _status(provider, ("VOYAGE_API_KEY",), bool(_setting(s, "voyage_api_key")))
     if provider == "cohere":
         return _status(provider, ("COHERE_API_KEY",), bool(_setting(s, "cohere_api_key")))
-    if provider in {"jina", "tei"}:
+    if provider in {"jina", "tei", "huggingface_tei"}:
         return _status(provider, ("TEI_ENDPOINT_URL",), bool(_setting(s, "tei_endpoint_url")))
     if provider in RUNPOD_PROVIDERS:
         return _status(
@@ -358,7 +358,7 @@ def provider_for(provider_name: str, settings: Any | None = None) -> EmbeddingPr
         return VoyageEmbeddingProvider(_setting(s, 'voyage_api_key'))
     if provider == 'cohere':
         return CohereEmbeddingProvider(_setting(s, 'cohere_api_key'))
-    if provider in {'jina', 'tei'}:
+    if provider in {'jina', 'tei', 'huggingface_tei'}:
         return GenericEndpointEmbeddingProvider(provider, _setting(s, 'tei_endpoint_url') or '')
     if provider in RUNPOD_PROVIDERS:
         return GenericEndpointEmbeddingProvider('runpod', _setting(s, 'runpod_embedding_endpoint_url') or '', _setting(s, 'runpod_api_key'))
@@ -375,7 +375,7 @@ def provider_for_rerank(provider_name: str, settings: Any | None = None) -> Rera
     status = provider_config_status(provider, s)
     if not status.configured:
         raise ProviderConfigurationError(status.reason or f"{provider} rerank provider is not configured")
-    if provider in {'jina', 'tei'}:
+    if provider in {'jina', 'tei', 'huggingface_tei'}:
         return GenericEndpointRerankProvider(provider, _setting(s, 'tei_endpoint_url') or '')
     if provider in RUNPOD_PROVIDERS:
         return GenericEndpointRerankProvider('runpod', _setting(s, 'runpod_embedding_endpoint_url') or '', _setting(s, 'runpod_api_key'))

@@ -68,13 +68,15 @@ Run this only after the local registry gate passes:
 
 ```bash
 docker login
-python scripts/release/build-images.py --registry-prefix docker.io/expertaiservices
-python scripts/release/publish-images.py --registry-prefix docker.io/expertaiservices
+python scripts/release/external-registry-proof.py \
+  --registry-prefix docker.io/expertaiservices \
+  --cell external-registry
 ```
 
 External registry credential use, clean pull-by-digest evidence, and Docker
 Hub/private-registry operator proof remain separate proof gates. Do not mark a
-VPS or customer cell ready from the local manifest alone.
+VPS or customer cell ready from the local manifest alone. See
+`runbooks/external-registry-push.md` for the repo-local proof package.
 
 ## VPS Cell Launch
 
@@ -107,4 +109,5 @@ Accepted forms are documented in `runbooks/encrypted-secrets.md` and include
 passwords, API keys, access keys, peppers, tokens, and DSNs with embedded
 passwords while printing variable names only. Live SOPS/Vault reads, DNS/TLS,
 and customer-host proof remain operator proof gates outside the local release
-proof.
+proof. Use `runbooks/customer-cell-launch.md` to package selected-host launch
+evidence without reusing local or registry-only proof as a VPS readiness claim.
