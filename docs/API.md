@@ -5,17 +5,20 @@ The API has two layers:
 1. **Native SVS API** for ingestion, mode routing, retrieval, admin, model registry, and instance operations.
 2. **OpenAI-compatible vector-store API** for clients that expect `/v1/vector_stores`-style behavior.
 
-Generated `/openapi.json` currently contains 51 paths and 81 schema components. The
-OpenAI-compatible surfaces described below have named request/response
-components and focused regression proof. Full contract closure remains
-explicitly pending for mostly untyped native success responses and several
-inline or optional-body JSON request schemas.
+Generated `/openapi.json` currently contains 51 paths, 68 operations, and 118
+schema components. All documented native and OpenAI-compatible operations have
+named 2xx response components, and every JSON request body resolves directly to
+a named component. Native responses are runtime-bound through FastAPI response
+models. Named nullable request wrappers preserve explicit JSON `null` behavior
+for vector-store create/update. Multipart document and OpenAI file uploads
+retain named `multipart/form-data` components. Metrics and extracted OpenAI file
+content use HTTP-proven `text/plain` responses with named string schemas.
 
-Specifically, the native health/readiness/metrics, registry/profile,
-ingestion/jobs, retrieval, bakeoff, maintenance, and admin route families do
-not yet expose stable success response components. Inline request schemas
-remain on native model-endpoint patch, OpenAI vector-store file attach/update,
-and file-batch create; vector-store create/update retain optional-body wrappers.
+`tests/test_openapi_contract.py` freezes all valid OpenAPI HTTP methods across
+the exact 68-operation inventory, verifies
+that every request and successful response body is a direct component reference,
+and validates representative runtime payloads against the promoted contracts.
+This is contract closure, not new OpenAI parity behavior.
 
 The generated `/openapi.json` includes named OpenAI-compatible request and
 response components for vector-store search and Responses
@@ -383,7 +386,8 @@ timestamp.
 Generated `/openapi.json` exposes `/v1/files` upload, list, retrieve, and delete
 JSON responses through `OpenAIFile`, `OpenAIFileListResponse`, and
 `OpenAIFileDeletedResponse` components. `GET /v1/files/{file_id}/content`
-advertises `text/plain` because the route returns the file contents directly.
+advertises `text/plain` because the route returns decoded or extracted text,
+even when the stored source MIME is non-text.
 
 Vector-store, vector-store file, and file-batch file lists support OpenAI
 pagination controls: `limit`, `order`, `after`, and `before`; vector-store file

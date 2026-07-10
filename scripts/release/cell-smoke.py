@@ -5,6 +5,17 @@ import argparse
 from release_common import DEFAULT_CELL, api_base, compose_base, compose_network_name, ensure_env, run
 
 
+def restore_workers(base: list[str], worker_scale: int) -> None:
+    pulled = run(
+        base + ["up", "-d", "--no-deps", "--pull", "always", "--scale", f"worker={worker_scale}", "worker"],
+        check=False,
+    )
+    if pulled.returncode == 0:
+        return
+    print("Registry pull failed; restoring workers from the pinned local image.")
+    run(base + ["up", "-d", "--no-deps", "--pull", "never", "--scale", f"worker={worker_scale}", "worker"])
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run publish-gate smoke checks against a registry-pulled cell.")
     parser.add_argument("--cell", default=DEFAULT_CELL)
@@ -78,7 +89,7 @@ def main() -> None:
             "/app/tests/integration",
         ])
     finally:
-        run(base + ["up", "-d", "--pull", "always", "--scale", f"worker={args.worker_scale}", "worker"], check=False)
+        restore_workers(base, args.worker_scale)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -26,6 +28,14 @@ APP_IMAGES = {
     "admin-ui": ("apps/admin_ui/Dockerfile", "exai-vector-store-admin-ui"),
     "instance-agent": ("apps/instance_agent/Dockerfile", "exai-vector-store-instance-agent"),
 }
+APP_IMAGE_ENV_VARS = {
+    service: f"SVS_IMAGE_{service.upper().replace('-', '_')}"
+    for service in APP_IMAGES
+}
+PINNED_IMAGE_ENV_FILENAME = ".env.images"
+PINNED_IMAGE_REFERENCE_RE = re.compile(
+    r"^(?P<repository>[^@\s]+)@sha256:(?P<digest>[0-9a-f]{64})$"
+)
 
 
 def version() -> str:
@@ -38,6 +48,10 @@ def release_dir(cell: str = DEFAULT_CELL) -> Path:
 
 def env_file(cell: str = DEFAULT_CELL) -> Path:
     return release_dir(cell) / ".env.cell"
+
+
+def pinned_image_env_file(cell: str = DEFAULT_CELL) -> Path:
+    return release_dir(cell) / PINNED_IMAGE_ENV_FILENAME
 
 
 def release_manifest_path(cell: str = DEFAULT_CELL) -> Path:
@@ -78,7 +92,17 @@ def compose_cmd() -> list[str]:
 
 
 def compose_base(cell: str = DEFAULT_CELL) -> list[str]:
-    return compose_cmd() + ["--env-file", str(env_file(cell)), "-f", str(COMPOSE_FILE), "-p", project_name(cell)]
+    validate_pinned_image_env(cell)
+    return compose_cmd() + [
+        "--env-file",
+        str(env_file(cell)),
+        "--env-file",
+        str(pinned_image_env_file(cell)),
+        "-f",
+        str(COMPOSE_FILE),
+        "-p",
+        project_name(cell),
+    ]
 
 
 def printable_command(args: list[str]) -> str:
@@ -117,6 +141,45 @@ def run(args: list[str], *, check: bool = True, cwd: Path = ROOT, env: dict[str,
     return proc
 
 
+def inspect_local_repo_digests(reference: str) -> tuple[str, ...] | None:
+    result = run(
+        ["docker", "image", "inspect", "--format", "{{json .RepoDigests}}", reference],
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    output = (result.stdout or "").strip().splitlines()
+    if not output:
+        return ()
+    try:
+        values = json.loads(output[-1])
+    except json.JSONDecodeError:
+        return ()
+    if not isinstance(values, list):
+        return ()
+    return tuple(str(value) for value in values)
+
+
+def ensure_app_images_available(
+    image_references: dict[str, str],
+    *,
+    services: tuple[str, ...] | None = None,
+) -> None:
+    selected_services = _validate_service_selection(services)
+    if set(image_references) != set(selected_services):
+        raise RuntimeError("Digest-pinned image availability requires the exact selected APP_IMAGES mapping")
+    for service in selected_services:
+        reference = image_references[service]
+        repo_digests = inspect_local_repo_digests(reference)
+        if repo_digests is None:
+            run(["docker", "pull", reference])
+            repo_digests = inspect_local_repo_digests(reference)
+        if repo_digests is None or reference not in repo_digests:
+            raise RuntimeError(
+                f"Digest-pinned image verification failed for {service}: local RepoDigests do not contain {reference}"
+            )
+
+
 def wait_for_services(cell: str, services: list[str], timeout_seconds: int = 240) -> None:
     deadline = time.time() + timeout_seconds
     names = [f"{project_name(cell)}-{service}-1" for service in services]
@@ -138,8 +201,140 @@ def wait_for_services(cell: str, services: list[str], timeout_seconds: int = 240
 
 
 def read_env(cell: str = DEFAULT_CELL) -> dict[str, str]:
+    return _read_env_file(env_file(cell))
+
+
+def write_pinned_image_env(
+    cell: str,
+    image_references: dict[str, str],
+    *,
+    registry_prefix: str | None = None,
+) -> Path:
+    prefix = normalize_registry_prefix(registry_prefix or read_env(cell).get("SVS_REGISTRY_PREFIX"))
+    return write_pinned_image_env_file(
+        pinned_image_env_file(cell),
+        image_references,
+        registry_prefix=prefix,
+        check_process_env=True,
+    )
+
+
+def write_pinned_image_env_file(
+    path: Path,
+    image_references: dict[str, str],
+    *,
+    registry_prefix: str,
+    services: tuple[str, ...] | None = None,
+    check_process_env: bool = False,
+) -> Path:
+    selected_services = _validate_service_selection(services)
+    _validate_pinned_image_references(
+        image_references,
+        services=selected_services,
+        registry_prefix=normalize_registry_prefix(registry_prefix),
+        check_process_env=check_process_env,
+    )
+    lines = [
+        "# Generated immutable app image references. Do not commit this file.",
+        "# Values are non-secret and derive from a verified release manifest.",
+    ]
+    for service in selected_services:
+        env_name = APP_IMAGE_ENV_VARS[service]
+        lines.append(f"{env_name}={image_references[service]}")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".tmp")
+    try:
+        temporary.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        os.replace(temporary, path)
+    except BaseException:
+        temporary.unlink(missing_ok=True)
+        raise
+    return path
+
+
+def restore_pinned_image_env_file(path: Path, previous: bytes | None) -> None:
+    if previous is None:
+        path.unlink(missing_ok=True)
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".rollback.tmp")
+    try:
+        temporary.write_bytes(previous)
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def validate_pinned_image_env(cell: str = DEFAULT_CELL) -> dict[str, str]:
+    path = pinned_image_env_file(cell)
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Missing pinned image env file: {path}. Run cell-up.py with a verified release manifest first."
+        )
+    values = _read_env_file(path)
+    expected_keys = set(APP_IMAGE_ENV_VARS.values())
+    actual_keys = set(values)
+    if actual_keys != expected_keys:
+        missing = sorted(expected_keys - actual_keys)
+        extra = sorted(actual_keys - expected_keys)
+        details: list[str] = []
+        if missing:
+            details.append("missing " + ", ".join(missing))
+        if extra:
+            details.append("unexpected " + ", ".join(extra))
+        raise RuntimeError(f"Pinned image env must contain exactly the APP_IMAGES mapping ({'; '.join(details)})")
+    image_references = {service: values[env_name] for service, env_name in APP_IMAGE_ENV_VARS.items()}
+    registry_prefix = normalize_registry_prefix(read_env(cell).get("SVS_REGISTRY_PREFIX"))
+    _validate_pinned_image_references(
+        image_references,
+        services=tuple(APP_IMAGES),
+        registry_prefix=registry_prefix,
+        check_process_env=True,
+    )
+    return image_references
+
+
+def _validate_pinned_image_references(
+    image_references: dict[str, str],
+    *,
+    services: tuple[str, ...],
+    registry_prefix: str,
+    check_process_env: bool,
+) -> None:
+    expected_services = set(services)
+    actual_services = set(image_references)
+    if actual_services != expected_services:
+        raise RuntimeError("Pinned image references must match the selected APP_IMAGES services")
+    issues: list[str] = []
+    for service in services:
+        _dockerfile, image_name = APP_IMAGES[service]
+        reference = image_references[service]
+        match = PINNED_IMAGE_REFERENCE_RE.fullmatch(reference)
+        if not match:
+            issues.append(f"{service} must use repository@sha256 digest syntax")
+            continue
+        expected_repository = f"{registry_prefix}/{image_name}"
+        if match.group("repository") != expected_repository:
+            issues.append(f"{service} repository does not match {expected_repository}")
+        env_name = APP_IMAGE_ENV_VARS[service]
+        if check_process_env and env_name in os.environ and os.environ[env_name] != reference:
+            issues.append(f"process environment override {env_name} does not match the pinned digest")
+    if issues:
+        raise RuntimeError("Pinned image validation failed: " + "; ".join(issues))
+
+
+def _validate_service_selection(services: tuple[str, ...] | None) -> tuple[str, ...]:
+    selected = services or tuple(APP_IMAGES)
+    if not selected or len(set(selected)) != len(selected):
+        raise RuntimeError("Pinned image services must be a non-empty unique APP_IMAGES selection")
+    unknown = sorted(set(selected) - set(APP_IMAGES))
+    if unknown:
+        raise RuntimeError("Unknown APP_IMAGES services: " + ", ".join(unknown))
+    return selected
+
+
+def _read_env_file(path: Path) -> dict[str, str]:
     values: dict[str, str] = {}
-    path = env_file(cell)
     if not path.exists():
         return values
     for raw in path.read_text(encoding="utf-8").splitlines():

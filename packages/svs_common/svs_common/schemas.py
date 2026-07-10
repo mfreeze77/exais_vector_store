@@ -23,6 +23,48 @@ class Principal(BaseModel):
     max_security_level: int = 1
     scopes: list[str] = Field(default_factory=list)
 
+
+class HealthResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    ok: bool
+    service: str
+    version: str
+    sparse_backend: str
+    dense_backend: str
+
+
+class ReadinessResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    ready: bool
+    db: bool | None = None
+    qdrant: bool | None = None
+
+
+class PrometheusMetricsResponse(RootModel[str]):
+    pass
+
+
+class OpenAIFileContentResponse(RootModel[str]):
+    pass
+
+
+class VectorizationModesResponse(BaseModel):
+    modes: dict[str, dict[str, Any]] = Field(default_factory=dict)
+
+
+class ModelRegistryResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    models: dict[str, dict[str, Any]] = Field(default_factory=dict)
+    rerankers: dict[str, dict[str, Any]] = Field(default_factory=dict)
+    policies: dict[str, Any] = Field(default_factory=dict)
+
+
+class RetrievalProfilesResponse(BaseModel):
+    profiles: dict[str, dict[str, Any]] = Field(default_factory=dict)
+
 class RetrievalScope(BaseModel):
     tenant_id: str
     business_instance_id: str
@@ -144,6 +186,14 @@ class VectorStoreUpdateRequest(BaseModel):
     @classmethod
     def validate_chunking_strategy(cls, value: Any) -> dict[str, Any] | None:
         return validate_openai_chunking_strategy(value)
+
+
+class NullableVectorStoreCreateRequest(RootModel[VectorStoreCreateRequest | None]):
+    pass
+
+
+class NullableVectorStoreUpdateRequest(RootModel[VectorStoreUpdateRequest | None]):
+    pass
 
 class VectorStoreResponse(BaseModel):
     id: str
@@ -270,6 +320,43 @@ class OpenAIVectorStoreFileContentResponse(BaseModel):
     next_page: str | None = None
 
 
+class OpenAIVectorStoreFileAttachRequest(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    file_id: str | None = None
+    title: str | None = None
+    filename: str | None = None
+    mime_type: str | None = None
+    content: str | None = None
+    mode: str | None = None
+    source_uri: str | None = None
+    attributes: dict[str, Any] | None = None
+    metadata: dict[str, Any] | None = None
+    chunking_strategy: dict[str, Any] | None = None
+    security_level: int | None = None
+    classification: str | None = None
+    allowed_groups: list[str] | None = None
+    allowed_roles: list[str] | None = None
+    source_trust: str | None = None
+
+
+class OpenAIVectorStoreFileUpdateRequest(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    attributes: dict[str, Any] | None = None
+    metadata: dict[str, Any] | None = None
+
+
+class OpenAIVectorStoreFileBatchCreateRequest(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    file_ids: list[str] | None = None
+    files: list[dict[str, Any]] | None = None
+    attributes: dict[str, Any] | None = None
+    metadata: dict[str, Any] | None = None
+    chunking_strategy: dict[str, Any] | None = None
+
+
 class OpenAIVectorStoreFileBatchCounts(BaseModel):
     model_config = ConfigDict(extra='allow')
 
@@ -332,6 +419,8 @@ class IngestionJobResponse(BaseModel):
     vector_store_file_id: str | None = None
 
 class IngestionJobDetail(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
     id: str
     status: str
     job_type: str
@@ -343,6 +432,15 @@ class IngestionJobDetail(BaseModel):
     created_at: int | None = None
     updated_at: int | None = None
     completed_at: int | None = None
+    payload: dict[str, Any] = Field(default_factory=dict)
+
+
+class IngestionJobListResponse(BaseModel):
+    object: str = 'list'
+    data: list[IngestionJobDetail] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: bool = False
 
 class ChunkRecord(BaseModel):
     id: str
@@ -1135,10 +1233,41 @@ class ModelEndpointRequest(BaseModel):
         _validate_config_secret_references(value)
         return value
 
+
+class ModelEndpointPatchRequest(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    name: str | None = None
+    provider: str | None = None
+    kind: Literal['embedding', 'reranker', 'tokenizer', 'multimodal'] | None = None
+    base_url: str | None = None
+    model: str | None = None
+    dimensions: int | None = None
+    supports: list[str] | None = None
+    privacy: str | None = None
+    security_max_level: int | None = None
+    status: str | None = None
+    health_status: str | None = None
+    p95_latency_ms: int | None = None
+    region: str | None = None
+    model_revision: str | None = None
+    auth_secret_ref: str | None = None
+    last_health_check_at: int | None = None
+    routing_state: str | None = None
+    config: dict[str, Any] | None = None
+
 class ModelEndpointResponse(ModelEndpointRequest):
     id: str
     created_at: int | None = None
     updated_at: int | None = None
+
+
+class ModelEndpointListResponse(BaseModel):
+    object: str = 'list'
+    data: list[ModelEndpointResponse] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: bool = False
 
 class IngestionPreviewRequest(DocumentIngestRequest):
     persist: bool = True
@@ -1194,6 +1323,27 @@ class BakeoffRunResponse(BaseModel):
     metrics: dict[str, Any] = Field(default_factory=dict)
     results: list[dict[str, Any]] = Field(default_factory=list)
 
+
+class BakeoffRunSummaryResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str
+    name: str
+    mode: str
+    model_profile_ids: list[str] = Field(default_factory=list)
+    status: str
+    metrics: dict[str, Any] = Field(default_factory=dict)
+    created_at: int | None = None
+    completed_at: int | None = None
+
+
+class BakeoffRunListResponse(BaseModel):
+    object: str = 'list'
+    data: list[BakeoffRunSummaryResponse] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: bool = False
+
 class ReindexRequest(BaseModel):
     vector_store_id: str | None = None
     document_id: str | None = None
@@ -1206,6 +1356,99 @@ class MaintenanceResult(BaseModel):
     action: str
     processed: int = 0
     details: dict[str, Any] = Field(default_factory=dict)
+
+
+class AdminSessionResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    object: str = 'admin.session'
+    authenticated: bool
+    tenant_id: str
+    business_instance_id: str
+    user_id: str | None = None
+    api_key_id: str | None = None
+    scopes: list[str] = Field(default_factory=list)
+    roles: list[str] = Field(default_factory=list)
+    groups: list[str] = Field(default_factory=list)
+    max_security_level: int
+
+
+class UsageEventResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    event_type: str
+    quantity: int | float
+    unit: str
+    provider: str | None = None
+    model: str | None = None
+    cost_estimate_usd: float | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    created_at: int | None = None
+
+
+class UsageEventListResponse(BaseModel):
+    object: str = 'list'
+    data: list[UsageEventResponse] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: bool = False
+
+
+class AuditEventResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str
+    event_type: str
+    action: str
+    resource_type: str
+    resource_id: str | None = None
+    security_level: int | None = None
+    allowed: bool
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    created_at: int | None = None
+
+
+class AuditEventListResponse(BaseModel):
+    object: str = 'list'
+    data: list[AuditEventResponse] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: bool = False
+
+
+class TenantResponse(BaseModel):
+    id: str
+    name: str
+    slug: str
+
+
+class InstanceApiKeyResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str
+    label: str
+    scopes: list[str] = Field(default_factory=list)
+    max_security_level: int
+    api_key: str | None = None
+    status: str | None = None
+    created_at: int | None = None
+    last_used_at: int | None = None
+    expires_at: int | None = None
+
+
+class InstanceApiKeyListResponse(BaseModel):
+    object: str = 'list'
+    data: list[InstanceApiKeyResponse] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: bool = False
+
+
+class InstanceApiKeyDeletedResponse(BaseModel):
+    id: str
+    object: str = 'api_key.deleted'
+    deleted: bool = True
+    data: InstanceApiKeyResponse
 
 class InstanceManifest(BaseModel):
     apiVersion: str = 'svs/v1'

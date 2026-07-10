@@ -11,6 +11,7 @@ python scripts/release/registry-up.py
 python scripts/release/build-images.py --registry-prefix localhost:5000/expertaiservices
 python scripts/release/publish-images.py --registry-prefix localhost:5000/expertaiservices
 python scripts/release/remove-local-app-images.py --registry-prefix localhost:5000/expertaiservices
+# Existing cells only; a fresh cell has no volumes to remove.
 python scripts/release/cell-down.py --cell local --volumes
 python scripts/release/cell-up.py --cell local --worker-scale 4
 python scripts/release/cell-smoke.py --cell local
@@ -22,11 +23,47 @@ files live under `.release/` and are ignored by git.
 
 `build-images.py` writes `.release/image-build-manifest.json` for the full
 `APP_IMAGES` set. `publish-images.py` writes the cell-scoped
-`.release/cells/local/release-manifest.json` after registry manifest inspection.
-`cell-up.py` verifies that manifest before Docker pull/up and rejects missing
-metadata, `latest`, mismatched registry/version tags, missing app services, or
-images without `sha256` digest metadata. This proves local digest/provenance
-automation only; it is not Docker Hub, VPS, or customer-cell proof.
+`.release/cells/local/release-manifest.json` atomically after registry manifest
+inspection. Publication does not change the active cell image set. `cell-up.py`
+validates that candidate manifest, derives all five approved
+`repository@sha256:digest` references, and proves every digest locally or by a
+digest pull before atomically replacing the non-secret active
+`.release/cells/local/.env.images` file. A validation or pull failure preserves
+the previous pin file byte-for-byte. A later compose or health-check failure
+restores that previous pin artifact before the command exits; container rollback
+remains an explicit operator action when compose changed runtime state.
+
+Activation rejects missing metadata, `latest`, mismatched registry/version
+tags, missing app services, bare local image IDs, or repository-digest
+provenance that does not match the manifest. Compose requires the active pinned
+image file for every release command, so a moved version tag cannot change the
+bytes used by startup or worker recovery.
+
+Before boot, `cell-up.py` verifies each approved reference against local Docker
+`RepoDigests`; a matching local image needs no registry pull. Missing images are
+pulled by digest and re-inspected, and any mismatch fails before compose starts.
+Infrastructure images are pulled separately and the cell boots with
+`--pull never`. This proves local digest/provenance automation only; it is not
+Docker Hub, VPS, or customer-cell proof.
+
+`local-restore-drill.py` requires an explicit published, registry-resolvable
+`--release-manifest`. It preflights the full digest set before writing either
+fresh-cell pin file, boots infrastructure, and runs `scripts/migrate.sh` from
+the pinned API image before starting source apps or restoring the target dump.
+Clean build manifests backed only by local image IDs are rejected.
+
+The optional `agent` profile uses the pinned instance-agent image and Docker
+socket. It exposes `${SVS_AGENT_INSTANCE_ROOT:-../../instances}` read-only as
+`/workspace/instances`,
+`${SVS_AGENT_RELEASE_CELL_ROOT:-../../.release/cells}` read-only as
+`/workspace/.release/cells`, and
+`${SVS_AGENT_PIN_ROOT:-../../.release/instances}` read-write as
+`/workspace/.release/instances`. Keep instance manifests and `.env.instance`
+files under the first root and release manifests under the second so paths sent
+by `svsctl.py` resolve inside the container. Only the dedicated pin root is
+writable. The image carries Docker CLI plus Compose v2; deploy dry-run proves
+digest availability and Compose rendering without activating pins or starting
+instance containers.
 
 Default local public ports are product-specific high ports: API `18080`, model
 gateway `18081`, admin UI `13080`, instance agent `18090`, Postgres `15432`,
@@ -90,17 +127,17 @@ python scripts/release/generate-cell-env.py \
   --production \
   --registry-prefix docker.io/expertaiservices \
   --reference-source-env .env.production.example
-cp .release/cells/customer-001/.env.cell /opt/exais/vector-store/.env.cell
-python scripts/release/prod-env-preflight.py --env-file /opt/exais/vector-store/.env.cell
-SVS_CELL_ENV_FILE=/opt/exais/vector-store/.env.cell \
-  docker-compose --env-file /opt/exais/vector-store/.env.cell \
-  -f infra/docker/compose.cell.yml \
-  -p exais-vector-store-customer-001 \
-  up -d --pull always
+python scripts/release/prod-env-preflight.py \
+  --env-file .release/cells/customer-001/.env.cell
+python scripts/release/cell-up.py \
+  --cell customer-001 \
+  --release-manifest /opt/exais/proof/operator-approved-release-manifest.json
 ```
 
 Use a registry prefix such as `docker.io/expertaiservices` or a private registry
-namespace. Keep `SVS_VERSION` pinned to `VERSION`; do not use `latest` for cells.
+namespace. The operator-approved manifest must match the generated cell registry
+and `SVS_VERSION`; app containers are started from its immutable digest
+references, never by resolving the version tag. Do not use `latest` for cells.
 
 Production env files must carry secret references, not plaintext values.
 Accepted forms are documented in `runbooks/encrypted-secrets.md` and include

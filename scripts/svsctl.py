@@ -20,13 +20,14 @@ def run(cmd: list[str]):
 def main():
     p = argparse.ArgumentParser('svsctl')
     sub = p.add_subparsers(dest='cmd', required=True)
-    d = sub.add_parser('deploy'); d.add_argument('manifest'); d.add_argument('--agent', default=os.getenv('SVS_AGENT_URL','http://localhost:8090')); d.add_argument('--version'); d.add_argument('--dry-run', action='store_true')
+    configured_release_manifest = os.getenv('SVS_RELEASE_MANIFEST')
+    d = sub.add_parser('deploy'); d.add_argument('manifest'); d.add_argument('--agent', default=os.getenv('SVS_AGENT_URL','http://localhost:8090')); d.add_argument('--version'); d.add_argument('--release-manifest', default=configured_release_manifest, required=not configured_release_manifest); d.add_argument('--instance-env'); d.add_argument('--dry-run', action='store_true')
     b = sub.add_parser('backup'); b.add_argument('manifest')
     r = sub.add_parser('restore'); r.add_argument('bundle')
-    u = sub.add_parser('fleet-upgrade'); u.add_argument('version'); u.add_argument('--max-concurrent', type=int, default=3)
+    u = sub.add_parser('fleet-upgrade'); u.add_argument('version'); u.add_argument('--release-manifest', default=configured_release_manifest, required=not configured_release_manifest); u.add_argument('--max-concurrent', type=int, default=3)
     args = p.parse_args()
     if args.cmd == 'deploy':
-        print(json.dumps(http_json('POST', f'{args.agent}/agent/v1/instances/deploy', {'manifest_path': args.manifest, 'version': args.version, 'dry_run': args.dry_run}), indent=2))
+        print(json.dumps(http_json('POST', f'{args.agent}/agent/v1/instances/deploy', {'manifest_path': args.manifest, 'release_manifest_path': args.release_manifest, 'env_file_path': args.instance_env, 'version': args.version, 'dry_run': args.dry_run}), indent=2))
     elif args.cmd == 'backup':
         run(['bash', 'scripts/backup-instance.sh', args.manifest])
     elif args.cmd == 'restore':
@@ -34,7 +35,7 @@ def main():
     elif args.cmd == 'fleet-upgrade':
         manifests = [str(x) for x in Path('instances').glob('**/instance.yaml') if '_templates' not in str(x)]
         for manifest in manifests:
-            run(['python', 'scripts/svsctl.py', 'deploy', manifest, '--version', args.version])
+            run(['python', 'scripts/svsctl.py', 'deploy', manifest, '--version', args.version, '--release-manifest', args.release_manifest])
 
 if __name__ == '__main__':
     main()

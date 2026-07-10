@@ -43,7 +43,8 @@ def test_missing_provider_inputs_do_not_claim_live_proof():
     assert "sk-" not in rendered
 
 
-def test_envref_without_runtime_value_is_not_treated_as_live_credential():
+def test_envref_without_runtime_value_is_not_treated_as_live_credential(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     report = _run(
         _args("--providers", "openai"),
         env={"OPENAI_API_KEY": "envref://OPENAI_API_KEY"},

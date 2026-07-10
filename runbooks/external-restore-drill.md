@@ -65,14 +65,16 @@ If any artifact is only a local marker such as `metadata_marker`,
 ## Restore Procedure
 
 Start or prepare the external restore cell from pinned images and the validated
-env file. Keep the raw compose command and `ps` output:
+env file. Place that file at the cell release path, then activate an
+operator-approved published release manifest. Keep the raw command and `ps`
+output:
 
 ```bash
-SVS_CELL_ENV_FILE=<external-cell-env> \
-  docker-compose --env-file <external-cell-env> \
-  -f infra/docker/compose.cell.yml \
-  -p exais-vector-store-<cell-id> \
-  up -d --pull always
+mkdir -p .release/cells/<cell-id>
+cp <external-cell-env> .release/cells/<cell-id>/.env.cell
+python scripts/release/cell-up.py \
+  --cell <cell-id> \
+  --release-manifest <operator-approved-published-release-manifest>
 ```
 
 Prove the restored cell is reachable through the supported access path:

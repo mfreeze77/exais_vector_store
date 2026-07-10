@@ -4,11 +4,11 @@ Micro-production means many isolated instances share one base product image set.
 
 ```text
 Base product:
-  ${SVS_REGISTRY_PREFIX}/exai-vector-store-api:${SVS_VERSION}
-  ${SVS_REGISTRY_PREFIX}/exai-vector-store-worker:${SVS_VERSION}
-  ${SVS_REGISTRY_PREFIX}/exai-vector-store-model-gateway:${SVS_VERSION}
-  ${SVS_REGISTRY_PREFIX}/exai-vector-store-admin-ui:${SVS_VERSION}
-  ${SVS_REGISTRY_PREFIX}/exai-vector-store-instance-agent:${SVS_VERSION}
+  ${SVS_REGISTRY_PREFIX}/exai-vector-store-api@sha256:<manifest-digest>
+  ${SVS_REGISTRY_PREFIX}/exai-vector-store-worker@sha256:<manifest-digest>
+  ${SVS_REGISTRY_PREFIX}/exai-vector-store-model-gateway@sha256:<manifest-digest>
+  ${SVS_REGISTRY_PREFIX}/exai-vector-store-admin-ui@sha256:<manifest-digest>
+  ${SVS_REGISTRY_PREFIX}/exai-vector-store-instance-agent@sha256:<manifest-digest>
 
 Instance:
   instance.yaml
@@ -26,11 +26,12 @@ Instance:
 CI builds pinned images
   -> write and verify release manifest
   -> push to registry for the target proof gate
-  -> write digest/provenance manifest
-  -> instance-agent pulls version
+  -> atomically write digest/provenance candidate manifest
+  -> verify local RepoDigests or pull missing refs by digest
+  -> atomically activate per-cell repository@digest image refs
   -> backup/preflight
   -> migrations
-  -> compose up
+  -> compose up --pull never
   -> health check
   -> smoke retrieval
   -> deployment record
@@ -46,9 +47,38 @@ RM-004 closes the repo-buildable image provenance lane: CI can build the API,
 worker, model-gateway, admin-ui, and instance-agent images from
 `scripts/release/release_common.py:APP_IMAGES`; release scripts emit JSON
 manifests with fixed version tags, OCI service/version labels, and `sha256`
-digest metadata; and local cell startup rejects unpinned or unverifiable app
-image sets before pull/up. External registry publication proof, customer/VPS
-startup evidence, and live operator credentials are later proof gates.
+digest metadata. The publish/startup path derives one exact five-service
+`repository@sha256:digest` mapping. Publication atomically replaces only the
+release manifest; it never changes the active cell. Startup rejects bare local
+image IDs and mismatched repository provenance, verifies cached `RepoDigests`,
+pulls only missing digest references, and only then atomically activates the
+cell's non-secret `.env.images`. Candidate failure preserves the previous pins.
+Every compose-based release command consumes the active file and startup uses
+`--pull never`, so a moved version tag cannot select unapproved bytes. Compose
+or health failure restores the previous pin artifact without claiming automatic
+container/data rollback.
+
+The narrow instance-agent RM-004 path applies the same rule to API, worker, and
+model-gateway. Deploy and rollback callers must provide a verified release
+manifest through `release_manifest_path` or `--release-manifest`; the agent
+preflights all three digests, writes project-local active pins, supplies the
+verified refs as the compose process environment, and uses `--pull never`.
+Failed compose activation restores the previous pin artifact.
+
+The packaged agent includes the Docker CLI and Compose v2 plugin. Its release
+cell profile mounts the operator-controlled `instances/` tree and release-cell
+tree read-only at `/workspace/instances` and `/workspace/.release/cells`; only
+the instance pin root at `/workspace/.release/instances` is writable. Override
+the host roots with `SVS_AGENT_INSTANCE_ROOT`,
+`SVS_AGENT_RELEASE_CELL_ROOT`, and `SVS_AGENT_PIN_ROOT`. Put each instance's
+`.env.instance` beside its `instance.yaml`, or pass another mounted path as
+`env_file_path`. Relative API paths are resolved below `/workspace`. Agent dry
+run performs digest preflight and `docker compose config` through a temporary
+pin file without changing active pins or containers.
+
+This does not claim fleet polling, deployment history, customer-host execution,
+or live orchestration. External registry publication proof, customer/VPS
+startup evidence, and live operator credentials remain later proof gates.
 
 RM-005 closes the repo-buildable encrypted-secret reference lane. Production
 cell env files use reference values such as

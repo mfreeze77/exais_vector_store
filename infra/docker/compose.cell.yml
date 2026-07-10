@@ -1,5 +1,5 @@
 # Docker-first local/customer cell compose file.
-# App services use registry-pulled, version-pinned images. Infra services use
+# App services use manifest-derived, digest-pinned images. Infra services use
 # public pinned upstream images and named volumes so a cell can be destroyed and
 # recreated cleanly without source-tree data directories.
 services:
@@ -65,7 +65,7 @@ services:
       retries: 30
 
   model-gateway:
-    image: ${SVS_REGISTRY_PREFIX:-localhost:5000/expertaiservices}/exai-vector-store-model-gateway:${SVS_VERSION:?SVS_VERSION is required}
+    image: ${SVS_IMAGE_MODEL_GATEWAY:?SVS_IMAGE_MODEL_GATEWAY is required}
     env_file:
       - ${SVS_CELL_ENV_FILE:?SVS_CELL_ENV_FILE is required}
     ports:
@@ -81,7 +81,7 @@ services:
     restart: unless-stopped
 
   api:
-    image: ${SVS_REGISTRY_PREFIX:-localhost:5000/expertaiservices}/exai-vector-store-api:${SVS_VERSION:?SVS_VERSION is required}
+    image: ${SVS_IMAGE_API:?SVS_IMAGE_API is required}
     env_file:
       - ${SVS_CELL_ENV_FILE:?SVS_CELL_ENV_FILE is required}
     ports:
@@ -107,7 +107,7 @@ services:
     restart: unless-stopped
 
   worker:
-    image: ${SVS_REGISTRY_PREFIX:-localhost:5000/expertaiservices}/exai-vector-store-worker:${SVS_VERSION:?SVS_VERSION is required}
+    image: ${SVS_IMAGE_WORKER:?SVS_IMAGE_WORKER is required}
     env_file:
       - ${SVS_CELL_ENV_FILE:?SVS_CELL_ENV_FILE is required}
     depends_on:
@@ -131,7 +131,7 @@ services:
     restart: unless-stopped
 
   admin-ui:
-    image: ${SVS_REGISTRY_PREFIX:-localhost:5000/expertaiservices}/exai-vector-store-admin-ui:${SVS_VERSION:?SVS_VERSION is required}
+    image: ${SVS_IMAGE_ADMIN_UI:?SVS_IMAGE_ADMIN_UI is required}
     environment:
       VITE_API_BASE: ${SVS_PUBLIC_API_BASE:-http://localhost:18080}
     ports:
@@ -147,14 +147,20 @@ services:
     restart: unless-stopped
 
   instance-agent:
-    image: ${SVS_REGISTRY_PREFIX:-localhost:5000/expertaiservices}/exai-vector-store-instance-agent:${SVS_VERSION:?SVS_VERSION is required}
+    image: ${SVS_IMAGE_INSTANCE_AGENT:?SVS_IMAGE_INSTANCE_AGENT is required}
     env_file:
       - ${SVS_CELL_ENV_FILE:?SVS_CELL_ENV_FILE is required}
+    environment:
+      SVS_AGENT_WORKDIR: /workspace
+      SVS_INSTANCE_PIN_ROOT: /workspace/.release/instances
     profiles: ["agent"]
     ports:
       - "${SVS_INSTANCE_AGENT_PORT:-18090}:8090"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ${SVS_AGENT_INSTANCE_ROOT:-../../instances}:/workspace/instances:ro
+      - ${SVS_AGENT_RELEASE_CELL_ROOT:-../../.release/cells}:/workspace/.release/cells:ro
+      - ${SVS_AGENT_PIN_ROOT:-../../.release/instances}:/workspace/.release/instances
     depends_on:
       postgres:
         condition: service_healthy

@@ -2,7 +2,7 @@
 
 | Area | Scaffolded | Production hardening next |
 |---|---|---|
-| API | FastAPI native + OpenAI-compatible routes; OpenAI-compatible named-component contract proof | native success response/request component typing, several inline OpenAI request bodies, pagination tuning, rate-limit tuning |
+| API | FastAPI native + OpenAI-compatible routes; complete named-component request/2xx response contract proof | pagination tuning, rate-limit tuning |
 | DB | schema + RLS + Alembic baseline | rollback locks, PITR, forward-fix revisions for future changes |
 | Ingestion | markdown + PDF-MD stub | resumability, dedupe, parser plugins |
 | Retrieval | dense+sparse+RRF+ACL+context | rerankers, expansion, latency tuning |
@@ -47,10 +47,16 @@ Reindex repair is complete and reconciled: the API and queued worker use the sha
 
 `docker run --rm -v "${pwdPath}:/work" -w /work -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python -m pytest -q -rs tests/test_reindex_idempotency.py tests/test_index_cleanup.py tests/test_qdrant_repair_all_script.py tests/test_qdrant_repair_proof_script.py`
 
+The full generated OpenAPI contract is complete and reconciled under RM-002.
+Current proof records 51 paths, 68 operations, and 118 schema components. Every
+JSON request body and 2xx response body is component-backed; native responses
+are runtime-bound, vector-store null bodies retain named nullable contracts, and
+multipart/raw-text responses keep their correct media types. The focused
+contract and OpenAI route suites pass with `141 passed`.
+
 Still not complete:
 
 - rollback locks, PITR, and future schema revisions beyond the frozen Alembic baseline
-- full OpenAPI contract. RM-002 generated proof records 49 paths (26 native, 23 OpenAI-compatible) and 77 schema components; the focused production-candidate contract/OpenAI suites passed with `137 passed`. OpenAI-compatible vector-store, file, file-batch, Responses, citation, and API-key surfaces are component-backed. Remaining gaps are explicit: most native success responses are untyped, and several JSON request bodies remain inline dictionaries or optional-body wrappers.
 - external production-scale observability/SLO/load proof beyond local-cell metric visibility
 - external/offsite restore drill against a real backup target
 - operator live-provider bakeoff proof, fine-tuning, and multimodal research features

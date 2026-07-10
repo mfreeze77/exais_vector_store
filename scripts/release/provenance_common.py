@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -13,6 +14,7 @@ from release_common import APP_IMAGES
 MANIFEST_SCHEMA_VERSION = 1
 IMAGE_SET_AUTHORITY = "scripts/release/release_common.py:APP_IMAGES"
 DIGEST_RE = re.compile(r"^sha256:[a-fA-F0-9]{64}$")
+RESOLVABLE_DIGEST_SOURCES = frozenset({"registry_header", "repository_digest"})
 
 
 @dataclass(frozen=True)
@@ -92,9 +94,19 @@ def write_release_manifest(images: list[ImageDigest], destination: Path) -> Path
         "services": list(APP_IMAGES),
         "images": [image.to_manifest() for image in ordered],
     }
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    _atomic_write_text(destination, json.dumps(payload, indent=2, sort_keys=True) + "\n")
     return destination
+
+
+def _atomic_write_text(destination: Path, content: str) -> None:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary = destination.with_name(destination.name + ".tmp")
+    try:
+        temporary.write_text(content, encoding="utf-8")
+        os.replace(temporary, destination)
+    except BaseException:
+        temporary.unlink(missing_ok=True)
+        raise
 
 
 def verify_release_manifest(manifest_path: Path, *, require_digests: bool = True) -> ReleaseManifestReport:
@@ -192,6 +204,43 @@ def format_manifest_report(report: ReleaseManifestReport) -> str:
         service = f" [{issue.service}]" if issue.service else ""
         lines.append(f"- {issue.code}{service}: {issue.message}")
     return "\n".join(lines)
+
+
+def repository_digest_reference(image: ImageDigest) -> str:
+    repository, _tag = _split_image_tag(image.image)
+    if not repository:
+        raise ValueError(f"release manifest image for {image.service} does not include a repository")
+    if not _valid_digest(image.digest):
+        raise ValueError(f"release manifest image for {image.service} does not include a valid sha256 digest")
+    return f"{repository}@{image.digest}"
+
+
+def release_image_references(report: ReleaseManifestReport) -> dict[str, str]:
+    if not report.ok:
+        raise ValueError("release manifest must pass verification before image references are derived")
+    by_service = {image.service: image for image in report.images}
+    if set(by_service) != set(APP_IMAGES):
+        raise ValueError("release manifest image set does not match APP_IMAGES")
+
+    references: dict[str, str] = {}
+    issues: list[str] = []
+    for service in APP_IMAGES:
+        image = by_service[service]
+        reference = repository_digest_reference(image)
+        digest_source = image.provenance.get("digest_source")
+        recorded_reference = image.provenance.get("repository_digest")
+        if recorded_reference and recorded_reference != reference:
+            issues.append(f"{service} provenance repository_digest does not match the manifest digest")
+        if digest_source == "repository_digest" and recorded_reference != reference:
+            issues.append(f"{service} repository_digest provenance is missing or unverifiable")
+        elif digest_source not in RESOLVABLE_DIGEST_SOURCES:
+            issues.append(
+                f"{service} digest_source {digest_source!r} is not registry-resolvable; local image IDs cannot pin cell startup"
+            )
+        references[service] = reference
+    if issues:
+        raise ValueError("; ".join(issues))
+    return references
 
 
 def _verify_image_entry(

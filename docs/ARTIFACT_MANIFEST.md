@@ -35,7 +35,7 @@ proof. Current local proof is recorded in
 python -m compileall -f -q packages apps tests scripts
 docker run --rm -v "${PWD}:/work" -w /work --network exais-vector-store-local_default ... python -m pytest -q -rs --ignore=tests/integration
 46 passed, 2 warnings in 5.56s
-python scripts/release/local-restore-drill.py --source-cell restore-src --restore-cell restore --documents 12 --headings-per-doc 3 --source-port-base 28080 --restore-port-base 28180 --timeout-seconds 300
+python scripts/release/local-restore-drill.py --release-manifest .release/cells/local/release-manifest.json --source-cell restore-src --restore-cell restore --documents 12 --headings-per-doc 3 --source-port-base 28080 --restore-port-base 28180 --timeout-seconds 300
 restore_readyz_status=200
 restore_qdrant_count=48
 restore_search_results=5

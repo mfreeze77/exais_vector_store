@@ -7,7 +7,7 @@ Hub or VPS claim is made.
 - [x] `python scripts/release/build-images.py --registry-prefix localhost:5000/expertaiservices` builds every app image with the tag from `VERSION`.
 - [x] `python scripts/release/publish-images.py --registry-prefix localhost:5000/expertaiservices` pushes all 5 app images and proves each pushed tag with `docker manifest inspect` or, for an insecure local HTTP registry, a registry manifest GET from the registry network.
 - [x] `python scripts/release/remove-local-app-images.py --registry-prefix localhost:5000/expertaiservices` removes the local app image tags and follow-up `docker image inspect` fails for those tags.
-- [x] `python scripts/release/cell-up.py --cell local --worker-scale 4` completes through registry pull and `--pull always`; compose `ps` shows core services healthy.
+- [x] `python scripts/release/cell-up.py --cell local --worker-scale 4` derives all 5 manifest-approved repository-digest refs, verifies matching local `RepoDigests` or pulls missing refs by digest, and boots with `--pull never`; compose `ps` shows core services healthy.
 - [x] `/readyz` returns `200` from inside the pulled API container and from an external curl container on the cell network; host loopback curl is recorded when the Windows host stack permits it.
 - [x] API/worker logs contain zero `Unsafe SVS startup configuration` lines.
 - [x] Compile and unit tests pass inside the pulled API image.
@@ -45,6 +45,32 @@ ACCESS_PATH=cell-network-fallback
 The Wave 009 snapshot is a follow-up local-registry proof. It does not replace
 the original remove-local-tags proof above and does not claim Docker Hub or VPS
 launch.
+
+## RM-004 Digest Activation Snapshot
+
+```text
+Version tag moved while running API remained on its prior approved digest.
+Publish wrote .release/cells/local/release-manifest.json atomically.
+Active .env.images SHA256 before publish = 28b89c0cf031f83a6d159ec54e463366c282c14f5fd544c8a33c5c98cdb69918
+Active .env.images SHA256 after publish  = 28b89c0cf031f83a6d159ec54e463366c282c14f5fd544c8a33c5c98cdb69918
+python scripts/release/cell-up.py --cell local --worker-scale 4 --timeout-seconds 300
+All five candidate RepoDigests verified before active pin replacement.
+Compose used --pull never; API, model gateway, admin UI, four workers, and infrastructure healthy.
+API digest = sha256:2be494069ee4bbd8d05dddc853330ddc88e7ce09e679b72d06b7a02b906cd9cd
+Instance-agent digest = sha256:472c1f1d0e1871237f539e9c08d4771165d5af4684190f2a4e40177d4d746ba2
+Pinned release-cell agent profile: Docker 26.1.5, Compose 2.26.1, health=healthy.
+Agent dry-run HTTP 200; three digest preflights and compose config passed; no active probe pin created.
+python scripts/release/cell-smoke.py --cell local --worker-scale 4
+540 passed, 2 warnings
+5 passed, 8 warnings
+Registry-down recovery restored all four workers from the active digest pin.
+python scripts/release/local-restore-drill.py --release-manifest .release/cells/local/release-manifest.json ...
+restore_sql_counts_final={"active_chunks": 48, "active_jobs": 0, "failed_jobs": 0, "indexed_chunks": 48}
+restore_search_results=5
+```
+
+This remains local Docker proof. It does not claim external registry,
+customer-host, DNS/TLS, or production secret-manager readiness.
 
 Docker Hub follow-up is mechanical only after this gate passes:
 

@@ -7,10 +7,18 @@ from types import SimpleNamespace
 
 import pytest
 from fastapi import HTTPException
+from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 from svs_api import main as api_main
-from svs_common.schemas import ChunkRecord, OpenAIVectorStoreSearchRequest, Principal, VectorStoreCreateRequest, VectorStoreUpdateRequest
+from svs_common.schemas import (
+    ChunkRecord,
+    OpenAIVectorStoreSearchRequest,
+    Principal,
+    VectorStoreCreateRequest,
+    VectorStoreResponse,
+    VectorStoreUpdateRequest,
+)
 from svs_common.vector_store_repo import (
     OPENAI_CHUNKING_STRATEGY_ATTRIBUTE,
     OPENAI_DESCRIPTION_ATTRIBUTE,
@@ -81,6 +89,42 @@ def test_openai_vector_store_create_accepts_empty_body_and_current_fields():
     assert req.chunking_strategy == {"type": "auto"}
 
 
+def test_openai_vector_store_create_preserves_explicit_null_body(monkeypatch):
+    captured = {}
+    created = VectorStoreResponse(id="vs_null_create")
+    principal = Principal(
+        tenant_id="tenant",
+        business_instance_id="biz",
+        scopes=["vector_stores:write"],
+    )
+    db = _Db([])
+
+    def fake_create(db, principal, req):
+        captured["request"] = req
+        return created
+
+    monkeypatch.setattr(api_main, "check_idempotency", lambda *args, **kwargs: None)
+    monkeypatch.setattr(api_main, "store_idempotency", lambda *args, **kwargs: None)
+    monkeypatch.setattr(api_main.vs_repo, "create", fake_create)
+
+    api_main.app.dependency_overrides[api_main.get_request_principal] = lambda: principal
+    api_main.app.dependency_overrides[api_main.db_for_principal] = lambda: db
+    try:
+        response = TestClient(api_main.app).post(
+            "/v1/vector_stores",
+            content=b"null",
+            headers={"content-type": "application/json"},
+        )
+    finally:
+        api_main.app.dependency_overrides.pop(api_main.get_request_principal, None)
+        api_main.app.dependency_overrides.pop(api_main.db_for_principal, None)
+
+    assert response.status_code == 200
+    assert response.json()["id"] == created.id
+    assert isinstance(captured["request"], VectorStoreCreateRequest)
+    assert captured["request"].model_dump(exclude_unset=True) == {}
+
+
 def test_openai_vector_store_create_rejects_unknown_fields():
     with pytest.raises(ValidationError):
         VectorStoreCreateRequest.model_validate({"name": "Docs", "silently_ignored": True})
@@ -91,6 +135,42 @@ def test_openai_vector_store_update_accepts_empty_body_and_rejects_unknown_field
 
     with pytest.raises(ValidationError):
         VectorStoreUpdateRequest.model_validate({"unknown": "drift"})
+
+
+def test_openai_vector_store_update_preserves_explicit_null_body(monkeypatch):
+    captured = {}
+    updated = VectorStoreResponse(id="vs_null_update")
+    principal = Principal(
+        tenant_id="tenant",
+        business_instance_id="biz",
+        scopes=["vector_stores:write"],
+    )
+    db = _Db([])
+
+    def fake_update(db, principal, vector_store_id, patch):
+        captured["patch"] = patch
+        return updated
+
+    monkeypatch.setattr(api_main, "_check_openai_idempotency", lambda *args, **kwargs: ("fp", None))
+    monkeypatch.setattr(api_main, "_store_openai_idempotency", lambda *args, **kwargs: None)
+    monkeypatch.setattr(api_main.vs_repo, "update", fake_update)
+
+    api_main.app.dependency_overrides[api_main.get_request_principal] = lambda: principal
+    api_main.app.dependency_overrides[api_main.db_for_principal] = lambda: db
+    try:
+        response = TestClient(api_main.app).patch(
+            "/v1/vector_stores/vs_null_update",
+            content=b"null",
+            headers={"content-type": "application/json"},
+        )
+    finally:
+        api_main.app.dependency_overrides.pop(api_main.get_request_principal, None)
+        api_main.app.dependency_overrides.pop(api_main.db_for_principal, None)
+
+    assert response.status_code == 200
+    assert response.json()["id"] == updated.id
+    assert isinstance(captured["patch"], VectorStoreUpdateRequest)
+    assert captured["patch"].model_dump(exclude_unset=True) == {}
 
 
 @pytest.mark.parametrize("model", [VectorStoreCreateRequest, VectorStoreUpdateRequest])

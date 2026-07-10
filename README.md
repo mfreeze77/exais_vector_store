@@ -68,28 +68,26 @@ PYTHONPATH=packages/svs_common:apps/api:apps/worker:apps/model_gateway:apps/inst
 docker run --rm -v "${PWD}:/work" -w /work --network exais-vector-store-local_default \
   -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent \
   localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate \
-  python -m pytest -q -rs --ignore=tests/integration
-46 passed, 2 warnings
-Generated OpenAPI paths: 49 (26 native, 23 OpenAI-compatible)
-Generated schema components: 77
+  python -m pytest -q -rs tests/test_openapi_contract.py tests/test_openai_compat_search.py tests/test_openai_responses_routes.py
+141 passed, 2 warnings
+Generated OpenAPI paths: 51 (28 native, 23 OpenAI-compatible)
+Generated OpenAPI operations: 68 (31 native, 37 OpenAI-compatible)
+Generated schema components: 118
 ```
 
-The generated contract proves named request/response components for the
-OpenAI-compatible vector-store, file, file-batch, Responses, citation, and
-API-key surfaces. Full contract closure is still pending: most native success
-responses are untyped, and several JSON request bodies remain inline
-dictionaries or optional-body wrappers. The focused production-candidate proof
-is recorded below.
-
-The remaining untyped native success responses are the health/readiness/
-metrics, registry/profile, ingestion/jobs, retrieval, bakeoff, maintenance,
-and admin route families. Inline request schemas remain on native model-endpoint
-patch, OpenAI vector-store file attach/update, and file-batch create; vector
-store create/update also retain optional-body wrappers.
+RM-002 closes the generated contract gap for all documented native and
+OpenAI-compatible operations. Every JSON request body and every 2xx response
+body now resolves directly to a named schema component. Native success schemas
+are bound to FastAPI response models. Named nullable wrappers preserve explicit
+JSON `null` support for vector-store create/update. The two multipart uploads
+retain named multipart components, while metrics and extracted file content
+retain HTTP-proven `text/plain` responses backed by named string components. An
+exact 68-operation inventory makes route additions or removals fail focused
+contract proof until the contract is reconciled.
 
 ```text
 docker run --rm -v "${pwdPath}:/work" -w /work -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python -m pytest -q -rs tests/test_openapi_contract.py tests/test_openai_compat_search.py tests/test_openai_responses_routes.py
-137 passed, 2 warnings
+141 passed, 2 warnings
 ```
 
 Wave 009 local Docker proof also booted a registry-pulled cell, returned

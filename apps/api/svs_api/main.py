@@ -15,10 +15,18 @@ from svs_common.db import jsonb_param, get_session, set_rls_context
 from svs_common.sql import jsonb_text
 from svs_common.security import principal_from_dev_headers
 from svs_common.schemas import (
-    Principal, VectorStoreCreateRequest, SearchRequest, ContextPackRequest, RetrievalAnswerRequest, DocumentIngestRequest,
+    AdminSessionResponse, AuditEventListResponse, BakeoffRunListResponse, HealthResponse,
+    IngestionJobDetail, IngestionJobListResponse, IngestionJobResponse, InstanceApiKeyDeletedResponse,
+    InstanceApiKeyListResponse, InstanceApiKeyResponse, ModelEndpointListResponse, ModelEndpointPatchRequest,
+    ModelRegistryResponse, OpenAIFileContentResponse, OpenAIVectorStoreFileAttachRequest,
+    OpenAIVectorStoreFileBatchCreateRequest, OpenAIVectorStoreFileUpdateRequest, PrometheusMetricsResponse,
+    ReadinessResponse, RetrievalProfilesResponse, TenantResponse, UsageEventListResponse,
+    VectorizationModesResponse,
+    Principal, VectorStoreCreateRequest, SearchRequest, SearchResponse, ContextPackRequest, ContextPackResponse,
+    RetrievalAnswerRequest, RetrievalAnswerResponse, DocumentIngestRequest,
     VectorStoreDeletedResponse, VectorStoreListResponse, VectorStoreResponse,
-    IngestionPreviewRequest, ModelEndpointRequest, ModelEndpointResponse,
-    BakeoffRunRequest, ReindexRequest, OpenAIFile, OpenAIFileDeletedResponse,
+    IngestionPlanResponse, IngestionPreviewRequest, ModelEndpointRequest, ModelEndpointResponse,
+    BakeoffRunRequest, BakeoffRunResponse, MaintenanceResult, ReindexRequest, OpenAIFile, OpenAIFileDeletedResponse,
     OpenAIFileListResponse, OpenAIVectorStoreFile, OpenAIVectorStoreFileBatch,
     OpenAIVectorStoreFileBatchFilesPage, OpenAIVectorStoreFileContentResponse,
     OpenAIVectorStoreFileDeletedResponse, OpenAIVectorStoreFileListResponse,
@@ -29,6 +37,7 @@ from svs_common.schemas import (
     OpenAIAdminApiKey, OpenAIAdminApiKeyCreateRequest, OpenAIAdminApiKeyCreateResponse,
     OpenAIAdminApiKeyDeletedResponse, OpenAIAdminApiKeyListResponse,
     OpenAIProjectApiKey, OpenAIProjectApiKeyDeletedResponse, OpenAIProjectApiKeyListResponse,
+    NullableVectorStoreCreateRequest, NullableVectorStoreUpdateRequest,
     OpenAIResponseObject, OpenAIResponseRequest, OpenAIResponseStreamEvent, validate_openai_chunking_strategy,
 )
 from svs_common.openai_compat import (
@@ -149,11 +158,52 @@ def _install_openai_response_stream_openapi_contract(openapi_schema: dict[str, A
         content['text/event-stream'] = _openai_response_stream_event_schema_ref()
 
 
+OPENAPI_NAMED_REQUEST_MODELS: dict[tuple[str, str], type[Any]] = {
+    ('/api/v1/model-endpoints/{endpoint_id}', 'patch'): ModelEndpointPatchRequest,
+    ('/v1/vector_stores', 'post'): NullableVectorStoreCreateRequest,
+    ('/v1/vector_stores/{vector_store_id}', 'post'): NullableVectorStoreUpdateRequest,
+    ('/v1/vector_stores/{vector_store_id}', 'patch'): NullableVectorStoreUpdateRequest,
+    ('/v1/vector_stores/{vector_store_id}/files', 'post'): OpenAIVectorStoreFileAttachRequest,
+    ('/v1/vector_stores/{vector_store_id}/files/{file_id}', 'post'): OpenAIVectorStoreFileUpdateRequest,
+    ('/v1/vector_stores/{vector_store_id}/files/{file_id}', 'patch'): OpenAIVectorStoreFileUpdateRequest,
+    ('/v1/vector_stores/{vector_store_id}/file_batches', 'post'): OpenAIVectorStoreFileBatchCreateRequest,
+}
+
+
+OPENAPI_RAW_TEXT_RESPONSE_MODELS: dict[tuple[str, str], type[Any]] = {
+    ('/metrics', 'get'): PrometheusMetricsResponse,
+    ('/v1/files/{file_id}/content', 'get'): OpenAIFileContentResponse,
+}
+
+
+def _install_openapi_model_schema(openapi_schema: dict[str, Any], model: type[Any]) -> dict[str, str]:
+    schema = model.model_json_schema(ref_template='#/components/schemas/{model}')
+    definitions = schema.pop('$defs', {})
+    schemas = openapi_schema.setdefault('components', {}).setdefault('schemas', {})
+    for name, definition in definitions.items():
+        schemas[name] = definition
+    schemas[model.__name__] = schema
+    return {'$ref': f'#/components/schemas/{model.__name__}'}
+
+
+def _install_named_route_openapi_contracts(openapi_schema: dict[str, Any]) -> None:
+    for (path, method), model in OPENAPI_NAMED_REQUEST_MODELS.items():
+        operation = openapi_schema['paths'][path][method]
+        request_content = operation['requestBody']['content']['application/json']
+        request_content['schema'] = _install_openapi_model_schema(openapi_schema, model)
+
+    for (path, method), model in OPENAPI_RAW_TEXT_RESPONSE_MODELS.items():
+        operation = openapi_schema['paths'][path][method]
+        response_content = operation['responses']['200']['content']['text/plain']
+        response_content['schema'] = _install_openapi_model_schema(openapi_schema, model)
+
+
 def custom_openapi() -> dict[str, Any]:
     if app.openapi_schema:
         return app.openapi_schema
     openapi_schema = get_openapi(title=app.title, version=app.version, routes=app.routes)
     _install_openai_response_stream_openapi_contract(openapi_schema)
+    _install_named_route_openapi_contracts(openapi_schema)
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
@@ -909,7 +959,7 @@ async def _attach_existing_document_ids_to_vector_store(
     return attached_ids
 
 
-@app.get('/healthz')
+@app.get('/healthz', response_model=HealthResponse, response_model_exclude_unset=True)
 def healthz():
     return {'ok': True, 'service': 'svs-api', 'version': settings.svs_product_version, 'sparse_backend': settings.svs_sparse_backend, 'dense_backend': settings.svs_dense_backend}
 
@@ -928,7 +978,7 @@ def readiness_payload(db: Session, qdrant_adapter) -> dict[str, Any]:
     return {'ready': ready, **checks}
 
 
-@app.get('/readyz')
+@app.get('/readyz', response_model=ReadinessResponse, response_model_exclude_unset=True)
 def readyz(response: Response, db: Session = Depends(get_session)):
     payload = readiness_payload(db, retrieval.qdrant)
     if not payload['ready']:
@@ -1040,7 +1090,7 @@ def _metric_scalar(db: Session, sql: str) -> Any:
         return 0
 
 
-@app.get('/metrics', response_class=PlainTextResponse)
+@app.get('/metrics', response_class=PlainTextResponse, response_model=PrometheusMetricsResponse)
 def metrics(db: Session = Depends(get_session)):
     lines = [
         _prometheus_metric_line('svs_api_build_info', 1, {'version': settings.svs_product_version}),
@@ -1178,7 +1228,7 @@ def get_openai_file(file_id: str, principal: Principal = Depends(get_request_pri
     return _openai_file_object_from_row(row)
 
 
-@app.get('/v1/files/{file_id}/content', response_class=PlainTextResponse)
+@app.get('/v1/files/{file_id}/content', response_class=PlainTextResponse, response_model=OpenAIFileContentResponse)
 def get_openai_file_content(file_id: str, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, ['documents:read', 'documents:write', 'retrieval:read'], any_of=True)
     enforce_rate_limit(db, principal, 'files.content')
@@ -1194,7 +1244,7 @@ def get_openai_file_content(file_id: str, principal: Principal = Depends(get_req
         content = '\n\n'.join(r['text'] for r in chunks if r['text'])
     if not content:
         raise HTTPException(status_code=404, detail='No readable content found for file')
-    return PlainTextResponse(content, media_type=row['mime_type'] or 'text/plain')
+    return PlainTextResponse(content, media_type='text/plain')
 
 
 @app.delete('/v1/files/{file_id}', response_model=OpenAIFileDeletedResponse, response_model_exclude_unset=True)
@@ -1256,22 +1306,22 @@ def delete_openai_file(
     return response
 
 
-@app.get('/api/v1/vectorization/modes')
+@app.get('/api/v1/vectorization/modes', response_model=VectorizationModesResponse)
 def list_modes():
     return {'modes': vectorization_modes()}
 
 
-@app.get('/api/v1/models/registry')
+@app.get('/api/v1/models/registry', response_model=ModelRegistryResponse)
 def list_models():
     return model_registry()
 
 
-@app.get('/api/v1/retrieval/profiles')
+@app.get('/api/v1/retrieval/profiles', response_model=RetrievalProfilesResponse)
 def list_profiles():
     return {'profiles': retrieval_profiles()}
 
 
-@app.post('/api/v1/ingestion/preview')
+@app.post('/api/v1/ingestion/preview', response_model=IngestionPlanResponse)
 def ingestion_preview(req: IngestionPreviewRequest, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, ['documents:write', 'retrieval:read'], any_of=True)
     enforce_rate_limit(db, principal, 'ingestion.preview')
@@ -1282,7 +1332,7 @@ def ingestion_preview(req: IngestionPreviewRequest, principal: Principal = Depen
     return plan
 
 
-@app.post('/api/v1/documents/ingest')
+@app.post('/api/v1/documents/ingest', response_model=IngestionJobResponse)
 async def ingest_document(req: DocumentIngestRequest, idempotency_key: str | None = Header(default=None, alias='Idempotency-Key'), principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'documents:write')
     enforce_rate_limit(db, principal, 'documents.ingest')
@@ -1296,7 +1346,7 @@ async def ingest_document(req: DocumentIngestRequest, idempotency_key: str | Non
     return payload
 
 
-@app.post('/api/v1/documents/upload')
+@app.post('/api/v1/documents/upload', response_model=IngestionJobResponse)
 async def upload_document(file: UploadFile = File(...), title: str | None = Form(default=None), mode: str = Form(default='auto_detect_v1'), vector_store_id: str | None = Form(default=None), knowledge_base_id: str | None = Form(default=None), security_level: int = Form(default=1), principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'documents:write')
     enforce_rate_limit(db, principal, 'documents.upload')
@@ -1320,7 +1370,7 @@ async def upload_document(file: UploadFile = File(...), title: str | None = Form
     return await ingest_or_enqueue(req, principal, db)
 
 
-@app.get('/api/v1/jobs')
+@app.get('/api/v1/jobs', response_model=IngestionJobListResponse, response_model_exclude_unset=True)
 def list_jobs(limit: int = 20, status: str | None = None, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, ['documents:write', 'admin:read'], any_of=True)
     enforce_rate_limit(db, principal, 'jobs.read')
@@ -1341,7 +1391,7 @@ def list_jobs(limit: int = 20, status: str | None = None, principal: Principal =
     return _list_response(data, has_more=len(data) == params['limit'])
 
 
-@app.get('/api/v1/jobs/{job_id}')
+@app.get('/api/v1/jobs/{job_id}', response_model=IngestionJobDetail, response_model_exclude_unset=True)
 def get_job(job_id: str, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, ['documents:write', 'admin:read'], any_of=True)
     row = db.execute(text('''
@@ -1355,7 +1405,7 @@ def get_job(job_id: str, principal: Principal = Depends(get_request_principal), 
     return dict(row)
 
 
-@app.post('/api/v1/jobs/{job_id}/retry')
+@app.post('/api/v1/jobs/{job_id}/retry', response_model=IngestionJobResponse, response_model_exclude_unset=True)
 def retry_job(job_id: str, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'documents:write')
     result = db.execute(text('''
@@ -1368,7 +1418,7 @@ def retry_job(job_id: str, principal: Principal = Depends(get_request_principal)
     return {'id': job_id, 'status': 'queued'}
 
 
-@app.post('/api/v1/retrieval/search')
+@app.post('/api/v1/retrieval/search', response_model=SearchResponse)
 async def search(req: SearchRequest, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'retrieval:read')
     enforce_rate_limit(db, principal, 'retrieval.search')
@@ -1379,7 +1429,7 @@ async def search(req: SearchRequest, principal: Principal = Depends(get_request_
     return result
 
 
-@app.post('/api/v1/retrieval/context-pack')
+@app.post('/api/v1/retrieval/context-pack', response_model=ContextPackResponse)
 async def context_pack(req: ContextPackRequest, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'retrieval:read')
     enforce_rate_limit(db, principal, 'retrieval.context_pack')
@@ -1390,7 +1440,7 @@ async def context_pack(req: ContextPackRequest, principal: Principal = Depends(g
     return result
 
 
-@app.post('/api/v1/retrieval/answer')
+@app.post('/api/v1/retrieval/answer', response_model=RetrievalAnswerResponse)
 async def retrieval_answer(req: RetrievalAnswerRequest, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'retrieval:read')
     enforce_rate_limit(db, principal, 'retrieval.answer')
@@ -1415,7 +1465,7 @@ def create_model_endpoint(req: ModelEndpointRequest, principal: Principal = Depe
     return ModelEndpointResponse(**endpoint_response_payload({**payload, 'id': endpoint_id}))
 
 
-@app.get('/api/v1/model-endpoints')
+@app.get('/api/v1/model-endpoints', response_model=ModelEndpointListResponse, response_model_exclude_unset=True)
 def list_model_endpoints(principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, ['models:read', 'models:write'], any_of=True)
     rows = db.execute(text('''
@@ -1466,7 +1516,7 @@ def update_model_endpoint(endpoint_id: str, patch: dict[str, Any] = Body(default
     return ModelEndpointResponse(**endpoint_response_payload(dict(row)))
 
 
-@app.post('/api/v1/bakeoffs')
+@app.post('/api/v1/bakeoffs', response_model=BakeoffRunResponse)
 def create_bakeoff(req: BakeoffRunRequest, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, ['evals:write', 'models:write'], any_of=True)
     result = bakeoff.create_run(db, principal, req)
@@ -1474,14 +1524,14 @@ def create_bakeoff(req: BakeoffRunRequest, principal: Principal = Depends(get_re
     return result
 
 
-@app.get('/api/v1/bakeoffs')
+@app.get('/api/v1/bakeoffs', response_model=BakeoffRunListResponse, response_model_exclude_unset=True)
 def list_bakeoffs(limit: int = 20, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, ['evals:read', 'evals:write', 'models:write'], any_of=True)
     data, has_more = bakeoff.list_runs(db, principal, limit=limit)
     return _list_response(data, has_more)
 
 
-@app.get('/api/v1/bakeoffs/{run_id}')
+@app.get('/api/v1/bakeoffs/{run_id}', response_model=BakeoffRunResponse)
 def get_bakeoff(run_id: str, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, ['evals:read', 'evals:write', 'models:write'], any_of=True)
     result = bakeoff.get_run(db, principal, run_id)
@@ -1490,7 +1540,7 @@ def get_bakeoff(run_id: str, principal: Principal = Depends(get_request_principa
     return result
 
 
-@app.post('/api/v1/maintenance/expire-vector-stores')
+@app.post('/api/v1/maintenance/expire-vector-stores', response_model=MaintenanceResult)
 def expire_vector_stores(principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'maintenance:write')
     result = maintenance.sweep_expired_vector_stores(db, principal)
@@ -1498,7 +1548,7 @@ def expire_vector_stores(principal: Principal = Depends(get_request_principal), 
     return result
 
 
-@app.post('/api/v1/maintenance/reindex')
+@app.post('/api/v1/maintenance/reindex', response_model=MaintenanceResult)
 async def reindex(req: ReindexRequest, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'maintenance:write')
     result = await maintenance.reindex_chunks(db, principal, req)
@@ -1506,7 +1556,7 @@ async def reindex(req: ReindexRequest, principal: Principal = Depends(get_reques
     return result
 
 
-@app.get('/api/v1/admin/session')
+@app.get('/api/v1/admin/session', response_model=AdminSessionResponse)
 def admin_session(principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, ADMIN_UI_SESSION_SCOPES, any_of=True)
     return {
@@ -1568,7 +1618,7 @@ def admin_fleet_versions(
     )
 
 
-@app.get('/api/v1/admin/usage')
+@app.get('/api/v1/admin/usage', response_model=UsageEventListResponse, response_model_exclude_unset=True)
 def usage(limit: int = 100, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, ['admin:read', 'usage:read'], any_of=True)
     rows = db.execute(text('''
@@ -1579,7 +1629,7 @@ def usage(limit: int = 100, principal: Principal = Depends(get_request_principal
     return _list_response([dict(r) for r in rows])
 
 
-@app.get('/api/v1/admin/audit-events')
+@app.get('/api/v1/admin/audit-events', response_model=AuditEventListResponse, response_model_exclude_unset=True)
 def audit_events(limit: int = 100, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, ['admin:read', 'audit:read'], any_of=True)
     rows = db.execute(text('''
@@ -1590,7 +1640,7 @@ def audit_events(limit: int = 100, principal: Principal = Depends(get_request_pr
     return _list_response([dict(r) for r in rows])
 
 
-@app.post('/api/v1/admin/tenants')
+@app.post('/api/v1/admin/tenants', response_model=TenantResponse)
 def create_tenant(name: str, slug: str, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'admin:write')
     tenant_id = new_id('ten')
@@ -1600,7 +1650,7 @@ def create_tenant(name: str, slug: str, principal: Principal = Depends(get_reque
     return {'id': tenant_id, 'name': name, 'slug': slug}
 
 
-@app.post('/api/v1/admin/api-keys')
+@app.post('/api/v1/admin/api-keys', response_model=InstanceApiKeyResponse, response_model_exclude_unset=True)
 def create_instance_api_key(label: str = 'default', scopes: str = 'retrieval:read,documents:write,vector_stores:write,vector_stores:read', max_security_level: int | None = None, expires_at: int | None = None, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'api_keys:write')
     enforce_rate_limit(db, principal, 'admin.api_keys.create')
@@ -1609,7 +1659,7 @@ def create_instance_api_key(label: str = 'default', scopes: str = 'retrieval:rea
     return result
 
 
-@app.get('/api/v1/admin/api-keys')
+@app.get('/api/v1/admin/api-keys', response_model=InstanceApiKeyListResponse, response_model_exclude_unset=True)
 def list_instance_api_keys(limit: int = 20, after: str | None = None, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, ['api_keys:read', 'api_keys:write'], any_of=True)
     enforce_rate_limit(db, principal, 'admin.api_keys.list')
@@ -1617,7 +1667,7 @@ def list_instance_api_keys(limit: int = 20, after: str | None = None, principal:
     return _list_response(data, has_more)
 
 
-@app.delete('/api/v1/admin/api-keys/{api_key_id}')
+@app.delete('/api/v1/admin/api-keys/{api_key_id}', response_model=InstanceApiKeyDeletedResponse, response_model_exclude_unset=True)
 def revoke_instance_api_key(api_key_id: str, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'api_keys:write')
     enforce_rate_limit(db, principal, 'admin.api_keys.revoke')

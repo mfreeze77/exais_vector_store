@@ -10,18 +10,22 @@ from urllib.parse import urlsplit, urlunsplit
 
 from release_common import (
     DEFAULT_REGISTRY_PREFIX,
-    ROOT,
     api_base,
     compose_base,
     compose_network_name,
+    ensure_app_images_available,
     env_file,
+    normalize_registry_prefix,
     printable_command,
     project_name,
     release_dir,
     run,
     wait_for_services,
+    version,
+    write_pinned_image_env,
 )
 from backup_common import BackupArtifact, sha256_file, write_backup_manifest as write_shared_backup_manifest
+from provenance_common import format_manifest_report, release_image_references, verify_release_manifest
 from scale_common import api_json, chunk_vector_store_where, job_vector_store_where, parse_int_row, psql
 
 
@@ -70,6 +74,46 @@ def write_drill_env(cell: str, registry_prefix: str, port_base: int) -> None:
     for key in sorted(drill_env_values(cell, registry_prefix, port_base)):
         print(f"- {key}")
     print("No values printed.")
+
+
+def preflight_drill_image_pins(
+    manifest_path: Path,
+    registry_prefix: str,
+) -> dict[str, str]:
+    report = verify_release_manifest(manifest_path)
+    issues: list[str] = []
+    normalized_registry = normalize_registry_prefix(registry_prefix)
+    if report.registry_prefix and report.registry_prefix != normalized_registry:
+        issues.append(
+            f"manifest registry_prefix {report.registry_prefix!r} does not match restore drill registry {normalized_registry!r}"
+        )
+    if report.product_version and report.product_version != version():
+        issues.append(
+            f"manifest product_version {report.product_version!r} does not match repo VERSION {version()!r}"
+        )
+    if not report.ok or issues:
+        print(format_manifest_report(report))
+        for issue in issues:
+            print(f"- RESTORE_IMAGE_SET: {issue}")
+        raise SystemExit(1)
+    try:
+        image_references = release_image_references(report)
+    except ValueError as exc:
+        print(f"- RESTORE_IMAGE_SET: {exc}")
+        raise SystemExit(1) from exc
+    ensure_app_images_available(image_references)
+    return image_references
+
+
+def activate_drill_image_pins(
+    cells: tuple[str, str],
+    image_references: dict[str, str],
+    registry_prefix: str,
+) -> None:
+    normalized_registry = normalize_registry_prefix(registry_prefix)
+    for cell in cells:
+        path = write_pinned_image_env(cell, image_references, registry_prefix=normalized_registry)
+        print(f"Activated immutable image pins: {path}")
 
 
 def curl_json_on_cell_network(cell: str, method: str, url: str, payload: dict | None = None, timeout: int = 120) -> tuple[int, dict]:
@@ -203,8 +247,11 @@ def restore_doc(index: int, headings: int, token: str) -> dict:
 def boot_clean_cell(cell: str, worker_scale: int, timeout_seconds: int) -> None:
     base = compose_base(cell)
     run(base + ["down", "--volumes"], check=False)
-    run(base + ["pull", *CORE_SERVICES])
-    run(base + ["up", "-d", "--pull", "always", "--scale", f"worker={worker_scale}", *CORE_SERVICES])
+    run(base + ["pull", *INFRA_SERVICES])
+    run(base + ["up", "-d", "--pull", "never", *INFRA_SERVICES])
+    wait_for_services(cell, INFRA_SERVICES, timeout_seconds)
+    run_cell_migrations(cell)
+    run(base + ["up", "-d", "--pull", "never", "--scale", f"worker={worker_scale}", *APP_SERVICES])
     wait_for_services(cell, CORE_SERVICES, timeout_seconds)
     run(base + ["ps"])
 
@@ -212,14 +259,20 @@ def boot_clean_cell(cell: str, worker_scale: int, timeout_seconds: int) -> None:
 def boot_restore_infra(cell: str, timeout_seconds: int) -> None:
     base = compose_base(cell)
     run(base + ["down", "--volumes"], check=False)
-    run(base + ["pull", *CORE_SERVICES])
-    run(base + ["up", "-d", "--pull", "always", *INFRA_SERVICES])
+    run(base + ["pull", *INFRA_SERVICES])
+    run(base + ["up", "-d", "--pull", "never", *INFRA_SERVICES])
     wait_for_services(cell, INFRA_SERVICES, timeout_seconds)
+    run_cell_migrations(cell)
+
+
+def run_cell_migrations(cell: str) -> None:
+    base = compose_base(cell)
+    run(base + ["run", "--rm", "--no-deps", "--pull", "never", "api", "bash", "scripts/migrate.sh"])
 
 
 def boot_restore_apps(cell: str, worker_scale: int, timeout_seconds: int) -> None:
     base = compose_base(cell)
-    run(base + ["up", "-d", "--pull", "always", "--scale", f"worker={worker_scale}", *APP_SERVICES])
+    run(base + ["up", "-d", "--pull", "never", "--scale", f"worker={worker_scale}", *APP_SERVICES])
     wait_for_services(cell, CORE_SERVICES, timeout_seconds)
     run(base + ["ps"])
 
@@ -437,11 +490,17 @@ def write_backup_manifest(path: Path, data: dict) -> None:
     print(f"BACKUP_SHARED_MANIFEST={shared_manifest}")
 
 
-def main() -> None:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Prove a local backup/restore drill with a rebuilt Qdrant index.")
     parser.add_argument("--source-cell", default="restore-src")
     parser.add_argument("--restore-cell", default="restore")
     parser.add_argument("--registry-prefix", default=DEFAULT_REGISTRY_PREFIX)
+    parser.add_argument(
+        "--release-manifest",
+        type=Path,
+        required=True,
+        help="Published release manifest with registry-resolvable digests; clean build manifests are rejected.",
+    )
     parser.add_argument("--source-port-base", type=int, default=28080)
     parser.add_argument("--restore-port-base", type=int, default=28180)
     parser.add_argument("--documents", type=int, default=20)
@@ -449,14 +508,27 @@ def main() -> None:
     parser.add_argument("--worker-scale", type=int, default=1)
     parser.add_argument("--timeout-seconds", type=int, default=300)
     parser.add_argument("--keep-cells", action="store_true")
-    args = parser.parse_args()
+    return parser
+
+
+def main() -> None:
+    args = build_parser().parse_args()
     if args.source_cell == args.restore_cell:
         raise ValueError("--source-cell and --restore-cell must be distinct.")
     if abs(args.source_port_base - args.restore_port_base) < 20:
         raise ValueError("source and restore port bases must be at least 20 apart.")
 
+    image_references = preflight_drill_image_pins(
+        args.release_manifest,
+        args.registry_prefix,
+    )
     write_drill_env(args.source_cell, args.registry_prefix, args.source_port_base)
     write_drill_env(args.restore_cell, args.registry_prefix, args.restore_port_base)
+    activate_drill_image_pins(
+        (args.source_cell, args.restore_cell),
+        image_references,
+        args.registry_prefix,
+    )
 
     token = f"restore-drill-{int(time.time())}"
     expected_min_chunks = args.documents * args.headings_per_doc

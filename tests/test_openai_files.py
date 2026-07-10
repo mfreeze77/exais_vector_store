@@ -7,6 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 from fastapi import HTTPException
+from fastapi.testclient import TestClient
 
 from svs_api import main as api_main
 from svs_common.schemas import (
@@ -104,6 +105,40 @@ def test_decode_openai_text_upload_rejects_unsupported_binary_bytes():
 
     assert exc.value.status_code == 415
     assert "UTF-8, UTF-16, or ASCII" in exc.value.detail
+
+
+def test_openai_file_content_returns_plain_text_for_non_text_stored_mime(monkeypatch):
+    principal = Principal(
+        tenant_id="tenant",
+        business_instance_id="biz",
+        scopes=["documents:read"],
+    )
+    monkeypatch.setattr(
+        api_main,
+        "_resolve_document_row_for_file_id",
+        lambda *args: {
+            "id": "doc_pdf",
+            "object_key": "parsed/doc_pdf.md",
+            "mime_type": "application/pdf",
+        },
+    )
+    monkeypatch.setattr(
+        api_main,
+        "ObjectStore",
+        lambda: SimpleNamespace(get_text=lambda object_key: "Extracted PDF text"),
+    )
+
+    api_main.app.dependency_overrides[api_main.get_request_principal] = lambda: principal
+    api_main.app.dependency_overrides[api_main.db_for_principal] = lambda: _Db()
+    try:
+        response = TestClient(api_main.app).get("/v1/files/file-pdf/content")
+    finally:
+        api_main.app.dependency_overrides.pop(api_main.get_request_principal, None)
+        api_main.app.dependency_overrides.pop(api_main.db_for_principal, None)
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/plain")
+    assert response.content == b"Extracted PDF text"
 
 
 def test_openai_file_upload_expiration_seconds_validates_created_at_policy():

@@ -1,7 +1,29 @@
 from __future__ import annotations
 
+from fastapi.testclient import TestClient
+
 from svs_api import main as api_main
 from svs_common.schemas import (
+    AdminSessionResponse,
+    AuditEventListResponse,
+    BakeoffRunListResponse,
+    BakeoffRunResponse,
+    ContextPackResponse,
+    HealthResponse,
+    IngestionJobDetail,
+    IngestionJobListResponse,
+    IngestionJobResponse,
+    IngestionPlanResponse,
+    InstanceApiKeyDeletedResponse,
+    InstanceApiKeyListResponse,
+    InstanceApiKeyResponse,
+    MaintenanceResult,
+    ModelEndpointListResponse,
+    ModelEndpointPatchRequest,
+    ModelEndpointResponse,
+    ModelRegistryResponse,
+    NullableVectorStoreCreateRequest,
+    NullableVectorStoreUpdateRequest,
     OpenAIAdminApiKey,
     OpenAIAdminApiKeyCreateRequest,
     OpenAIAdminApiKeyCreateResponse,
@@ -18,15 +40,101 @@ from svs_common.schemas import (
     OpenAIResponseRequest,
     OpenAIResponseStreamEvent,
     OpenAIVectorStoreFileContentResponse,
+    OpenAIVectorStoreFileAttachRequest,
+    OpenAIVectorStoreFileBatchCreateRequest,
     OpenAIVectorStoreFileDeletedResponse,
     OpenAIVectorStoreFileBatch,
     OpenAIVectorStoreFileBatchFilesPage,
     OpenAIVectorStoreFileListResponse,
+    OpenAIVectorStoreFileUpdateRequest,
     OpenAIVectorStoreSearchResultsPage,
+    ReadinessResponse,
+    RetrievalAnswerResponse,
+    RetrievalProfilesResponse,
+    SearchResponse,
+    TenantResponse,
+    UsageEventListResponse,
+    VectorizationModesResponse,
     VectorStoreDeletedResponse,
     VectorStoreListResponse,
     VectorStoreResponse,
 )
+
+
+HTTP_METHODS = {'get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace'}
+EXPECTED_OPERATIONS = {
+    tuple(line.split(' ', 1))
+    for line in '''
+get /healthz
+get /readyz
+get /metrics
+get /api/v1/vectorization/modes
+get /api/v1/models/registry
+get /api/v1/retrieval/profiles
+post /api/v1/ingestion/preview
+post /api/v1/documents/ingest
+post /api/v1/documents/upload
+get /api/v1/jobs
+get /api/v1/jobs/{job_id}
+post /api/v1/jobs/{job_id}/retry
+post /api/v1/retrieval/search
+post /api/v1/retrieval/context-pack
+post /api/v1/retrieval/answer
+post /api/v1/model-endpoints
+get /api/v1/model-endpoints
+patch /api/v1/model-endpoints/{endpoint_id}
+post /api/v1/bakeoffs
+get /api/v1/bakeoffs
+get /api/v1/bakeoffs/{run_id}
+post /api/v1/maintenance/expire-vector-stores
+post /api/v1/maintenance/reindex
+get /api/v1/admin/session
+get /api/v1/admin/fleet/versions
+get /api/v1/admin/usage
+get /api/v1/admin/audit-events
+post /api/v1/admin/tenants
+post /api/v1/admin/api-keys
+get /api/v1/admin/api-keys
+delete /api/v1/admin/api-keys/{api_key_id}
+post /v1/files
+get /v1/files
+get /v1/files/{file_id}
+delete /v1/files/{file_id}
+get /v1/files/{file_id}/content
+post /v1/organization/admin_api_keys
+get /v1/organization/admin_api_keys
+get /v1/organization/admin_api_keys/{key_id}
+delete /v1/organization/admin_api_keys/{key_id}
+get /v1/organization/projects/{project_id}/api_keys
+get /v1/organization/projects/{project_id}/api_keys/{api_key_id}
+delete /v1/organization/projects/{project_id}/api_keys/{api_key_id}
+post /v1/responses
+post /v1/responses/input_tokens
+post /v1/responses/compact
+get /v1/responses/{response_id}
+post /v1/responses/{response_id}/cancel
+delete /v1/responses/{response_id}
+get /v1/responses/{response_id}/input_items
+post /v1/vector_stores
+get /v1/vector_stores
+get /v1/vector_stores/{vector_store_id}
+post /v1/vector_stores/{vector_store_id}
+patch /v1/vector_stores/{vector_store_id}
+delete /v1/vector_stores/{vector_store_id}
+post /v1/vector_stores/{vector_store_id}/files
+get /v1/vector_stores/{vector_store_id}/files
+get /v1/vector_stores/{vector_store_id}/files/{file_id}
+post /v1/vector_stores/{vector_store_id}/files/{file_id}
+patch /v1/vector_stores/{vector_store_id}/files/{file_id}
+delete /v1/vector_stores/{vector_store_id}/files/{file_id}
+get /v1/vector_stores/{vector_store_id}/files/{file_id}/content
+post /v1/vector_stores/{vector_store_id}/file_batches
+get /v1/vector_stores/{vector_store_id}/file_batches/{batch_id}
+post /v1/vector_stores/{vector_store_id}/file_batches/{batch_id}/cancel
+get /v1/vector_stores/{vector_store_id}/file_batches/{batch_id}/files
+post /v1/vector_stores/{vector_store_id}/search
+'''.strip().splitlines()
+}
 
 
 def _ref_name(ref: str) -> str:
@@ -54,6 +162,307 @@ def _ref_names_in(schema) -> set[str]:
         return names
     return set()
 
+
+def test_every_documented_operation_uses_named_request_and_success_components():
+    api_main.app.openapi_schema = None
+    spec = api_main.app.openapi()
+    components = spec['components']['schemas']
+    operations = {
+        (method, path)
+        for path, path_item in spec['paths'].items()
+        for method in path_item
+        if method in HTTP_METHODS
+    }
+    assert len(spec['paths']) == 51
+    assert len(components) == 118
+    assert operations == EXPECTED_OPERATIONS
+
+    request_media: set[tuple[str, str, str]] = set()
+    response_media: set[tuple[str, str, str]] = set()
+    for method, path in sorted(operations):
+        operation = spec['paths'][path][method]
+        for media_type, body in operation.get('requestBody', {}).get('content', {}).items():
+            request_media.add((path, method, media_type))
+            schema = body.get('schema', {})
+            assert set(schema) == {'$ref'}, (path, method, media_type, schema)
+            assert _ref_name(schema['$ref']) in components
+
+        success_responses = {
+            code: response
+            for code, response in operation['responses'].items()
+            if str(code).startswith('2')
+        }
+        assert success_responses, (path, method)
+        for response in success_responses.values():
+            content = response.get('content', {})
+            assert content, (path, method, response)
+            for media_type, body in content.items():
+                response_media.add((path, method, media_type))
+                schema = body.get('schema', {})
+                assert set(schema) == {'$ref'}, (path, method, media_type, schema)
+                assert _ref_name(schema['$ref']) in components
+
+    assert {entry for entry in request_media if entry[2] != 'application/json'} == {
+        ('/api/v1/documents/upload', 'post', 'multipart/form-data'),
+        ('/v1/files', 'post', 'multipart/form-data'),
+    }
+    assert {entry for entry in response_media if entry[2] != 'application/json'} == {
+        ('/metrics', 'get', 'text/plain'),
+        ('/v1/files/{file_id}/content', 'get', 'text/plain'),
+        ('/v1/responses', 'post', 'text/event-stream'),
+        ('/v1/responses/{response_id}', 'get', 'text/event-stream'),
+    }
+
+    for (path, method), model in api_main.OPENAPI_NAMED_REQUEST_MODELS.items():
+        schema = spec['paths'][path][method]['requestBody']['content']['application/json']['schema']
+        assert _ref_name(schema['$ref']) == model.__name__
+    app_routes = {
+        (method.lower(), route.path): route
+        for route in api_main.app.routes
+        for method in getattr(route, 'methods', set())
+    }
+    runtime_bound_operations = {
+        operation for operation in EXPECTED_OPERATIONS if not operation[1].startswith('/v1/')
+    } | {('get', '/v1/files/{file_id}/content')}
+    for method, path in runtime_bound_operations:
+        route = app_routes[(method, path)]
+        assert route.response_model is not None, (path, method)
+        media_type = 'text/plain' if path in {'/metrics', '/v1/files/{file_id}/content'} else 'application/json'
+        schema = spec['paths'][path][method]['responses']['200']['content'][media_type]['schema']
+        assert _ref_name(schema['$ref']) == route.response_model.__name__
+    assert _ref_names_in(spec).issubset(components)
+
+
+def test_promoted_request_contract_models_preserve_runtime_payload_shapes():
+    payloads = {
+        ModelEndpointPatchRequest: {
+            'status': 'active',
+            'config': {'auth_secret_ref': 'env://OPENAI_API_KEY'},
+            'routing_state': 'ready',
+        },
+        OpenAIVectorStoreFileAttachRequest: {
+            'file_id': 'file_contract',
+            'attributes': {'region': 'us'},
+            'chunking_strategy': {'type': 'auto'},
+        },
+        OpenAIVectorStoreFileUpdateRequest: {'attributes': {'region': 'eu'}},
+        OpenAIVectorStoreFileBatchCreateRequest: {
+            'file_ids': ['file_contract'],
+            'attributes': {'batch': 'contract'},
+        },
+        NullableVectorStoreCreateRequest: None,
+        NullableVectorStoreUpdateRequest: None,
+    }
+    for model, payload in payloads.items():
+        assert model.model_validate(payload).model_dump(mode='python', exclude_unset=True) == payload
+
+    api_main.app.openapi_schema = None
+    spec = api_main.app.openapi()
+    for path, method, component_name, nested_name in (
+        ('/v1/vector_stores', 'post', 'NullableVectorStoreCreateRequest', 'VectorStoreCreateRequest'),
+        (
+            '/v1/vector_stores/{vector_store_id}',
+            'post',
+            'NullableVectorStoreUpdateRequest',
+            'VectorStoreUpdateRequest',
+        ),
+        (
+            '/v1/vector_stores/{vector_store_id}',
+            'patch',
+            'NullableVectorStoreUpdateRequest',
+            'VectorStoreUpdateRequest',
+        ),
+    ):
+        request_schema = spec['paths'][path][method]['requestBody']['content']['application/json']['schema']
+        assert _ref_name(request_schema['$ref']) == component_name
+        wrapper = spec['components']['schemas'][component_name]
+        assert {'$ref': f'#/components/schemas/{nested_name}'} in wrapper['anyOf']
+        assert {'type': 'null'} in wrapper['anyOf']
+
+
+def test_metrics_text_contract_matches_http_response():
+    class UnavailableMetricsDb:
+        def execute(self, *args, **kwargs):
+            raise RuntimeError('metrics dependency unavailable')
+
+    api_main.app.dependency_overrides[api_main.get_session] = lambda: UnavailableMetricsDb()
+    try:
+        response = TestClient(api_main.app).get('/metrics')
+    finally:
+        api_main.app.dependency_overrides.pop(api_main.get_session, None)
+
+    assert response.status_code == 200
+    assert response.headers['content-type'].startswith('text/plain')
+    assert 'svs_api_build_info' in response.text
+    assert 'svs_ingestion_jobs_queued 0' in response.text
+
+
+def test_native_response_contract_models_preserve_runtime_payload_shapes():
+    health_payload = api_main.healthz()
+    modes_payload = api_main.list_modes()
+    models_payload = api_main.list_models()
+    profiles_payload = api_main.list_profiles()
+    assert HealthResponse.model_validate(health_payload).model_dump(mode='python', exclude_unset=True) == health_payload
+    assert VectorizationModesResponse.model_validate(modes_payload).model_dump(mode='python') == modes_payload
+    assert ModelRegistryResponse.model_validate(models_payload).model_dump(mode='python') == models_payload
+    assert RetrievalProfilesResponse.model_validate(profiles_payload).model_dump(mode='python') == profiles_payload
+
+    payloads = {
+        ReadinessResponse: {'ready': True, 'db': True},
+        IngestionPlanResponse: {
+            'mode': 'markdown_docs_v1',
+            'embedding_profile_id': 'embedding_contract',
+            'retrieval_profile_id': 'retrieval_contract',
+            'estimated_tokens': 10,
+            'estimated_chunks': 1,
+        },
+        IngestionJobResponse: {'id': 'job_contract', 'status': 'completed', 'document_id': 'doc_contract'},
+        IngestionJobDetail: {
+            'id': 'job_contract',
+            'status': 'completed',
+            'job_type': 'ingest_document',
+            'payload': {'document_id': 'doc_contract'},
+        },
+        IngestionJobListResponse: {
+            'object': 'list',
+            'data': [{
+                'id': 'job_contract',
+                'status': 'queued',
+                'job_type': 'ingest_document',
+                'payload': {'title': 'Contract'},
+            }],
+            'first_id': 'job_contract',
+            'last_id': 'job_contract',
+            'has_more': False,
+        },
+        SearchResponse: {'query': 'contract', 'results': []},
+        ContextPackResponse: {
+            'query': 'contract',
+            'context': '',
+            'citations': [],
+            'chunks': [],
+            'token_estimate': 0,
+        },
+        RetrievalAnswerResponse: {
+            'query': 'contract',
+            'answer': 'answer',
+            'citations': [],
+            'chunks': [],
+            'context': '',
+            'token_estimate': 0,
+        },
+        ModelEndpointResponse: {'id': 'mdl_contract', 'name': 'Contract', 'provider': 'openai'},
+        ModelEndpointListResponse: {
+            'object': 'list',
+            'data': [{'id': 'mdl_contract', 'name': 'Contract', 'provider': 'openai'}],
+            'first_id': 'mdl_contract',
+            'last_id': 'mdl_contract',
+            'has_more': False,
+        },
+        BakeoffRunResponse: {'id': 'eval_contract', 'status': 'completed', 'metrics': {}, 'results': []},
+        BakeoffRunListResponse: {
+            'object': 'list',
+            'data': [{
+                'id': 'eval_contract',
+                'name': 'Contract',
+                'mode': 'markdown_docs_v1',
+                'model_profile_ids': ['embedding_contract'],
+                'status': 'completed',
+                'metrics': {},
+                'created_at': 1710000000,
+                'completed_at': 1710000001,
+            }],
+            'first_id': 'eval_contract',
+            'last_id': 'eval_contract',
+            'has_more': False,
+        },
+        MaintenanceResult: {
+            'ok': True,
+            'action': 'reindex_chunks',
+            'processed': 1,
+            'details': {'has_more': False},
+        },
+        AdminSessionResponse: {
+            'object': 'admin.session',
+            'authenticated': True,
+            'tenant_id': 'ten_contract',
+            'business_instance_id': 'biz_contract',
+            'user_id': 'usr_contract',
+            'api_key_id': 'key_contract',
+            'scopes': ['admin:read'],
+            'roles': ['admin'],
+            'groups': [],
+            'max_security_level': 3,
+        },
+        UsageEventListResponse: {
+            'object': 'list',
+            'data': [{
+                'event_type': 'retrieval.query',
+                'quantity': 1,
+                'unit': 'request',
+                'provider': 'openai',
+                'model': 'text-embedding-3-small',
+                'cost_estimate_usd': 0.0001,
+                'metadata': {},
+                'created_at': 1710000000,
+            }],
+            'first_id': None,
+            'last_id': None,
+            'has_more': False,
+        },
+        AuditEventListResponse: {
+            'object': 'list',
+            'data': [{
+                'id': 'aud_contract',
+                'event_type': 'retrieval',
+                'action': 'search',
+                'resource_type': 'vector_store',
+                'resource_id': 'vs_contract',
+                'security_level': 1,
+                'allowed': True,
+                'metadata': {},
+                'created_at': 1710000000,
+            }],
+            'first_id': None,
+            'last_id': None,
+            'has_more': False,
+        },
+        TenantResponse: {'id': 'ten_contract', 'name': 'Contract', 'slug': 'contract'},
+        InstanceApiKeyResponse: {
+            'id': 'key_contract',
+            'api_key': 'svs_live_contract',
+            'label': 'contract',
+            'scopes': ['retrieval:read'],
+            'max_security_level': 1,
+        },
+        InstanceApiKeyListResponse: {
+            'object': 'list',
+            'data': [{
+                'id': 'key_contract',
+                'label': 'contract',
+                'scopes': ['retrieval:read'],
+                'max_security_level': 1,
+                'status': 'active',
+            }],
+            'first_id': 'key_contract',
+            'last_id': 'key_contract',
+            'has_more': False,
+        },
+        InstanceApiKeyDeletedResponse: {
+            'id': 'key_contract',
+            'object': 'api_key.deleted',
+            'deleted': True,
+            'data': {
+                'id': 'key_contract',
+                'label': 'contract',
+                'scopes': ['retrieval:read'],
+                'max_security_level': 1,
+                'status': 'revoked',
+            },
+        },
+    }
+    for model, payload in payloads.items():
+        assert model.model_validate(payload).model_dump(mode='python', exclude_unset=True) == payload
 
 def test_responses_create_openapi_uses_named_request_component():
     api_main.app.openapi_schema = None

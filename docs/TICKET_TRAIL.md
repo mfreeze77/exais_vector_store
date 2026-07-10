@@ -13,11 +13,16 @@ Status legend:
 - SVS-002 Docker Compose local stack — scaffolded.
 - SVS-003 Versioned image release model — implemented for the
   `scripts/release/release_common.py:APP_IMAGES` app image set, build/publish
-  manifest emission, and pinned local-cell startup validation.
+  manifest emission, and immutable digest-pinned local-cell startup.
 - SVS-004 CI image build/push with digests — implemented for repo-buildable CI
-  image builds and digest/provenance manifest verification. External registry
-  credential proof, clean pull-by-digest evidence, VPS/customer-cell launch, and
-  Docker Hub claims remain separate operator proof gates.
+  image builds and digest/provenance manifest verification. RM-004 is complete:
+  publication atomically writes the candidate manifest without mutating active
+  pins; startup derives and preflights all five `repository@sha256:digest`
+  references before atomically activating the per-cell image env. Cell and
+  instance compose paths have no mutable app-tag fallback and use
+  `--pull never`. External registry credential proof, clean pull-by-digest
+  evidence, VPS/customer-cell launch, and Docker Hub claims remain separate
+  operator proof gates.
 
 ## EPIC-002 Tenancy/security
 
@@ -35,7 +40,7 @@ Status legend:
 - SVS-022 Search vector store — implemented for OpenAI-shaped search, hybrid ranking options, request-scoped `ranker: none`, query planning, citation output, direct search response OpenAPI component coverage, direct search `next_page` cursor paging, and safe metadata filter parity including list and range comparisons.
 - SVS-023 File batches — implemented with OpenAI create/retrieve/cancel/list-files parity, named OpenAPI response components for file batches and batch file pages, and focused proof.
 - SVS-024 Expiration policies — implemented for strict OpenAI `expires_after` request validation, `last_active_at` activity refresh, fail-closed retrieval, and maintenance sweeper proof for expired row marking plus stale-vector cleanup enqueue.
-- RM-002 OpenAPI contract reconciliation — OpenAI-compatible vector-store, file, file-batch, Responses, citation, and API-key surfaces have named generated request/response components and pass focused contract proof. The production-candidate image currently generates 49 paths (26 native and 23 OpenAI-compatible) with 77 schema components; `tests/test_openapi_contract.py` and the focused OpenAI route suites pass with `137 passed`. The full contract remains incomplete: most native success responses are still untyped, and several JSON request bodies remain inline dictionaries or optional-body wrappers. These are explicit follow-up gaps, not reopened OpenAI parity work.
+- RM-002 OpenAPI contract reconciliation — complete. The generated contract covers 51 paths and 68 operations (31 native and 37 OpenAI-compatible) with 118 schema components. Every JSON request body and 2xx response body resolves directly to a named component. Native response contracts are runtime-bound; named nullable wrappers preserve vector-store create/update JSON `null`; multipart uploads and HTTP-proven raw-text responses retain correct media types. `tests/test_openapi_contract.py` freezes every valid OpenAPI HTTP method across the exact operation inventory, while the focused contract/OpenAI route suites pass with `141 passed`. This closes contract drift without reopening OpenAI parity behavior.
 
 ## EPIC-004 Ingestion/indexing
 
@@ -68,8 +73,14 @@ Status legend:
 ## EPIC-007 Micro-production deployment
 
 - SVS-060 Instance manifests — scaffolded.
-- SVS-061 Instance agent — scaffolded.
-- SVS-062 Fleet upgrade script — scaffolded.
+- SVS-061 Instance agent — scaffolded overall; RM-004 deploy/rollback image
+  activation is implemented for explicit verified release manifests, exact
+  three-service digest preflight, process-env-safe compose pins, `--pull never`,
+  failed-up pin restoration, packaged Docker/Compose tooling, mounted instance
+  and release-state roots, and mutation-free Compose dry-run validation. Live
+  customer-host orchestration remains unproved.
+- SVS-062 Fleet upgrade script — scaffolded; deploy callers now forward the
+  required verified release-manifest path, without claiming fleet execution.
 - SVS-063 Encrypted secrets workflow — implemented for repo-buildable
   production secret-reference validation. `svs_common.secrets` accepts
   SOPS/age, Vault, and `envref://` references; production preflight rejects
@@ -79,8 +90,12 @@ Status legend:
   rotation, and rollback. Live SOPS/Vault execution and customer-host
   secret-manager proof remain operator proof gates.
 - SVS-064 Signed releases/digest pinning — implemented for local digest
-  provenance manifests and cell startup rejection of unpinned or unverifiable
-  app image metadata. Cryptographic signing and external registry proof remain
+  provenance manifests, exact five-service repository-digest pins, persistent
+  compose consumption, failure-atomic activation, and startup rejection of
+  unpinned, mismatched, or locally unverifiable app images. Failed compose or
+  health activation restores the prior pin artifact without claiming runtime
+  data rollback. The narrow instance compose/agent path requires three verified
+  digest pins. Cryptographic signing and external registry proof remain
   operator-dependent follow-up gates.
 
 ## EPIC-008 Production ops

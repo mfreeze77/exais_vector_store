@@ -4,8 +4,21 @@ import argparse
 import json
 from pathlib import Path
 
-from release_common import APP_IMAGES, DEFAULT_CELL, image_tag, normalize_registry_prefix, release_manifest_path, run, version
-from provenance_common import ImageDigest, format_manifest_report, verify_release_manifest, write_release_manifest
+from release_common import (
+    APP_IMAGES,
+    DEFAULT_CELL,
+    image_tag,
+    normalize_registry_prefix,
+    release_manifest_path,
+    run,
+    version,
+)
+from provenance_common import (
+    ImageDigest,
+    format_manifest_report,
+    verify_release_manifest,
+    write_release_manifest,
+)
 
 ACCEPT_HEADER = (
     "Accept: application/vnd.oci.image.manifest.v1+json, "

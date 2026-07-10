@@ -8,5 +8,15 @@ COPY packages /app/packages
 COPY apps /app/apps
 COPY configs /app/configs
 COPY tests /app/tests
+COPY scripts /app/scripts
+COPY evals /app/evals
+COPY tickets /app/tickets
+COPY charts /app/charts
+COPY infra /app/infra
+COPY runbooks /app/runbooks
+COPY load-tests /app/load-tests
+COPY migrations /app/migrations
+COPY db /app/db
+COPY VERSION alembic.ini docker-compose.yml /app/
 EXPOSE 8080
 CMD ["uvicorn", "svs_api.main:app", "--host", "0.0.0.0", "--port", "8080"]
