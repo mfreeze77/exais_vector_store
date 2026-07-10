@@ -116,6 +116,7 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-106 OpenAI Files OpenAPI Contract](./WAVE-106-openai-files-openapi-contract.md)
 - [WAVE-107 OpenAI Uploaded File ID Citation Parity](./WAVE-107-openai-uploaded-file-id-citation-parity.md)
 - [WAVE-108 Golden Query Bakeoff Metrics](./WAVE-108-golden-query-bakeoff-metrics.md)
+- [WAVE-109 Expert AI Services Live Retrieval Quality Gate](./WAVE-109-expertaiservices-live-retrieval-quality-gate.md)
 
 ## Execution Model
 

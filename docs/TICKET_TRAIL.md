@@ -122,7 +122,11 @@ Status legend:
 ## EPIC-009 Evals/fine-tuning
 
 - SVS-080 Eval schema/metrics — implemented for recall@k, precision@k, MRR,
-  NDCG@k, leakage counts, and chunk/document judged golden-query metrics.
+  NDCG@k, leakage counts, chunk/document judged golden-query metrics, and the
+  WAVE-109 live ticket-corpus quality gate. The production default passed all
+  19 judged questions at hit@5 with `0.903509` MRR, `0.927944` NDCG@5,
+  complete passage support/strict citations, and `465.850 ms` p95. The proof
+  applies only to the current `expertaiservices` Markdown ticket corpus.
 - SVS-081 Model bakeoff runner — implemented for persisted bakeoff runs/results,
   per-candidate golden metric comparison when judged result IDs are supplied,
   and deterministic proxy fallback; live retrieval/provider fan-out remains

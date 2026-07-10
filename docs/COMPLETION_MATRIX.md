@@ -11,7 +11,7 @@
 | RunPod | handler/Dockerfile | GPU image, warm pool, autoscaling |
 | Micro production | manifests/agent/scripts | signed releases, canaries |
 | Ops | Terraform/Ansible/runbooks; backup artifact manifests and restore preflight; local observability stack | external production SLO/load proof, external/offsite restore proof |
-| Evals | metrics/schema + golden bakeoff metrics + deterministic live fan-out runner | live provider credential proof, fine-tuning, multimodal research |
+| Evals | metrics/schema + golden bakeoff metrics + deterministic live fan-out runner + live 19-query ticket-corpus quality gate | customer-specific golden sets, live cross-model provider proof, fine-tuning, multimodal research |
 
 
 ## Frontend

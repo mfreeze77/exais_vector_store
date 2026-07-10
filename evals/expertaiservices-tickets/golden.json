@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "id": "expertaiservices-tickets-v1",
+  "description": "Filename-judged live retrieval quality set for the Expert AI Services ticket corpus.",
+  "expected_store_name": "expertaiservices",
+  "minimum_completed_files": 118,
+  "required_candidate_id": "default_auto",
+  "promotion_min_score_delta": 0.01,
+  "metric_k": 5,
+  "request_top_k": 10,
+  "thresholds": {
+    "min_hit_at_5": 0.95,
+    "min_top1_accuracy": 0.75,
+    "min_mrr": 0.8,
+    "min_ndcg_at_5": 0.85,
+    "min_support_at_10": 0.95,
+    "min_citation_complete_rate": 1.0,
+    "min_mean_unique_files_at_10": 3.0,
+    "max_error_rate": 0.0,
+    "max_latency_ms_p95": 500.0
+  },
+  "candidates": [
+    {
+      "id": "default_auto",
+      "rewrite_query": false,
+      "ranking_options": {
+        "ranker": "auto",
+        "score_threshold": 0.0
+      }
+    },
+    {
+      "id": "default_auto_rewrite",
+      "rewrite_query": true,
+      "ranking_options": {
+        "ranker": "auto",
+        "score_threshold": 0.0
+      }
+    },
+    {
+      "id": "no_rerank",
+      "rewrite_query": false,
+      "ranking_options": {
+        "ranker": "none",
+        "score_threshold": 0.0
+      }
+    },
+    {
+      "id": "dense_only_auto",
+      "rewrite_query": false,
+      "ranking_options": {
+        "ranker": "auto",
+        "score_threshold": 0.0,
+        "hybrid_search": {
+          "embedding_weight": 1.0,
+          "text_weight": 0.0
+        }
+      }
+    },
+    {
+      "id": "sparse_only_auto",
+      "rewrite_query": false,
+      "ranking_options": {
+        "ranker": "auto",
+        "score_threshold": 0.0,
+        "hybrid_search": {
+          "embedding_weight": 0.0,
+          "text_weight": 1.0
+        }
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "real_embedding_fail_closed",
+      "query": "How does the system fail closed when a real embedding provider returns a hash mock fallback?",
+      "expected_filenames": ["WAVE-011-real-embedding-provider-gate.md"],
+      "support_terms": ["hash_mock", "fail closed"]
+    },
+    {
+      "id": "marker_warmup_retry",
+      "query": "How is RunPod Marker PDF ingestion protected against cold-start warm-up failures and retries?",
+      "expected_filenames": ["WAVE-010-runpod-marker-pdf-ingestion.md"],
+      "support_terms": ["warm-up", "bounded retry"]
+    },
+    {
+      "id": "idempotent_reindex_replay",
+      "query": "What proof shows forced reindex uses stable IDs and does not duplicate dense or sparse entries?",
+      "expected_filenames": ["WAVE-032-idempotent-reindexing-proof.md"],
+      "support_terms": ["stable", "duplicate"]
+    },
+    {
+      "id": "profile_rerank",
+      "query": "Which retrieval change applies profile-driven reranking after dense and sparse RRF fusion?",
+      "expected_filenames": ["WAVE-021-profile-driven-rerank-retrieval.md"],
+      "support_terms": ["post-fusion", "rerank"]
+    },
+    {
+      "id": "mmr_diversity",
+      "query": "How does lexical MMR reduce near-duplicate chunks after reranking?",
+      "expected_filenames": ["WAVE-052-rerank-diversity-mmr.md"],
+      "support_terms": ["MMR", "near-duplicate"]
+    },
+    {
+      "id": "neighbor_context",
+      "query": "How are neighboring chunks added to a context pack while preserving citations?",
+      "expected_filenames": ["WAVE-023-context-pack-neighbor-expansion.md"],
+      "support_terms": ["neighbor", "citation"]
+    },
+    {
+      "id": "parent_context",
+      "query": "How are parent heading sections expanded into a context pack?",
+      "expected_filenames": ["WAVE-024-context-pack-parent-section-expansion.md"],
+      "support_terms": ["parent", "heading"]
+    },
+    {
+      "id": "symbol_boost",
+      "query": "How are exact code identifiers and symbols boosted during hybrid retrieval?",
+      "expected_filenames": ["WAVE-075-code-symbol-exact-match-boost.md"],
+      "support_terms": ["exact symbol", "boost"]
+    },
+    {
+      "id": "phrase_sparse",
+      "query": "How does Postgres sparse retrieval preserve quoted phrase intent?",
+      "expected_filenames": ["WAVE-081-phrase-aware-sparse-retrieval.md"],
+      "support_terms": ["websearch_to_tsquery", "phrase"]
+    },
+    {
+      "id": "candidate_idf",
+      "query": "What changed local reranking to use candidate-aware IDF and token proximity?",
+      "expected_filenames": ["WAVE-083-candidate-aware-local-rerank.md"],
+      "support_terms": ["candidate", "IDF"]
+    },
+    {
+      "id": "search_cursor",
+      "query": "How is the opaque next-page cursor implemented for vector store search?",
+      "expected_filenames": ["WAVE-088-openai-vector-store-search-next-page-cursor.md"],
+      "support_terms": ["next_page", "opaque"]
+    },
+    {
+      "id": "upload_encoding",
+      "query": "How are UTF-8 text uploads and invalid encodings handled?",
+      "expected_filenames": ["WAVE-042-openai-file-upload-text-encoding-parity.md"],
+      "support_terms": ["UTF-16", "415"]
+    },
+    {
+      "id": "negation_filter",
+      "query": "How are OpenAI negation filters applied to file search attributes?",
+      "expected_filenames": ["WAVE-054-openai-negation-filter-parity.md"],
+      "support_terms": ["negation", "filter"]
+    },
+    {
+      "id": "multi_query",
+      "query": "How are multiple vector store search queries planned and merged into one ranked result?",
+      "expected_filenames": ["WAVE-053-openai-vector-store-search-multi-query.md"],
+      "support_terms": ["query arrays", "merge results"]
+    },
+    {
+      "id": "citation_span",
+      "query": "How is a citation marker replacement span kept safe for clients?",
+      "expected_filenames": ["WAVE-099-openai-citation-replacement-span-contract.md"],
+      "support_terms": ["start_index", "end_index"]
+    },
+    {
+      "id": "golden_metrics",
+      "query": "Which work added recall precision MRR and NDCG metrics to golden bakeoffs?",
+      "expected_filenames": ["WAVE-108-golden-query-bakeoff-metrics.md"],
+      "support_terms": ["MRR", "NDCG"]
+    },
+    {
+      "id": "file_id_compat",
+      "query": "How are newly uploaded file IDs formatted while legacy underscore IDs still resolve?",
+      "expected_filenames": ["WAVE-107-openai-uploaded-file-id-citation-parity.md"],
+      "support_terms": ["hyphenated", "legacy"]
+    },
+    {
+      "id": "files_openapi",
+      "query": "How does the OpenAPI contract describe the v1 files upload and list responses?",
+      "expected_filenames": ["WAVE-106-openai-files-openapi-contract.md"],
+      "support_terms": ["OpenAIFile", "OpenAIFileListResponse"]
+    },
+    {
+      "id": "tenant_leakage",
+      "query": "What proof prevents cross-tenant retrieval leakage through RLS and scoped search?",
+      "expected_filenames": ["WAVE-031-openai-tenant-leakage-proof.md"],
+      "support_terms": ["tenant", "RLS"]
+    }
+  ]
+}
