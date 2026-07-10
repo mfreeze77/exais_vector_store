@@ -400,8 +400,10 @@ Production requirements:
   `envref://KEY` references, rejects DSNs with embedded passwords, and reports
   variable names only.
 - Rotation and rollback handling live in `runbooks/encrypted-secrets.md`.
-  Repo-buildable validation does not claim live SOPS/Vault access, DNS/TLS, or
-  customer-host secret-manager proof.
+  The host-side release flow resolves references into a restricted temporary
+  Compose env before image-pin activation or Docker startup, then removes it at
+  command exit. Repository proof does not claim customer credentials, DNS/TLS,
+  or a successful secret-manager read on a selected customer host.
 - API keys stored hashed, never reversible.
 - Embedding provider keys scoped per environment and rotated.
 - Customer-managed key support later for enterprise tenants.

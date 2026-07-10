@@ -81,14 +81,17 @@ Status legend:
   customer-host orchestration remains unproved.
 - SVS-062 Fleet upgrade script — scaffolded; deploy callers now forward the
   required verified release-manifest path, without claiming fleet execution.
-- SVS-063 Encrypted secrets workflow — implemented for repo-buildable
-  production secret-reference validation. `svs_common.secrets` accepts
-  SOPS/age, Vault, and `envref://` references; production preflight rejects
-  plaintext secret-bearing values and DSNs with embedded passwords while
-  reporting names only; `generate-cell-env.py --production` imports only valid
-  secret references; and `runbooks/encrypted-secrets.md` documents setup,
-  rotation, and rollback. Live SOPS/Vault execution and customer-host
-  secret-manager proof remain operator proof gates.
+- SVS-063 Encrypted secrets workflow — implemented for host-side production
+  cell launch. `svs_common.secrets` resolves SOPS/age, Vault, and `envref://`
+  references; production preflight rejects plaintext secret-bearing values and
+  DSNs with embedded passwords while reporting names only; and
+  `generate-cell-env.py --production` imports only valid references.
+  `cell-up.py` resolves them into a restricted process-scoped Compose env before
+  image-pin activation or Docker and removes the file after the command;
+  `cell-smoke.py` does the same across worker stop/recreate and restoration.
+  `runbooks/encrypted-secrets.md` documents setup, failure handling, rotation,
+  and rollback. Authenticated reads and successful launch on a selected
+  customer host remain operator proof gates.
 - SVS-064 Signed releases/digest pinning — implemented for local digest
   provenance manifests, exact five-service repository-digest pins, persistent
   compose consumption, failure-atomic activation, and startup rejection of

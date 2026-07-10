@@ -80,15 +80,21 @@ This does not claim fleet polling, deployment history, customer-host execution,
 or live orchestration. External registry publication proof, customer/VPS
 startup evidence, and live operator credentials remain later proof gates.
 
-RM-005 closes the repo-buildable encrypted-secret reference lane. Production
-cell env files use reference values such as
+RM-005 closes the host-side encrypted-secret runtime lane. Production cell env
+files use reference values such as
 `sops://configs/cell-secrets.example.sops.yaml#POSTGRES_PASSWORD`,
 `age://...#KEY`, `vault://kv/exais/customer-001#KEY`, or `envref://KEY`.
 `scripts/release/prod-env-preflight.py` rejects plaintext secret-bearing values
 and DSNs with embedded passwords while reporting variable names only.
 `scripts/release/generate-cell-env.py --production --reference-source-env ...`
-imports only valid secret references. Live SOPS/Vault execution and customer
-host secret-manager proof remain operator proof gates.
+imports only valid secret references. Before pin activation or Docker startup,
+`cell-up.py` repeats preflight, resolves references through SOPS/age, Vault, or
+the release environment, and supplies Compose a restricted temporary env file
+that is deleted after the command. `cell-smoke.py` repeats resolution for its
+worker stop/recreate proof and cleans up after worker restoration. Repository
+tests do not claim possession of customer credentials; authenticated
+secret-manager and launch proof on the selected customer host remain operator
+proof gates.
 
 RM-006 closes the repo-buildable backup manifest and restore-preflight lane.
 `scripts/backup-instance.sh` now writes schema-versioned artifact manifests for

@@ -91,11 +91,17 @@ def compose_cmd() -> list[str]:
     raise RuntimeError("Docker Compose was not found. Install docker-compose or the Docker compose plugin.")
 
 
-def compose_base(cell: str = DEFAULT_CELL) -> list[str]:
+def compose_base(cell: str = DEFAULT_CELL, *, prepared_env_path: Path | None = None) -> list[str]:
     validate_pinned_image_env(cell)
+    selected_env_path = prepared_env_path or env_file(cell)
+    process_override = os.environ.get("SVS_CELL_ENV_FILE")
+    if process_override and Path(process_override).resolve() != selected_env_path.resolve():
+        raise RuntimeError(
+            "Cell environment validation failed: process environment override SVS_CELL_ENV_FILE does not match the prepared env path"
+        )
     return compose_cmd() + [
         "--env-file",
-        str(env_file(cell)),
+        str(selected_env_path),
         "--env-file",
         str(pinned_image_env_file(cell)),
         "-f",

@@ -14,6 +14,27 @@ def assert_tokens(path: str, tokens: list[str]) -> None:
     assert not missing, f"{path} missing tokens: {missing}"
 
 
+def test_rm005_encrypted_secrets_runbook_documents_runtime_and_proof_boundary():
+    assert_tokens(
+        "runbooks/encrypted-secrets.md",
+        [
+            "RM-005",
+            "before image-pin activation or any Docker call",
+            "sops://<path>#<KEY>",
+            "age://<path>#<KEY>",
+            "vault://<path>#<KEY>",
+            "envref://<ENV_VAR>",
+            "SVS_SOPS_BIN",
+            "SVS_VAULT_BIN",
+            "mode `0700`",
+            "mode `0600`",
+            "Rotation",
+            "Rollback",
+            "customer-host proof",
+        ],
+    )
+
+
 def test_rm015_external_restore_runbook_documents_external_proof_boundary():
     assert_tokens(
         "runbooks/external-restore-drill.md",

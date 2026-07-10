@@ -305,6 +305,26 @@ def test_compose_base_rejects_mutable_process_override(tmp_path, monkeypatch):
         release_common.compose_base("unit")
 
 
+def test_compose_base_uses_prepared_secret_env_and_rejects_process_bypass(tmp_path, monkeypatch):
+    monkeypatch.setattr(release_common, "release_dir", lambda cell: tmp_path / cell)
+    monkeypatch.setattr(release_common, "compose_cmd", lambda: ["docker", "compose"])
+    cell_env = release_common.env_file("unit")
+    cell_env.parent.mkdir(parents=True)
+    cell_env.write_text("SVS_REGISTRY_PREFIX=registry.internal/exais\n", encoding="utf-8")
+    report = verify_release_manifest(write_release_manifest(manifest_images(), tmp_path / "release-manifest.json"))
+    release_common.write_pinned_image_env("unit", release_image_references(report))
+    prepared = tmp_path / "runtime" / ".env.runtime"
+    prepared.parent.mkdir()
+    prepared.write_text("SVS_CELL_ENV_FILE=prepared\n", encoding="utf-8")
+
+    base = release_common.compose_base("unit", prepared_env_path=prepared)
+
+    assert base[3] == str(prepared)
+    monkeypatch.setenv("SVS_CELL_ENV_FILE", str(cell_env))
+    with pytest.raises(RuntimeError, match="process environment override SVS_CELL_ENV_FILE"):
+        release_common.compose_base("unit", prepared_env_path=prepared)
+
+
 def test_cell_compose_consumes_only_required_digest_image_variables():
     body = release_common.COMPOSE_FILE.read_text(encoding="utf-8")
 
@@ -378,8 +398,10 @@ def test_cell_up_never_resolves_moved_tags_during_boot(monkeypatch, tmp_path):
 
     monkeypatch.setattr(sys, "argv", ["cell-up.py", "--cell", "unit", "--worker-scale", "3", "--no-wait"])
     monkeypatch.setattr(cell_up, "ensure_env", lambda cell: None)
+    monkeypatch.setattr(cell_up, "prepare_cell_environment", lambda cell, allow_local_registry=False: tmp_path / ".env.runtime")
+    monkeypatch.setattr(cell_up, "cleanup_runtime_secret_env", lambda path: None)
     monkeypatch.setattr(cell_up, "activate_cell_release", lambda cell, manifest: references)
-    monkeypatch.setattr(cell_up, "compose_base", lambda cell: base)
+    monkeypatch.setattr(cell_up, "compose_base", lambda cell, prepared_env_path=None: base)
     monkeypatch.setattr(cell_up, "run", lambda args, **kwargs: calls.append(args))
 
     cell_up.main()
@@ -441,8 +463,10 @@ def test_cell_up_restores_previous_pins_on_post_activation_system_exit(tmp_path,
 
     monkeypatch.setattr(sys, "argv", ["cell-up.py", "--cell", "unit", "--no-wait"])
     monkeypatch.setattr(cell_up, "ensure_env", lambda cell: None)
+    monkeypatch.setattr(cell_up, "prepare_cell_environment", lambda cell, allow_local_registry=False: tmp_path / ".env.runtime")
+    monkeypatch.setattr(cell_up, "cleanup_runtime_secret_env", lambda path: None)
     monkeypatch.setattr(cell_up, "activate_cell_release", activate)
-    monkeypatch.setattr(cell_up, "compose_base", lambda cell: ["docker", "compose"])
+    monkeypatch.setattr(cell_up, "compose_base", lambda cell, prepared_env_path=None: ["docker", "compose"])
     monkeypatch.setattr(
         cell_up,
         "run",
@@ -453,3 +477,65 @@ def test_cell_up_restores_previous_pins_on_post_activation_system_exit(tmp_path,
         cell_up.main()
 
     assert active_path.read_bytes() == previous
+
+
+def test_cell_up_resolves_production_secrets_before_activation_or_docker(tmp_path, monkeypatch):
+    cell_up = load_release_script("cell_up_secret_order_test", "cell-up.py")
+    monkeypatch.setattr(release_common, "release_dir", lambda cell: tmp_path / cell)
+    active_path = release_common.pinned_image_env_file("unit")
+    active_path.parent.mkdir(parents=True)
+    previous = b"previous-active-pin-bytes\n"
+    active_path.write_bytes(previous)
+    events = []
+
+    def fail_prepare(cell, allow_local_registry=False):
+        events.append("prepare")
+        raise RuntimeError("SECRET_RESOLUTION_FAILED vault DATABASE_URL")
+
+    monkeypatch.setattr(cell_up, "ensure_env", lambda cell: events.append("ensure"))
+    monkeypatch.setattr(cell_up, "prepare_cell_environment", fail_prepare)
+    monkeypatch.setattr(cell_up, "activate_cell_release", lambda *args: pytest.fail("pins must not activate"))
+    monkeypatch.setattr(cell_up, "compose_base", lambda *args, **kwargs: pytest.fail("compose must not initialize"))
+    monkeypatch.setattr(cell_up, "run", lambda *args, **kwargs: pytest.fail("Docker must not run"))
+    monkeypatch.setattr(cell_up, "cleanup_runtime_secret_env", lambda path: events.append("cleanup"))
+
+    with pytest.raises(RuntimeError, match="SECRET_RESOLUTION_FAILED"):
+        cell_up.start_cell(
+            cell="unit",
+            worker_scale=1,
+            timeout_seconds=30,
+            no_wait=True,
+            release_manifest=None,
+            allow_local_registry=False,
+        )
+
+    assert events == ["ensure", "prepare", "cleanup"]
+    assert active_path.read_bytes() == previous
+
+
+def test_prepare_production_environment_preflights_before_materialization(tmp_path, monkeypatch):
+    cell_up = load_release_script("cell_up_secret_preflight_test", "cell-up.py")
+    source = tmp_path / ".env.cell"
+    source.write_text("SVS_ENV=prod\n", encoding="utf-8")
+    runtime = tmp_path / ".env.runtime"
+    events = []
+
+    monkeypatch.setattr(cell_up, "env_file", lambda cell: source)
+    monkeypatch.setattr(cell_up, "read_env", lambda cell: {"SVS_ENV": "prod"})
+    monkeypatch.setattr(
+        cell_up,
+        "run",
+        lambda command, **kwargs: events.append(("preflight", command)),
+    )
+    monkeypatch.setattr(
+        cell_up,
+        "runtime_env_path",
+        lambda path: events.append(("resolve", path)) or runtime,
+    )
+
+    selected = cell_up.prepare_cell_environment("unit")
+
+    assert selected == runtime
+    assert events[0][0] == "preflight"
+    assert events[1] == ("resolve", source)
+    assert "prod-env-preflight.py" in " ".join(str(part) for part in events[0][1])

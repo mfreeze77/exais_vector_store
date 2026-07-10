@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 from release_common import (
@@ -9,6 +10,7 @@ from release_common import (
     compose_base,
     ensure_app_images_available,
     ensure_env,
+    env_file,
     normalize_registry_prefix,
     pinned_image_env_file,
     read_env,
@@ -19,9 +21,11 @@ from release_common import (
     write_pinned_image_env,
 )
 from provenance_common import format_manifest_report, release_image_references, verify_release_manifest
+from secret_runtime import cleanup_runtime_secret_env, is_production_environment, runtime_env_path
 
 INFRA_SERVICES = ["postgres", "redis", "qdrant", "minio"]
 CORE_SERVICES = [*INFRA_SERVICES, "model-gateway", "api", "worker", "admin-ui"]
+PRODUCTION_PREFLIGHT = Path(__file__).with_name("prod-env-preflight.py")
 
 
 def validate_cell_release_manifest(cell: str, manifest_path: Path | None = None) -> dict[str, str]:
@@ -69,31 +73,68 @@ def activate_cell_release(cell: str, manifest_path: Path | None = None) -> dict[
     return image_references
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Pull and boot a clean local cell from registry images.")
-    parser.add_argument("--cell", default=DEFAULT_CELL)
-    parser.add_argument("--worker-scale", type=int, default=1)
-    parser.add_argument("--timeout-seconds", type=int, default=300)
-    parser.add_argument("--no-wait", action="store_true")
-    parser.add_argument("--release-manifest", type=Path, default=None)
-    args = parser.parse_args()
-    ensure_env(args.cell)
-    pins_path = pinned_image_env_file(args.cell)
+def prepare_cell_environment(cell: str, *, allow_local_registry: bool = False) -> Path:
+    source_path = env_file(cell)
+    values = read_env(cell)
+    if is_production_environment(values):
+        command = [sys.executable, str(PRODUCTION_PREFLIGHT), "--env-file", str(source_path)]
+        if allow_local_registry:
+            command.append("--allow-local-registry")
+        run(command)
+    return runtime_env_path(source_path)
+
+
+def start_cell(
+    *,
+    cell: str,
+    worker_scale: int,
+    timeout_seconds: int,
+    no_wait: bool,
+    release_manifest: Path | None,
+    allow_local_registry: bool,
+) -> None:
+    ensure_env(cell)
+    pins_path = pinned_image_env_file(cell)
     previous_pins = pins_path.read_bytes() if pins_path.exists() else None
     activated = False
     try:
-        activate_cell_release(args.cell, args.release_manifest)
+        prepared_env_path = prepare_cell_environment(
+            cell,
+            allow_local_registry=allow_local_registry,
+        )
+        activate_cell_release(cell, release_manifest)
         activated = True
-        base = compose_base(args.cell)
+        base = compose_base(cell, prepared_env_path=prepared_env_path)
         run(base + ["pull", *INFRA_SERVICES])
-        run(base + ["up", "-d", "--pull", "never", "--scale", f"worker={args.worker_scale}", *CORE_SERVICES])
-        if not args.no_wait:
-            wait_for_services(args.cell, ["postgres", "redis", "qdrant", "minio", "model-gateway", "api", "worker", "admin-ui"], args.timeout_seconds)
+        run(base + ["up", "-d", "--pull", "never", "--scale", f"worker={worker_scale}", *CORE_SERVICES])
+        if not no_wait:
+            wait_for_services(cell, ["postgres", "redis", "qdrant", "minio", "model-gateway", "api", "worker", "admin-ui"], timeout_seconds)
         run(base + ["ps"])
     except BaseException:
         if activated:
             restore_pinned_image_env_file(pins_path, previous_pins)
         raise
+    finally:
+        cleanup_runtime_secret_env(env_file(cell))
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Pull and boot a digest-pinned cell from registry images.")
+    parser.add_argument("--cell", default=DEFAULT_CELL)
+    parser.add_argument("--worker-scale", type=int, default=1)
+    parser.add_argument("--timeout-seconds", type=int, default=300)
+    parser.add_argument("--no-wait", action="store_true")
+    parser.add_argument("--release-manifest", type=Path, default=None)
+    parser.add_argument("--allow-local-registry", action="store_true")
+    args = parser.parse_args()
+    start_cell(
+        cell=args.cell,
+        worker_scale=args.worker_scale,
+        timeout_seconds=args.timeout_seconds,
+        no_wait=args.no_wait,
+        release_manifest=args.release_manifest,
+        allow_local_registry=args.allow_local_registry,
+    )
 
 
 if __name__ == "__main__":

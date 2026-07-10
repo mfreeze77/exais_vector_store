@@ -144,7 +144,12 @@ Accepted forms are documented in `runbooks/encrypted-secrets.md` and include
 `sops://...#KEY`, `age://...#KEY`, `vault://...#KEY`, and `envref://KEY`.
 `prod-env-preflight.py` validates those references and rejects plaintext
 passwords, API keys, access keys, peppers, tokens, and DSNs with embedded
-passwords while printing variable names only. Live SOPS/Vault reads, DNS/TLS,
-and customer-host proof remain operator proof gates outside the local release
+passwords while printing variable names only. `cell-up.py` automatically runs
+that preflight, resolves the references before image-pin activation or Docker,
+and gives Compose a restricted process-scoped env file that is removed after
+the release command. `cell-smoke.py` repeats resolution while it stops and
+recreates workers, retaining the temporary file through restoration and then
+removing it. SOPS/Vault credentials, DNS/TLS, and successful launch on the
+selected customer host remain operator proof gates outside the local release
 proof. Use `runbooks/customer-cell-launch.md` to package selected-host launch
 evidence without reusing local or registry-only proof as a VPS readiness claim.

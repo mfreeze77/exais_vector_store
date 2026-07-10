@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import os
 import re
+import subprocess
 from dataclasses import dataclass
-from typing import Mapping
+from pathlib import Path
+from typing import Callable, Mapping, Protocol
 from urllib.parse import urlsplit
 
 
@@ -27,6 +30,126 @@ class SecretReference:
     scheme: str
     locator: str
     name: str
+
+
+class SecretCommandResult(Protocol):
+    returncode: int
+    stdout: str | None
+
+
+SecretCommandRunner = Callable[[list[str]], SecretCommandResult]
+
+
+class SecretResolutionError(RuntimeError):
+    def __init__(self, code: str, reference: SecretReference):
+        self.code = code
+        self.reference = reference
+        super().__init__(f"{code} {reference.scheme} {reference.name}")
+
+
+def _run_secret_command(args: list[str]) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        args,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+    )
+
+
+class SecretResolver:
+    def __init__(
+        self,
+        *,
+        base_dir: Path,
+        environ: Mapping[str, str] | None = None,
+        command_runner: SecretCommandRunner | None = None,
+        sops_binary: str | None = None,
+        vault_binary: str | None = None,
+    ) -> None:
+        self.base_dir = base_dir
+        self.environ = environ if environ is not None else os.environ
+        self.command_runner = command_runner or _run_secret_command
+        self.sops_binary = sops_binary or self.environ.get("SVS_SOPS_BIN") or "sops"
+        self.vault_binary = vault_binary or self.environ.get("SVS_VAULT_BIN") or "vault"
+
+    def resolve(self, reference: SecretReference) -> str:
+        if reference.scheme == "envref":
+            value = self.environ.get(reference.name)
+            if value is None:
+                raise SecretResolutionError("MISSING_ENV_REFERENCE", reference)
+            return _validate_resolved_secret(value, reference)
+        if reference.scheme in {"sops", "age"}:
+            locator = Path(reference.locator)
+            if not locator.is_absolute():
+                locator = self.base_dir / locator
+            args = [
+                self.sops_binary,
+                "--decrypt",
+                "--extract",
+                f'["{reference.name}"]',
+                str(locator),
+            ]
+            return self._resolve_command(args, reference)
+        if reference.scheme == "vault":
+            args = [
+                self.vault_binary,
+                "kv",
+                "get",
+                f"-field={reference.name}",
+                reference.locator,
+            ]
+            return self._resolve_command(args, reference)
+        raise SecretResolutionError("UNSUPPORTED_SECRET_SCHEME", reference)
+
+    def _resolve_command(self, args: list[str], reference: SecretReference) -> str:
+        try:
+            result = self.command_runner(args)
+        except OSError as exc:
+            raise SecretResolutionError("SECRET_RESOLVER_UNAVAILABLE", reference) from exc
+        if result.returncode != 0:
+            raise SecretResolutionError("SECRET_RESOLUTION_FAILED", reference)
+        value = result.stdout or ""
+        if value.endswith("\r\n"):
+            value = value[:-2]
+        elif value.endswith("\n"):
+            value = value[:-1]
+        return _validate_resolved_secret(value, reference)
+
+
+def resolve_secret_values(
+    values: Mapping[str, str],
+    resolver: SecretResolver,
+) -> tuple[dict[str, str], tuple[str, ...]]:
+    resolved = dict(values)
+    resolved_keys: list[str] = []
+    for key in sorted(values):
+        value = values[key]
+        reference = parse_secret_reference(value)
+        if reference is None:
+            if looks_like_secret_reference(value):
+                malformed = SecretReference(
+                    scheme=value.strip().partition("://")[0] or "unknown",
+                    locator="",
+                    name=key,
+                )
+                raise SecretResolutionError("INVALID_SECRET_REFERENCE", malformed)
+            continue
+        resolved[key] = resolver.resolve(reference)
+        resolved_keys.append(key)
+    return resolved, tuple(resolved_keys)
+
+
+def _validate_resolved_secret(value: str, reference: SecretReference) -> str:
+    if not value:
+        raise SecretResolutionError("EMPTY_RESOLVED_SECRET", reference)
+    if "\x00" in value or "\n" in value or "\r" in value:
+        raise SecretResolutionError("INVALID_RESOLVED_SECRET", reference)
+    if looks_like_secret_reference(value):
+        raise SecretResolutionError("UNRESOLVED_SECRET_REFERENCE", reference)
+    return value
 
 
 def is_secret_key(key: str) -> bool:
