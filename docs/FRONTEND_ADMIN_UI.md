@@ -1,6 +1,10 @@
-# Frontend / Admin UI Scaffold
+# Frontend / Admin UI Operator Console
 
-The frontend is intentionally thin. It is not the security authority; it selects modes, submits work, and decorates requests with the bearer credential that the API resolves into a principal.
+The frontend is intentionally not the security authority; it selects modes,
+submits work, and decorates requests with the bearer credential that the API
+resolves into a principal. The WAVE-110 UI promotes the old scaffold into an
+Expert AI Services operator console for one private VPS / Docker Compose cell
+per onboarded customer.
 
 ## Current capabilities
 
@@ -9,9 +13,46 @@ The frontend is intentionally thin. It is not the security authority; it selects
 - Reviews fleet version evidence through `/api/v1/admin/fleet/versions`.
 - Selects a mode such as `markdown_docs_v1`, `pdf_markdown_external_v1`, `code_repo_v1`, or `auto_detect_v1`.
 - Creates an OpenAI-compatible vector store through `/v1/vector_stores`.
-- Ingests Markdown/text content through `/api/v1/documents/ingest`.
-- Searches through `/api/v1/retrieval/search`.
+- Ingests pasted Markdown/text content through `/v1/vector_stores/{id}/files`.
+- Uploads OpenAI-compatible files through `/v1/files` and attaches them through
+  `/v1/vector_stores/{id}/files`.
+- Searches through `/v1/vector_stores/{id}/search` and runs
+  `/v1/responses` file-search requests.
+- Creates and revokes scoped API keys through `/api/v1/admin/api-keys`.
+- Shows backup readiness from current `/metrics` counters when available.
 - Sends `Authorization: Bearer <api key>` for protected production requests.
+
+## Private customer cell workflow
+
+The intended commercial deployment is one isolated customer stack:
+
+```text
+Customer agent
+  -> https://customer-api.expertaiservices.com/v1/responses
+  -> ExAIS API container
+  -> customer-private Postgres, Qdrant, MinIO/object store, Redis, worker
+```
+
+The operator console is used by Expert AI Services during onboarding and
+support. The customer agent consumes the API directly. The normal handoff is:
+
+1. Record customer name, slug, API hostname, admin hostname, and deployment
+   notes for the private VPS cell.
+2. Create or select the customer vector store.
+3. Upload or paste source documents and verify attached-file/ingestion status.
+4. Create a read-only agent key with retrieval/file-search scopes. The raw key
+   appears only on the create response and must be stored in the customer's
+   agent secret store.
+5. Hand off redacted endpoint examples for:
+
+```http
+POST /v1/responses
+POST /v1/vector_stores/{vector_store_id}/search
+```
+
+The UI surfaces backup counters and release/fleet evidence that already exist.
+It does not claim external offsite restore proof unless a backend endpoint or
+operator artifact records that proof.
 
 ## Production UI contract
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 from hashlib import sha256
+import os
+import re
 import time
 from typing import Annotated, Any
 import uuid
@@ -13,7 +15,7 @@ from sqlalchemy import text
 from svs_common.config import get_settings, validate_production_guardrails
 from svs_common.db import jsonb_param, get_session, set_rls_context
 from svs_common.sql import jsonb_text
-from svs_common.security import principal_from_dev_headers
+from svs_common.security import build_retrieval_scope, chunk_allowed_by_scope, principal_from_dev_headers
 from svs_common.schemas import (
     AdminSessionResponse, AuditEventListResponse, BakeoffRunListResponse, HealthResponse,
     IngestionJobDetail, IngestionJobListResponse, IngestionJobResponse, InstanceApiKeyDeletedResponse,
@@ -22,7 +24,7 @@ from svs_common.schemas import (
     OpenAIVectorStoreFileBatchCreateRequest, OpenAIVectorStoreFileUpdateRequest, PrometheusMetricsResponse,
     ReadinessResponse, RetrievalProfilesResponse, TenantResponse, UsageEventListResponse,
     VectorizationModesResponse,
-    Principal, VectorStoreCreateRequest, SearchRequest, SearchResponse, ContextPackRequest, ContextPackResponse,
+    ChunkRecord, Principal, VectorStoreCreateRequest, SearchRequest, SearchResponse, ContextPackRequest, ContextPackResponse,
     RetrievalAnswerRequest, RetrievalAnswerResponse, DocumentIngestRequest,
     VectorStoreDeletedResponse, VectorStoreListResponse, VectorStoreResponse,
     IngestionPlanResponse, IngestionPreviewRequest, ModelEndpointRequest, ModelEndpointResponse,
@@ -64,7 +66,7 @@ from svs_common.openai_compat import (
     vector_store_search_page_window,
 )
 from svs_common.openai_metadata import validate_openai_file_attributes
-from svs_common.query_planner import plan_query
+from svs_common.query_planner import KANSAS_CIVICS_LEGAL_PROFILE_ID, merge_query_filters, plan_query
 from svs_common.vector_store_repo import (
     VectorStoreRepository,
     VectorStoreUnavailableError,
@@ -1341,6 +1343,7 @@ async def ingest_document(req: DocumentIngestRequest, idempotency_key: str | Non
         return cached
     result = await ingest_or_enqueue(req, principal, db)
     payload = result.model_dump()
+    set_rls_context(db, principal)
     store_idempotency(db, principal, idempotency_key, fp, payload)
     db.commit()
     return payload
@@ -1599,7 +1602,7 @@ def admin_fleet_versions(
                extract(epoch from created_at)::bigint created_at
         FROM instance_deployments
         WHERE tenant_id=:tenant_id
-          AND (:selected_business_id IS NULL
+          AND (CAST(:selected_business_id AS text) IS NULL
                OR business_instance_id=:selected_business_id
                OR business_instance_id IS NULL)
         ORDER BY coalesce(completed_at, started_at, created_at) DESC, id DESC
@@ -1934,6 +1937,434 @@ async def attach_file(
     return response
 
 
+def _legal_exact_document_diversity_enabled(query_planner_profile_id: str | None, query_plans: list[Any]) -> bool:
+    if query_planner_profile_id != KANSAS_CIVICS_LEGAL_PROFILE_ID:
+        return False
+    for query_plan in query_plans:
+        file_filters = query_plan.filters.get('file_attribute_filters') if isinstance(query_plan.filters, dict) else None
+        if isinstance(file_filters, dict) and file_filters:
+            return True
+    return False
+
+
+def _document_diversified_chunks(chunks: list[Any]) -> list[Any]:
+    buckets: dict[str, list[Any]] = {}
+    document_order: list[str] = []
+    for chunk in chunks:
+        document_key = str(getattr(chunk, 'document_id', None) or getattr(chunk, 'id', len(document_order)))
+        if document_key not in buckets:
+            buckets[document_key] = []
+            document_order.append(document_key)
+        buckets[document_key].append(chunk)
+
+    diversified: list[Any] = []
+    depth = 0
+    while True:
+        added = False
+        for document_key in document_order:
+            bucket = buckets[document_key]
+            if depth < len(bucket):
+                diversified.append(bucket[depth])
+                added = True
+        if not added:
+            return diversified
+        depth += 1
+
+
+KSCOURTS_GRAPHRAG_INTENT_RE = re.compile(
+    r"\b(?:cited\s+by|cites?|cited|authority|authorities|related|same\s+docket|same\s+party|precedent|citation|citations)\b",
+    re.I,
+)
+
+
+def _env_truthy(name: str) -> bool:
+    return (os.getenv(name) or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _kscourts_graphrag_enabled(query_planner_profile_id: str | None) -> bool:
+    return query_planner_profile_id == KANSAS_CIVICS_LEGAL_PROFILE_ID and _env_truthy("SVS_KSCOURTS_GRAPHRAG_ENABLED")
+
+
+def _query_has_kscourts_graphrag_intent(query: str | list[str]) -> bool:
+    values = query if isinstance(query, list) else [query]
+    return any(KSCOURTS_GRAPHRAG_INTENT_RE.search(value or "") for value in values)
+
+
+def _graph_expansion_limit() -> int:
+    raw = os.getenv("SVS_KSCOURTS_GRAPHRAG_MAX_EXPANSIONS", "3")
+    try:
+        return max(0, min(int(raw), 10))
+    except ValueError:
+        return 3
+
+
+def _kscourts_graphrag_relation_rows(
+    db: Session,
+    principal: Principal,
+    vector_store_id: str,
+    seed_document_ids: list[str],
+    *,
+    limit: int,
+) -> list[dict[str, Any]]:
+    if not seed_document_ids or limit <= 0:
+        return []
+    rows = db.execute(text("""
+        WITH seed_opinions AS (
+            SELECT id AS seed_node_id,
+                   attributes->>'document_id' AS seed_document_id
+            FROM graph_nodes
+            WHERE tenant_id=:tenant_id
+              AND business_instance_id=:biz_id
+              AND vector_store_id=:vector_store_id
+              AND node_type='opinion'
+              AND attributes->>'document_id' = ANY(:seed_document_ids)
+        ),
+        same_related AS (
+            SELECT e.id AS edge_id,
+                   e.edge_type AS relation_type,
+                   so.seed_document_id,
+                   related.id AS related_node_id,
+                   related.attributes->>'document_id' AS related_document_id,
+                   e.attributes,
+                   e.provenance
+            FROM seed_opinions so
+            JOIN graph_edges e
+              ON e.tenant_id=:tenant_id
+             AND e.business_instance_id=:biz_id
+             AND e.vector_store_id=:vector_store_id
+             AND e.edge_type IN ('same_docket', 'related_party')
+             AND (e.source_node_id=so.seed_node_id OR e.target_node_id=so.seed_node_id)
+            JOIN graph_nodes related
+              ON related.tenant_id=e.tenant_id
+             AND related.business_instance_id=e.business_instance_id
+             AND related.vector_store_id=e.vector_store_id
+             AND related.id = CASE
+                 WHEN e.source_node_id=so.seed_node_id THEN e.target_node_id
+                 ELSE e.source_node_id
+               END
+             AND related.node_type='opinion'
+            WHERE related.attributes->>'document_id' <> so.seed_document_id
+        ),
+        cited_authority AS (
+            SELECT cite.id AS edge_id,
+                   'cited_authority' AS relation_type,
+                   so.seed_document_id,
+                   authority_opinion.id AS related_node_id,
+                   authority_opinion.attributes->>'document_id' AS related_document_id,
+                   cite.attributes,
+                   cite.provenance
+            FROM seed_opinions so
+            JOIN graph_edges cite
+              ON cite.tenant_id=:tenant_id
+             AND cite.business_instance_id=:biz_id
+             AND cite.vector_store_id=:vector_store_id
+             AND cite.edge_type='cites_case'
+             AND cite.source_node_id=so.seed_node_id
+            JOIN graph_edges source_doc
+              ON source_doc.tenant_id=cite.tenant_id
+             AND source_doc.business_instance_id=cite.business_instance_id
+             AND source_doc.vector_store_id=cite.vector_store_id
+             AND source_doc.edge_type='source_document'
+             AND source_doc.target_node_id=cite.target_node_id
+            JOIN graph_nodes authority_opinion
+              ON authority_opinion.tenant_id=source_doc.tenant_id
+             AND authority_opinion.business_instance_id=source_doc.business_instance_id
+             AND authority_opinion.vector_store_id=source_doc.vector_store_id
+             AND authority_opinion.id=source_doc.source_node_id
+             AND authority_opinion.node_type='opinion'
+            WHERE authority_opinion.attributes->>'document_id' <> so.seed_document_id
+        ),
+        cited_by AS (
+            SELECT cite.id AS edge_id,
+                   'cited_by' AS relation_type,
+                   so.seed_document_id,
+                   citing_opinion.id AS related_node_id,
+                   citing_opinion.attributes->>'document_id' AS related_document_id,
+                   cite.attributes,
+                   cite.provenance
+            FROM seed_opinions so
+            JOIN graph_edges source_doc
+              ON source_doc.tenant_id=:tenant_id
+             AND source_doc.business_instance_id=:biz_id
+             AND source_doc.vector_store_id=:vector_store_id
+             AND source_doc.edge_type='source_document'
+             AND source_doc.source_node_id=so.seed_node_id
+            JOIN graph_edges cite
+              ON cite.tenant_id=source_doc.tenant_id
+             AND cite.business_instance_id=source_doc.business_instance_id
+             AND cite.vector_store_id=source_doc.vector_store_id
+             AND cite.edge_type='cites_case'
+             AND cite.target_node_id=source_doc.target_node_id
+            JOIN graph_nodes citing_opinion
+              ON citing_opinion.tenant_id=cite.tenant_id
+             AND citing_opinion.business_instance_id=cite.business_instance_id
+             AND citing_opinion.vector_store_id=cite.vector_store_id
+             AND citing_opinion.id=cite.source_node_id
+             AND citing_opinion.node_type='opinion'
+            WHERE citing_opinion.attributes->>'document_id' <> so.seed_document_id
+        ),
+        all_relations AS (
+            SELECT * FROM same_related
+            UNION ALL
+            SELECT * FROM cited_authority
+            UNION ALL
+            SELECT * FROM cited_by
+        )
+        SELECT DISTINCT ON (related_document_id, relation_type)
+               edge_id,
+               relation_type,
+               seed_document_id,
+               related_document_id,
+               attributes,
+               provenance
+        FROM all_relations
+        WHERE related_document_id IS NOT NULL
+        ORDER BY related_document_id, relation_type, edge_id
+        LIMIT :limit
+    """), {
+        "tenant_id": principal.tenant_id,
+        "biz_id": principal.business_instance_id,
+        "vector_store_id": vector_store_id,
+        "seed_document_ids": seed_document_ids,
+        "limit": limit,
+    }).mappings().all()
+    return [dict(row) for row in rows]
+
+
+def _hydrate_kscourts_graphrag_chunks(
+    db: Session,
+    principal: Principal,
+    vector_store_id: str,
+    relation_rows: list[dict[str, Any]],
+    existing_document_ids: set[str],
+    *,
+    limit: int,
+) -> tuple[list[ChunkRecord], dict[str, dict[str, Any]]]:
+    target_rows = [row for row in relation_rows if row["related_document_id"] not in existing_document_ids]
+    if not target_rows or limit <= 0:
+        return [], {}
+    graph_meta_by_document_id = _kscourts_graphrag_metadata_by_document(relation_rows)
+    document_ids = []
+    for row in target_rows:
+        document_id = str(row["related_document_id"])
+        if document_id not in document_ids:
+            document_ids.append(document_id)
+        if len(document_ids) >= limit:
+            break
+    rows = db.execute(text("""
+        WITH wanted(document_id, graph_rank) AS (
+          SELECT document_id, graph_rank
+          FROM unnest(CAST(:document_ids AS text[])) WITH ORDINALITY AS t(document_id, graph_rank)
+        ),
+        ranked_chunks AS (
+          SELECT c.id,
+                 c.document_id,
+                 c.document_version_id,
+                 c.ordinal,
+                 c.text,
+                 c.heading_path,
+                 c.page_start,
+                 c.page_end,
+                 c.metadata,
+                 c.security_level,
+                 c.classification,
+                 c.allowed_groups,
+                 c.allowed_roles,
+                 d.title,
+                 d.filename,
+                 d.source_uri,
+                 cite.file_id,
+                 wanted.graph_rank,
+                 row_number() OVER (PARTITION BY c.document_id ORDER BY c.ordinal) AS chunk_rank
+          FROM wanted
+          JOIN chunks c
+            ON c.document_id=wanted.document_id
+           AND c.tenant_id=:tenant_id
+           AND c.business_instance_id=:biz_id
+           AND c.vector_store_id=:vector_store_id
+           AND c.active=true
+           AND c.security_level <= :max_security_level
+          JOIN documents d
+            ON d.id=c.document_id
+           AND d.tenant_id=c.tenant_id
+           AND d.business_instance_id=c.business_instance_id
+          LEFT JOIN document_versions dv
+            ON dv.id=d.current_version_id
+           AND dv.document_id=d.id
+           AND dv.tenant_id=d.tenant_id
+           AND dv.business_instance_id=d.business_instance_id
+          LEFT JOIN LATERAL (
+            SELECT coalesce(
+                f.attributes->>'attached_from_file_id',
+                dv.metadata #>> '{attributes,_openai_file_id}',
+                f.document_id,
+                f.id
+            ) AS file_id
+            FROM vector_store_files f
+            WHERE f.tenant_id=c.tenant_id
+              AND f.business_instance_id=c.business_instance_id
+              AND f.document_id=c.document_id
+              AND f.vector_store_id=:vector_store_id
+              AND f.status <> 'cancelled'
+            ORDER BY f.created_at DESC
+            LIMIT 1
+          ) cite ON true
+        )
+        SELECT *
+        FROM ranked_chunks
+        WHERE chunk_rank=1
+        ORDER BY graph_rank
+        LIMIT :limit
+    """), {
+        "tenant_id": principal.tenant_id,
+        "biz_id": principal.business_instance_id,
+        "vector_store_id": vector_store_id,
+        "max_security_level": principal.max_security_level,
+        "document_ids": document_ids,
+        "limit": limit,
+    }).mappings().all()
+    scope = build_retrieval_scope(principal)
+    chunks = []
+    metadata_by_chunk_id: dict[str, dict[str, Any]] = {}
+    for index, row in enumerate(rows, start=1):
+        metadata = graph_meta_by_document_id.get(str(row["document_id"]), {})
+        chunk = ChunkRecord(
+            id=row["id"],
+            document_id=row["document_id"],
+            document_version_id=row["document_version_id"],
+            file_id=row["file_id"],
+            title=row["title"],
+            filename=row["filename"],
+            source_uri=row["source_uri"],
+            ordinal=row["ordinal"],
+            text=row["text"],
+            heading_path=list(row["heading_path"] or []),
+            page_start=row["page_start"],
+            page_end=row["page_end"],
+            metadata=dict(row["metadata"] or {}),
+            security_level=row["security_level"],
+            classification=row["classification"],
+            allowed_groups=list(row["allowed_groups"] or []),
+            allowed_roles=list(row["allowed_roles"] or []),
+            score=max(0.01, round(0.66 - (index * 0.01), 6)),
+            source="kscourts_graphrag_expansion",
+        )
+        if not chunk_allowed_by_scope(chunk, scope):
+            continue
+        chunk.citation = {"graph_expansion": metadata}
+        metadata_by_chunk_id[chunk.id] = metadata
+        chunks.append(chunk)
+    return chunks, metadata_by_chunk_id
+
+
+def _kscourts_graphrag_metadata_by_document(relation_rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    metadata: dict[str, dict[str, Any]] = {}
+    for row in relation_rows:
+        document_id = str(row["related_document_id"])
+        metadata.setdefault(document_id, {
+            "profile": "kscourts_postgres_graph_v1",
+            "relation_type": row["relation_type"],
+            "edge_id": row["edge_id"],
+            "source_document_id": row["seed_document_id"],
+            "target_document_id": document_id,
+            "attributes": dict(row.get("attributes") or {}),
+            "provenance": dict(row.get("provenance") or {}),
+        })
+    return metadata
+
+
+def _interleave_graph_expansion_chunks(chunks: list[ChunkRecord], graph_chunks: list[ChunkRecord]) -> list[ChunkRecord]:
+    if not graph_chunks:
+        return chunks
+    existing_ids = {chunk.id for chunk in chunks}
+    additions = [chunk for chunk in graph_chunks if chunk.id not in existing_ids]
+    if not additions:
+        return chunks
+    if not chunks:
+        return additions
+    return [chunks[0], *additions, *chunks[1:]]
+
+
+def _annotate_openai_search_page_with_graph(
+    page: dict[str, Any],
+    graph_metadata_by_document_id: dict[str, dict[str, Any]],
+    graph_metadata_by_chunk_id: dict[str, dict[str, Any]],
+    summary: dict[str, Any],
+) -> dict[str, Any]:
+    annotated = 0
+    for item in page.get("data") or []:
+        citation = item.get("citation") if isinstance(item, dict) else None
+        if not isinstance(citation, dict):
+            continue
+        graph_metadata = (
+            graph_metadata_by_chunk_id.get(str(citation.get("chunk_id")))
+            or graph_metadata_by_document_id.get(str(citation.get("document_id")))
+        )
+        if not graph_metadata:
+            continue
+        citation["graph_expansion"] = graph_metadata
+        for candidate in item.get("citations") or []:
+            if isinstance(candidate, dict) and candidate.get("chunk_id") == citation.get("chunk_id"):
+                candidate["graph_expansion"] = graph_metadata
+        annotated += 1
+    for citation in page.get("citations") or []:
+        if not isinstance(citation, dict):
+            continue
+        graph_metadata = (
+            graph_metadata_by_chunk_id.get(str(citation.get("chunk_id")))
+            or graph_metadata_by_document_id.get(str(citation.get("document_id")))
+        )
+        if graph_metadata:
+            citation["graph_expansion"] = graph_metadata
+    graph_summary = dict(summary)
+    graph_summary["annotated_result_count"] = annotated
+    page["graph_expansion"] = graph_summary
+    return page
+
+
+def _apply_kscourts_graphrag_expansion(
+    db: Session,
+    principal: Principal,
+    vector_store_id: str,
+    chunks: list[ChunkRecord],
+    *,
+    enabled: bool,
+    query: str | list[str],
+) -> tuple[list[ChunkRecord], dict[str, dict[str, Any]], dict[str, dict[str, Any]], dict[str, Any] | None]:
+    if not enabled:
+        return chunks, {}, {}, None
+    if not _query_has_kscourts_graphrag_intent(query):
+        return chunks, {}, {}, {"enabled": True, "applied": False, "reason": "no_graph_intent"}
+    seed_document_ids = []
+    for chunk in chunks:
+        if chunk.document_id not in seed_document_ids:
+            seed_document_ids.append(chunk.document_id)
+        if len(seed_document_ids) >= 10:
+            break
+    limit = _graph_expansion_limit()
+    if not seed_document_ids or limit <= 0:
+        return chunks, {}, {}, {"enabled": True, "applied": False, "reason": "no_seed_documents"}
+    relation_rows = _kscourts_graphrag_relation_rows(db, principal, vector_store_id, seed_document_ids, limit=limit * 4)
+    metadata_by_document_id = _kscourts_graphrag_metadata_by_document(relation_rows)
+    graph_chunks, metadata_by_chunk_id = _hydrate_kscourts_graphrag_chunks(
+        db,
+        principal,
+        vector_store_id,
+        relation_rows,
+        {chunk.document_id for chunk in chunks},
+        limit=limit,
+    )
+    expanded = _interleave_graph_expansion_chunks(chunks, graph_chunks[:limit])
+    relation_types = sorted({str(row["relation_type"]) for row in relation_rows})
+    return expanded, metadata_by_document_id, metadata_by_chunk_id, {
+        "enabled": True,
+        "applied": bool(relation_rows),
+        "candidate_count": len(relation_rows),
+        "inserted_chunk_count": len(graph_chunks),
+        "relation_types": relation_types,
+    }
+
+
 async def _openai_vector_store_search_page(
     vector_store_id: str,
     req: OpenAIVectorStoreSearchRequest,
@@ -1943,23 +2374,31 @@ async def _openai_vector_store_search_page(
     _refresh_vector_store_activity_or_404(db, principal, vector_store_id)
     search_kwargs = openai_search_options_to_search_request_kwargs(req)
     raw_queries = req.query if isinstance(req.query, list) else [req.query]
-    query_plans = [plan_query(query, rewrite_query=req.rewrite_query) for query in raw_queries]
+    query_planner_profile_id = os.getenv("SVS_QUERY_PLANNER_PROFILE_ID") or None
+    query_plans = [
+        plan_query(query, rewrite_query=req.rewrite_query, profile_id=query_planner_profile_id)
+        for query in raw_queries
+    ]
     effective_search_query = (
         query_plans[0].effective_query
         if isinstance(req.query, str)
         else [query_plan.effective_query for query_plan in query_plans]
     )
-    subqueries = [
-        subquery
+    base_filters = dict(search_kwargs.pop('filters') or {})
+    base_filters['vector_store_id'] = vector_store_id
+    search_jobs = [
+        (subquery, merge_query_filters(base_filters, query_plan.filters))
         for query_plan in query_plans
         for subquery in query_plan.subqueries
     ]
-    filters = dict(search_kwargs.pop('filters') or {})
-    filters['vector_store_id'] = vector_store_id
+    subqueries = [subquery for subquery, _filters in search_jobs]
     search_kwargs.pop('query', None)
+    legal_exact_diversity = _legal_exact_document_diversity_enabled(query_planner_profile_id, query_plans)
     page_size = req.top_k or req.max_num_results
     page_offset = vector_store_search_next_page_offset(req.next_page)
     search_fetch_limit = page_offset + page_size + 1
+    if legal_exact_diversity:
+        search_fetch_limit = max(search_fetch_limit, page_offset + max(page_size * 5, 50) + 1)
     search_kwargs['top_k'] = search_fetch_limit
     metadata = dict(search_kwargs.pop('search_metadata') or {})
     compat_meta = dict(metadata.get('openai_compat') or {})
@@ -1967,18 +2406,41 @@ async def _openai_vector_store_search_page(
         'effective_query': effective_search_query,
         'subqueries': subqueries,
         'rewritten': any(query_plan.rewritten for query_plan in query_plans),
+        'query_planner_profile_id': query_planner_profile_id,
+        'planned_filters': [query_plan.filters for query_plan in query_plans],
+        'legal_exact_document_diversity': legal_exact_diversity,
+        'search_fetch_limit': search_fetch_limit,
         'page_offset': page_offset,
     })
     metadata['openai_compat'] = compat_meta
     result_lists = []
-    for subquery in subqueries:
+    for subquery, filters in search_jobs:
         result = await retrieval.search(db, principal, SearchRequest(vector_store_id=vector_store_id, filters=filters, query=subquery, search_metadata=metadata, **search_kwargs))
         result_lists.append(result.results)
     chunks = merge_chunk_results(result_lists, search_fetch_limit)
     chunks = apply_openai_ranking_options(req, chunks, limit=search_fetch_limit)
+    if legal_exact_diversity:
+        chunks = _document_diversified_chunks(chunks)
+    graphrag_enabled = _kscourts_graphrag_enabled(query_planner_profile_id)
+    chunks, graph_metadata_by_document_id, graph_metadata_by_chunk_id, graph_summary = _apply_kscourts_graphrag_expansion(
+        db,
+        principal,
+        vector_store_id,
+        chunks,
+        enabled=graphrag_enabled,
+        query=req.query,
+    )
     chunks, next_page = vector_store_search_page_window(req, chunks)
     file_lookup = _vector_store_file_lookup(db, principal, vector_store_id, [ch.document_id for ch in chunks])
-    return vector_store_search_results_page(req, chunks, file_lookup, search_query=effective_search_query, next_page=next_page)
+    page = vector_store_search_results_page(req, chunks, file_lookup, search_query=effective_search_query, next_page=next_page)
+    if graph_summary is not None:
+        page = _annotate_openai_search_page_with_graph(
+            page,
+            graph_metadata_by_document_id,
+            graph_metadata_by_chunk_id,
+            graph_summary,
+        )
+    return page
 
 
 @app.post(

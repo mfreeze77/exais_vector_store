@@ -117,6 +117,12 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-107 OpenAI Uploaded File ID Citation Parity](./WAVE-107-openai-uploaded-file-id-citation-parity.md)
 - [WAVE-108 Golden Query Bakeoff Metrics](./WAVE-108-golden-query-bakeoff-metrics.md)
 - [WAVE-109 Expert AI Services Live Retrieval Quality Gate](./WAVE-109-expertaiservices-live-retrieval-quality-gate.md)
+- [WAVE-110 Customer Private VPS Operator Console](./WAVE-110-customer-private-vps-operator-console.md)
+- [WAVE-111 Kansas Court Decisions Corpus Ingestion](./WAVE-111-kansas-court-decisions-ingestion.md)
+- [WAVE-112 Kansas Court Decisions GraphRAG Readiness](./WAVE-112-kansas-court-decisions-graphrag-readiness.md)
+- [WAVE-113 Kansas Civics Instance Query Planner](./WAVE-113-kansas-civics-instance-query-planner.md)
+- [WAVE-114 Kansas Civics Legal Exact Result Diversity](./WAVE-114-kansas-civics-legal-exact-result-diversity.md)
+- [WAVE-115 Kansas Civics GraphRAG Search Expansion](./WAVE-115-kansas-civics-graphrag-search-expansion.md)
 
 ## Execution Model
 
@@ -149,6 +155,13 @@ PYTHONPATH=packages/svs_common:apps/api:apps/worker:apps/model_gateway:apps/inst
   pytest -q -rs
 npm --prefix apps/admin_ui run build
 docker compose config
+```
+
+When host Python/npm dependencies or the Docker Compose plugin are unavailable,
+use the Docker-first proof helper instead:
+
+```powershell
+python scripts/release/local-proof.py --cell ks-state-civics
 ```
 
 Use `./scripts/smoke-test.sh`, migrations, Docker services, or live integration

@@ -37,6 +37,9 @@ docker compose up -d postgres redis qdrant minio api worker model-gateway admin-
 ./scripts/smoke-test.sh
 ```
 
+If the Docker Compose plugin is not installed, use the standalone binary:
+`docker-compose up -d postgres redis qdrant minio api worker model-gateway admin-ui`.
+
 For the smallest micro-production cell, keep `SVS_SPARSE_BACKEND=postgres_fts`. For a standard business cell with stronger sparse/code retrieval, set `SVS_SPARSE_BACKEND=opensearch` and start the OpenSearch service.
 
 ## Key docs
@@ -98,6 +101,18 @@ API/admin access through the Docker cell-network fallback on this Windows host.
 The live Postgres RLS integration suite remains wired in `.github/workflows/ci.yml`
 under `postgres-rls-integration` and requires a Docker Compose Postgres service
 plus `SVS_RUN_INTEGRATION=1`.
+
+On Windows hosts without local Python test dependencies, local npm dependencies,
+or the Docker Compose plugin, run the Docker-first proof helper instead:
+
+```powershell
+python scripts/release/local-proof.py --cell ks-state-civics
+```
+
+The helper auto-selects `docker-compose` when the `docker compose` plugin is
+missing, runs API readiness inside the running API container when present, runs
+Python compile/tests inside the built API image, and builds the admin UI in a
+Node container with `node_modules` isolated in a Docker volume.
 
 ## Remaining production integration
 

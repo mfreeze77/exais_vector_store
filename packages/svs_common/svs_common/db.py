@@ -44,8 +44,15 @@ def get_session() -> Iterator[Session]:
     db = _SessionLocal()
     try:
         yield db
+    except Exception:
+        db.rollback()
+        raise
     finally:
-        db.close()
+        try:
+            if db.in_transaction():
+                db.rollback()
+        finally:
+            db.close()
 
 @contextmanager
 def scoped_session(principal: Principal | None = None) -> Iterator[Session]:

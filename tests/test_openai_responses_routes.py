@@ -1276,6 +1276,238 @@ def test_openai_vector_store_search_page_runs_planned_subqueries(monkeypatch):
     assert [item["citation"]["chunk_id"] for item in page["data"]] == ["chk_planned_1", "chk_planned_2"]
 
 
+def test_openai_vector_store_search_page_applies_instance_query_planner_filters(monkeypatch):
+    calls = []
+
+    async def fake_retrieval_search(db_session, principal, search_req):
+        calls.append(search_req)
+        return SearchResponse(
+            query=search_req.query,
+            results=[
+                ChunkRecord(
+                    id="chk_ks_docket",
+                    document_id="doc_ks_docket",
+                    ordinal=0,
+                    text="Evidence for State v. Perez",
+                    score=0.9,
+                )
+            ],
+        )
+
+    def fake_file_lookup(db_session, principal, vector_store_id, document_ids):
+        return {
+            "doc_ks_docket": {
+                "file_id": "file_ks_docket",
+                "filename": "State v. Perez.pdf",
+            },
+        }
+
+    monkeypatch.setenv("SVS_QUERY_PLANNER_PROFILE_ID", "ks_civics_legal_v1")
+    monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", lambda *args, **kwargs: None)
+    monkeypatch.setattr(api_main, "_vector_store_file_lookup", fake_file_lookup)
+    monkeypatch.setattr(api_main.retrieval, "search", fake_retrieval_search)
+
+    page = asyncio.run(api_main._openai_vector_store_search_page(
+        "vs_route",
+        OpenAIVectorStoreSearchRequest(
+            query="Find State v. Perez docket 80739",
+            max_num_results=10,
+        ),
+        _principal(),
+        _Db(),
+    ))
+
+    assert [call.query for call in calls] == ["State v. Perez"]
+    assert calls[0].filters == {
+        "vector_store_id": "vs_route",
+        "file_attribute_filters": {"docket_number": "80739"},
+    }
+    assert calls[0].search_metadata["openai_compat"]["query_planner_profile_id"] == "ks_civics_legal_v1"
+    assert calls[0].search_metadata["openai_compat"]["planned_filters"] == [
+        {"file_attribute_filters": {"docket_number": "80739"}}
+    ]
+    assert page["search_query"] == "State v. Perez"
+    assert page["data"][0]["file_id"] == "file_ks_docket"
+
+
+def test_openai_vector_store_search_page_diversifies_legal_exact_duplicate_documents(monkeypatch):
+    calls = []
+
+    async def fake_retrieval_search(db_session, principal, search_req):
+        calls.append(search_req)
+        return SearchResponse(
+            query=search_req.query,
+            results=[
+                ChunkRecord(id="chk_harris_a_1", document_id="doc_harris_a", ordinal=0, text="Harris A 1", score=0.99),
+                ChunkRecord(id="chk_harris_a_2", document_id="doc_harris_a", ordinal=1, text="Harris A 2", score=0.98),
+                ChunkRecord(id="chk_harris_a_3", document_id="doc_harris_a", ordinal=2, text="Harris A 3", score=0.97),
+                ChunkRecord(id="chk_harris_b_1", document_id="doc_harris_b", ordinal=0, text="Harris B 1", score=0.50),
+                ChunkRecord(id="chk_harris_a_4", document_id="doc_harris_a", ordinal=3, text="Harris A 4", score=0.49),
+            ],
+        )
+
+    def fake_file_lookup(db_session, principal, vector_store_id, document_ids):
+        return {
+            "doc_harris_a": {
+                "file_id": "file_harris_a",
+                "filename": "State v. Harris A.pdf",
+                "attributes": {"docket_number": "116515"},
+            },
+            "doc_harris_b": {
+                "file_id": "file_harris_b",
+                "filename": "State v. Harris B.pdf",
+                "attributes": {"docket_number": "116515"},
+            },
+        }
+
+    monkeypatch.setenv("SVS_QUERY_PLANNER_PROFILE_ID", "ks_civics_legal_v1")
+    monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", lambda *args, **kwargs: None)
+    monkeypatch.setattr(api_main, "_vector_store_file_lookup", fake_file_lookup)
+    monkeypatch.setattr(api_main.retrieval, "search", fake_retrieval_search)
+
+    page = asyncio.run(api_main._openai_vector_store_search_page(
+        "vs_route",
+        OpenAIVectorStoreSearchRequest(
+            query="State v. Harris docket 116515",
+            max_num_results=3,
+        ),
+        _principal(),
+        _Db(),
+    ))
+
+    assert calls[0].top_k == 51
+    assert calls[0].search_metadata["openai_compat"]["legal_exact_document_diversity"] is True
+    assert calls[0].search_metadata["openai_compat"]["search_fetch_limit"] == 51
+    assert [item["file_id"] for item in page["data"]] == ["file_harris_a", "file_harris_b", "file_harris_a"]
+    assert [item["citation"]["chunk_id"] for item in page["data"]] == ["chk_harris_a_1", "chk_harris_b_1", "chk_harris_a_2"]
+
+
+def test_openai_vector_store_search_page_keeps_graphrag_disabled(monkeypatch):
+    calls = []
+
+    async def fake_retrieval_search(db_session, principal, search_req):
+        calls.append(search_req)
+        return SearchResponse(
+            query=search_req.query,
+            results=[
+                ChunkRecord(id="chk_direct", document_id="doc_direct", ordinal=0, text="Direct vector hit", score=0.9),
+            ],
+        )
+
+    def fail_graph_relation_lookup(*args, **kwargs):
+        raise AssertionError("disabled GraphRAG must not query graph tables")
+
+    def fake_file_lookup(db_session, principal, vector_store_id, document_ids):
+        return {"doc_direct": {"file_id": "file_direct", "filename": "direct.pdf"}}
+
+    monkeypatch.setenv("SVS_QUERY_PLANNER_PROFILE_ID", "ks_civics_legal_v1")
+    monkeypatch.delenv("SVS_KSCOURTS_GRAPHRAG_ENABLED", raising=False)
+    monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", lambda *args, **kwargs: None)
+    monkeypatch.setattr(api_main, "_vector_store_file_lookup", fake_file_lookup)
+    monkeypatch.setattr(api_main, "_kscourts_graphrag_relation_rows", fail_graph_relation_lookup)
+    monkeypatch.setattr(api_main.retrieval, "search", fake_retrieval_search)
+
+    page = asyncio.run(api_main._openai_vector_store_search_page(
+        "vs_route",
+        OpenAIVectorStoreSearchRequest(
+            query="related cases for State v. Harris docket 116515",
+            max_num_results=5,
+        ),
+        _principal(),
+        _Db(),
+    ))
+
+    assert len(calls) == 1
+    assert "graph_expansion" not in page
+    assert [item["file_id"] for item in page["data"]] == ["file_direct"]
+
+
+def test_openai_vector_store_search_page_adds_opt_in_graphrag_expansion(monkeypatch):
+    metadata = {
+        "profile": "kscourts_postgres_graph_v1",
+        "relation_type": "same_docket",
+        "edge_id": "edge_same_docket",
+        "source_document_id": "doc_direct",
+        "target_document_id": "doc_related",
+        "attributes": {"docket_number": "116515"},
+        "provenance": {"extraction_method": "metadata", "confidence": 1.0},
+    }
+
+    async def fake_retrieval_search(db_session, principal, search_req):
+        return SearchResponse(
+            query=search_req.query,
+            results=[
+                ChunkRecord(id="chk_direct", document_id="doc_direct", ordinal=0, text="Direct vector hit", score=0.9),
+                ChunkRecord(id="chk_other", document_id="doc_other", ordinal=0, text="Other vector hit", score=0.8),
+            ],
+        )
+
+    def fake_relation_rows(db_session, principal, vector_store_id, seed_document_ids, *, limit):
+        assert vector_store_id == "vs_route"
+        assert seed_document_ids[:1] == ["doc_direct"]
+        return [{
+            "edge_id": "edge_same_docket",
+            "relation_type": "same_docket",
+            "seed_document_id": "doc_direct",
+            "related_document_id": "doc_related",
+            "attributes": {"docket_number": "116515"},
+            "provenance": {"extraction_method": "metadata", "confidence": 1.0},
+        }]
+
+    def fake_hydrate(db_session, principal, vector_store_id, relation_rows, existing_document_ids, *, limit):
+        assert existing_document_ids == {"doc_direct", "doc_other"}
+        chunk = ChunkRecord(
+            id="chk_related",
+            document_id="doc_related",
+            ordinal=0,
+            text="Graph-expanded same-docket opinion",
+            score=0.65,
+            source="kscourts_graphrag_expansion",
+            citation={"graph_expansion": metadata},
+        )
+        return [chunk], {"chk_related": metadata}
+
+    def fake_file_lookup(db_session, principal, vector_store_id, document_ids):
+        return {
+            "doc_direct": {"file_id": "file_direct", "filename": "direct.pdf"},
+            "doc_related": {"file_id": "file_related", "filename": "related.pdf"},
+            "doc_other": {"file_id": "file_other", "filename": "other.pdf"},
+        }
+
+    monkeypatch.setenv("SVS_QUERY_PLANNER_PROFILE_ID", "ks_civics_legal_v1")
+    monkeypatch.setenv("SVS_KSCOURTS_GRAPHRAG_ENABLED", "true")
+    monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", lambda *args, **kwargs: None)
+    monkeypatch.setattr(api_main, "_vector_store_file_lookup", fake_file_lookup)
+    monkeypatch.setattr(api_main, "_kscourts_graphrag_relation_rows", fake_relation_rows)
+    monkeypatch.setattr(api_main, "_hydrate_kscourts_graphrag_chunks", fake_hydrate)
+    monkeypatch.setattr(api_main.retrieval, "search", fake_retrieval_search)
+
+    page = asyncio.run(api_main._openai_vector_store_search_page(
+        "vs_route",
+        OpenAIVectorStoreSearchRequest(
+            query="related cases for State v. Harris docket 116515",
+            max_num_results=5,
+        ),
+        _principal(),
+        _Db(),
+    ))
+
+    assert [item["file_id"] for item in page["data"][:3]] == ["file_direct", "file_related", "file_other"]
+    assert page["graph_expansion"] == {
+        "enabled": True,
+        "applied": True,
+        "candidate_count": 1,
+        "inserted_chunk_count": 1,
+        "relation_types": ["same_docket"],
+        "annotated_result_count": 1,
+    }
+    graph_citation = page["data"][1]["citation"]["graph_expansion"]
+    assert graph_citation["relation_type"] == "same_docket"
+    assert graph_citation["edge_id"] == "edge_same_docket"
+    assert graph_citation["source_document_id"] == "doc_direct"
+    assert graph_citation["target_document_id"] == "doc_related"
+
+
 def test_openai_vector_store_search_page_accepts_query_array(monkeypatch):
     calls = []
 

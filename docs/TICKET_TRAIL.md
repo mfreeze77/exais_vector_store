@@ -50,6 +50,23 @@ Status legend:
 - SVS-033 Code/table/log specialized parsers — implemented with code-symbol chunks, JSON/CSV/Markdown-table record chunks, log event-boundary chunks, and focused router/chunker proof.
 - SVS-034 Idempotent reindexing — implemented with cursor-aware repair, stable dense point/sparse doc replay, force/non-force selection proof, and repair-all script coverage. RM-001 reconciliation proof: `docker run --rm -v "${pwdPath}:/work" -w /work -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python -m pytest -q -rs tests/test_reindex_idempotency.py tests/test_index_cleanup.py tests/test_qdrant_repair_all_script.py tests/test_qdrant_repair_proof_script.py` -> `14 passed`.
 - SVS-035 Blue/green index versions — implemented with optional active index version suffixes for Qdrant/OpenSearch, default-name compatibility, and reindex collection/point metadata persistence proof.
+- SVS-036 Kansas Court Decisions corpus ingestion — implemented via WAVE-111
+  for manifest-driven, resumable ingestion of the local Kansas court decision
+  PDF corpus. The pilot importer performs text-first PDF extraction into
+  `pdf_markdown_external_v1`, preserves legal metadata, records failed PDFs,
+  supports bounded Marker fallback retries, blocks full-corpus runs on
+  `hash_mock` unless explicitly overridden, and produced local Docker proof for
+  `29` indexed pilot documents and `248` indexed chunks.
+- SVS-037 Kansas Court Decisions GraphRAG readiness — implemented via WAVE-112
+  with deterministic citation/entity extraction, source-grounded JSONL graph
+  artifacts, artifact-level authority/cited-by/related/filter eval proof, and a
+  Postgres-first backend recommendation before any production graph service is
+  introduced.
+- SVS-038 Kansas Civics GraphRAG search expansion — implemented via WAVE-115
+  with tenant-scoped Postgres graph staging tables, an idempotent Kansas graph
+  artifact loader, profile-scoped opt-in OpenAI vector-store search expansion,
+  graph relation citation metadata, and live `ks-state-civics` proof. This is
+  still additive GraphRAG, not a graph database or replacement retrieval path.
 
 ## EPIC-005 Model gateway/router
 
@@ -118,6 +135,12 @@ Status legend:
   dashboard panels, alert rules, and smoke proof. External SLO/load proof,
   production-scale observability, and customer-host deployment proof remain
   separate gates.
+- SVS-075 Customer-private VPS deployment model — ready-to-build for one
+  isolated Docker Compose cell per customer, with public HTTPS API/admin
+  endpoints only through a reverse proxy, no exposed data-plane service ports,
+  customer-specific secrets, volumes, backups, and upgrade windows. WAVE-110
+  owns the operator-console surface for this model; Hetzner provisioning,
+  registry credentials, DNS, and offsite restore proof remain operator gates.
 
 ## EPIC-009 Evals/fine-tuning
 
@@ -140,3 +163,10 @@ Status legend:
 - SVS-092 Ingest/search UI — scaffolded.
 - SVS-093 Production auth/session UI — ready-to-build.
 - SVS-094 Fleet/version dashboard — ready-to-build.
+- SVS-095 Customer private VPS operator console — implemented via WAVE-110.
+  The UI is now the Expert AI Services operator surface for customer
+  onboarding, vector-store/file management, ingestion status, scoped agent API
+  keys, OpenAI-compatible endpoint handoff, fleet health, release drift, and
+  backup readiness. The local Docker cell proof covered the rebuilt admin UI,
+  the OpenAI-compatible vector-store path, Responses file search, fleet version
+  reporting, and cleanup of temporary proof artifacts.

@@ -199,6 +199,7 @@ def test_admin_fleet_versions_uses_principal_scope_and_rls_queries(monkeypatch):
     assert "FROM business_instances" in executed_sql
     assert "FROM instance_deployments" in executed_sql
     assert "tenant_id=:tenant_id" in executed_sql
+    assert "CAST(:selected_business_id AS text) IS NULL" in executed_sql
     assert "business_instance_id=:selected_business_id" in executed_sql
 
 
