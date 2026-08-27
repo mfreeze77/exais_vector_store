@@ -141,6 +141,11 @@ Status legend:
   customer-specific secrets, volumes, backups, and upgrade windows. WAVE-110
   owns the operator-console surface for this model; Hetzner provisioning,
   registry credentials, DNS, and offsite restore proof remain operator gates.
+- SVS-076 Instance-scoped caller vector-store lifecycle — ready-to-build via
+  WAVE-116 for the API-key caller process that creates multiple vector stores,
+  uploads files, attaches or batches files, and hands only selected store IDs to
+  agents. This intentionally keeps API keys scoped at the customer-instance
+  level instead of adding per-key vector-store grant tables.
 
 ## EPIC-009 Evals/fine-tuning
 

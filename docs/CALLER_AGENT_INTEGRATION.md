@@ -65,6 +65,12 @@ Recommended scopes:
 Do not give a normal user-facing agent `api_keys:write`, `admin:*`, or ingestion
 scopes unless that agent is explicitly responsible for lifecycle operations.
 
+API keys are scoped to the customer instance, not to individual vector stores.
+Within the same tenant/business instance, the caller's scopes and security level
+control what it can do, and the caller-supplied `vector_store_id` controls which
+store it searches or mutates. If an agent should only use one or two stores, do
+not expose other store IDs in that agent's tool configuration.
+
 OpenAI-compatible admin API-key aliases also exist:
 
 ```http
@@ -77,6 +83,79 @@ DELETE /v1/organization/admin_api_keys/{key_id}
 `POST /v1/organization/admin_api_keys` returns the plaintext key once as
 `value`, but it inherits the current caller's scopes and max security level. Use
 the native create route when you need a purpose-built read-only agent key.
+
+## Vector-store and file lifecycle
+
+An API-key caller can create vector stores and upload files when the key has the
+right instance scopes:
+
+- `vector_stores:write` to create or update vector stores.
+- `documents:write` to upload files, attach files, and create file batches.
+- `retrieval:read` to search after ingestion.
+
+Create a vector store:
+
+```bash
+curl -sS -X POST "$EXAIS_API_BASE/v1/vector_stores" \
+  -H "Authorization: Bearer $EXAIS_INGEST_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "KS Law",
+    "metadata": {
+      "corpus": "ks_law"
+    }
+  }'
+```
+
+Upload a file in OpenAI-compatible form:
+
+```bash
+curl -sS -X POST "$EXAIS_API_BASE/v1/files" \
+  -H "Authorization: Bearer $EXAIS_INGEST_KEY" \
+  -F "purpose=assistants" \
+  -F "file=@./source.pdf"
+```
+
+Attach an uploaded file to a vector store:
+
+```bash
+curl -sS -X POST "$EXAIS_API_BASE/v1/vector_stores/$EXAIS_VECTOR_STORE_ID/files" \
+  -H "Authorization: Bearer $EXAIS_INGEST_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "file_id": "file-..."
+  }'
+```
+
+Create a vector store and attach existing files in one request:
+
+```bash
+curl -sS -X POST "$EXAIS_API_BASE/v1/vector_stores" \
+  -H "Authorization: Bearer $EXAIS_INGEST_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Kansas Supreme Court and Appeals",
+    "file_ids": ["file-..."],
+    "metadata": {
+      "corpus": "ks_courts"
+    }
+  }'
+```
+
+Attach many files with a batch:
+
+```bash
+curl -sS -X POST "$EXAIS_API_BASE/v1/vector_stores/$EXAIS_VECTOR_STORE_ID/file_batches" \
+  -H "Authorization: Bearer $EXAIS_INGEST_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "file_ids": ["file-...", "file-..."]
+  }'
+```
+
+The same uploaded file can be attached to more than one vector store inside the
+same instance. For example, a public Kansas law store and a court-opinion store
+can share source files when the caller intentionally attaches them to both.
 
 ## Recommended MCP tools
 
