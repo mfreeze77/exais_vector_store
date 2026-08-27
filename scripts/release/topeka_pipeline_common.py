@@ -245,6 +245,8 @@ def api_json_via_cell_network(
 ) -> dict[str, Any]:
     parts = urlsplit(url)
     cell_url = urlunsplit((parts.scheme, "api:8080", parts.path, parts.query, parts.fragment))
+    if not shutil.which("docker"):
+        return api_json_via_direct_http(method, cell_url, body, headers=headers, timeout=timeout)
     args = [
         "docker",
         "run",
@@ -265,6 +267,26 @@ def api_json_via_cell_network(
         args += ["--data-binary", "@-"]
     args.append(cell_url)
     return _run_curl_json(args, body, timeout=timeout, display_url=cell_url, method=method)
+
+
+def api_json_via_direct_http(
+    method: str,
+    url: str,
+    body: bytes | None,
+    *,
+    headers: dict[str, str],
+    timeout: int,
+) -> dict[str, Any]:
+    print(f"$ direct-http {method} {url}")
+    req = request.Request(url, data=body, headers=headers, method=method)
+    try:
+        with request.urlopen(req, timeout=timeout) as resp:
+            raw = resp.read().decode("utf-8")
+            print(f"{method} {url} -> {resp.status}")
+            return json.loads(raw) if raw else {}
+    except error.HTTPError as exc:
+        raw = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"{method} {url} failed with HTTP {exc.code}: {raw[:1200]}") from exc
 
 
 def _run_curl_json(

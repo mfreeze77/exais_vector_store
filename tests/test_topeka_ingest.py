@@ -129,6 +129,7 @@ def test_common_docker_network_transport_targets_cell_api_service(monkeypatch):
         captured["timeout"] = timeout
         return subprocess.CompletedProcess(args=args, returncode=0, stdout=b'{"ok": true}\n200\n')
 
+    monkeypatch.setattr(common.shutil, "which", lambda name: "docker" if name == "docker" else None)
     monkeypatch.setattr(common.subprocess, "run", fake_run)
 
     result = common.api_json(
@@ -148,3 +149,47 @@ def test_common_docker_network_transport_targets_cell_api_service(monkeypatch):
     assert "--network" in captured["args"]
     assert "exais-vector-store-ks-state-civics_default" in captured["args"]
     assert captured["args"][-1] == "http://api:8080/api/v1/documents/ingest"
+
+
+def test_common_docker_network_transport_uses_direct_http_without_docker_cli(monkeypatch):
+    common = load_script("topeka_pipeline_common_direct_transport", "topeka_pipeline_common.py")
+    captured = {}
+
+    class FakeResponse:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def read(self):
+            return b'{"ok": true}'
+
+    def fake_urlopen(req, timeout):
+        captured["url"] = req.full_url
+        captured["method"] = req.get_method()
+        captured["timeout"] = timeout
+        return FakeResponse()
+
+    monkeypatch.setattr(common.shutil, "which", lambda name: None)
+    monkeypatch.setattr(common.request, "urlopen", fake_urlopen)
+
+    result = common.api_json(
+        "POST",
+        "http://127.0.0.1:28080",
+        "/api/v1/documents/ingest",
+        {"x": 1},
+        headers={"Content-Type": "application/json"},
+        timeout=7,
+        cell="ks-state-civics",
+        transport="docker-network",
+    )
+
+    assert result == {"ok": True}
+    assert captured == {
+        "method": "POST",
+        "timeout": 7,
+        "url": "http://api:8080/api/v1/documents/ingest",
+    }
