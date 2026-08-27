@@ -44,7 +44,7 @@ caller key because it accepts explicit scopes.
 
 ```bash
 curl -sS -X POST \
-  "$EXAIS_API_BASE/api/v1/admin/api-keys?label=ks-agent-readonly&scopes=retrieval%3Aread%2Cvector_stores%3Aread&max_security_level=9" \
+  "$EXAIS_API_BASE/api/v1/admin/api-keys?label=ks-agent-readonly&scopes=retrieval%3Aread%2Cvector_stores%3Aread&max_security_level=5" \
   -H "Authorization: Bearer $EXAIS_ADMIN_KEY"
 ```
 
@@ -83,6 +83,37 @@ DELETE /v1/organization/admin_api_keys/{key_id}
 `POST /v1/organization/admin_api_keys` returns the plaintext key once as
 `value`, but it inherits the current caller's scopes and max security level. Use
 the native create route when you need a purpose-built read-only agent key.
+
+## First admin bootstrap
+
+A fresh production cell needs one bootstrap admin key before callers can use the
+API-key lifecycle routes. Use owner/migration database credentials once, and
+write the raw key outside the repository. The process environment must include
+the resolved `DATABASE_URL` and `SVS_API_KEY_PEPPER` values for the target cell:
+
+```bash
+python scripts/release/bootstrap-instance-admin-key.py \
+  --database-url "$DATABASE_URL" \
+  --tenant-id ten_ks_state_civics \
+  --tenant-name "KS State Civics" \
+  --tenant-slug ks-state-civics \
+  --business-instance-id biz_ks_state_civics \
+  --business-name "KS State Civics" \
+  --business-slug ks-state-civics \
+  --user-id usr_ks_state_civics_admin \
+  --user-email "operator@example.com" \
+  --user-display-name "KS State Civics Admin" \
+  --group-id grp_ks_state_civics_admins \
+  --knowledge-base-id kb_ks_state_civics \
+  --knowledge-base-name "KS State Civics KB" \
+  --knowledge-base-slug ks-state-civics \
+  --secret-output "$HOME/exais-secrets/ks-state-civics-admin-key.json"
+```
+
+The script creates the minimum tenant, business, operator user, admin group,
+membership, knowledge base, and admin API-key row under the correct RLS context.
+It refuses to write the raw key under the repo path. Use `--print-secret` only
+for an interactive one-time console handoff.
 
 ## Vector-store and file lifecycle
 
@@ -156,6 +187,24 @@ curl -sS -X POST "$EXAIS_API_BASE/v1/vector_stores/$EXAIS_VECTOR_STORE_ID/file_b
 The same uploaded file can be attached to more than one vector store inside the
 same instance. For example, a public Kansas law store and a court-opinion store
 can share source files when the caller intentionally attaches them to both.
+
+Run the repeatable lifecycle proof against a live cell after creating the
+bootstrap admin key:
+
+```bash
+python scripts/release/instance-caller-lifecycle-proof.py \
+  --api-base "$EXAIS_API_BASE" \
+  --admin-key "$EXAIS_ADMIN_KEY" \
+  --output .release/cells/ks-state-civics/caller-lifecycle-proof.json
+```
+
+When `--admin-key` is supplied, the proof script creates temporary ingestion and
+search-only API keys, creates two vector stores, uploads a fixture file, attaches
+it directly to one store, attaches it by file batch to another store, searches
+both stores with the search-only key, verifies citations, verifies
+multi-store `/v1/responses` file search, and revokes the temporary keys unless
+`--keep-created-keys` is passed. The output proof contains redacted key metadata
+only.
 
 ## Recommended MCP tools
 

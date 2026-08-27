@@ -144,8 +144,38 @@ python scripts/release/cell-access-proof.py \
 
 The current migrations seed the default Expert AI Services dev records. For a
 production customer cell, create an explicit Kansas tenant/business/bootstrap
-packet before ingestion. Use owner/migration credentials through a one-time
-operator script or psql session, then create scoped API keys through the API.
+packet before ingestion. Use owner/migration credentials through the one-time
+bootstrap helper, then create scoped API keys through the API.
+
+Preferred helper:
+
+Run it with the resolved production `DATABASE_URL` and `SVS_API_KEY_PEPPER` in
+the process environment. Do not pass secret references that have not been
+resolved yet.
+
+```bash
+python scripts/release/bootstrap-instance-admin-key.py \
+  --database-url "$DATABASE_URL" \
+  --tenant-id ten_ks_state_civics \
+  --tenant-name "KS State Civics" \
+  --tenant-slug ks-state-civics \
+  --business-instance-id biz_ks_state_civics \
+  --business-name "KS State Civics" \
+  --business-slug ks-state-civics \
+  --user-id usr_ks_state_civics_admin \
+  --user-email "<operator-email>" \
+  --user-display-name "KS State Civics Admin" \
+  --group-id grp_ks_state_civics_admins \
+  --knowledge-base-id kb_ks_state_civics \
+  --knowledge-base-name "KS State Civics KB" \
+  --knowledge-base-slug ks-state-civics \
+  --secret-output "<path-outside-repo>/ks-state-civics-admin-key.json"
+```
+
+The helper sets tenant/business RLS context, creates the minimum records below
+with `ON CONFLICT DO NOTHING`, inserts the first admin API-key hash, and refuses
+to write the raw key under the repo path. Use `--print-secret` only for an
+interactive one-time console handoff.
 
 Minimum records:
 
@@ -187,6 +217,21 @@ Agent keys should be narrower:
 ```text
 retrieval:read,vector_stores:read
 ```
+
+Run the caller lifecycle proof before handoff:
+
+```bash
+python scripts/release/instance-caller-lifecycle-proof.py \
+  --api-base "$EXAIS_API_BASE" \
+  --admin-key "$EXAIS_ADMIN_KEY" \
+  --output .release/cells/ks-state-civics/caller-lifecycle-proof.json
+```
+
+This creates temporary ingestion/search keys, creates two vector stores, uploads
+a fixture file, attaches it directly and through a file batch, searches the
+exposed stores with the search-only key, verifies citations, verifies
+multi-store `/v1/responses` file search, writes a redacted proof artifact, and
+revokes temporary keys unless `--keep-created-keys` is passed.
 
 ## Corpus Load
 

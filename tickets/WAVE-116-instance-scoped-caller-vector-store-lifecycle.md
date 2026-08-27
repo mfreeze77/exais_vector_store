@@ -64,22 +64,22 @@ that shows exactly how a customer instance creates and uses multiple stores.
 
 ## Acceptance Criteria
 
-- [ ] A fresh customer instance has a documented first-admin-key bootstrap step
+- [x] A fresh customer instance has a documented first-admin-key bootstrap step
   that does not store raw secrets in the repo.
-- [ ] An ingestion-capable key with
+- [x] An ingestion-capable key with
   `retrieval:read,vector_stores:read,vector_stores:write,documents:write` can
   create at least two vector stores.
-- [ ] The same ingestion-capable key can upload at least one file with
+- [x] The same ingestion-capable key can upload at least one file with
   `POST /v1/files`.
-- [ ] The same ingestion-capable key can attach that file to a vector store with
+- [x] The same ingestion-capable key can attach that file to a vector store with
   `POST /v1/vector_stores/{vector_store_id}/files`.
-- [ ] The same ingestion-capable key can create a file batch with
+- [x] The same ingestion-capable key can create a file batch with
   `POST /v1/vector_stores/{vector_store_id}/file_batches`.
-- [ ] A search-only key with `retrieval:read,vector_stores:read` can search the
+- [x] A search-only key with `retrieval:read,vector_stores:read` can search the
   exposed store IDs and receive OpenAI-style plus native citations.
-- [ ] `POST /v1/responses` with `file_search.vector_store_ids` can search
+- [x] `POST /v1/responses` with `file_search.vector_store_ids` can search
   multiple stores in the same customer instance.
-- [ ] Caller-agent docs include the instance-scoped store policy and lifecycle
+- [x] Caller-agent docs include the instance-scoped store policy and lifecycle
   examples.
 
 ## Verification
@@ -119,3 +119,37 @@ python -m pytest -q -rs tests/test_openai_files.py tests/test_openai_compat_sear
 If a future customer requires hidden vector stores to be a hard authorization
 boundary, add a new ticket for per-key vector-store grants. That is intentionally
 not part of this wave.
+
+## Implementation Proof
+
+Completed on 2026-08-27.
+
+Changed source:
+
+- `scripts/release/bootstrap-instance-admin-key.py`
+- `scripts/release/instance-caller-lifecycle-proof.py`
+- `tests/test_instance_caller_lifecycle_scripts.py`
+- `docs/CALLER_AGENT_INTEGRATION.md`
+- `runbooks/ks-state-civics-hetzner-vps-launch.md`
+- `docs/TICKET_TRAIL.md`
+
+Verification:
+
+- `python scripts\release\bootstrap-instance-admin-key.py --help` passed on
+  host Python.
+- `python scripts\release\instance-caller-lifecycle-proof.py --help` passed on
+  host Python.
+- `python -m py_compile scripts\release\bootstrap-instance-admin-key.py scripts\release\instance-caller-lifecycle-proof.py`
+  passed on host Python.
+- Docker API-image focused script tests passed:
+  `docker run --rm -v "${PWD}:/work" -w /work -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python -m pytest -q -rs tests/test_instance_caller_lifecycle_scripts.py`
+  -> `3 passed`.
+- Docker API-image OpenAI-compatible regression set passed:
+  `docker run --rm -v "${PWD}:/work" -w /work -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python -m pytest -q -rs tests/test_instance_caller_lifecycle_scripts.py tests/test_openai_files.py tests/test_openai_compat_search.py tests/test_openai_responses_routes.py tests/test_auth_scopes.py`
+  -> `201 passed`.
+- `git diff --check` passed.
+
+Runtime live-cell proof is implemented by
+`scripts/release/instance-caller-lifecycle-proof.py` but was not executed against
+a live VPS/API endpoint in this implementation turn because no production
+endpoint and bearer credentials were supplied.
