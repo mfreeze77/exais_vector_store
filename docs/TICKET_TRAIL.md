@@ -148,6 +148,13 @@ Status legend:
   level instead of adding per-key vector-store grant tables. The implementation
   added first-admin-key bootstrap and live caller-lifecycle proof scripts with
   secret-redaction tests; live VPS proof remains an operator handoff gate.
+- SVS-077 Instance vector-store source packages — implemented via WAVE-117 as a
+  pre-VPS rollout gate. Each customer vector store loaded from scraped or
+  externally collected data must have an instance-owned source package with the
+  collector entrypoint, portable source reference, manifest/checksum lock,
+  API-only update policy, GraphRAG/eval proof policy, validation command, and
+  dry-run update planner. KS State Civics now has the first package before
+  migrated-volume handoff or first Hetzner launch.
 
 ## EPIC-009 Evals/fine-tuning
 

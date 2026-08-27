@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "exai_vector_store Vector Store Source Package",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "vectorStore",
+    "source",
+    "ingestion",
+    "updatePolicy",
+    "graph",
+    "eval"
+  ],
+  "properties": {
+    "apiVersion": {
+      "const": "svs/v1"
+    },
+    "kind": {
+      "const": "VectorStoreSourcePackage"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["instanceSlug", "vectorStoreSlug", "sourceSlug"],
+      "properties": {
+        "instanceSlug": {"type": "string", "minLength": 1},
+        "vectorStoreSlug": {"type": "string", "minLength": 1},
+        "sourceSlug": {"type": "string", "minLength": 1},
+        "productionReady": {"type": "boolean"}
+      },
+      "additionalProperties": true
+    },
+    "vectorStore": {
+      "type": "object",
+      "required": ["id", "name", "tenantId", "businessInstanceId", "knowledgeBaseId"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "tenantId": {"type": "string", "minLength": 1},
+        "businessInstanceId": {"type": "string", "minLength": 1},
+        "knowledgeBaseId": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    },
+    "source": {
+      "type": "object",
+      "required": ["type", "connector", "storage", "manifest"],
+      "properties": {
+        "type": {"type": "string", "minLength": 1},
+        "connector": {
+          "type": "object",
+          "required": ["kind", "entrypoint"],
+          "properties": {
+            "kind": {"type": "string", "minLength": 1},
+            "entrypoint": {"type": "string", "minLength": 1},
+            "repository": {"type": "string"},
+            "revision": {"type": "string"}
+          },
+          "additionalProperties": true
+        },
+        "storage": {
+          "type": "object",
+          "required": ["rawCorpusUri", "manifestUri"],
+          "properties": {
+            "rawCorpusUri": {"type": "string", "minLength": 1},
+            "manifestUri": {"type": "string", "minLength": 1},
+            "backupUri": {"type": "string"},
+            "localProofPath": {"type": "string"},
+            "localProofOnly": {"type": "boolean"}
+          },
+          "additionalProperties": true
+        },
+        "manifest": {
+          "type": "object",
+          "required": [
+            "format",
+            "stableIdentityFields",
+            "checksumField",
+            "savedPathField",
+            "lockFile"
+          ],
+          "properties": {
+            "format": {"enum": ["csv", "jsonl"]},
+            "stableIdentityFields": {
+              "type": "array",
+              "minItems": 1,
+              "items": {"type": "string", "minLength": 1}
+            },
+            "checksumField": {"type": "string", "minLength": 1},
+            "savedPathField": {"type": "string", "minLength": 1},
+            "lockFile": {"type": "string", "minLength": 1},
+            "rowCount": {"type": "integer", "minimum": 0},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "byteCount": {"type": "integer", "minimum": 0}
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "ingestion": {
+      "type": "object",
+      "required": ["mode", "runner", "command", "idempotency"],
+      "properties": {
+        "mode": {"const": "api"},
+        "runner": {"type": "string", "minLength": 1},
+        "command": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string"}
+        },
+        "idempotency": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    },
+    "updatePolicy": {
+      "type": "object",
+      "required": ["diffMode", "removedRecords", "dryRunRequired"],
+      "properties": {
+        "diffMode": {"type": "string", "minLength": 1},
+        "removedRecords": {"type": "string", "minLength": 1},
+        "dryRunRequired": {"type": "boolean"}
+      },
+      "additionalProperties": true
+    },
+    "graph": {
+      "type": "object",
+      "required": ["enabled"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "extractCommand": {"type": "array", "items": {"type": "string"}},
+        "loadCommand": {"type": "array", "items": {"type": "string"}},
+        "evalCommand": {"type": "array", "items": {"type": "string"}},
+        "expectedProofArtifacts": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": true
+    },
+    "eval": {
+      "type": "object",
+      "required": ["command", "expectedProofArtifacts"],
+      "properties": {
+        "command": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "expectedProofArtifacts": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

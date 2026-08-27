@@ -20,6 +20,9 @@ Use this for one dedicated VPS running one isolated Docker Compose stack:
   `vault://`, or `envref://`.
 - The generic Terraform/Ansible files are scaffolds. Treat Hetzner host
   creation, DNS, firewall, TLS, and offsite backups as operator proof gates.
+- First VPS rollout is gated on WAVE-117: the Kansas Court Decisions vector
+  store must have a validated instance source package before migrated-volume
+  handoff, reingestion, or production update is called complete.
 
 ## Required Operator Inputs
 
@@ -33,6 +36,9 @@ Use this for one dedicated VPS running one isolated Docker Compose stack:
   `envref://` injector.
 - Embedding provider choice. Do not use `hash_mock` for the production corpus.
 - Kansas court decision source corpus path or transfer plan.
+- Validated source package for each vector store being migrated or replayed.
+  For the pilot this means
+  `instances/ks-state-civics/vector-stores/kansas-court-decisions`.
 
 ## Recommended VPS Shape
 
@@ -77,6 +83,31 @@ This writes:
 
 Copy the approved `release-manifest.json` to the VPS proof path used by
 `cell-up.py`.
+
+## Source Package Gate
+
+Before migrating local volumes, replaying the corpus, or calling the first VPS
+launch complete, validate the instance source package:
+
+```bash
+python scripts/release/validate-instance-source-packages.py \
+  --instance ks-state-civics \
+  --production
+```
+
+Then capture the dry-run update plan:
+
+```bash
+python scripts/release/instance-source-update.py \
+  --instance ks-state-civics \
+  --vector-store kansas-court-decisions \
+  --source kscourts-decisions \
+  --dry-run \
+  --production
+```
+
+The dry-run must report `api_only_update_path=true`,
+`direct_storage_writes=false`, and `mutation_performed=false`.
 
 ## Production Env
 

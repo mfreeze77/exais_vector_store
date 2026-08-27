@@ -1,0 +1,102 @@
+apiVersion: svs/v1
+kind: VectorStoreSourcePackage
+metadata:
+  instanceSlug: ks-state-civics
+  vectorStoreSlug: kansas-court-decisions
+  sourceSlug: kscourts-decisions
+  productionReady: true
+vectorStore:
+  id: vs_a0d3ac76893e4f6f83bf2992
+  name: Kansas Court Decisions
+  tenantId: ten_ks_state_civics
+  businessInstanceId: biz_ks_state_civics
+  knowledgeBaseId: kb_ks_state_civics
+source:
+  type: kscourts_decisions
+  connector:
+    kind: external_repo
+    repository: operator-source://ksa-diff-collector-main
+    entrypoint: collector/sources/kscourts_decisions.py
+    companionScript: scripts/download_kscourts_decisions.py
+    revision: local-archive-2026-08-08
+  storage:
+    rawCorpusUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/kscourts-decisions/pdfs/
+    manifestUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/kscourts-decisions/decisions_manifest.csv
+    backupUri: backup://exai-vector-store-ks-state-civics/sources/kscourts-decisions/2026-08-08/
+    localProofPath: 'C:\Users\mfrie\Ai_Projects\ksa-diff-collector-main\data\raw\kscourts-decisions\decisions_manifest.csv'
+    localProofOnly: true
+  manifest:
+    format: csv
+    stableIdentityFields:
+      - document_id
+      - docket_number
+      - filename
+    checksumField: sha256
+    savedPathField: saved_path
+    lockFile: source.lock.json
+    rowCount: 16728
+    sha256: 405550f9c167048dc31b74c4fcc8f438109154caa7e192fb4de9413c734b0365
+    byteCount: 8784741
+ingestion:
+  mode: api
+  runner: scripts/release/kscourts-ingest.py
+  command:
+    - python
+    - scripts/release/kscourts-ingest.py
+    - --cell
+    - ks-state-civics
+    - --source-root
+    - ${KSCOURTS_SOURCE_ROOT}
+    - --manifest
+    - data/raw/kscourts-decisions/decisions_manifest.csv
+    - --vector-store-name
+    - Kansas Court Decisions
+    - --knowledge-base-id
+    - kb_ks_state_civics
+    - --full-corpus
+    - --api-transport
+    - docker-network
+  idempotency: source_identity_sha256
+updatePolicy:
+  diffMode: stable_identity_and_checksum
+  removedRecords: soft_delete_or_expire_after_operator_approval
+  dryRunRequired: true
+graph:
+  enabled: true
+  extractCommand:
+    - python
+    - scripts/release/kscourts-graphrag-extract.py
+    - --vector-store-id
+    - vs_a0d3ac76893e4f6f83bf2992
+    - --tenant-id
+    - ten_ks_state_civics
+    - --business-instance-id
+    - biz_ks_state_civics
+    - --output-dir
+    - .release/cells/ks-state-civics/graphrag/full
+  loadCommand:
+    - python
+    - scripts/release/kscourts-graphrag-load.py
+    - --graph-artifact
+    - .release/cells/ks-state-civics/graphrag/full
+  evalCommand:
+    - python
+    - scripts/release/kscourts-graphrag-eval.py
+    - --cell
+    - ks-state-civics
+    - --vector-store-id
+    - vs_a0d3ac76893e4f6f83bf2992
+  expectedProofArtifacts:
+    - .release/cells/ks-state-civics/graphrag/full/graph-summary.json
+    - .release/cells/ks-state-civics/graphrag/full/load-proof.json
+    - .release/cells/ks-state-civics/graphrag/full/eval-proof.json
+eval:
+  command:
+    - python
+    - scripts/release/kscourts-recall-eval.py
+    - --cell
+    - ks-state-civics
+    - --vector-store-id
+    - vs_a0d3ac76893e4f6f83bf2992
+  expectedProofArtifacts:
+    - .release/cells/ks-state-civics/kscourts-recall-eval.json
