@@ -4,7 +4,7 @@ metadata:
   instanceSlug: ks-state-civics
   vectorStoreSlug: topeka-municipal-code
 vectorStore:
-  id: vs_topeka_municipal_code_pending
+  id: vs_268b119a2cd84b568af62155
   name: Topeka Municipal Code
   tenantId: ten_ks_state_civics
   businessInstanceId: biz_ks_state_civics
@@ -12,5 +12,7 @@ vectorStore:
   corpus: topeka_municipal_code
   currentLocalProof:
     observedAt: '2026-08-27'
-    status: planned_source_package
-    note: Codified-code and ordinance-PDF source packages are prepared, but the live vector store has not been created or seeded.
+    status: pilot_seeded
+    documentCount: 1
+    recallPassed: false
+    note: Live vector store exists and has a one-section codified-code pilot seed. Broad current-code recall remains blocked until the full codified corpus can be acquired.

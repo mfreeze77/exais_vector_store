@@ -60,7 +60,7 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - The codified-code parser now rejects non-number word fragments as ordinance history and preserves distinct ordinance-history graph edges by ordinance/section/date/raw value.
 - Bounded live proof on `https://topeka.municipal.codes/TMC/18.55.010` produced 1 section, 326 definitions, 17 numbered ordinance-history rows, 336 graph nodes, 343 graph edges, and 328 citation URL rows.
 - Bounded live ordinance collector proof against the official City of Topeka ordinance page with `--limit 2` wrote two ordinance PDF records with no failures.
-- Topeka source packages remain `productionReady: false` and still use `vs_topeka_municipal_code_pending` until a real vector store ID and live corpus proof exist.
+- Topeka source packages remain `productionReady: false`; the local pilot vector store is `vs_268b119a2cd84b568af62155`, but broad recall is still blocked until the full codified corpus can be acquired.
 
 ## Acceptance Criteria
 
@@ -89,7 +89,7 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 1. Run a bounded Playwright full-corpus discovery crawl and inspect skipped/challenge-only URLs.
 2. Produce codified-code seed artifacts and verify section count, citation URL count, graph node/edge count, and failure list.
 3. Build and test the official ordinance PDF collector and manifest.
-4. Create/find the real `topeka-municipal-code` vector store ID through the ExAIS API and update source packages away from `vs_topeka_municipal_code_pending`.
+4. Full-corpus gate: keep `productionReady: false` until the codified-code acquisition path can crawl all required source pages and broad recall passes.
 5. Implement codified-code and ordinance API ingestion, using `citation_url`/`pdf_url` as document `source_uri`.
 6. Implement graph load/eval proof for codified references, definitions, ordinance history, and ordinance-to-section edges.
 7. Run recall proof for current-law and amendment-history questions.

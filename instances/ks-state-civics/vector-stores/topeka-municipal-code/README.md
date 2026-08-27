@@ -7,7 +7,7 @@ This vector store belongs to the `ks-state-civics` instance and is intended to h
 
 The split is deliberate. Codified sections are the best source for current-law answers. Ordinance PDFs are the best source for amendment history, adoption language, repeals, and official legislative trail.
 
-Status: planned. The package uses `vs_topeka_municipal_code_pending` until an operator creates the real vector store through the ExAIS API and updates this file plus both source packages.
+Status: pilot seeded. The live local vector store is `vs_268b119a2cd84b568af62155`; it currently contains a one-section codified-code pilot seed, not the full Topeka Municipal Code corpus.
 
 Citation policy:
 
