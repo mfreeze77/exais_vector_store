@@ -1,0 +1,52 @@
+apiVersion: svs/v1
+kind: Instance
+metadata:
+  instanceId: inst_ks_state_civics
+  slug: ks-state-civics
+  environment: production
+  ownerTenantId: ten_ks_state_civics
+  businessInstanceId: biz_ks_state_civics
+  labels:
+    customer: ks-state-civics
+    isolation: dedicated_vps_cell
+    corpus: kansas_court_decisions
+    region: fsn1
+product:
+  version: 0.9.8-production-candidate
+  releaseChannel: stable
+runtime:
+  deploymentMode: dedicated_customer_cell
+  composeProjectName: exais-vector-store-ks-state-civics
+  domains:
+    api: api.ks-state-civics.example.com
+    admin: admin.ks-state-civics.example.com
+storage:
+  postgres:
+    database: svs
+  qdrant:
+    collectionPrefix: ks_civics_
+  opensearch:
+    indexPrefix: ks_civics_
+  object:
+    bucket: exai-vector-store-ks-state-civics
+    prefix: instances/ks-state-civics/
+security:
+  maxSecurityLevel: 9
+  requirePreRetrievalFilter: true
+  requirePostRetrievalAclCheck: true
+  requireCitations: true
+  externalProvidersDeniedAboveSecurityLevel: 9
+retrieval:
+  defaultProfile: hybrid_rrf_secure_v2
+  queryPlannerProfile: ks_civics_legal_v1
+  graphExpansion:
+    enabled: true
+    maxExpansions: 3
+models:
+  allowedProviders: [openai, voyage, runpod_serverless]
+  preferredEmbeddingProfiles:
+    pdf_markdown_external_v1: openai_text_embedding_3_small_1536
+backups:
+  schedule: daily
+  retentionDays: 30
+  requireRestoreDrillDays: 30
