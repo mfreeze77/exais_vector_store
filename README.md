@@ -60,6 +60,7 @@ For the smallest micro-production cell, keep `SVS_SPARSE_BACKEND=postgres_fts`. 
 - `docs/COMPLETION_MATRIX_V0_9_5.md`
 - `docs/SECURITY.md`
 - `docs/MICRO_PRODUCTION.md`
+- `docs/CALLER_AGENT_INTEGRATION.md`
 - `docs/VECTORIZATION_ROUTER.md`
 - `docs/PDF_PIPELINE_STUB.md`
 
