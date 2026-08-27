@@ -19,7 +19,7 @@ DEFAULT_CELL = "ks-state-civics"
 DEFAULT_TENANT_ID = "ten_ks_state_civics"
 DEFAULT_BUSINESS_INSTANCE_ID = "biz_ks_state_civics"
 DEFAULT_USER_ID = "usr_ks_state_civics_admin"
-DEFAULT_KNOWLEDGE_BASE_ID = "kb_ks_state_civics"
+DEFAULT_KNOWLEDGE_BASE_ID = "kb_ks_civics"
 DEFAULT_VECTOR_STORE_NAME = "Topeka Municipal Code"
 DEFAULT_VECTOR_STORE_ID = "vs_topeka_municipal_code_pending"
 

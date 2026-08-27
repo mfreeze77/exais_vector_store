@@ -121,7 +121,7 @@ python scripts/release/bootstrap-instance-admin-key.py \
   --user-email "operator@example.com" \
   --user-display-name "KS State Civics Admin" \
   --group-id grp_ks_state_civics_admins \
-  --knowledge-base-id kb_ks_state_civics \
+  --knowledge-base-id kb_ks_civics \
   --knowledge-base-name "KS State Civics KB" \
   --knowledge-base-slug ks-state-civics \
   --secret-output "$HOME/exais-secrets/ks-state-civics-admin-key.json"

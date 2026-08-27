@@ -80,7 +80,7 @@ timestamp. Small manifests may be committed only when size and privacy allow.
 - Record the current live vector store ID
   `vs_a0d3ac76893e4f6f83bf2992`, tenant ID `ten_ks_state_civics`, business
   instance ID `biz_ks_state_civics`, and knowledge base ID
-  `kb_ks_state_civics` in the instance store package.
+  `kb_ks_civics` in the instance store package.
 - Define a manifest diff policy based on stable source identity and content
   checksums.
 - Define the API-only update path for new/changed/deleted source records.

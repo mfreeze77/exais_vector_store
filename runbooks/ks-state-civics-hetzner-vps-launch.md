@@ -335,7 +335,7 @@ python scripts/release/bootstrap-instance-admin-key.py \
   --user-email "<operator-email>" \
   --user-display-name "KS State Civics Admin" \
   --group-id grp_ks_state_civics_admins \
-  --knowledge-base-id kb_ks_state_civics \
+  --knowledge-base-id kb_ks_civics \
   --knowledge-base-name "KS State Civics KB" \
   --knowledge-base-slug ks-state-civics \
   --secret-output "<path-outside-repo>/ks-state-civics-admin-key.json"
@@ -370,7 +370,7 @@ VALUES ('ten_ks_state_civics', 'grp_ks_state_civics_admins', 'usr_ks_state_civic
 ON CONFLICT DO NOTHING;
 
 INSERT INTO knowledge_bases(id, tenant_id, business_instance_id, name, slug)
-VALUES ('kb_ks_state_civics', 'ten_ks_state_civics', 'biz_ks_state_civics', 'KS State Civics KB', 'ks-state-civics')
+VALUES ('kb_ks_civics', 'ten_ks_state_civics', 'biz_ks_state_civics', 'KS State Civics KB', 'ks-state-civics')
 ON CONFLICT DO NOTHING;
 ```
 
@@ -451,7 +451,7 @@ python scripts/release/kscourts-ingest.py \
   --source-root <path-to-ksa-diff-collector-main> \
   --manifest data/raw/kscourts-decisions/decisions_manifest.csv \
   --vector-store-name "Kansas Court Decisions" \
-  --knowledge-base-id kb_ks_state_civics \
+  --knowledge-base-id kb_ks_civics \
   --full-corpus
 ```
 

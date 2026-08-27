@@ -10,7 +10,7 @@ vectorStore:
   name: Topeka Municipal Code
   tenantId: ten_ks_state_civics
   businessInstanceId: biz_ks_state_civics
-  knowledgeBaseId: kb_ks_state_civics
+  knowledgeBaseId: kb_ks_civics
 source:
   type: topeka_ordinance_pdfs
   connector:
@@ -56,7 +56,7 @@ ingestion:
     - --vector-store-name
     - Topeka Municipal Code
     - --knowledge-base-id
-    - kb_ks_state_civics
+    - kb_ks_civics
     - --api-transport
     - docker-network
   idempotency: source_identity_sha256

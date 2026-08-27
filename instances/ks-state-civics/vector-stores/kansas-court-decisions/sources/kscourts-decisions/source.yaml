@@ -10,7 +10,7 @@ vectorStore:
   name: Kansas Court Decisions
   tenantId: ten_ks_state_civics
   businessInstanceId: biz_ks_state_civics
-  knowledgeBaseId: kb_ks_state_civics
+  knowledgeBaseId: kb_ks_civics
 source:
   type: kscourts_decisions
   connector:
@@ -65,7 +65,7 @@ ingestion:
     - --vector-store-name
     - Kansas Court Decisions
     - --knowledge-base-id
-    - kb_ks_state_civics
+    - kb_ks_civics
     - --full-corpus
     - --api-transport
     - docker-network
