@@ -5,6 +5,7 @@ from pydantic import ValidationError
 
 from svs_common.openai_compat import (
     apply_openai_ranking_options,
+    chunk_file_citation,
     encode_vector_store_search_next_page,
     ensure_openai_response_citation_integrity,
     OpenAICompatError,
@@ -629,6 +630,28 @@ def test_search_results_page_returns_file_level_metadata():
     assert page["data"][0]["citation"]["heading_path"] == ["RunPod", "Warmup"]
     assert page["data"][0]["citation"]["url"] == "https://docs.example.test/marker-ticket.md"
     assert page["citations"] == [page["data"][0]["citation"]]
+
+
+def test_chunk_file_citation_uses_http_source_uri_only_for_public_url():
+    scraped = ChunkRecord(
+        id="chk_scraped",
+        document_id="doc_scraped",
+        filename="agenda.md",
+        source_uri="https://agency.example.test/agendas/2026-08-27",
+        ordinal=0,
+        text="Agenda item text.",
+    )
+    internal = ChunkRecord(
+        id="chk_internal",
+        document_id="doc_internal",
+        filename="agenda.md",
+        source_uri="object-store://customer/seed/extracted/agenda.md",
+        ordinal=0,
+        text="Agenda item text.",
+    )
+
+    assert chunk_file_citation(scraped)["url"] == "https://agency.example.test/agendas/2026-08-27"
+    assert "url" not in chunk_file_citation(internal)
 
 
 def test_search_results_page_keeps_openai_citations_when_content_excluded():

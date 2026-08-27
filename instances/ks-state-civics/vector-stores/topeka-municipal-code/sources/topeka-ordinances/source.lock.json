@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "lockedAt": "2026-08-27T19:48:32Z",
+  "sourceType": "topeka_ordinance_pdfs",
+  "acquisitionStatus": {
+    "status": "collector_implemented_pending_full_seed",
+    "observedAt": "2026-08-27",
+    "details": "The City of Topeka Ordinances page exposes recent ordinance and charter ordinance document links. The collector now discovers official Topeka PDF links, writes ordinances.jsonl plus citation-url-map.jsonl, and stores PDFs under seed/raw/pdfs. Full live collection, external markdown extraction, API ingestion, and recall proof remain pending."
+  },
+  "sourceManifest": {
+    "format": "jsonl",
+    "status": "pending",
+    "manifestUri": "object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-ordinances/seed/manifests/ordinances.jsonl"
+  },
+  "vectorStore": {
+    "id": "vs_topeka_municipal_code_pending",
+    "name": "Topeka Municipal Code",
+    "tenantId": "ten_ks_state_civics",
+    "businessInstanceId": "biz_ks_state_civics",
+    "knowledgeBaseId": "kb_ks_state_civics"
+  }
+}

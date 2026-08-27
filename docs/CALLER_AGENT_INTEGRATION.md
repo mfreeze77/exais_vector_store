@@ -13,6 +13,23 @@ the MCP server should be a thin adapter around the HTTP endpoints below; it
 should not implement retrieval, graph logic, citation formatting, or ACL logic
 itself.
 
+## Processing boundary
+
+Do not collapse the downstream responsibilities into the caller agent or VPS
+host:
+
+- Caller agents call ExAIS API endpoints with ExAIS bearer keys.
+- Caller agents do not call Qdrant, Postgres, MinIO, RunPod Marker, or embedding
+  providers directly.
+- Raw PDF/OCR/PDF-to-Markdown conversion is handled by the configured remote
+  RunPod Marker endpoint before ExAIS chunks and indexes returned Markdown.
+- Embeddings are created by the configured external embedding provider
+  (for example Voyage or OpenAI) over HTTPS. The customer VPS does not run local
+  embedding models.
+- The embedding provider, model, and dimensions are part of the vector-store
+  compatibility contract. Do not search an existing collection with a different
+  provider/model/dimension query embedding.
+
 For each customer instance, give the caller only these values:
 
 ```text
@@ -515,6 +532,31 @@ Use native `citation` and `citations` for richer audit and renderer behavior:
 chunk id, document id, page range, title, URL, heading path, score, marker spans,
 `model_source_id`, `model_marker`, and graph relation metadata.
 
+## Caller-hosted source artifacts
+
+For customer apps that want clickable/showable citations, host the retained
+Markdown or HTML extraction output on the caller side and ingest with that
+artifact URL as the document `source_uri`. ExAIS copies HTTP/HTTPS `source_uri`
+values into native `citation.url`; non-public internal object keys are preserved
+for audit but are not rendered as public URLs.
+
+Recommended rendering flow:
+
+- Store raw PDF/source, converted Markdown or HTML, checksum, and manifest row.
+- Publish the converted artifact at a stable HTTPS URL controlled by the caller
+  app, for example a case page or static Markdown/HTML asset.
+- Ingest the same converted text into ExAIS with `source_uri` set to that HTTPS
+  artifact URL and page/heading metadata preserved.
+- For normal scraped web pages where the original URL is the desired public
+  citation, set `source_uri` to the canonical source URL and keep the extracted
+  Markdown/HTML snapshot internally for audit. The caller does not need to host a
+  duplicate copy unless it wants a preserved evidence view.
+- When search returns `citation.url`, `page_start`, `page_end`, and
+  `heading_path`, render the citation as a clickable link or open an evidence
+  panel on the caller side.
+- Keep the URL stable across reindexing. If the artifact is regenerated, update
+  by versioned URL or content hash so old citations remain auditable.
+
 ## Caller answer policy
 
 The calling agent should follow these rules:
@@ -596,6 +638,8 @@ Before handing a customer instance to a caller agent, record:
   expiration policy.
 - Whether the caller may ingest or only search.
 - Whether graph expansion is enabled for the instance.
+- Caller-hosted source artifact URL pattern and whether `citation.url` points to
+  converted Markdown/HTML, original PDF, or both through the caller UI.
 - A smoke search with at least one returned citation.
 - A graph-intent smoke search for legal instances, including the
   `graph_expansion` object when available.

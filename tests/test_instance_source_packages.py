@@ -31,12 +31,20 @@ def test_ks_civics_source_package_validates_in_production():
         production=True,
     )
 
-    assert len(packages) == 1
+    assert len(packages) == 3
     assert issues == []
-    package = packages[0]
+    package = next(item for item in packages if item.source_slug == "kscourts-decisions")
     assert package.vector_store_slug == "kansas-court-decisions"
     assert module.get_path(package.source, "ingestion.mode") == "api"
     assert module.get_path(package.source, "vectorStore.id") == "vs_a0d3ac76893e4f6f83bf2992"
+
+    topeka_packages = [item for item in packages if item.vector_store_slug == "topeka-municipal-code"]
+    assert {item.source_slug for item in topeka_packages} == {"topeka-codified-code", "topeka-ordinances"}
+    assert all(module.get_path(item.source, "metadata.productionReady") is False for item in topeka_packages)
+    assert {module.get_path(item.source, "source.citation.sourceUriPolicy") for item in topeka_packages} == {
+        "canonical_source_url",
+        "official_pdf_url",
+    }
 
 
 def test_validator_fails_vector_store_without_source_package(tmp_path):
@@ -127,6 +135,10 @@ def test_dry_run_update_plan_is_api_only_and_does_not_mutate(tmp_path):
     assert plan["api_only_update_path"] is True
     assert plan["direct_storage_writes"] is False
     assert plan["manifest_status"] == "matches_lock"
+    assert plan["seed_folder_uri"] == "object-store://unit/seed/"
+    assert plan["extracted_artifacts_uri"] == "object-store://unit/seed/extracted/"
+    assert plan["citation_source_uri_policy"] == "canonical_source_url"
+    assert plan["citation_url_map_uri"] == "object-store://unit/seed/citation-url-map.jsonl"
     assert plan["diff"] == {
         "added": 0,
         "changed": 0,
@@ -135,6 +147,74 @@ def test_dry_run_update_plan_is_api_only_and_does_not_mutate(tmp_path):
         "examples": {"added": [], "changed": [], "removed": []},
     }
     assert "secret" not in json.dumps(plan).lower()
+
+
+def test_prepare_seed_layout_dry_run_reports_seed_skeleton(tmp_path):
+    module = _load_module()
+    _write_minimal_package(tmp_path)
+    packages, issues = module.validate_instance_source_packages("unit", root=tmp_path, production=True)
+    assert issues == []
+
+    plan = module.prepare_seed_layout(packages[0], create=False)
+
+    assert plan["mutation_performed"] is False
+    assert plan["local_seed_folder"] == "instances/unit/vector-stores/unit-store/sources/unit-source/seed"
+    assert plan["directories"] == [
+        "instances/unit/vector-stores/unit-store/sources/unit-source/seed",
+        "instances/unit/vector-stores/unit-store/sources/unit-source/seed/raw",
+        "instances/unit/vector-stores/unit-store/sources/unit-source/seed/extracted",
+        "instances/unit/vector-stores/unit-store/sources/unit-source/seed/manifests",
+    ]
+    assert plan["files"] == [
+        "instances/unit/vector-stores/unit-store/sources/unit-source/seed/citation-url-map.jsonl",
+    ]
+    assert not (tmp_path / plan["local_seed_folder"]).exists()
+
+
+def test_prepare_seed_layout_execute_creates_seed_skeleton(tmp_path):
+    module = _load_module()
+    _write_minimal_package(tmp_path)
+    packages, issues = module.validate_instance_source_packages("unit", root=tmp_path, production=True)
+    assert issues == []
+
+    plan = module.prepare_seed_layout(packages[0], create=True)
+
+    assert plan["mutation_performed"] is True
+    for rel in plan["directories"]:
+        assert (tmp_path / rel).is_dir()
+    for rel in plan["files"]:
+        path = tmp_path / rel
+        assert path.is_file()
+        assert path.read_text(encoding="utf-8") == ""
+
+
+def test_validator_rejects_missing_seed_and_citation_policy(tmp_path):
+    module = _load_module()
+    package = _write_minimal_package(tmp_path)
+    source_path = package / "sources" / "unit-source" / "source.yaml"
+    data = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    del data["source"]["seed"]
+    del data["source"]["citation"]
+    source_path.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
+
+    _packages, issues = module.validate_instance_source_packages("unit", root=tmp_path, production=True)
+
+    codes = {issue.code for issue in issues}
+    assert "REQUIRED_FIELD_MISSING" in codes
+
+
+def test_validator_rejects_caller_hosted_citation_policy_without_url_mapping(tmp_path):
+    module = _load_module()
+    package = _write_minimal_package(tmp_path)
+    source_path = package / "sources" / "unit-source" / "source.yaml"
+    data = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    data["source"]["citation"] = {"sourceUriPolicy": "caller_hosted_extracted_artifact"}
+    data["source"]["seed"].pop("citationUrlMapUri")
+    source_path.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
+
+    _packages, issues = module.validate_instance_source_packages("unit", root=tmp_path, production=True)
+
+    assert "CALLER_ARTIFACT_URL_MAPPING_MISSING" in {issue.code for issue in issues}
 
 
 def _write_minimal_package(root: Path) -> Path:
@@ -181,6 +261,21 @@ def _write_minimal_package(root: Path) -> Path:
                 "manifestUri": "object-store://unit/manifest.csv",
                 "localProofPath": str(manifest),
                 "localProofOnly": True,
+            },
+            "seed": {
+                "layout": "instance_source_seed_v1",
+                "folderUri": "object-store://unit/seed/",
+                "rawSubdir": "raw/",
+                "extractedSubdir": "extracted/",
+                "manifestsSubdir": "manifests/",
+                "extractedArtifactsUri": "object-store://unit/seed/extracted/",
+                "citationUrlMapUri": "object-store://unit/seed/citation-url-map.jsonl",
+                "localProofOnly": True,
+            },
+            "citation": {
+                "sourceUriPolicy": "canonical_source_url",
+                "sourceUrlField": "canonical_url",
+                "storeExtractedArtifacts": True,
             },
             "manifest": {
                 "format": "csv",

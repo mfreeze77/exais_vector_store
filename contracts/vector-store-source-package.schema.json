@@ -45,7 +45,7 @@
     },
     "source": {
       "type": "object",
-      "required": ["type", "connector", "storage", "manifest"],
+      "required": ["type", "connector", "storage", "seed", "citation", "manifest"],
       "properties": {
         "type": {"type": "string", "minLength": 1},
         "connector": {
@@ -68,6 +68,41 @@
             "backupUri": {"type": "string"},
             "localProofPath": {"type": "string"},
             "localProofOnly": {"type": "boolean"}
+          },
+          "additionalProperties": true
+        },
+        "seed": {
+          "type": "object",
+          "required": ["folderUri", "extractedArtifactsUri"],
+          "properties": {
+            "layout": {"type": "string", "minLength": 1},
+            "folderUri": {"type": "string", "minLength": 1},
+            "rawSubdir": {"type": "string"},
+            "extractedSubdir": {"type": "string"},
+            "manifestsSubdir": {"type": "string"},
+            "extractedArtifactsUri": {"type": "string", "minLength": 1},
+            "citationUrlMapUri": {"type": "string"},
+            "localFolderPath": {"type": "string"},
+            "localProofOnly": {"type": "boolean"}
+          },
+          "additionalProperties": true
+        },
+        "citation": {
+          "type": "object",
+          "required": ["sourceUriPolicy"],
+          "properties": {
+            "sourceUriPolicy": {
+              "enum": [
+                "canonical_source_url",
+                "official_pdf_url",
+                "caller_hosted_extracted_artifact",
+                "mixed_by_record"
+              ]
+            },
+            "sourceUrlField": {"type": "string"},
+            "extractedArtifactUrlField": {"type": "string"},
+            "callerArtifactBaseUrl": {"type": "string"},
+            "storeExtractedArtifacts": {"type": "boolean"}
           },
           "additionalProperties": true
         },

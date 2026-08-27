@@ -19,6 +19,12 @@ LOCAL_PATH_RE = re.compile(r"^(?:[A-Za-z]:[\\/]|\\\\)")
 PORTABLE_URI_RE = re.compile(r"^[a-z][a-z0-9+.-]*://", re.IGNORECASE)
 FORBIDDEN_INGESTION_MODES = {"db", "database", "qdrant", "minio", "object-store-direct"}
 SECRET_FRAGMENT_RE = re.compile(r"(?i)(bearer|token|api[_-]?key|password|secret)=([^&\s]+)")
+ALLOWED_CITATION_SOURCE_URI_POLICIES = {
+    "canonical_source_url",
+    "official_pdf_url",
+    "caller_hosted_extracted_artifact",
+    "mixed_by_record",
+}
 
 
 @dataclass(frozen=True)
@@ -164,6 +170,9 @@ def validate_source_package(package: SourcePackage, *, instance: str, production
         "source.connector.entrypoint",
         "source.storage.rawCorpusUri",
         "source.storage.manifestUri",
+        "source.seed.folderUri",
+        "source.seed.extractedArtifactsUri",
+        "source.citation.sourceUriPolicy",
         "source.manifest.format",
         "source.manifest.stableIdentityFields",
         "source.manifest.checksumField",
@@ -205,6 +214,8 @@ def validate_source_package(package: SourcePackage, *, instance: str, production
         issues.append(issue("error", "BAD_STABLE_IDENTITY_FIELDS", f"{source_rel}:source.manifest.stableIdentityFields", "stable identity fields must be a non-empty string list"))
 
     issues.extend(_validate_path_policy(doc, source_rel, production=production))
+    issues.extend(_validate_seed_policy(doc, source_rel, production=production))
+    issues.extend(_validate_citation_policy(doc, source_rel))
     issues.extend(_validate_lock_file(package, source_rel))
     issues.extend(_validate_graph_policy(doc, source_rel))
     return issues
@@ -233,6 +244,43 @@ def _validate_path_policy(doc: dict[str, Any], source_rel: str, *, production: b
             issues.append(issue("error", "LOCAL_PATH_NOT_MARKED_PROOF", f"{source_rel}:source.storage.{key}", f"local path must be marked localProofOnly/local proof: {value}"))
         if production and not has_portable_pointer:
             issues.append(issue("error", "LOCAL_PATH_ONLY_SOURCE", f"{source_rel}:source.storage.{key}", "production package cannot rely on a local path as the only source pointer"))
+    return issues
+
+
+def _validate_seed_policy(doc: dict[str, Any], source_rel: str, *, production: bool) -> list[ValidationIssue]:
+    seed = get_path(doc, "source.seed") or {}
+    if not isinstance(seed, dict):
+        return [issue("error", "SEED_POLICY_INVALID", f"{source_rel}:source.seed", "source.seed must be an object")]
+    issues: list[ValidationIssue] = []
+    for key in ("folderUri", "extractedArtifactsUri", "citationUrlMapUri"):
+        value = seed.get(key)
+        if not value:
+            continue
+        if isinstance(value, str) and is_local_absolute_path(value):
+            issues.append(issue("error", "SEED_URI_LOCAL_PATH", f"{source_rel}:source.seed.{key}", "seed artifact URI must not be a local absolute path"))
+        elif production and (not isinstance(value, str) or not is_portable_uri(value)):
+            issues.append(issue("error", "SEED_URI_NOT_PORTABLE", f"{source_rel}:source.seed.{key}", "production seed artifact pointers must be portable URIs"))
+    return issues
+
+
+def _validate_citation_policy(doc: dict[str, Any], source_rel: str) -> list[ValidationIssue]:
+    citation = get_path(doc, "source.citation") or {}
+    if not isinstance(citation, dict):
+        return [issue("error", "CITATION_POLICY_INVALID", f"{source_rel}:source.citation", "source.citation must be an object")]
+    policy = str(citation.get("sourceUriPolicy") or "").strip()
+    issues: list[ValidationIssue] = []
+    if policy and policy not in ALLOWED_CITATION_SOURCE_URI_POLICIES:
+        issues.append(issue("error", "BAD_CITATION_SOURCE_URI_POLICY", f"{source_rel}:source.citation.sourceUriPolicy", f"sourceUriPolicy must be one of {sorted(ALLOWED_CITATION_SOURCE_URI_POLICIES)}"))
+    if policy in {"canonical_source_url", "official_pdf_url"} and not citation.get("sourceUrlField"):
+        issues.append(issue("error", "CITATION_SOURCE_URL_FIELD_MISSING", f"{source_rel}:source.citation.sourceUrlField", f"{policy} requires the manifest/source URL field used for document source_uri"))
+    if policy in {"caller_hosted_extracted_artifact", "mixed_by_record"}:
+        has_mapping = bool(
+            citation.get("extractedArtifactUrlField")
+            or citation.get("callerArtifactBaseUrl")
+            or get_path(doc, "source.seed.citationUrlMapUri")
+        )
+        if not has_mapping:
+            issues.append(issue("error", "CALLER_ARTIFACT_URL_MAPPING_MISSING", f"{source_rel}:source.citation", "caller-hosted artifact citations require extractedArtifactUrlField, callerArtifactBaseUrl, or source.seed.citationUrlMapUri"))
     return issues
 
 
@@ -447,8 +495,91 @@ def build_update_plan(
         "removed_record_policy": get_path(source, "updatePolicy.removedRecords"),
         "graph_enabled": bool(get_path(source, "graph.enabled")),
         "dry_run_required": bool(get_path(source, "updatePolicy.dryRunRequired")),
+        "seed_folder_uri": get_path(source, "source.seed.folderUri"),
+        "extracted_artifacts_uri": get_path(source, "source.seed.extractedArtifactsUri"),
+        "citation_source_uri_policy": get_path(source, "source.citation.sourceUriPolicy"),
+        "citation_url_map_uri": get_path(source, "source.seed.citationUrlMapUri"),
         "command": redact_command(list(get_path(source, "ingestion.command") or [])),
     }
+
+
+def seed_layout_plan(package: SourcePackage) -> dict[str, Any]:
+    seed = get_path(package.source, "source.seed") or {}
+    if not isinstance(seed, dict):
+        seed = {}
+    base = _local_seed_folder(package, seed)
+    directories = [
+        base,
+        base / _safe_seed_subdir(seed.get("rawSubdir"), default="raw"),
+        base / _safe_seed_subdir(seed.get("extractedSubdir"), default="extracted"),
+        base / _safe_seed_subdir(seed.get("manifestsSubdir"), default="manifests"),
+    ]
+    files: list[Path] = []
+    if seed.get("citationUrlMapUri"):
+        files.append(base / "citation-url-map.jsonl")
+    return {
+        "instance": get_path(package.source, "metadata.instanceSlug"),
+        "vector_store_slug": package.vector_store_slug,
+        "source_slug": package.source_slug,
+        "seed_folder_uri": seed.get("folderUri"),
+        "extracted_artifacts_uri": seed.get("extractedArtifactsUri"),
+        "citation_url_map_uri": seed.get("citationUrlMapUri"),
+        "local_seed_folder": relative_to_root(base, package.root),
+        "directories": [relative_to_root(path, package.root) for path in directories],
+        "files": [relative_to_root(path, package.root) for path in files],
+    }
+
+
+def prepare_seed_layout(package: SourcePackage, *, create: bool) -> dict[str, Any]:
+    plan = seed_layout_plan(package)
+    created_dirs: list[str] = []
+    existing_dirs: list[str] = []
+    created_files: list[str] = []
+    existing_files: list[str] = []
+    if create:
+        for rel in plan["directories"]:
+            path = package.root / rel
+            if path.exists():
+                existing_dirs.append(rel)
+            else:
+                path.mkdir(parents=True, exist_ok=True)
+                created_dirs.append(rel)
+        for rel in plan["files"]:
+            path = package.root / rel
+            if path.exists():
+                existing_files.append(rel)
+            else:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("", encoding="utf-8")
+                created_files.append(rel)
+    return {
+        **plan,
+        "mutation_performed": bool(create),
+        "created_directories": created_dirs,
+        "existing_directories": existing_dirs,
+        "created_files": created_files,
+        "existing_files": existing_files,
+    }
+
+
+def _local_seed_folder(package: SourcePackage, seed: dict[str, Any]) -> Path:
+    configured = seed.get("localFolderPath")
+    if isinstance(configured, str) and configured.strip():
+        path = Path(os.path.expandvars(configured.strip()))
+        if not path.is_absolute():
+            path = package.root / path
+        return path
+    return package.source_path.parent / "seed"
+
+
+def _safe_seed_subdir(value: Any, *, default: str) -> Path:
+    raw = str(value or default).replace("\\", "/").strip("/")
+    parts = [part for part in raw.split("/") if part]
+    if not parts or any(part in {".", ".."} for part in parts):
+        raise ValueError(f"unsafe seed subdir: {value!r}")
+    if any(":" in part for part in parts):
+        raise ValueError(f"unsafe seed subdir: {value!r}")
+    return Path(*parts)
 
 
 def _local_proof_manifest(storage: dict[str, Any]) -> Path | None:

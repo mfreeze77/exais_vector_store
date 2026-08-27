@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "lockedAt": "2026-08-27T19:48:32Z",
+  "sourceType": "topeka_codified_municipal_code",
+  "acquisitionStatus": {
+    "status": "playwright_crawler_integrated_pending_full_seed",
+    "observedAt": "2026-08-27",
+    "details": "Plain HTTP smoke from Docker received 403/cf-mitigated challenge. The vendored scraper now supports stock Playwright Chromium fetching, rendered HTML/network archives, citation-url-map output, and GraphRAG rows with citation_url/source_url fields. Full corpus seeding and API ingestion remain pending."
+  },
+  "lastPlaywrightProbe": {
+    "observedAt": "2026-08-27T20:24:10Z",
+    "runtime": "mcr.microsoft.com/playwright:v1.55.0-noble",
+    "mode": "headless_chromium_rendered_page_probe",
+    "rootUrl": {
+      "url": "https://topeka.municipal.codes/TMC",
+      "httpStatus": 200,
+      "title": "Topeka Municipal Code",
+      "htmlLength": 22506,
+      "contentSignals": {
+        "hasTmcHeading": true,
+        "hasSectionLinks": true,
+        "hasCodePublisherContent": true
+      }
+    },
+    "sectionUrl": {
+      "url": "https://topeka.municipal.codes/TMC/18.55.010",
+      "httpStatus": 200,
+      "title": "Ch. 18.55 Definitions | Topeka Municipal Code",
+      "htmlLength": 252073,
+      "parserProof": {
+        "pageType": "section",
+        "citation": "18.55.010",
+        "sectionPresent": true,
+        "sectionTextChars": 92429,
+        "definitionCount": 326,
+        "internalLinks": 84,
+        "nodeCount": 336,
+        "edgeCount": 343,
+        "ordinanceHistoryCount": 17,
+        "contentHash": "a9a909ddd8b52b10ca8bc63352fd09114d1930078c9cfa076fbb6fa43b515c9c"
+      }
+    },
+    "boundary": "No Cloudflare evasion, stealth plugin, captcha solving, proxy rotation, or challenge bypass was used. The probe used a stock Playwright Chromium browser and archived rendered HTML/network proof locally."
+  },
+  "lastPlaywrightCliProof": {
+    "observedAt": "2026-08-27T21:07:36Z",
+    "runtime": "mcr.microsoft.com/playwright/python:v1.55.0-noble",
+    "commandScope": "direct section smoke",
+    "rootUrl": "https://topeka.municipal.codes/TMC/18.55.010",
+    "fetcher": "playwright",
+    "pagesFetched": 1,
+    "pagesFailed": 0,
+    "sections": 1,
+    "definitions": 326,
+    "nodes": 336,
+    "edges": 343,
+    "citationUrlRows": 328,
+    "rawHtmlArchived": true,
+    "networkLogArchived": true,
+    "graphUrlProof": "section, definition, and graph edge rows include citation_url=https://topeka.municipal.codes/TMC/18.55.010",
+    "dataQualityFix": "Ordinance-history extraction now requires a numbered ordinance token and preserves distinct history edges by ordinance/section/date/raw value."
+  },
+  "failClosedProof": {
+    "observedAt": "2026-08-27T20:39:00Z",
+    "scenario": "Playwright root-only diagnostic crawl fetched pages but extracted zero code sections",
+    "exitCode": 3,
+    "manifestStatus": "failed_no_sections"
+  },
+  "upstreamPackage": {
+    "name": "topeka-code-scraper",
+    "version": "0.1.1",
+    "zipPath": "seed/raw/vendor/topeka-code-scraper-v0.1.1.zip",
+    "zipSha256": "bf143b147b70259a8b31adf3340553e633bfe54006617f7f6d5080830d2a2e51"
+  },
+  "vendoredConnector": {
+    "version": "0.1.2",
+    "revision": "topeka-code-scraper-v0.1.2-exais-playwright",
+    "notes": "Adds stock Playwright fetch mode, challenge-only-page detection, rendered HTML/network archive support, citation-url-map output, and GraphRAG citation_url/source_url properties."
+  },
+  "sourceManifest": {
+    "format": "jsonl",
+    "status": "pending",
+    "manifestUri": "object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-codified-code/seed/manifests/sections.jsonl"
+  },
+  "vectorStore": {
+    "id": "vs_topeka_municipal_code_pending",
+    "name": "Topeka Municipal Code",
+    "tenantId": "ten_ks_state_civics",
+    "businessInstanceId": "biz_ks_state_civics",
+    "knowledgeBaseId": "kb_ks_state_civics"
+  }
+}

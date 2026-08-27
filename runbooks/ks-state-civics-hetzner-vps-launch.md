@@ -42,15 +42,43 @@ Use this for one dedicated VPS running one isolated Docker Compose stack:
 
 ## Recommended VPS Shape
 
-For the Kansas legal/civics pilot, start with a dedicated business cell class:
+For the first Kansas legal/civics customer cell, size the VPS for API,
+queue/worker orchestration, Postgres, Qdrant, MinIO, graph tables, retrieval,
+and backup/restore headroom. Do not size it as a local PDF/OCR or local
+embedding-model host.
 
-- 16+ vCPU or dedicated CPU equivalent.
-- 64 GB RAM minimum; 128 GB preferred if OpenSearch is enabled later.
+Practical starting shapes:
+
+- 16 GB RAM: sane first VPS target for the current Kansas court-decision
+  corpus when embeddings and PDF conversion are external.
+- 32 GB RAM: comfortable production pilot with rebuild, backup, graph, and
+  moderate growth headroom.
+- 64 GB+ RAM: only for future-heavy cells, high concurrency, OpenSearch,
+  transcript-scale corpora, or multiple large stores on one customer box.
+- Dedicated CPU is preferred over shared CPU when p99 retrieval latency matters.
 - Local NVMe preferred.
 - At least 500 GB usable disk for the pilot and rebuild headroom.
 - Server backups/snapshots enabled, plus an external object/storage backup
   target. Hetzner Cloud server backups/snapshots do not include attached
   Volumes, so Volume data needs its own backup process.
+
+## Runtime Responsibility Boundary
+
+Keep these responsibilities separate. This is a hard deployment boundary for
+all downstream planning:
+
+- RunPod Marker handles raw PDF/OCR/PDF-to-Markdown conversion through the
+  configured remote Marker endpoint.
+- Voyage/OpenAI or another configured embedding provider creates embeddings
+  over HTTPS; the VPS does not load or run embedding models locally.
+- The VPS runs ExAIS API, workers, Postgres, Qdrant, MinIO, graph tables,
+  retrieval, key management, source-package update orchestration, and proof
+  scripts.
+- Agents call the ExAIS API over HTTPS with ExAIS bearer keys. They do not call
+  Qdrant, Postgres, MinIO, Marker, or the embedding provider directly.
+- Local PDF text extraction in the Kansas importer is an optional importer
+  optimization/fallback path, not a customer VPS sizing requirement and not the
+  general product default.
 
 ## Host Firewall
 
@@ -62,6 +90,70 @@ Expose only:
 Do not expose Postgres, Redis, Qdrant, MinIO, model-gateway, or worker ports to
 the public internet. Keep Compose service ports private behind the reverse
 proxy where possible.
+
+## Provider-Neutral Public API Mode
+
+If this cell runs outside Hetzner or outside the same Hetzner private network as
+`kansasaccountability`, treat the ExAIS API as the only supported network
+boundary. This is valid for OVH, RackNerd, netcup, Oracle, or another VPS
+provider when these gates are met:
+
+- Public ingress is HTTPS only on `443/tcp`, plus `80/tcp` only for certificate
+  issuance or redirect.
+- SSH is restricted to operator IPs and key-only authentication.
+- No data-plane service ports are reachable from the internet:
+  Postgres `5432`, Redis `6379`, Qdrant `6333/6334`, MinIO `9000/9001`,
+  model-gateway, and worker ports must remain private to the host/Compose
+  network.
+- Docker published ports are audited with an external probe, not only `ufw`
+  status, because Docker can install iptables rules outside `ufw` policy.
+- Agents receive only the public `EXAIS_API_BASE`, selected vector-store IDs,
+  and read-only ExAIS bearer keys. They do not receive Qdrant, database,
+  object-store, Marker, or embedding-provider credentials.
+- CORS is restricted to the exact admin/caller origins; do not use wildcard
+  origins for production.
+- If the caller app has static egress IPs, enforce an API allowlist. If it does
+  not, rely on HTTPS, bearer-key scope, rate limits, audit logs, and key
+  rotation. Add mTLS only when customer policy requires device/client
+  certificate binding.
+
+Public HTTPS mode must include a remote caller smoke test from outside the VPS
+provider network: `/readyz`, one scoped-key search, one citation-bearing result,
+and one graph-intent search for legal instances.
+
+## Caller IP Allowlist Gate
+
+When the customer agent runs server-side on `kansasaccountability`, all ExAIS
+search calls should originate from that VPS public egress IP unless the app is
+later moved behind another NAT, proxy, CDN, or job platform. Verify the current
+public IP immediately before applying firewall or reverse-proxy rules.
+
+For a provider-neutral deployment, restrict the API hostname to:
+
+- `kansasaccountability` public IPv4 as a `/32` caller allowlist entry.
+- Current operator/admin IPs as temporary `/32` entries.
+- Certificate renewal traffic on `80/tcp` only as needed.
+
+Do not assume the allowlist works when:
+
+- The agent calls ExAIS directly from a browser or mobile client.
+- The caller runs inside OpenAI-hosted tools, ChatGPT, or another external agent
+  platform.
+- The app uses a CDN, outbound proxy, serverless function, or worker queue with
+  different egress IPs.
+
+In those cases, put a server-side proxy/tool adapter on `kansasaccountability`
+or use the new platform's documented static egress IPs. Keep the ExAIS API
+closed to unknown source IPs whenever a stable caller egress path exists.
+
+Proof requirement:
+
+- From the allowed caller IP, `/readyz` and a scoped-key search return expected
+  responses.
+- From a non-allowed external IP, the API is rejected at the firewall or reverse
+  proxy before it reaches the ExAIS app.
+- External scans show only `22/tcp` from operator IPs and `80/443` as intended;
+  data-plane ports remain closed.
 
 ## External Registry Proof
 
@@ -109,6 +201,42 @@ python scripts/release/instance-source-update.py \
 The dry-run must report `api_only_update_path=true`,
 `direct_storage_writes=false`, and `mutation_performed=false`.
 
+## Local Staging And SSH Handoff
+
+For the first Kansas cell, it is acceptable and often preferable to do the
+expensive rebuild/reingest work on a powerful local machine, then transfer a
+consistent restore bundle to the VPS over SSH. This keeps the VPS sized for
+serving search instead of full-corpus rebuilds.
+
+Use this mode when:
+
+- The local cell has the approved release images and production-equivalent env.
+- Remote Marker and the configured embedding provider are available from the
+  local cell.
+- Full ingest, graph extraction/load, recall eval, and search smoke pass
+  locally.
+- The VPS is intended to start as a serving cell, not as the rebuild machine.
+
+Hard rules:
+
+- Reingest locally through the ExAIS API; do not write directly to local or VPS
+  Postgres, Qdrant, MinIO, or graph tables.
+- SSH/rsync/scp is only the transport for an approved restore bundle or
+  snapshots. It is not approval to run ad hoc SQL updates on the VPS.
+- Quiesce writes before capturing the handoff bundle so Postgres metadata,
+  Qdrant points, MinIO artifacts, graph tables, and source-package locks
+  describe the same corpus instant.
+- Prefer logical backup artifacts over raw Docker volume copies:
+  Postgres `pg_dump`, Qdrant collection snapshots or a proven rebuild plan,
+  object-store export/mirror, graph artifacts, source package files, env
+  references, and release manifest.
+- After restore on the VPS, run readiness, caller lifecycle proof, recall eval,
+  and graph-expansion smoke before exposing the endpoint.
+
+This local-staging path can reduce the first VPS shape to a search-serving
+profile such as 4-8 GB RAM for a demo or 8-16 GB for a paid read-mostly pilot.
+It does not replace offsite backup/restore proof before customer production.
+
 ## Production Env
 
 On the VPS:
@@ -146,8 +274,18 @@ OPENSEARCH_INDEX_PREFIX=ks_civics_
 S3_BUCKET=exai-vector-store-ks-state-civics
 SVS_OBJECT_STORE_STRICT=true
 SVS_DEV_MODE=false
-DEFAULT_EMBEDDING_PROVIDER=openai
+DEFAULT_EMBEDDING_PROVIDER=voyage
+VOYAGE_API_KEY=sops://configs/cell-secrets.ks-state-civics.sops.yaml#VOYAGE_API_KEY
+MARKER_MODE=remote
+MARKER_RUNPOD_API_KEY=sops://configs/cell-secrets.ks-state-civics.sops.yaml#MARKER_RUNPOD_API_KEY
+MARKER_RUNPOD_ENDPOINT_ID=envref://MARKER_RUNPOD_ENDPOINT_ID
 ```
+
+The existing loaded Kansas Court Decisions collection is
+`ks_civics_biz_ks_state_civics_voyage_4_docs_1024`, backed by Voyage
+`voyage-4` at 1024 dimensions. Do not change the embedding provider/model or
+dimensions for this store unless you are intentionally creating a new vector
+collection and rerunning recall proof.
 
 Validate without printing secrets:
 
@@ -268,6 +406,45 @@ revokes temporary keys unless `--keep-created-keys` is passed.
 
 After the cell is healthy and the bootstrap tenant/business exists:
 
+Confirm the PDF-processing boundary before any corpus run. Raw PDF upload and
+general customer ingestion should use remote RunPod Marker conversion, then
+ingest returned Markdown as `pdf_markdown_external_v1`. The Kansas court
+importer may use local text extraction for already text-extractable court PDFs
+as a cost/speed optimization, with Marker fallback for encrypted, scanned, or
+low-text PDFs. This local importer behavior is not a requirement for customer
+VPS sizing.
+
+Before seeding a customer-facing corpus, decide where the converted Markdown or
+HTML artifacts will be hosted for the caller app. The ingestion payload should
+use the caller-hosted HTTPS artifact URL as `source_uri` when user-facing
+citations need to open the extracted source text. Preserve internal object-store
+keys and checksums for audit/restore, but do not rely on internal object keys as
+the only citation target.
+
+Prepare the source-package seed skeleton before the first scrape or replay:
+
+```bash
+python scripts/release/prepare-instance-source-seeds.py \
+  --instance ks-state-civics \
+  --vector-store kansas-court-decisions \
+  --source kscourts-decisions \
+  --production \
+  --execute
+```
+
+For normal scraped web URLs, the canonical source URL can remain the public
+`source_uri` and therefore the returned `citation.url`. In that case, store the
+extracted Markdown/HTML snapshot in the instance seed folder for audit and
+rebuilds, but the caller app does not need to host a duplicate copy unless it
+wants a preserved evidence page.
+
+For the existing local Kansas Court Decisions seed, `kscourts-ingest.py` used
+the official PDF URL as `source_uri`. That does not break current search or PDF
+citations. It only means caller-hosted Markdown/HTML evidence pages need an
+additional artifact export/publish plus source-URI remap before the caller UI
+can open extracted text directly from `citation.url`. This is a metadata/artifact
+handoff step; do not re-vectorize solely to change citation URL targets.
+
 ```bash
 python scripts/release/kscourts-ingest.py \
   --cell ks-state-civics \
@@ -329,10 +506,16 @@ Before onboarding a real customer, prove:
 
 - External registry proof exists for the approved release.
 - VPS host evidence is captured.
+- Provider-neutral public API mode proof passes if the VPS is not on the
+  Hetzner private network with the caller.
+- Caller IP allowlist proof passes when the caller has stable server-side
+  egress.
 - Production env preflight passes.
 - Cell launch, smoke, and access proof pass.
 - DNS/TLS proof passes.
 - Tenant/business/bootstrap key packet is recorded without secrets.
+- Caller-hosted converted artifact URL pattern is recorded if citations need to
+  open Markdown/HTML source pages.
 - Kansas corpus ingest completes or has a bounded failure report.
 - Recall eval passes the agreed threshold.
 - GraphRAG tables load and graph expansion smoke passes.

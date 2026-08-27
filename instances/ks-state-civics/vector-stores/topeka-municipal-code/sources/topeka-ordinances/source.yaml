@@ -1,0 +1,115 @@
+apiVersion: svs/v1
+kind: VectorStoreSourcePackage
+metadata:
+  instanceSlug: ks-state-civics
+  vectorStoreSlug: topeka-municipal-code
+  sourceSlug: topeka-ordinances
+  productionReady: false
+vectorStore:
+  id: vs_topeka_municipal_code_pending
+  name: Topeka Municipal Code
+  tenantId: ten_ks_state_civics
+  businessInstanceId: biz_ks_state_civics
+  knowledgeBaseId: kb_ks_state_civics
+source:
+  type: topeka_ordinance_pdfs
+  connector:
+    kind: official_city_document_center
+    repository: https://topeka.gov/community/ordinances/index.php
+    entrypoint: scripts/release/topeka-ordinances-collect.py
+    revision: observed-2026-08-27
+    acquisitionSpec: docs/TOPEKA_MUNICIPAL_CODE_SEEDING_SPEC.md
+  storage:
+    rawCorpusUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-ordinances/seed/raw/
+    manifestUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-ordinances/seed/manifests/ordinances.jsonl
+    backupUri: backup://exai-vector-store-ks-state-civics/sources/topeka-ordinances/pending/
+  seed:
+    layout: instance_source_seed_v1
+    folderUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-ordinances/seed/
+    rawSubdir: raw/
+    extractedSubdir: extracted/
+    manifestsSubdir: manifests/
+    extractedArtifactsUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-ordinances/seed/extracted/
+    citationUrlMapUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-ordinances/seed/citation-url-map.jsonl
+  citation:
+    sourceUriPolicy: official_pdf_url
+    sourceUrlField: pdf_url
+    storeExtractedArtifacts: true
+  manifest:
+    format: jsonl
+    stableIdentityFields:
+      - ordinance_number
+      - pdf_url
+    checksumField: sha256
+    savedPathField: saved_path
+    lockFile: source.lock.json
+ingestion:
+  mode: api
+  runner: scripts/release/topeka-ordinance-pdf-ingest.py
+  command:
+    - python
+    - scripts/release/topeka-ordinance-pdf-ingest.py
+    - --cell
+    - ks-state-civics
+    - --manifest
+    - ${TOPEKA_ORDINANCE_MANIFEST}
+    - --vector-store-name
+    - Topeka Municipal Code
+    - --knowledge-base-id
+    - kb_ks_state_civics
+    - --api-transport
+    - docker-network
+  idempotency: source_identity_sha256
+updatePolicy:
+  diffMode: stable_identity_and_checksum
+  removedRecords: soft_delete_or_expire_after_operator_approval
+  dryRunRequired: true
+graph:
+  enabled: true
+  extractCommand:
+    - python
+    - scripts/release/topeka-code-graphrag-extract.py
+    - --source-output
+    - ${TOPEKA_CODE_OUTPUT}
+    - --ordinance-manifest
+    - ${TOPEKA_ORDINANCE_MANIFEST}
+    - --output-dir
+    - .release/cells/ks-state-civics/graphrag/topeka-ordinances
+  loadCommand:
+    - python
+    - scripts/release/topeka-code-graphrag-load.py
+    - --graph-artifact
+    - .release/cells/ks-state-civics/graphrag/topeka-ordinances
+    - --api-transport
+    - docker-network
+    - --output
+    - .release/cells/ks-state-civics/graphrag/topeka-ordinances/load-proof.json
+  evalCommand:
+    - python
+    - scripts/release/topeka-code-graphrag-eval.py
+    - --cell
+    - ks-state-civics
+    - --vector-store-id
+    - vs_topeka_municipal_code_pending
+    - --graph-artifact
+    - .release/cells/ks-state-civics/graphrag/topeka-ordinances
+    - --output
+    - .release/cells/ks-state-civics/graphrag/topeka-ordinances/eval-proof.json
+  expectedProofArtifacts:
+    - .release/cells/ks-state-civics/graphrag/topeka-ordinances/graph-summary.json
+    - .release/cells/ks-state-civics/graphrag/topeka-ordinances/load-proof.json
+    - .release/cells/ks-state-civics/graphrag/topeka-ordinances/eval-proof.json
+eval:
+  command:
+    - python
+    - scripts/release/topeka-code-recall-eval.py
+    - --cell
+    - ks-state-civics
+    - --vector-store-id
+    - vs_topeka_municipal_code_pending
+    - --api-transport
+    - docker-network
+    - --output
+    - .release/cells/ks-state-civics/topeka-code-recall-eval.json
+  expectedProofArtifacts:
+    - .release/cells/ks-state-civics/topeka-code-recall-eval.json

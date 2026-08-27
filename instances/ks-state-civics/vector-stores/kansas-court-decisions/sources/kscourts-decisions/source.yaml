@@ -25,6 +25,19 @@ source:
     backupUri: backup://exai-vector-store-ks-state-civics/sources/kscourts-decisions/2026-08-08/
     localProofPath: 'C:\Users\mfrie\Ai_Projects\ksa-diff-collector-main\data\raw\kscourts-decisions\decisions_manifest.csv'
     localProofOnly: true
+  seed:
+    layout: instance_source_seed_v1
+    folderUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/kscourts-decisions/seed/
+    rawSubdir: raw/
+    extractedSubdir: extracted/
+    manifestsSubdir: manifests/
+    extractedArtifactsUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/kscourts-decisions/seed/extracted/
+    citationUrlMapUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/kscourts-decisions/seed/citation-url-map.jsonl
+    localProofOnly: true
+  citation:
+    sourceUriPolicy: official_pdf_url
+    sourceUrlField: pdf_url
+    storeExtractedArtifacts: true
   manifest:
     format: csv
     stableIdentityFields:
