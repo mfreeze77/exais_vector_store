@@ -69,6 +69,7 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - Larger stock-Playwright proof on 2026-08-28 fetched 141 of the first 200 section/subsection URLs and failed 59 publisher-challenge pages. The artifact gate reported `vectorization_allowed: false`, 5.218 percent coverage, 2,561 missing required URLs, and zero section text/citation issues on fetched pages.
 - Operator provided a Decodo Web Scraping API credential as a local runtime secret. The codified-code scraper now supports `--fetcher decodo`, defaulting to Decodo's minimal universal request after live proof showed Topeka HTML succeeds without explicit JS/proxy parameters while `headless: html` and `proxy_pool: standard` returned provider status 613. The route still writes only JSON/JSONL/raw/network artifacts for the existing quality gate. The Decodo credential remains env-only and must not be committed or written into artifacts.
 - The scraper now supports `--url-list-offset` and `--url-list-limit` so paid acquisition can run in 200-page windows without discarding the full URL manifest hierarchy needed for `CONTAINS` GraphRAG edges.
+- WAVE-119 adds a projection-only workbench lane from saved Topeka artifacts to stable canonical components, component relations, and title/chapter slices. This keeps future legislative redline/import work separate from vectorization and ingestion.
 
 ## Acceptance Criteria
 

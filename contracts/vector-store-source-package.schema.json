@@ -134,6 +134,30 @@
       },
       "additionalProperties": true
     },
+    "artifactGeneration": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "qualityGate": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "workbenchProjection": {
+      "type": "object",
+      "required": ["mode", "runner", "command", "outputContract"],
+      "properties": {
+        "mode": {"type": "string", "minLength": 1},
+        "status": {"type": "string"},
+        "boundary": {"type": "string"},
+        "runner": {"type": "string", "minLength": 1},
+        "gatedBy": {"type": "array", "items": {"type": "string"}},
+        "command": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "outputContract": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "stableIdentity": {"type": "object", "additionalProperties": true},
+        "sliceLevels": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": true
+    },
     "ingestion": {
       "type": "object",
       "required": ["mode", "runner", "command", "idempotency"],

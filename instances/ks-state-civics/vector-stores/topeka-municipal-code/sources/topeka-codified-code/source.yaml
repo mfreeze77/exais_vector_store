@@ -38,7 +38,9 @@ source:
     rawSubdir: raw/
     extractedSubdir: extracted/
     manifestsSubdir: manifests/
+    workbenchSubdir: workbench/
     extractedArtifactsUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-codified-code/seed/extracted/
+    workbenchProjectionUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-codified-code/seed/workbench/
     citationUrlMapUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-codified-code/seed/citation-url-map.jsonl
   citation:
     sourceUriPolicy: canonical_source_url
@@ -111,6 +113,34 @@ artifactGeneration:
         - retrieved_at
         - network_events
         - source
+workbenchProjection:
+  mode: topeka_municipal_code_v1
+  status: required_before_workbench_import
+  boundary: projection-only; reads saved JSON/JSONL scrape artifacts and writes workbench JSON; no ingestion, vectorization, Qdrant, Postgres, MinIO, OpenSearch, or graph writes
+  runner: scripts/release/topeka-code-workbench-project.py
+  gatedBy:
+    - topeka-code-artifact-quality.passed
+    - saved-raw-html-archive-present
+  command:
+    - python
+    - scripts/release/topeka-code-workbench-project.py
+    - --source-output
+    - ${TOPEKA_CODE_OUTPUT}
+    - --output-dir
+    - ${TOPEKA_CODE_OUTPUT}/workbench
+  outputContract:
+    - workbench/canonical-document.json
+    - workbench/components.jsonl
+    - workbench/component-projection.jsonl
+    - workbench/component-relations.jsonl
+    - workbench/slices.jsonl
+    - workbench/workbench-import-manifest.json
+  stableIdentity:
+    sourceComponentKey: preserved Topeka graph/source identity such as ks-topeka:tmc:1.10.020 or ks-topeka:tmc:1.10.020:marker:a
+    workbenchComponentId: deterministic UUIDv5 derived from sourceComponentKey
+  sliceLevels:
+    - title
+    - chapter
 qualityGate:
   requiredBeforeIngestion: true
   vectorizationAllowed: false

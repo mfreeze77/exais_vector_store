@@ -166,6 +166,59 @@ Graph node and edge properties must preserve `source_url` and `citation_url` whe
 
 The adapter boundary is artifact-level by design. The ExAIS repo can validate and ingest artifacts without owning acquisition code that bypasses publisher access controls.
 
+### 3A. Workbench Canonical Projection
+
+Saved codified-code captures must support more than vector search. Before the
+Topeka corpus is represented as editable law, generate a separate workbench
+projection from the saved JSON/JSONL artifacts and archived HTML.
+
+The projection command is:
+
+```bash
+python scripts/release/topeka-code-workbench-project.py \
+  --source-output ${TOPEKA_CODE_OUTPUT} \
+  --output-dir ${TOPEKA_CODE_OUTPUT}/workbench
+```
+
+It writes:
+
+- `workbench/canonical-document.json`
+- `workbench/components.jsonl`
+- `workbench/component-projection.jsonl`
+- `workbench/component-relations.jsonl`
+- `workbench/slices.jsonl`
+- `workbench/workbench-import-manifest.json`
+
+This is a projection-only step. It does not call ExAIS ingestion, model
+gateways, embedding providers, Qdrant, Postgres, MinIO, OpenSearch, or graph
+write paths.
+
+The `topeka_municipal_code_v1` projection keeps two identities:
+
+- `source_component_key`: stable Topeka/source identity, for example
+  `ks-topeka:tmc:1.10.020` or
+  `ks-topeka:tmc:1.10.020:marker:a`.
+- `workbench_component_id`: deterministic UUIDv5 derived from the source
+  component key for compatibility with the StateCivics legislative workbench
+  canonical-document schema.
+
+The projection maps:
+
+- URL-manifest/GraphRAG hierarchy into code, title, chapter, article, appendix,
+  section, and container components.
+- Section blocks into paragraph/table child components with ordinals,
+  citations, `content_hash`, `source_url`, and `source_html_hash`.
+- Extracted definitions into definition child components and `DEFINES`
+  relations.
+- Section references and ordinance history into relation rows with citation URL
+  provenance.
+- Title/chapter slices into `slices.jsonl` so the workbench can import a focused
+  portion of the municipal code instead of loading the whole corpus.
+
+The source of truth remains the saved capture/archive and component hashes.
+Embeddings, Qdrant rows, graph rows, rendered HTML, and workbench import files
+are derived projections that can be regenerated.
+
 ### 4. Official Topeka Ordinance PDF Collector
 
 The City of Topeka Ordinances page exposes recent ordinance documents through the city document center. Build a collector that:

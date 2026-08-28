@@ -123,6 +123,10 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-113 Kansas Civics Instance Query Planner](./WAVE-113-kansas-civics-instance-query-planner.md)
 - [WAVE-114 Kansas Civics Legal Exact Result Diversity](./WAVE-114-kansas-civics-legal-exact-result-diversity.md)
 - [WAVE-115 Kansas Civics GraphRAG Search Expansion](./WAVE-115-kansas-civics-graphrag-search-expansion.md)
+- [WAVE-116 Instance-Scoped Caller Vector Store Lifecycle](./WAVE-116-instance-scoped-caller-vector-store-lifecycle.md)
+- [WAVE-117 Instance Vector-Store Source Package Contract](./WAVE-117-instance-vector-store-source-package-contract.md)
+- [WAVE-118 Topeka Municipal Code Source Seeding](./WAVE-118-topeka-municipal-code-source-seeding.md)
+- [WAVE-119 Topeka Workbench Canonical Projection](./WAVE-119-topeka-workbench-canonical-projection.md)
 
 ## Execution Model
 

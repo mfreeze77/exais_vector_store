@@ -125,6 +125,22 @@
     "status": "artifact_quality_pending",
     "manifestUri": "object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-codified-code/seed/manifests/sections.jsonl"
   },
+  "workbenchProjection": {
+    "status": "implemented_pending_full_corpus_projection",
+    "schema": "exais.topeka.municipal_code.workbench_projection.v1",
+    "runner": "scripts/release/topeka-code-workbench-project.py",
+    "outputDir": "${TOPEKA_CODE_OUTPUT}/workbench",
+    "outputs": [
+      "canonical-document.json",
+      "components.jsonl",
+      "component-projection.jsonl",
+      "component-relations.jsonl",
+      "slices.jsonl",
+      "workbench-import-manifest.json"
+    ],
+    "identityPolicy": "source_component_key is preserved from Topeka source/graph identity; workbench_component_id is deterministic UUIDv5 from source_component_key.",
+    "boundary": "Projection-only from saved JSON/JSONL/HTML artifacts. No ingestion, vectorization, Qdrant, Postgres, MinIO, OpenSearch, or graph writes."
+  },
   "qualityPolicy": {
     "artifactOnlyUntilQualityPass": true,
     "qualityReport": "quality-report.json",
