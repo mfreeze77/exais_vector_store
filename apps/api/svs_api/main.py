@@ -1947,6 +1947,31 @@ def _legal_exact_document_diversity_enabled(query_planner_profile_id: str | None
     return False
 
 
+def _query_planner_profile_id_for_vector_store(db: Session, principal: Principal, vector_store_id: str) -> str | None:
+    profile_id = os.getenv("SVS_QUERY_PLANNER_PROFILE_ID") or None
+    if profile_id != KANSAS_CIVICS_LEGAL_PROFILE_ID:
+        return profile_id
+
+    row = db.execute(text('''
+        SELECT attributes
+        FROM vector_stores
+        WHERE id=:id
+          AND tenant_id=:tenant_id
+          AND business_instance_id=:biz_id
+          AND deleted_at IS NULL
+        LIMIT 1
+    '''), {'id': vector_store_id, 'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id}).mappings().first()
+    attrs = row['attributes'] if row and isinstance(row.get('attributes'), dict) else {}
+    if not attrs:
+        return profile_id
+
+    source_collection = str(attrs.get('source_collection') or '')
+    corpus = str(attrs.get('corpus') or '')
+    if source_collection == 'kscourts-decisions' or corpus in {'kscourts_decisions', 'kansas_court_decisions'}:
+        return profile_id
+    return None
+
+
 def _document_diversified_chunks(chunks: list[Any]) -> list[Any]:
     buckets: dict[str, list[Any]] = {}
     document_order: list[str] = []
@@ -2374,7 +2399,7 @@ async def _openai_vector_store_search_page(
     _refresh_vector_store_activity_or_404(db, principal, vector_store_id)
     search_kwargs = openai_search_options_to_search_request_kwargs(req)
     raw_queries = req.query if isinstance(req.query, list) else [req.query]
-    query_planner_profile_id = os.getenv("SVS_QUERY_PLANNER_PROFILE_ID") or None
+    query_planner_profile_id = _query_planner_profile_id_for_vector_store(db, principal, vector_store_id)
     query_plans = [
         plan_query(query, rewrite_query=req.rewrite_query, profile_id=query_planner_profile_id)
         for query in raw_queries

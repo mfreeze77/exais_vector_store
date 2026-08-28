@@ -1330,6 +1330,56 @@ def test_openai_vector_store_search_page_applies_instance_query_planner_filters(
     assert page["data"][0]["file_id"] == "file_ks_docket"
 
 
+def test_openai_vector_store_search_page_skips_court_planner_for_topeka_code(monkeypatch):
+    calls = []
+
+    async def fake_retrieval_search(db_session, principal, search_req):
+        calls.append(search_req)
+        return SearchResponse(
+            query=search_req.query,
+            results=[
+                ChunkRecord(
+                    id="chk_topeka_code",
+                    document_id="doc_topeka_code",
+                    ordinal=0,
+                    text="Ordinance 20625 amended Topeka property maintenance vegetation rules.",
+                    score=0.9,
+                )
+            ],
+        )
+
+    def fake_file_lookup(db_session, principal, vector_store_id, document_ids):
+        return {
+            "doc_topeka_code": {
+                "file_id": "file_topeka_code",
+                "filename": "TMC-8.60.150.md",
+            },
+        }
+
+    monkeypatch.setenv("SVS_QUERY_PLANNER_PROFILE_ID", "ks_civics_legal_v1")
+    monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", lambda *args, **kwargs: None)
+    monkeypatch.setattr(api_main, "_vector_store_file_lookup", fake_file_lookup)
+    monkeypatch.setattr(api_main.retrieval, "search", fake_retrieval_search)
+
+    page = asyncio.run(api_main._openai_vector_store_search_page(
+        "vs_topeka",
+        OpenAIVectorStoreSearchRequest(
+            query="Which Topeka property maintenance vegetation section was amended by Ordinance 20625 passed December 16 2025?",
+            max_num_results=10,
+        ),
+        _principal(),
+        _Db([{"attributes": {"corpus": "topeka_municipal_code", "source_collection": "topeka-municipal-code"}}]),
+    ))
+
+    assert [call.query for call in calls] == [
+        "Which Topeka property maintenance vegetation section was amended by Ordinance 20625 passed December 16 2025"
+    ]
+    assert calls[0].filters == {"vector_store_id": "vs_topeka"}
+    assert calls[0].search_metadata["openai_compat"]["query_planner_profile_id"] is None
+    assert calls[0].search_metadata["openai_compat"]["planned_filters"] == [{}]
+    assert page["data"][0]["file_id"] == "file_topeka_code"
+
+
 def test_openai_vector_store_search_page_diversifies_legal_exact_duplicate_documents(monkeypatch):
     calls = []
 

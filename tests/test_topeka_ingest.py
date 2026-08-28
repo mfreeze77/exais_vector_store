@@ -70,6 +70,22 @@ def test_codified_ingest_fails_when_citation_map_is_missing_section(tmp_path):
         module.load_section_payloads(tmp_path, vector_store_id="vs", knowledge_base_id="kb", security_level=1)
 
 
+def test_codified_ingest_idempotency_key_is_vector_store_specific():
+    module = load_script("topeka_code_ingest_idempotency", "topeka-code-ingest.py")
+    payload = {
+        "vector_store_id": "vs_one",
+        "source_uri": "https://topeka.municipal.codes/TMC/18.55.010",
+        "attributes": {"content_hash": "abc123"},
+    }
+    same_source_other_store = {
+        **payload,
+        "vector_store_id": "vs_two",
+    }
+
+    assert module.ingest_idempotency_key(payload) == module.ingest_idempotency_key(payload)
+    assert module.ingest_idempotency_key(payload) != module.ingest_idempotency_key(same_source_other_store)
+
+
 def test_ordinance_ingest_uses_pdf_url_and_precomputed_markdown(tmp_path):
     module = load_script("topeka_ordinance_pdf_ingest", "topeka-ordinance-pdf-ingest.py")
     manifest = tmp_path / "manifests" / "ordinances.jsonl"

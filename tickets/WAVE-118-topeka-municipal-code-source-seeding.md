@@ -75,12 +75,18 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - Full Decodo batch acquisition proof on 2026-08-28 reached all 2,702 required Section/Subsection fetch URLs across batches 001-014 with zero failed URLs, zero missing URLs, 2,702 raw HTML evidence files, 2,702 network evidence files, 2,702 section artifacts, 980 definition artifacts, and zero quality worklist rows. This remains artifact-only proof; no vectorization, ingestion, ExAIS API writes, Qdrant, Postgres, MinIO, OpenSearch, or graph writes were run.
 - Full batch consolidation proof on 2026-08-28 used `scripts/release/topeka-code-combine-batches.py` to create `.tmp/topeka-decodo-window-batches-20260827220454/combined-full-corpus-20260828-v2`. The combined source output has 2,702 sections, 980 definitions, 4,606 graph nodes, 6,909 deduped graph edges, 6,384 citation URL rows, 3,204 URL-manifest rows, 2,702 expected fetch URLs, 2,702 raw HTML files, and 2,702 network files.
 - Combined full-corpus artifact quality passed with 100 percent coverage, zero missing URLs, zero failed URLs, zero duplicate section IDs/URLs, zero empty-text sections, zero missing section citation URLs, and zero worklist rows. Combined graph edge types are `CONTAINS=3,203`, `DEFINES=980`, and `HAS_ORDINANCE_HISTORY=2,726`; the current parsed source artifacts produced zero `REFERENCES` edges.
+- Full codified-code API ingestion proof on 2026-08-28 loaded the clean caller-facing vector store `vs_d4185d1004604f08a55299fa` (`City of Topeka Municipal Code`) for `https://topks.statecivics.ai/local`. The API reported 2,702 completed files, 0 failed files, 3,469,765 usage bytes, and database proof showed 2,702 documents, 2,702 distinct official source URLs, 2,999 active chunks, and 2,999 indexed chunks.
+- Recall proof on 2026-08-28 passed 10/10 live Topeka searches against `vs_d4185d1004604f08a55299fa`: five current-code checks and five amendment-history checks, all with public citations. Proof artifact: `.release/cells/ks-state-civics/evals/topeka-code-recall-20260828-012315.json`.
+- The original pilot store `vs_268b119a2cd84b568af62155` now contains partial data and should not be used as the full Topeka caller-facing store. Attempting to replace its one-section proof exposed a chunk deactivation RLS bug; the full load used a clean store and the codified-code ingest script now scopes idempotency keys by `vector_store_id` so the same public source can be loaded into multiple stores.
+- Deeper API search proof on 2026-08-28 ran 24 Topeka legal-search queries against `vs_d4185d1004604f08a55299fa` with zero API errors after route hardening. `19/24` passed a basic citation/content gate and `5/24` were marked for review because broad phrasing needed tighter legal terms or caller-side answer framing. Proof artifact: `.release/cells/ks-state-civics/evals/topeka-code-deep-search-20260828.json`.
+- Deep search exposed a route-level bug: with `SVS_QUERY_PLANNER_PROFILE_ID=ks_civics_legal_v1`, Topeka ordinance numbers and dates could be interpreted as Kansas court-decision filters, and zero-row filtered profile resolution could fall back to the unavailable `runpod_serverless_or_local` embedding provider. The API now disables the Kansas court planner for non-court vector-store corpora such as `topeka_municipal_code`, and store-scoped searches do not fall back to private embedding profiles when no indexed chunks match planned filters.
+- The `https://topks.statecivics.ai/local` surface is an intended consumer route recorded in metadata. It is not yet wired or DNS-verified from this machine; current proof is against the ExAIS API in the local KS Civics Docker cell.
 
 ## Acceptance Criteria
 
 - The source-package validator passes for `ks-state-civics`.
-- Both Topeka source packages remain `productionReady: false` until a real corpus and vector store ID are proven.
-- Codified-code artifact generation and quality check run before any additional vectorization.
+- Both Topeka source packages remain `productionReady: false` until ordinance PDF ingestion, graph reference proof, and production/VPS promotion gates complete.
+- Codified-code artifact generation and quality check run before vectorization.
 - Operator capture import parses supplied HTML captures through the same JSON artifact, citation, graph, and quality-gate path as live fetching.
 - Quality-gate worklists identify every missing required URL, crawl failure, unexpected section URL, and section-level text/citation issue.
 - Full codified-code crawl writes nonempty `sections.jsonl`, `definitions.jsonl`, `nodes.jsonl`, `edges.jsonl`, `citation-url-map.jsonl`, `manifest.json`, and `crawl_report.json`.
@@ -89,10 +95,12 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - Full codified-code crawl records per-page failures and treats challenge-only pages as failures, not successful source records.
 - `citation-url-map.jsonl` has a section row for every section document to be ingested, and every section row has `source_url` and `citation_url`.
 - The ordinance collector writes a nonempty `ordinances.jsonl` with stable identity fields, SHA-256, PDF URL, and saved path.
-- API ingestion creates or finds the real Topeka vector store and writes both source types with clickable citations.
+- API ingestion creates or finds the real Topeka vector store and writes source records with clickable citations.
 - Graph proof includes `CONTAINS`, `REFERENCES`, `DEFINES`, `HAS_ORDINANCE_HISTORY`, and at least one ordinance-to-section edge when data supports it.
 - GraphRAG rows preserve `source_url`/`citation_url` so graph-expanded context can render clickable citations.
 - Recall proof includes at least five current-code questions and five amendment-history questions.
+- Topeka vector-store search does not inherit Kansas court-decision query filters.
+- Store-scoped searches with no matching indexed chunks do not fall back to an unavailable embedding provider.
 
 ## Dependencies
 

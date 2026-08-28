@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import time
 from pathlib import Path
 from typing import Any
 
@@ -85,6 +86,12 @@ def load_section_payloads(source_output: Path, *, vector_store_id: str, knowledg
     return payloads
 
 
+def ingest_idempotency_key(payload: dict[str, Any]) -> str:
+    return "topeka-code-ingest-" + sha256_text(
+        f"{payload['vector_store_id']}|{payload['source_uri']}|{payload['attributes']['content_hash']}"
+    )[:48]
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Ingest Topeka codified-code sections through the ExAIS API.")
     parser.add_argument("--cell", default=DEFAULT_CELL)
@@ -98,6 +105,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--limit", type=int, default=0)
     parser.add_argument("--api-timeout-seconds", type=int, default=180)
+    parser.add_argument("--submit-max-attempts", type=int, default=3)
+    parser.add_argument("--submit-retry-delay-seconds", type=float, default=2.0)
     parser.add_argument("--auth-token-file", type=Path)
     parser.add_argument("--api-transport", default="auto", choices=["auto", "host-curl", "api-container", "docker-network"])
     return parser.parse_args()
@@ -131,16 +140,30 @@ def main() -> None:
     submitted: list[dict[str, Any]] = []
     if not args.dry_run:
         for payload in payloads:
-            key = "topeka-code-ingest-" + sha256_text(f"{payload['source_uri']}|{payload['attributes']['content_hash']}")[:48]
-            response = submit_document(
-                api_base=api_base,
-                headers=headers,
-                payload=payload,
-                idempotency_key=key,
-                timeout=args.api_timeout_seconds,
-                cell=args.cell,
-                transport=args.api_transport,
-            )
+            key = ingest_idempotency_key(payload)
+            response = None
+            for attempt in range(1, max(args.submit_max_attempts, 1) + 1):
+                try:
+                    response = submit_document(
+                        api_base=api_base,
+                        headers=headers,
+                        payload=payload,
+                        idempotency_key=key,
+                        timeout=args.api_timeout_seconds,
+                        cell=args.cell,
+                        transport=args.api_transport,
+                    )
+                    break
+                except Exception as exc:
+                    if attempt >= max(args.submit_max_attempts, 1):
+                        raise
+                    print(json.dumps({
+                        "event": "topeka_ingest_retry",
+                        "attempt": attempt + 1,
+                        "source_uri": payload["source_uri"],
+                        "error": str(exc)[:500],
+                    }, sort_keys=True), flush=True)
+                    time.sleep(max(args.submit_retry_delay_seconds, 0.0) * attempt)
             submitted.append({"source_uri": payload["source_uri"], "response": response})
     result = {
         "dry_run": args.dry_run,

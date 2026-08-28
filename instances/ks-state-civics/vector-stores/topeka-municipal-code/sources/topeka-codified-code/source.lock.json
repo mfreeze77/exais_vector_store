@@ -122,7 +122,7 @@
   },
   "sourceManifest": {
     "format": "jsonl",
-    "status": "full_corpus_artifact_quality_passed_local_tmp",
+    "status": "full_corpus_artifact_quality_passed_and_codified_ingested_local",
     "manifestUri": "object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-codified-code/seed/manifests/sections.jsonl",
     "localProofPath": ".tmp/topeka-decodo-window-batches-20260827220454/combined-full-corpus-20260828-v2",
     "localProofCounts": {
@@ -135,6 +135,53 @@
       "rawHtmlFiles": 2702,
       "networkFiles": 2702
     }
+  },
+  "lastApiIngestProof": {
+    "observedAt": "2026-08-28",
+    "status": "full_codified_code_ingested_recall_passed",
+    "apiTransport": "api-container",
+    "vectorStoreId": "vs_d4185d1004604f08a55299fa",
+    "vectorStoreName": "City of Topeka Municipal Code",
+    "consumerBaseUrl": "https://topks.statecivics.ai/local",
+    "sourceOutput": ".tmp/topeka-decodo-window-batches-20260827220454/combined-full-corpus-20260828-v2",
+    "payloadCount": 2702,
+    "submittedCount": 2702,
+    "fileCounts": {
+      "total": 2702,
+      "completed": 2702,
+      "failed": 0,
+      "cancelled": 0,
+      "inProgress": 0
+    },
+    "databaseCounts": {
+      "documents": 2702,
+      "distinctSourceUris": 2702,
+      "activeChunks": 2999,
+      "indexedChunks": 2999
+    },
+    "recallProof": ".release/cells/ks-state-civics/evals/topeka-code-recall-20260828-012315.json",
+    "recallProofCounts": {
+      "queries": 10,
+      "passed": 10,
+      "currentCodePassed": 5,
+      "amendmentHistoryPassed": 5,
+      "p95Ms": 270.256
+    },
+    "deepSearchProof": ".release/cells/ks-state-civics/evals/topeka-code-deep-search-20260828.json",
+    "deepSearchProofCounts": {
+      "queries": 24,
+      "basicGatePassed": 19,
+      "reviewRequired": 5,
+      "errors": 0,
+      "p95Ms": 763.155
+    },
+    "apiSearchHardening": {
+      "status": "implemented_local",
+      "plannerBoundary": "The Kansas-court query planner is disabled for vector stores whose attributes identify a non-court corpus such as topeka_municipal_code.",
+      "profileFallbackBoundary": "Vector-store-scoped searches with no matching indexed rows return no dense embedding profiles instead of falling back to an unavailable private provider.",
+      "liveFailureFixed": "The ordinance-history query for Ordinance 20625 passed December 16 2025 returned HTTP 200 after the planner boundary fix; before the fix it returned HTTP 500 because it tried to use runpod_serverless_or_local without RUNPOD_EMBEDDING_ENDPOINT_URL."
+    },
+    "notes": "A clean store was used because the earlier pilot store had partial data and replacing its one-section proof hit a chunk deactivation RLS bug. The codified-code ingest script now scopes idempotency keys by vector_store_id so the same public-law source can be loaded into multiple stores. The public topks.statecivics.ai caller route is not yet wired or DNS-verified from this machine."
   },
   "batchConsolidation": {
     "status": "implemented",
@@ -157,7 +204,7 @@
     "boundary": "Artifact-only consolidation from completed batch folders. No ingestion, vectorization, Qdrant, Postgres, MinIO, OpenSearch, or graph writes."
   },
   "workbenchProjection": {
-    "status": "implemented_pending_full_corpus_projection",
+    "status": "implemented_full_corpus_projection_passed",
     "schema": "exais.topeka.municipal_code.workbench_projection.v1",
     "runner": "scripts/release/topeka-code-workbench-project.py",
     "outputDir": "${TOPEKA_CODE_OUTPUT}/workbench",
@@ -190,7 +237,7 @@
   "qualityPolicy": {
     "artifactOnlyUntilQualityPass": true,
     "qualityReport": "quality-report.json",
-    "vectorizationAllowed": false,
+    "vectorizationAllowed": true,
     "requiredBeforeIngestion": true,
     "gateScript": "scripts/release/topeka-code-artifact-quality.py",
     "worklistFiles": [
@@ -199,7 +246,7 @@
       "worklists/section-quality-issues.jsonl",
       "worklists/unexpected-section-urls.jsonl"
     ],
-    "notes": "Do not ingest or vectorize additional Topeka codified-code records until JSON artifact coverage, citations, text presence, crawl failures, and graph hierarchy pass."
+    "notes": "Codified-code artifact quality passed and the clean local full-corpus vector store was ingested on 2026-08-28. Keep ordinance PDF ingestion and graph reference extraction behind their own proof gates."
   },
   "acquisitionAdapters": {
     "operatorCaptureManifest": {

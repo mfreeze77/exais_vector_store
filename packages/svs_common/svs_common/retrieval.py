@@ -367,7 +367,11 @@ class RetrievalService:
             LIMIT 8
         """, "file_attr_filter"), params).mappings().all()
         profile_ids = [r["embedding_profile_id"] for r in rows if r["embedding_profile_id"]]
-        return profile_ids or [resolve_embedding_profile(req.mode or "markdown_docs_v1", scope.max_security_level)]
+        if profile_ids:
+            return profile_ids
+        if req.vector_store_id or filters.get("vector_store_id") or req.knowledge_base_id or filters.get("knowledge_base_id"):
+            return []
+        return [resolve_embedding_profile(req.mode or "markdown_docs_v1", scope.max_security_level)]
 
     async def _query_embedding(self, scope, embedding_profile_id: str, query: str, provider_name: str, model: str, dimensions: int) -> list[float]:
         cache = getattr(self, "_query_embedding_cache", None)

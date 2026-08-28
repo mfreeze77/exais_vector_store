@@ -82,7 +82,13 @@ Proof from 2026-08-28:
 
 This solves root discovery and graph hierarchy. It does not fully solve publisher challenge behavior. Full production seeding still needs a retry/resume acquisition pass or an operator-owned authorized export that satisfies the same artifact contract.
 
-Current operating rule: produce JSON/JSONL source artifacts only until the artifact quality gate passes. Do not call ExAIS document ingestion, embedding providers, Qdrant, or vector-store write paths for additional Topeka records until `scripts/release/topeka-code-artifact-quality.py` reports `passed: true`.
+Current status as of 2026-08-28: the Decodo-acquired full codified-code corpus passed the artifact quality gate and was ingested through the ExAIS API into clean local vector store `vs_d4185d1004604f08a55299fa` (`City of Topeka Municipal Code`) for the `https://topks.statecivics.ai/local` surface. The API reports `2,702` completed files with `0` failed files; database proof shows `2,702` documents, `2,702` distinct official source URLs, and `2,999` active/indexed chunks.
+
+Deep-search proof from 2026-08-28 completed 24 live Topeka API searches against `vs_d4185d1004604f08a55299fa` with zero API errors after route hardening. The proof artifact is `.release/cells/ks-state-civics/evals/topeka-code-deep-search-20260828.json`; 19 searches passed the basic citation/content gate and five were marked for review because broad legal topics needed tighter query terms or caller-side answer framing.
+
+The Topeka store must not use the Kansas court-decision query planner. That planner extracts docket numbers, decision years, court names, and publication status for court cases. On municipal code text, ordinance numbers and passed dates can otherwise be misread as court filters. The API route now disables that planner when vector-store attributes identify a non-court corpus such as `topeka_municipal_code`, and store-scoped searches no longer fall back to unavailable private embedding profiles when a planned filter matches zero indexed rows.
+
+Current operating rule: codified-code vectorization is allowed only from artifact-quality-passed source outputs. Keep official ordinance PDF ingestion, graph reference extraction, and production/VPS promotion behind their own proof gates.
 
 Public-access escalation packet: `docs/TOPEKA_PUBLIC_LAW_ACCESS_PACKET.md`.
 

@@ -4,15 +4,30 @@ metadata:
   instanceSlug: ks-state-civics
   vectorStoreSlug: topeka-municipal-code
 vectorStore:
-  id: vs_268b119a2cd84b568af62155
-  name: Topeka Municipal Code
+  id: vs_d4185d1004604f08a55299fa
+  name: City of Topeka Municipal Code
   tenantId: ten_ks_state_civics
   businessInstanceId: biz_ks_state_civics
   knowledgeBaseId: kb_ks_civics
   corpus: topeka_municipal_code
+  consumerBaseUrl: https://topks.statecivics.ai/local
   currentLocalProof:
-    observedAt: '2026-08-27'
-    status: pilot_seeded
-    documentCount: 1
-    recallPassed: false
-    note: Live vector store exists and has a one-section codified-code pilot seed. Broad current-code recall remains blocked until the full codified corpus can be acquired.
+    observedAt: '2026-08-28'
+    status: full_codified_code_ingested_recall_passed
+    documentCount: 2702
+    distinctSourceUriCount: 2702
+    activeChunkCount: 2999
+    indexedChunkCount: 2999
+    recallPassed: true
+    recallProof: .release/cells/ks-state-civics/evals/topeka-code-recall-20260828-012315.json
+    deepSearchProof: .release/cells/ks-state-civics/evals/topeka-code-deep-search-20260828.json
+    deepSearchQueryCount: 24
+    deepSearchBasicPasses: 19
+    deepSearchReviewCount: 5
+    apiSearchHardening: Topeka code stores now bypass the Kansas-court query planner and store-scoped searches do not fall back to unavailable private embedding profiles when planned filters match zero rows.
+    note: Clean local vector store contains the full codified Topeka Municipal Code source corpus for the topks.statecivics.ai local surface. The ExAIS API search path is locally verified; the public topks.statecivics.ai caller route itself is not yet wired or DNS-verified. Official ordinance PDF ingestion and graph reference extraction remain separate follow-up gates.
+  priorPilotStore:
+    id: vs_268b119a2cd84b568af62155
+    status: partial_pilot_store
+    documentCountAtSupersession: 2036
+    note: Original pilot store contains partial codified-code ingestion plus the earlier one-section proof and should not be used as the caller-facing full Topeka store.

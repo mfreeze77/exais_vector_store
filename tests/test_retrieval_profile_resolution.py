@@ -81,6 +81,20 @@ def test_search_embedding_profile_filters_by_file_attributes():
     assert db.params["profile_file_attr_exact"] == '{"region":"us"}'
 
 
+def test_search_embedding_profile_does_not_fallback_for_empty_vector_store_scope():
+    service = RetrievalService.__new__(RetrievalService)
+    db = _Db([])
+    principal = Principal(tenant_id="tenant", business_instance_id="biz-dev", max_security_level=5)
+    scope = build_retrieval_scope(principal)
+    req = SearchRequest(query="proof", vector_store_id="vs_empty", mode="markdown_docs_v1")
+
+    profiles = service._embedding_profiles_for_search(db, scope, req, {"vector_store_id": "vs_empty"})
+
+    assert profiles == []
+    assert "c.vector_store_id" in db.sql
+    assert db.params["vector_store_id"] == "vs_empty"
+
+
 def test_qdrant_filter_supports_file_attribute_alternatives():
     scope = build_retrieval_scope(Principal(tenant_id="tenant", business_instance_id="biz-dev", max_security_level=5))
 
