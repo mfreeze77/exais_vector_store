@@ -66,6 +66,7 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - Current operator rule: generate JSON/JSONL artifacts and run the artifact quality gate only. Do not ingest/vectorize additional Topeka records until artifact quality passes.
 - Operator-owned acquisition routes can now plug in through `--capture-manifest` by providing authorized HTML captures. The route implementation, cookies, credentials, proxy logic, captcha solving, stealth plugins, and challenge bypass code remain out of scope for this repository.
 - Public-access/export escalation is documented in `docs/TOPEKA_PUBLIC_LAW_ACCESS_PACKET.md`, and the artifact quality gate now emits complete worklists for missing URLs and capture failures.
+- Larger stock-Playwright proof on 2026-08-28 fetched 141 of the first 200 section/subsection URLs and failed 59 publisher-challenge pages. The artifact gate reported `vectorization_allowed: false`, 5.218 percent coverage, 2,561 missing required URLs, and zero section text/citation issues on fetched pages.
 
 ## Acceptance Criteria
 

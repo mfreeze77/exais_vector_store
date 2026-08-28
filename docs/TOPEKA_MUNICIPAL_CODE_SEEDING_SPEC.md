@@ -78,6 +78,7 @@ Proof from 2026-08-28:
 - A 10-page manifest-only Playwright run without isolated contexts fetched 1 section and failed 9 challenge pages.
 - A 10-page manifest-only Playwright run with isolated contexts fetched 8 sections and failed 2 challenge pages.
 - A 50-page manifest-only Playwright run with isolated contexts and one retry fetched 31 sections, failed 19 challenge pages, emitted 3,203 `CONTAINS` edges from the CSV hierarchy, and emitted 37 `HAS_ORDINANCE_HISTORY` edges from fetched section text.
+- A 200-page manifest-only Playwright run with isolated contexts and one retry fetched 141 sections, failed 59 challenge pages, emitted 3,203 `CONTAINS` edges, 22 `DEFINES` edges, and 244 `HAS_ORDINANCE_HISTORY` edges. The artifact quality gate reported `passed: false`, `vectorization_allowed: false`, `5.218%` coverage, `2,561` missing required URLs, `59` failed crawl URLs, and zero section text/citation issues on fetched pages.
 
 This solves root discovery and graph hierarchy. It does not fully solve publisher challenge behavior. Full production seeding still needs a retry/resume acquisition pass or an operator-owned authorized export that satisfies the same artifact contract.
 
