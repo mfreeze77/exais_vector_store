@@ -110,8 +110,16 @@
   },
   "sourceManifest": {
     "format": "jsonl",
-    "status": "pending",
+    "status": "artifact_quality_pending",
     "manifestUri": "object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-codified-code/seed/manifests/sections.jsonl"
+  },
+  "qualityPolicy": {
+    "artifactOnlyUntilQualityPass": true,
+    "qualityReport": "quality-report.json",
+    "vectorizationAllowed": false,
+    "requiredBeforeIngestion": true,
+    "gateScript": "scripts/release/topeka-code-artifact-quality.py",
+    "notes": "Do not ingest or vectorize additional Topeka codified-code records until JSON artifact coverage, citations, text presence, crawl failures, and graph hierarchy pass."
   },
   "vectorStore": {
     "id": "vs_268b119a2cd84b568af62155",

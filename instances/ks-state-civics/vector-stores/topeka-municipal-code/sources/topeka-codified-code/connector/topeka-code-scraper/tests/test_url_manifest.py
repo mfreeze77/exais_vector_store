@@ -8,6 +8,7 @@ from topeka_code_scraper.url_manifest import (
     merge_graphs,
     parse_level_filter,
     read_url_manifest,
+    write_url_manifest_artifacts,
 )
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -70,6 +71,26 @@ def test_manifest_merge_preserves_parsed_section_content_properties():
     assert section_node.properties["manifest_level"] == "Section"
     assert "CONTAINS" in {edge.type for edge in edges}
     assert "DEFINES" in {edge.type for edge in edges}
+
+
+def test_url_manifest_artifacts_are_written_and_added_to_manifest(tmp_path):
+    entries = [
+        _entry("Code", "TMC", "Topeka Municipal Code", "https://topeka.municipal.codes/TMC", 2),
+        _entry("Section", "18.55.010", "Definitions.", "https://topeka.municipal.codes/TMC/18.55.010", 3),
+    ]
+    (tmp_path / "manifest.json").write_text('{"files":{},"counts":{}}', encoding="utf-8")
+
+    stats = write_url_manifest_artifacts(tmp_path, entries, entries[1:])
+    manifest = __import__("json").loads((tmp_path / "manifest.json").read_text(encoding="utf-8"))
+    url_rows = (tmp_path / "url-manifest.jsonl").read_text(encoding="utf-8").splitlines()
+    fetch_rows = (tmp_path / "expected-fetch-urls.jsonl").read_text(encoding="utf-8").splitlines()
+
+    assert stats == {"expected_fetch_urls": 1, "url_manifest_rows": 2}
+    assert len(url_rows) == 2
+    assert len(fetch_rows) == 1
+    assert manifest["files"]["url_manifest"] == "url-manifest.jsonl"
+    assert manifest["files"]["expected_fetch_urls"] == "expected-fetch-urls.jsonl"
+    assert manifest["counts"]["expected_fetch_urls"] == 1
 
 
 def _entry(level: str, citation: str, name: str, url: str, row_number: int):

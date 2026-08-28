@@ -190,3 +190,64 @@ def merge_graphs(
         extra = "" if edge.type == "CONTAINS" else json.dumps(edge.properties, sort_keys=True)
         edges.setdefault((edge.source, edge.target, edge.type, extra), edge)
     return list(nodes.values()), list(edges.values())
+
+
+def write_url_manifest_artifacts(
+    output_dir: Path,
+    entries: list[UrlManifestEntry],
+    fetch_entries: list[UrlManifestEntry],
+) -> dict[str, int]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    fetch_required_urls = {entry.url for entry in fetch_entries}
+    url_manifest_count = _write_jsonl(
+        output_dir / "url-manifest.jsonl",
+        (manifest_row(entry, fetch_required=entry.url in fetch_required_urls) for entry in entries),
+    )
+    expected_fetch_count = _write_jsonl(
+        output_dir / "expected-fetch-urls.jsonl",
+        (manifest_row(entry, fetch_required=True) for entry in fetch_entries),
+    )
+    stats = {
+        "url_manifest_rows": url_manifest_count,
+        "expected_fetch_urls": expected_fetch_count,
+    }
+    _augment_manifest(output_dir / "manifest.json", stats)
+    return stats
+
+
+def manifest_row(entry: UrlManifestEntry, *, fetch_required: bool) -> dict[str, object]:
+    return {
+        "level": entry.level,
+        "id": entry.id,
+        "citation": entry.citation,
+        "name": entry.name,
+        "parent_title": entry.parent_title,
+        "parent_title_name": entry.parent_title_name,
+        "parent_chapter": entry.parent_chapter,
+        "url": entry.url,
+        "node_id": entry.node_id,
+        "parser_page_type": entry.parser_page_type,
+        "fetch_required": fetch_required,
+        "row_number": entry.row_number,
+    }
+
+
+def _write_jsonl(path: Path, rows: Iterable[dict[str, object]]) -> int:
+    count = 0
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n")
+            count += 1
+    return count
+
+
+def _augment_manifest(path: Path, stats: dict[str, int]) -> None:
+    if not path.exists():
+        return
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    files = manifest.setdefault("files", {})
+    counts = manifest.setdefault("counts", {})
+    files["url_manifest"] = "url-manifest.jsonl"
+    files["expected_fetch_urls"] = "expected-fetch-urls.jsonl"
+    counts.update(stats)
+    path.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")

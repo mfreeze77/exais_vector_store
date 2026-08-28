@@ -51,9 +51,53 @@ source:
     checksumField: content_hash
     savedPathField: source_url
     lockFile: source.lock.json
+artifactGeneration:
+  mode: json_only
+  runner: instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-codified-code/connector/topeka-code-scraper/src/topeka_code_scraper/cli.py
+  command:
+    - python
+    - -m
+    - topeka_code_scraper
+    - --fetcher
+    - playwright
+    - --isolate-playwright-context
+    - --url-list
+    - seed/raw/topeka_municipal_code_urls.csv
+    - --url-list-levels
+    - Section,Subsection
+    - --manifest-only
+    - --archive-raw
+    - --archive-network
+    - --output
+    - ${TOPEKA_CODE_OUTPUT}
+  outputContract:
+    - sections.jsonl
+    - definitions.jsonl
+    - nodes.jsonl
+    - edges.jsonl
+    - citation-url-map.jsonl
+    - url-manifest.jsonl
+    - expected-fetch-urls.jsonl
+    - manifest.json
+    - crawl_report.json
+qualityGate:
+  requiredBeforeIngestion: true
+  vectorizationAllowed: false
+  runner: scripts/release/topeka-code-artifact-quality.py
+  command:
+    - python
+    - scripts/release/topeka-code-artifact-quality.py
+    - --source-output
+    - ${TOPEKA_CODE_OUTPUT}
+    - --url-list
+    - instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-codified-code/seed/raw/topeka_municipal_code_urls.csv
+    - --output
+    - ${TOPEKA_CODE_OUTPUT}/quality-report.json
 ingestion:
   mode: api
   runner: scripts/release/topeka-code-ingest.py
+  gatedBy: topeka-code-artifact-quality.passed
+  disabledUntil: full_json_quality_pass
   command:
     - python
     - scripts/release/topeka-code-ingest.py

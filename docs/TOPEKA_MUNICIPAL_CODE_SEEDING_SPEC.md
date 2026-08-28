@@ -81,6 +81,8 @@ Proof from 2026-08-28:
 
 This solves root discovery and graph hierarchy. It does not fully solve publisher challenge behavior. Full production seeding still needs a retry/resume acquisition pass or an operator-owned authorized export that satisfies the same artifact contract.
 
+Current operating rule: produce JSON/JSONL source artifacts only until the artifact quality gate passes. Do not call ExAIS document ingestion, embedding providers, Qdrant, or vector-store write paths for additional Topeka records until `scripts/release/topeka-code-artifact-quality.py` reports `passed: true`.
+
 ### 3. Operator-Owned Publisher-Gated Acquisition Slot
 
 If an operator obtains a legally authorized export, API access, records request, licensed data feed, or an out-of-band publisher-gated acquisition method, it plugs in by producing the same artifact contract:
@@ -184,6 +186,7 @@ Do not copy evasion code into this repo. Treat any publisher-gated acquisition a
 
 - `topeka-code-scraper` tests pass from the vendored connector path.
 - Source-package validation passes while the source is explicitly marked `productionReady: false`.
+- Artifact generation emits JSON/JSONL files first; vectorization is blocked until the JSON artifact quality report passes.
 - Zero fetched pages exits nonzero and cannot produce a successful seed manifest.
 - Zero extracted sections exits nonzero unless explicitly allowed for diagnostics.
 - A seeded pilot returns clickable citations for both `source_url` and `pdf_url`.

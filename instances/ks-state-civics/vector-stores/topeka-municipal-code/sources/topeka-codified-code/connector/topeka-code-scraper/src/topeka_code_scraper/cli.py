@@ -8,7 +8,14 @@ import typer
 
 from .crawler import MunicipalCodeCrawler
 from .exporter import export_corpus
-from .url_manifest import load_url_manifest, manifest_graph, merge_graphs, parse_level_filter, read_url_manifest
+from .url_manifest import (
+    load_url_manifest,
+    manifest_graph,
+    merge_graphs,
+    parse_level_filter,
+    read_url_manifest,
+    write_url_manifest_artifacts,
+)
 
 app = typer.Typer(add_completion=False, help="Scrape the Topeka Municipal Code into clean JSONL + GraphRAG graph files.")
 
@@ -79,6 +86,8 @@ def scrape(
             report.node_count = len(nodes)
             report.edge_count = len(edges)
         export_corpus(output, pages, nodes, edges, report)
+        if manifest_entries:
+            write_url_manifest_artifacts(output, manifest_entries, fetch_entries)
         typer.echo(f"Fetched pages: {report.pages_fetched} ({report.pages_failed} failed)")
         typer.echo(f"Fetcher: {report.fetcher}")
         typer.echo(f"Sections: {report.section_count}")
