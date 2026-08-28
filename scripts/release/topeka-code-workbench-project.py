@@ -735,7 +735,7 @@ def slice_rows(
     type_by_key = {str(row["source_component_key"]): str(row["type"]) for row in components}
     component_by_key = {str(row["source_component_key"]): row for row in components}
     rows: list[dict[str, Any]] = []
-    for slice_type in ("title", "chapter"):
+    for slice_type in ("title", "chapter", "appendix", "article"):
         grouped: dict[str, list[str]] = defaultdict(list)
         for section_key in sections_by_key:
             ancestor = nearest_ancestor(section_key, parent_key_by_key, type_by_key, slice_type)

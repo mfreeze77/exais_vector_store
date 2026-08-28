@@ -53,8 +53,8 @@ that maps those artifacts into the workbench's component-shaped world.
 - Preserve section ancestry from the URL manifest/`CONTAINS` graph.
 - Convert section blocks into paragraph/table components under the section.
 - Convert definitions into definition components under the section.
-- Emit title/chapter slices so the workbench can import focused portions of the
-  municipal code.
+- Emit title/chapter/appendix/article slices so the workbench can import
+  focused portions of the municipal code.
 - Wire the projection into the Topeka codified-code source package as a
   generated artifact step.
 - Add focused tests for deterministic IDs, hierarchy preservation, slice
@@ -95,8 +95,8 @@ that maps those artifacts into the workbench's component-shaped world.
   component keys and `DEFINES` relations.
 - [x] `component-relations.jsonl` preserves `CONTAINS`, `REFERENCES`, `DEFINES`,
   and `HAS_ORDINANCE_HISTORY` relations when source data supports them.
-- [x] `slices.jsonl` contains title/chapter slices that point to section
-  component IDs and source URLs.
+- [x] `slices.jsonl` contains title/chapter/appendix/article slices that point
+  to section component IDs and source URLs.
 - [x] The projection manifest states the artifact-only boundary and reports
   quality status without enabling ingestion/vectorization.
 - [x] Tests cover the projection behavior and existing source-package validation
@@ -153,11 +153,27 @@ Verification:
 - Real saved batch projection, batch 003:
   `docker run --rm -v "${PWD}:/work" -w /work -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python scripts/release/topeka-code-workbench-project.py --source-output .tmp/topeka-decodo-window-batches-20260827220454/output/batch-003 --output-dir .tmp/topeka-decodo-window-batches-20260827220454/output/batch-003/workbench`
   -> projection quality passed, 200 source sections, 1,265 components, 1,499 relations, 22 slices, zero projection errors.
+- Appendix/article slice regression was added after full-batch audit showed
+  appendix-only windows had valid components but zero title/chapter slices.
+- Full Decodo batch audit across batches 001-014 found 2,702 expected URLs,
+  2,702 fetched URLs, zero missing URLs, zero failed URLs, 2,702 raw HTML files,
+  2,702 network files, and zero quality worklist rows.
+- Combined full-corpus projection on
+  `.tmp/topeka-decodo-window-batches-20260827220454/combined-full-corpus-20260828-v2`
+  passed with 2,702 source sections, 2,702 section components, 25,480 total
+  components, 29,185 component relations, 415 workbench slices, zero projection
+  errors, and `source_quality.artifact_quality_passed=true`.
+- The combined source artifacts produced zero `REFERENCES` edges, so the
+  projection preserved `CONTAINS`, `DEFINES`, and `HAS_ORDINANCE_HISTORY`
+  relations but did not prove cross-reference extraction.
+- Independent read-only QC sidecar reviewed the batch artifacts and returned
+  `PASS WITH NOTES`; the notes were batch-local quality scope and the need for
+  combined full-corpus validation before ingestion/vectorization.
 
 Known limitations:
 
 - This is a projection and import contract only. It does not implement the
   StateCivics drafting workbench import API or editor UI.
-- Batch-level projection success is not full-corpus production approval. The
-  full Topeka corpus still needs acquisition, artifact quality, workbench
+- Batch-level projection success is not final production approval. The full
+  Topeka corpus still needs combined-corpus artifact quality, combined workbench
   projection, ingestion, graph, and recall gates before production use.

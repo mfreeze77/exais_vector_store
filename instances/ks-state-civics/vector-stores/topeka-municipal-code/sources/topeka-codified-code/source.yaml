@@ -113,6 +113,31 @@ artifactGeneration:
         - retrieved_at
         - network_events
         - source
+  batchConsolidation:
+    mode: artifact_only_batch_merge
+    runner: scripts/release/topeka-code-combine-batches.py
+    boundary: reads completed batch JSON/raw/network artifacts and writes one combined source-output folder; no ingestion, vectorization, Qdrant, Postgres, MinIO, OpenSearch, or graph writes
+    command:
+      - python
+      - scripts/release/topeka-code-combine-batches.py
+      - --batch-root
+      - ${TOPEKA_CODE_BATCH_ROOT}
+      - --output-dir
+      - ${TOPEKA_CODE_OUTPUT}
+    gatedBy:
+      - every-batch-quality-report.passed
+    outputContract:
+      - sections.jsonl
+      - definitions.jsonl
+      - nodes.jsonl
+      - edges.jsonl
+      - citation-url-map.jsonl
+      - url-manifest.jsonl
+      - expected-fetch-urls.jsonl
+      - manifest.json
+      - crawl_report.json
+      - raw/
+      - network/
 workbenchProjection:
   mode: topeka_municipal_code_v1
   status: required_before_workbench_import
@@ -141,6 +166,8 @@ workbenchProjection:
   sliceLevels:
     - title
     - chapter
+    - appendix
+    - article
 qualityGate:
   requiredBeforeIngestion: true
   vectorizationAllowed: false

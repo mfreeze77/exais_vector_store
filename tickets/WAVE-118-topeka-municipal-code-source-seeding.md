@@ -43,6 +43,7 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - Full codified-code seed artifacts under `instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-codified-code/seed/` or the configured object-store URI.
 - Full ordinance PDF seed artifacts under `instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-ordinances/seed/` or the configured object-store URI.
 - `scripts/release/topeka-code-ingest.py`
+- `scripts/release/topeka-code-combine-batches.py`
 - `scripts/release/topeka-ordinances-collect.py`
 - `scripts/release/topeka-ordinance-pdf-ingest.py`
 - `scripts/release/topeka-code-graphrag-extract.py`
@@ -69,8 +70,11 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - Larger stock-Playwright proof on 2026-08-28 fetched 141 of the first 200 section/subsection URLs and failed 59 publisher-challenge pages. The artifact gate reported `vectorization_allowed: false`, 5.218 percent coverage, 2,561 missing required URLs, and zero section text/citation issues on fetched pages.
 - Operator provided a Decodo Web Scraping API credential as a local runtime secret. The codified-code scraper now supports `--fetcher decodo`, defaulting to Decodo's minimal universal request after live proof showed Topeka HTML succeeds without explicit JS/proxy parameters while `headless: html` and `proxy_pool: standard` returned provider status 613. The route still writes only JSON/JSONL/raw/network artifacts for the existing quality gate. The Decodo credential remains env-only and must not be committed or written into artifacts.
 - The scraper now supports `--url-list-offset` and `--url-list-limit` so paid acquisition can run in 200-page windows without discarding the full URL manifest hierarchy needed for `CONTAINS` GraphRAG edges.
-- WAVE-119 adds a projection-only workbench lane from saved Topeka artifacts to stable canonical components, component relations, and title/chapter slices. This keeps future legislative redline/import work separate from vectorization and ingestion.
+- WAVE-119 adds a projection-only workbench lane from saved Topeka artifacts to stable canonical components, component relations, and title/chapter/appendix/article slices. This keeps future legislative redline/import work separate from vectorization and ingestion.
 - Decodo batch window proof on 2026-08-28 reached 600 fetched pages across batches 001-003 with zero failed URLs. Batch 003 at offset 400/limit 200 produced 200 sections, 55 definitions, 3,313 graph nodes, 3,438 graph edges, complete section citation coverage, zero quality worklist rows, and `vectorization_allowed: true` for that 200-page window only.
+- Full Decodo batch acquisition proof on 2026-08-28 reached all 2,702 required Section/Subsection fetch URLs across batches 001-014 with zero failed URLs, zero missing URLs, 2,702 raw HTML evidence files, 2,702 network evidence files, 2,702 section artifacts, 980 definition artifacts, and zero quality worklist rows. This remains artifact-only proof; no vectorization, ingestion, ExAIS API writes, Qdrant, Postgres, MinIO, OpenSearch, or graph writes were run.
+- Full batch consolidation proof on 2026-08-28 used `scripts/release/topeka-code-combine-batches.py` to create `.tmp/topeka-decodo-window-batches-20260827220454/combined-full-corpus-20260828-v2`. The combined source output has 2,702 sections, 980 definitions, 4,606 graph nodes, 6,909 deduped graph edges, 6,384 citation URL rows, 3,204 URL-manifest rows, 2,702 expected fetch URLs, 2,702 raw HTML files, and 2,702 network files.
+- Combined full-corpus artifact quality passed with 100 percent coverage, zero missing URLs, zero failed URLs, zero duplicate section IDs/URLs, zero empty-text sections, zero missing section citation URLs, and zero worklist rows. Combined graph edge types are `CONTAINS=3,203`, `DEFINES=980`, and `HAS_ORDINANCE_HISTORY=2,726`; the current parsed source artifacts produced zero `REFERENCES` edges.
 
 ## Acceptance Criteria
 

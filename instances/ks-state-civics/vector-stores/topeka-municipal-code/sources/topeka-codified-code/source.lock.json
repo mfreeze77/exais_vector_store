@@ -122,8 +122,39 @@
   },
   "sourceManifest": {
     "format": "jsonl",
-    "status": "artifact_quality_pending",
-    "manifestUri": "object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-codified-code/seed/manifests/sections.jsonl"
+    "status": "full_corpus_artifact_quality_passed_local_tmp",
+    "manifestUri": "object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-codified-code/seed/manifests/sections.jsonl",
+    "localProofPath": ".tmp/topeka-decodo-window-batches-20260827220454/combined-full-corpus-20260828-v2",
+    "localProofCounts": {
+      "expectedFetchUrls": 2702,
+      "fetchedUrls": 2702,
+      "missingUrls": 0,
+      "failedUrls": 0,
+      "sections": 2702,
+      "definitions": 980,
+      "rawHtmlFiles": 2702,
+      "networkFiles": 2702
+    }
+  },
+  "batchConsolidation": {
+    "status": "implemented",
+    "runner": "scripts/release/topeka-code-combine-batches.py",
+    "mode": "artifact_only_batch_merge",
+    "gatedBy": "every batch quality-report.json must pass before consolidation",
+    "outputs": [
+      "sections.jsonl",
+      "definitions.jsonl",
+      "nodes.jsonl",
+      "edges.jsonl",
+      "citation-url-map.jsonl",
+      "url-manifest.jsonl",
+      "expected-fetch-urls.jsonl",
+      "manifest.json",
+      "crawl_report.json",
+      "raw/",
+      "network/"
+    ],
+    "boundary": "Artifact-only consolidation from completed batch folders. No ingestion, vectorization, Qdrant, Postgres, MinIO, OpenSearch, or graph writes."
   },
   "workbenchProjection": {
     "status": "implemented_pending_full_corpus_projection",
@@ -138,6 +169,21 @@
       "slices.jsonl",
       "workbench-import-manifest.json"
     ],
+    "sliceLevels": [
+      "title",
+      "chapter",
+      "appendix",
+      "article"
+    ],
+    "localProofPath": ".tmp/topeka-decodo-window-batches-20260827220454/combined-full-corpus-20260828-v2/workbench",
+    "localProofCounts": {
+      "sourceSections": 2702,
+      "sectionComponents": 2702,
+      "components": 25480,
+      "relations": 29185,
+      "slices": 415,
+      "projectionErrors": 0
+    },
     "identityPolicy": "source_component_key is preserved from Topeka source/graph identity; workbench_component_id is deterministic UUIDv5 from source_component_key.",
     "boundary": "Projection-only from saved JSON/JSONL/HTML artifacts. No ingestion, vectorization, Qdrant, Postgres, MinIO, OpenSearch, or graph writes."
   },

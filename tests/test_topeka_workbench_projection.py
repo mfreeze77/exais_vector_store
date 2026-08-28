@@ -60,6 +60,27 @@ def test_projection_filters_unfetched_manifest_sections(tmp_path):
     assert projection["manifest"]["quality"]["passed"] is True
 
 
+def test_projection_emits_appendix_slices_without_chapters(tmp_path):
+    script = load_script()
+    seed_topeka_appendix_artifacts(tmp_path)
+
+    projection = script.build_workbench_projection(tmp_path)
+
+    by_key = {row["source_component_key"]: row for row in projection["components"]}
+    assert by_key["ks-topeka:tmc:AxA"]["type"] == "appendix"
+    assert by_key["ks-topeka:tmc:AxA_ArtI"]["parent_source_component_key"] == "ks-topeka:tmc:AxA"
+    assert by_key["ks-topeka:tmc:A1-1"]["parent_source_component_key"] == "ks-topeka:tmc:AxA_ArtI"
+
+    appendix_slices = [row for row in projection["slices"] if row["slice_type"] == "appendix"]
+    article_slices = [row for row in projection["slices"] if row["slice_type"] == "article"]
+    assert len(appendix_slices) == 1
+    assert appendix_slices[0]["slice_key"] == "ks-topeka:tmc:AxA"
+    assert appendix_slices[0]["section_component_keys"] == ["ks-topeka:tmc:A1-1"]
+    assert len(article_slices) == 1
+    assert article_slices[0]["slice_key"] == "ks-topeka:tmc:AxA_ArtI"
+    assert article_slices[0]["section_component_keys"] == ["ks-topeka:tmc:A1-1"]
+
+
 def test_write_projection_outputs_manifest_and_contract_files(tmp_path):
     script = load_script()
     seed_topeka_artifacts(tmp_path)
@@ -162,6 +183,59 @@ def seed_topeka_artifacts(root: Path, *, include_unfetched: bool = False) -> Non
     if include_unfetched:
         edges.append(_edge("ks-topeka:tmc:1.05", "ks-topeka:tmc:1.05.020", 4))
     write_jsonl(root / "edges.jsonl", edges)
+    write_json(root / "crawl_report.json", {"pages_fetched": 1, "pages_failed": 0, "section_count": 1, "fetcher": "fixture"})
+    write_json(root / "quality-report.json", {"passed": True, "vectorization_allowed": True})
+
+
+def seed_topeka_appendix_artifacts(root: Path) -> None:
+    section = {
+        "id": "ks-topeka:tmc:A1-1",
+        "citation": "A1-1",
+        "title": "Sec. A1-1. Charter power.",
+        "source_url": "https://topeka.municipal.codes/TMC/A1-1",
+        "text": "The city may exercise home rule powers.",
+        "blocks": [{"order": 0, "kind": "paragraph", "text": "The city may exercise home rule powers."}],
+        "references": [],
+        "ordinance_history": [],
+        "content_hash": "d" * 64,
+        "source_html_hash": "e" * 64,
+    }
+    write_jsonl(root / "sections.jsonl", [section])
+    write_jsonl(root / "definitions.jsonl", [])
+    manifest_rows = [
+        _manifest("Code", "TMC", "", "Topeka Municipal Code (root)", "ks-topeka:tmc:root", "https://topeka.municipal.codes/TMC", 2, "code"),
+        _manifest("Appendix", "AxA", "AxA", "Appendix A: Compilation of Charter Ordinances", "ks-topeka:tmc:AxA", "https://topeka.municipal.codes/TMC/AxA", 3, "appendix"),
+        _manifest("Article", "AxA Art. I", "AxA_ArtI", "Article I. Home Rule", "ks-topeka:tmc:AxA_ArtI", "https://topeka.municipal.codes/TMC/AxA_ArtI", 4, "article"),
+        _manifest("Section", "A1-1", "A1-1", "Sec. A1-1. Charter power.", "ks-topeka:tmc:A1-1", "https://topeka.municipal.codes/TMC/A1-1", 5, "section"),
+    ]
+    write_jsonl(root / "url-manifest.jsonl", manifest_rows)
+    write_jsonl(
+        root / "nodes.jsonl",
+        [
+            {
+                "id": row["node_id"],
+                "type": row["parser_page_type"],
+                "label": f"{row['citation']} {row['name']}".strip(),
+                "properties": {
+                    "source_url": row["url"],
+                    "citation_url": row["url"],
+                    "citation": row["citation"],
+                    "title": row["name"],
+                    "manifest_level": row["level"],
+                    "manifest_row_number": row["row_number"],
+                },
+            }
+            for row in manifest_rows
+        ],
+    )
+    write_jsonl(
+        root / "edges.jsonl",
+        [
+            _edge("ks-topeka:tmc:root", "ks-topeka:tmc:AxA", 1),
+            _edge("ks-topeka:tmc:AxA", "ks-topeka:tmc:AxA_ArtI", 2),
+            _edge("ks-topeka:tmc:AxA_ArtI", "ks-topeka:tmc:A1-1", 3),
+        ],
+    )
     write_json(root / "crawl_report.json", {"pages_fetched": 1, "pages_failed": 0, "section_count": 1, "fetcher": "fixture"})
     write_json(root / "quality-report.json", {"passed": True, "vectorization_allowed": True})
 

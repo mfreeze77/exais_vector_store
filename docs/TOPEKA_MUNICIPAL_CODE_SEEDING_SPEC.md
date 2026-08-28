@@ -166,7 +166,30 @@ Graph node and edge properties must preserve `source_url` and `citation_url` whe
 
 The adapter boundary is artifact-level by design. The ExAIS repo can validate and ingest artifacts without owning acquisition code that bypasses publisher access controls.
 
-### 3A. Workbench Canonical Projection
+### 3A. Batch Consolidation
+
+When acquisition runs in paid or rate-limited windows, combine completed batch
+folders into one source-output folder before full-corpus quality, workbench
+projection, ingestion, or GraphRAG extraction:
+
+```bash
+python scripts/release/topeka-code-combine-batches.py \
+  --batch-root ${TOPEKA_CODE_BATCH_ROOT} \
+  --output-dir ${TOPEKA_CODE_OUTPUT}
+```
+
+The combiner requires every batch to have a passing `quality-report.json`,
+deduplicates the repeated URL-manifest graph, copies `raw/` and `network/`
+evidence files, and writes one combined artifact set with `sections.jsonl`,
+`definitions.jsonl`, `nodes.jsonl`, `edges.jsonl`, `citation-url-map.jsonl`,
+`url-manifest.jsonl`, `expected-fetch-urls.jsonl`, `manifest.json`, and
+`crawl_report.json`.
+
+This is still an artifact-only step. It does not call ExAIS ingestion, model
+gateways, embedding providers, Qdrant, Postgres, MinIO, OpenSearch, or graph
+write paths.
+
+### 3B. Workbench Canonical Projection
 
 Saved codified-code captures must support more than vector search. Before the
 Topeka corpus is represented as editable law, generate a separate workbench
@@ -212,8 +235,9 @@ The projection maps:
   relations.
 - Section references and ordinance history into relation rows with citation URL
   provenance.
-- Title/chapter slices into `slices.jsonl` so the workbench can import a focused
-  portion of the municipal code instead of loading the whole corpus.
+- Title/chapter/appendix/article slices into `slices.jsonl` so the workbench can
+  import a focused portion of the municipal code instead of loading the whole
+  corpus.
 
 The source of truth remains the saved capture/archive and component hashes.
 Embeddings, Qdrant rows, graph rows, rendered HTML, and workbench import files
