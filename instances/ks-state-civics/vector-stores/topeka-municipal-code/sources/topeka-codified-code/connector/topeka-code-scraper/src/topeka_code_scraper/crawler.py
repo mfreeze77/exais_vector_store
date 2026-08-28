@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 import json
 from pathlib import Path
 
-from .fetcher import FetchResult, HttpFetcher, PlaywrightFetcher
+from .fetcher import DecodoFetcher, FetchResult, HttpFetcher, PlaywrightFetcher
 from .graph import GraphBuilder
 from .models import CrawlReport, ParsedPage
 from .normalize import BASE_URL, canonicalize_url, sha256_text
@@ -31,6 +31,12 @@ class MunicipalCodeCrawler:
         fetcher: str = "http",
         render_wait_ms: int = 1500,
         isolate_playwright_context: bool = False,
+        decodo_proxy_pool: str = "",
+        decodo_headless: str = "",
+        decodo_geo: str = "",
+        decodo_locale: str = "",
+        decodo_device_type: str = "",
+        decodo_target: str = "universal",
         seed_urls: list[str] | None = None,
         page_hints: dict[str, UrlManifestEntry] | None = None,
         follow_links: bool = True,
@@ -51,6 +57,12 @@ class MunicipalCodeCrawler:
         self.fetcher = fetcher
         self.render_wait_ms = render_wait_ms
         self.isolate_playwright_context = isolate_playwright_context
+        self.decodo_proxy_pool = decodo_proxy_pool
+        self.decodo_headless = decodo_headless
+        self.decodo_geo = decodo_geo
+        self.decodo_locale = decodo_locale
+        self.decodo_device_type = decodo_device_type
+        self.decodo_target = decodo_target
         self.seed_urls = [url for url in (canonicalize_url(item) for item in (seed_urls or [])) if url]
         self.page_hints = page_hints or {}
         self.follow_links = follow_links
@@ -116,7 +128,7 @@ class MunicipalCodeCrawler:
         )
         return pages, nodes, edges, report
 
-    def _build_fetcher(self) -> HttpFetcher | PlaywrightFetcher:
+    def _build_fetcher(self) -> HttpFetcher | PlaywrightFetcher | DecodoFetcher:
         if self.fetcher == "http":
             return HttpFetcher(
                 delay_seconds=self.delay_seconds,
@@ -132,6 +144,18 @@ class MunicipalCodeCrawler:
                 user_agent=self.user_agent,
                 render_wait_ms=self.render_wait_ms,
                 isolate_context=self.isolate_playwright_context,
+            )
+        if self.fetcher == "decodo":
+            return DecodoFetcher(
+                delay_seconds=self.delay_seconds,
+                timeout_seconds=self.timeout_seconds,
+                retries=self.retries,
+                proxy_pool=self.decodo_proxy_pool,
+                headless=self.decodo_headless,
+                geo=self.decodo_geo,
+                locale=self.decodo_locale,
+                device_type=self.decodo_device_type,
+                target=self.decodo_target,
             )
         raise ValueError(f"Unsupported fetcher: {self.fetcher}")
 

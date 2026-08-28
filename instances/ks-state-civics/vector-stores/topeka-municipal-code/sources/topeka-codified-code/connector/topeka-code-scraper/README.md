@@ -136,6 +136,33 @@ topeka-code-scraper \
 
 This mode uses a normal isolated Chromium browser context. It does not use stealth plugins, captcha solving, proxy rotation, or challenge-circumvention code.
 
+Fetch through the operator-configured Decodo Web Scraping API. The default request sends the URL and `target: universal`, leaving proxy pool and JS rendering on Decodo's provider defaults:
+
+```bash
+export DECODO_API_TOKEN="value-after-Basic-from-Decodo-playground"
+
+topeka-code-scraper \
+  --fetcher decodo \
+  --url-list ./seed/raw/topeka_municipal_code_urls.csv \
+  --url-list-levels Section,Subsection \
+  --manifest-only \
+  --archive-raw \
+  --archive-network \
+  --output ./output/topeka-decodo
+```
+
+Optional non-secret Decodo knobs are available as flags or env vars:
+
+- `DECODO_API_ENDPOINT`
+- `DECODO_PROXY_POOL`
+- `DECODO_HEADLESS`
+- `DECODO_GEO`
+- `DECODO_LOCALE`
+- `DECODO_DEVICE_TYPE`
+- `DECODO_TARGET`
+
+The Decodo token must remain a runtime secret and should not be committed. The scraper records Decodo task metadata in network archives, but never writes the API credential into artifacts.
+
 Import operator-owned HTML captures instead of fetching live pages:
 
 ```bash
@@ -156,7 +183,7 @@ Each capture manifest row must contain a canonical TMC `url` and either inline `
 {"url":"https://topeka.municipal.codes/TMC/18.55.010","html_path":"html/18.55.010.html","status_code":200,"retrieved_at":"2026-08-28T00:00:00Z","source":"operator_authorized_route"}
 ```
 
-This is the shim for an operator-owned authorized export, browser capture, Cloudflare Worker route, or other route. The acquisition method stays outside this repository. Captures that are challenge-only pages are rejected and recorded as failures; cookies, credentials, storage state, bypass code, proxy logic, and route secrets do not belong in Git.
+This is the shim for an operator-owned authorized export, browser capture, Cloudflare Worker route, or other route. Captures that are challenge-only pages are rejected and recorded as failures; cookies, credentials, storage state, bypass code, proxy logic, and route secrets do not belong in Git.
 
 ## Example section record
 
@@ -231,6 +258,7 @@ The deterministic public IDs intentionally do not depend on ICC/eCode360 interna
 - A crawl that fetches pages but extracts zero code sections exits non-zero (`3`) unless `--allow-zero-sections` is set.
 - `--max-pages` provides a safe smoke-test mode.
 - `--fetcher playwright` accepts rendered code pages that contain real TMC text and section links, but fails challenge-only pages.
+- `--fetcher decodo` uses the Decodo Web Scraping API as a provider-backed HTML acquisition route and fails challenge-only or non-200 target pages.
 - `--capture-manifest` parses operator-owned HTML captures and applies the same challenge-page rejection, parser, exporter, graph, citation, and quality-gate path as live fetches.
 - `citation-url-map.jsonl` is always emitted so downstream citation URLs can be audited separately from parsed text.
 

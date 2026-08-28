@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 import random
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -223,6 +224,129 @@ class PlaywrightFetcher:
         )
 
 
+class DecodoFetcher:
+    RETRYABLE = {204, 408, 425, 429, 500, 502, 503, 504}
+
+    def __init__(
+        self,
+        *,
+        delay_seconds: float = 0.75,
+        timeout_seconds: float = 30.0,
+        retries: int = 4,
+        api_token: str | None = None,
+        endpoint_url: str | None = None,
+        proxy_pool: str | None = None,
+        headless: str | None = None,
+        geo: str | None = None,
+        locale: str | None = None,
+        device_type: str | None = None,
+        target: str | None = None,
+        transport: httpx.AsyncBaseTransport | None = None,
+    ) -> None:
+        self.retries = max(0, retries)
+        self.rate_limiter = PoliteRateLimiter(delay_seconds)
+        self.api_token = _normalize_decodo_token(api_token or os.getenv("DECODO_API_TOKEN"))
+        if not self.api_token:
+            raise RuntimeError("Decodo fetcher requires DECODO_API_TOKEN")
+        self.endpoint_url = endpoint_url or os.getenv("DECODO_API_ENDPOINT") or "https://scraper-api.decodo.com/v2/scrape"
+        self.proxy_pool = _optional_decodo_value(proxy_pool if proxy_pool is not None else os.getenv("DECODO_PROXY_POOL"))
+        self.headless = _optional_decodo_value(headless if headless is not None else os.getenv("DECODO_HEADLESS"))
+        self.geo = _optional_decodo_value(geo if geo is not None else os.getenv("DECODO_GEO"))
+        self.locale = _optional_decodo_value(locale if locale is not None else os.getenv("DECODO_LOCALE"))
+        self.device_type = _optional_decodo_value(device_type if device_type is not None else os.getenv("DECODO_DEVICE_TYPE"))
+        self.target = (target or os.getenv("DECODO_TARGET") or "universal").strip()
+        self.client = httpx.AsyncClient(
+            timeout=httpx.Timeout(timeout_seconds),
+            follow_redirects=True,
+            headers={
+                "Accept": "application/json",
+                "Authorization": f"Basic {self.api_token}",
+                "Content-Type": "application/json",
+            },
+            transport=transport,
+        )
+
+    async def __aenter__(self) -> "DecodoFetcher":
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb) -> None:
+        await self.client.aclose()
+
+    async def fetch(self, url: str) -> FetchResult:
+        payload = self._payload(url)
+        last_error: Exception | None = None
+        for attempt in range(self.retries + 1):
+            await self.rate_limiter.wait()
+            try:
+                response = await self.client.post(self.endpoint_url, json=payload)
+                if response.status_code in self.RETRYABLE and attempt < self.retries:
+                    await asyncio.sleep(min(30.0, (2**attempt) + random.random()))
+                    continue
+                if response.status_code != 200:
+                    raise RuntimeError(f"Decodo API HTTP {response.status_code} for {url}")
+                return self._result_from_response(url, response)
+            except (httpx.TimeoutException, httpx.TransportError, ValueError, RuntimeError) as exc:
+                last_error = exc
+                if attempt >= self.retries:
+                    raise
+                await asyncio.sleep(min(30.0, (2**attempt) + random.random()))
+        raise RuntimeError(f"Failed to fetch {url} through Decodo") from last_error
+
+    def _payload(self, url: str) -> dict[str, str]:
+        payload = {
+            "url": url,
+            "target": self.target,
+            "proxy_pool": self.proxy_pool,
+            "headless": self.headless,
+            "geo": self.geo,
+            "locale": self.locale,
+            "device_type": self.device_type,
+        }
+        return {key: value for key, value in payload.items() if value}
+
+    def _result_from_response(self, requested_url: str, response: httpx.Response) -> FetchResult:
+        body = response.json()
+        results = body.get("results")
+        if not isinstance(results, list) or not results:
+            if body.get("status") == "failed":
+                status_code = body.get("status_code")
+                message = body.get("message") or "no message"
+                raise RuntimeError(f"Decodo scrape failed status_code={status_code}: {message}")
+            raise RuntimeError(f"Decodo API response did not include results for {requested_url}")
+        result = results[0]
+        if not isinstance(result, dict):
+            raise RuntimeError(f"Decodo API result was not an object for {requested_url}")
+        content = result.get("content")
+        if not isinstance(content, str) or not content.strip():
+            raise RuntimeError(f"Decodo API returned empty content for {requested_url}")
+        target_status = _int_or_default(result.get("status_code"), response.status_code)
+        final_url = str(result.get("url") or requested_url)
+        headers = {str(key): str(value) for key, value in (result.get("headers") or {}).items()} if isinstance(result.get("headers"), dict) else {}
+        if is_challenge_only_page(target_status, headers, content):
+            raise RuntimeError(f"publisher challenge page returned for {requested_url}")
+        if target_status != 200:
+            raise RuntimeError(f"Decodo target HTTP {target_status} for {requested_url}")
+        return FetchResult(
+            url=final_url,
+            html=content,
+            status_code=target_status,
+            retrieved_at=datetime.now(UTC),
+            headers=headers,
+            network_events=[
+                {
+                    "event": "decodo_result",
+                    "task_id": result.get("task_id"),
+                    "created_at": result.get("created_at"),
+                    "updated_at": result.get("updated_at"),
+                    "status_code": target_status,
+                    "url": final_url,
+                    "proxy_pool": self.proxy_pool,
+                    "headless": self.headless,
+                }
+            ],
+        )
+
+
 def has_municipal_code_content(html: str) -> bool:
     lowered = html.lower()
     return (
@@ -236,11 +360,46 @@ def is_challenge_only_page(status_code: int, headers: dict[str, str], html: str)
     header_lookup = {key.lower(): value for key, value in headers.items()}
     if header_lookup.get("cf-mitigated", "").lower() == "challenge":
         return True
-    challenge_markers = (
-        "challenge-platform" in html
-        or "challenges.cloudflare.com" in html
-        or "cf-browser-verification" in html
+    lowered = html.lower()
+    challenge_markers = any(
+        marker in lowered
+        for marker in (
+            "challenge-platform",
+            "challenges.cloudflare.com",
+            "cf-browser-verification",
+            "cloudflare ray id",
+            "just a moment",
+            "checking your browser",
+            "verify you are human",
+            "attention required",
+            "access denied",
+            "__cf_chl_",
+            "cf-chl-",
+            "cf-turnstile",
+            "captcha",
+        )
     )
     if status_code in {403, 503} and challenge_markers:
         return True
     return challenge_markers and not has_municipal_code_content(html)
+
+
+def _normalize_decodo_token(value: str | None) -> str:
+    token = (value or "").strip()
+    if token.lower().startswith("basic "):
+        return token[6:].strip()
+    return token
+
+
+def _optional_decodo_value(value: str | None) -> str:
+    normalized = (value or "").strip()
+    if normalized.lower() in {"", "auto", "default", "off", "none", "null"}:
+        return ""
+    return normalized
+
+
+def _int_or_default(value: Any, default: int) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
