@@ -45,6 +45,8 @@ profile when these runtime settings are present:
 SVS_QUERY_PLANNER_PROFILE_ID=ks_civics_legal_v1
 SVS_KSCOURTS_GRAPHRAG_ENABLED=true
 SVS_KSCOURTS_GRAPHRAG_MAX_EXPANSIONS=3
+SVS_TOPEKA_GRAPHRAG_ENABLED=true
+SVS_TOPEKA_GRAPHRAG_MAX_EXPANSIONS=6
 ```
 
 ## Search lenses
@@ -67,9 +69,15 @@ Kansas court stores can expose:
   `related_party`.
 - `court_procedural_history`: same-docket relationships.
 
-Topeka municipal-code stores declare planned graph lenses for hierarchy,
-cross-reference, and ordinance-history search, but those should remain
-non-searchable until an API handler reports `status="available"`.
+Topeka municipal-code stores can expose:
+
+- `municipal_code_structure`: `CONTAINS` hierarchy across code, title, chapter,
+  article, appendix, table, and section nodes.
+- `municipal_code_cross_reference`: `REFERENCES` and `DEFINES` links for
+  internal code references and defined terms.
+- `municipal_code_history`: `HAS_ORDINANCE_HISTORY` and
+  `ORDINANCE_AMENDS_SECTION` links for section amendment history and official
+  ordinance PDFs.
 
 Explicit lens search:
 
@@ -81,6 +89,21 @@ Explicit lens search:
     "case_title": "State v. Harris",
     "docket_number": "116515",
     "relationship": "cited_by"
+  },
+  "max_num_results": 10,
+  "include_content": true,
+  "include_metadata": true
+}
+```
+
+Topeka municipal-code example:
+
+```json
+{
+  "query": "Show the code structure around Topeka municipal code chapter 14.40.",
+  "lens": "municipal_code_structure",
+  "inputs": {
+    "chapter": "14.40"
   },
   "max_num_results": 10,
   "include_content": true,
@@ -271,9 +294,9 @@ only.
 
 ## Recommended MCP tools
 
-Expose three tools to the calling agent. The first two both call direct
-vector-store search; the graph tool is a caller-facing specialization that tells
-the model when graph expansion was applied. The third tool uses the
+Expose four tools to the calling agent. The first three call direct
+vector-store search; graph tools are caller-facing specializations that tell
+the model when graph expansion was applied. The fourth tool uses the
 OpenAI-compatible Responses file-search facade when the caller wants a
 Responses-shaped retrieval summary.
 
@@ -440,7 +463,105 @@ Adapter behavior:
 
 Graph expansion is additive. It does not replace semantic retrieval. The API
 first finds seed results with normal retrieval, then adds graph-neighbor chunks
-when the KS civics graph profile is enabled and the query has graph intent.
+when the corpus-specific graph profile is enabled and the request has graph
+intent or an explicit graph lens.
+
+### `exais_municipal_code_graph_search`
+
+Use this for Topeka municipal-code questions where the relationship matters:
+chapter structure, section cross-references, definitions, or ordinance history.
+
+HTTP route:
+
+```http
+POST /v1/vector_stores/{vector_store_id}/search
+```
+
+Minimum HTTP body:
+
+```json
+{
+  "query": "What ordinance amended TMC 18.200.010?",
+  "lens": "municipal_code_history",
+  "inputs": {
+    "citation": "18.200.010",
+    "ordinance_number": "20340"
+  },
+  "max_num_results": 10,
+  "rewrite_query": true,
+  "include_content": true,
+  "include_metadata": true
+}
+```
+
+MCP tool schema:
+
+```json
+{
+  "name": "exais_municipal_code_graph_search",
+  "description": "Search a municipal-code vector store and surface graph-expanded hierarchy, cross-reference, definition, and ordinance-history relationships when available.",
+  "inputSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Municipal-code question with structure, reference, definition, or ordinance-history intent."
+      },
+      "vector_store_id": {
+        "type": "string",
+        "description": "Defaults to the municipal-code vector store configured for this customer instance."
+      },
+      "lens": {
+        "type": "string",
+        "enum": ["municipal_code_structure", "municipal_code_cross_reference", "municipal_code_history"],
+        "description": "Graph lens to request."
+      },
+      "citation": {
+        "type": "string",
+        "description": "Optional TMC citation, for example 14.40.030."
+      },
+      "chapter": {
+        "type": "string",
+        "description": "Optional TMC chapter, for example 14.40."
+      },
+      "term": {
+        "type": "string",
+        "description": "Optional defined term for the cross-reference lens."
+      },
+      "ordinance_number": {
+        "type": "string",
+        "description": "Optional ordinance number for the history lens."
+      },
+      "max_num_results": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50,
+        "default": 10
+      },
+      "require_graph": {
+        "type": "boolean",
+        "default": false,
+        "description": "Adapter-level flag. If true, report when graph_expansion is missing or not applied."
+      }
+    },
+    "required": ["query", "lens"]
+  }
+}
+```
+
+Adapter behavior:
+
+- Call the same `/v1/vector_stores/{vector_store_id}/search` route.
+- Pass `citation`, `chapter`, `term`, and `ordinance_number` through `inputs`
+  only when present.
+- Preserve result-level `citation.url`; it is the clickable public source URL.
+- Preserve `citation.graph_expansion`. For Topeka results that object includes
+  `profile`, `relation_type`, `edge_id`, source/target node IDs, related node
+  key/label, `graph_distance`, `relationship_source_url`,
+  `relationship_target_url`, attributes, and provenance.
+- If `require_graph=true` and `graph_expansion.applied` is not true, return a
+  tool-level warning but keep the semantic results.
 
 ### `exais_responses_file_search`
 
@@ -562,6 +683,9 @@ Direct vector-store search returns:
           "edge_id": "edge_...",
           "source_document_id": "doc_seed",
           "target_document_id": "doc_related",
+          "graph_distance": 1,
+          "relationship_source_url": "https://...",
+          "relationship_target_url": "https://...",
           "attributes": {},
           "provenance": {}
         }
@@ -636,7 +760,9 @@ The calling agent should follow these rules:
   support.
 - Treat graph-expanded hits as relation evidence. For legal material, label
   whether the relation is `cited_by`, `cited_authority`, `same_docket`, or
-  `related_party` instead of presenting all graph hits as direct holdings.
+  `related_party` for court cases, or `CONTAINS`, `REFERENCES`, `DEFINES`,
+  `HAS_ORDINANCE_HISTORY`, or `ORDINANCE_AMENDS_SECTION` for municipal code,
+  instead of presenting all graph hits as direct authority.
 - Do not expose raw API keys, admin routes, internal document IDs, or graph edge
   IDs to an end user unless the UI is explicitly an operator/debug surface.
 
@@ -691,8 +817,9 @@ export async function exaisVectorSearch(args: ExaisSearchArgs) {
 ```
 
 For an MCP server, bind this function to `exais_vector_search`. Bind
-`exais_legal_graph_search` to the same function and add adapter-side validation
-of `graph_expansion`. Bind `exais_responses_file_search` to `POST /v1/responses`.
+`exais_legal_graph_search` and `exais_municipal_code_graph_search` to the same
+function and add adapter-side validation of `graph_expansion`. Bind
+`exais_responses_file_search` to `POST /v1/responses`.
 
 ## Instance handoff checklist
 

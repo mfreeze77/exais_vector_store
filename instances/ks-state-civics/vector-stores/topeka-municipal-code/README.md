@@ -20,6 +20,10 @@ Local proof from 2026-08-28:
 - `10/10` Topeka recall checks passed with public citations.
 - `5/5` ordinance PDF recall checks passed with official PDF citations.
 - `24` deeper Topeka API searches completed with zero API errors after search hardening. `19` passed the basic citation/content gate; `5` were marked for review because broad phrasing needed tighter legal-query terms or caller-side answer framing.
+- Topeka graph load/search is locally verified through the ExAIS API: `4,969`
+  graph nodes, `10,167` graph edges, and explicit
+  `municipal_code_structure`, `municipal_code_cross_reference`, and
+  `municipal_code_history` searches return graph-expanded cited chunks.
 
 The previous pilot store, `vs_268b119a2cd84b568af62155`, contains partial data and should not be used as the full Topeka caller-facing store.
 
@@ -38,7 +42,8 @@ Citation policy:
 Graph policy:
 
 - Aggregate graph artifact proof currently provides `CONTAINS`, `REFERENCES`, `DEFINES`, `HAS_ORDINANCE_HISTORY`, `ORDINANCE_AMENDS_SECTION`, and `SAME_ORDINANCE` edges with citation URLs.
-- Ordinance PDF semantic search is live locally; Topeka graph load/search remains blocked until an ExAIS municipal-code graph API handler exists.
+- Ordinance PDF semantic search and Topeka municipal-code graph lenses are live
+  locally in the KS Civics Docker cell.
 - The Kansas court-decision query planner is intentionally disabled for this store so ordinance numbers and municipal-code dates are not misread as court docket/date filters.
 
 Do not treat the ordinance PDFs as a replacement for the codified code. Do not treat the codified code as enough for legal provenance without the ordinance PDFs.

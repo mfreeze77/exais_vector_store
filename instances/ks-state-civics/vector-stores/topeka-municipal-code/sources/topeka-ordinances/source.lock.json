@@ -74,7 +74,7 @@
   },
   "lastGraphArtifactProof": {
     "observedAt": "2026-08-28",
-    "status": "artifact_eval_passed_load_blocked_no_graph_api",
+    "status": "artifact_eval_passed_loaded_and_search_verified_local",
     "artifactPath": ".release/cells/ks-state-civics/graphrag/topeka-code",
     "evalProof": ".release/cells/ks-state-civics/graphrag/topeka-code/eval-proof.json",
     "loadProof": ".release/cells/ks-state-civics/graphrag/topeka-code/load-proof.json",
@@ -92,7 +92,24 @@
       "nodesWithCitationUrl": 4547,
       "edgesWithCitationUrl": 10167
     },
-    "loadBlocker": "No ExAIS Topeka graph load/search API path exists yet; direct Postgres graph writes remain forbidden for this source package."
+    "graphApi": {
+      "route": "/v1/vector_stores/vs_d4185d1004604f08a55299fa/graph",
+      "status": "loaded",
+      "loadedNodes": 4969,
+      "loadedEdges": 10167,
+      "danglingEdges": 0,
+      "apiDigest": "sha256:a0c1509efe4efdd2f134349aa7df89908f06f1ff1bba1df037340617177c1556"
+    },
+    "searchProof": {
+      "route": "/v1/vector_stores/vs_d4185d1004604f08a55299fa/search",
+      "transport": "docker-network",
+      "lensesVerified": [
+        "municipal_code_structure",
+        "municipal_code_cross_reference",
+        "municipal_code_history"
+      ],
+      "publicRoutePending": "https://topks.statecivics.ai/local is not yet wired or DNS-verified from this machine."
+    }
   },
   "vectorStore": {
     "id": "vs_d4185d1004604f08a55299fa",

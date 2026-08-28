@@ -52,11 +52,8 @@ def load_graph(
     if dry_run:
         return {"status": "dry_run", "dry_run": True, "vector_store_id": vector_store_id, **validation}
     if not graph_api_path:
-        raise RuntimeError(
-            "No ExAIS graph load API path is configured. Existing KS courts graph loading writes directly to Postgres; "
-            "WAVE-118 forbids that for Topeka. Set --graph-api-path/EXAIS_GRAPH_LOAD_PATH after a supported graph endpoint exists."
-        )
-    payload = {"vector_store_id": vector_store_id, "nodes": nodes, "edges": edges}
+        graph_api_path = f"/v1/vector_stores/{vector_store_id}/graph"
+    payload = {"nodes": nodes, "edges": edges, "replace": True}
     response = api_json(
         "POST",
         api_base,
@@ -104,7 +101,7 @@ def main() -> None:
         )
     except RuntimeError as exc:
         result = {
-            "status": "blocked_no_graph_api",
+            "status": "failed_api_load",
             "dry_run": False,
             "vector_store_id": args.vector_store_id,
             "error": str(exc),

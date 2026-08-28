@@ -59,7 +59,7 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - The ingestion scripts use ExAIS API document ingestion and keep `source_uri` mapped to section `citation_url` or official ordinance `pdf_url`.
 - The Topeka API scripts now honor `--api-transport` for host curl, API-container, and Docker-network calls; source-package commands use Docker-network transport for live cell execution.
 - The ordinance PDF ingestion script does not run Marker locally; it consumes precomputed markdown from the existing external RunPod Marker/operator extraction path.
-- The GraphRAG loader validates artifacts and can submit through a configured ExAIS graph API path. No such endpoint is currently present in the repo, so the loader fails closed with `blocked_no_graph_api` instead of using the older KS courts direct-Postgres loader.
+- The GraphRAG loader validates artifacts and submits through the ExAIS vector-store graph API path. Direct Postgres graph writes remain forbidden for Topeka source packages.
 - The codified-code parser now rejects non-number word fragments as ordinance history and preserves distinct ordinance-history graph edges by ordinance/section/date/raw value.
 - Bounded live proof on `https://topeka.municipal.codes/TMC/18.55.010` produced 1 section, 326 definitions, 17 numbered ordinance-history rows, 336 graph nodes, 343 graph edges, and 328 citation URL rows.
 - Bounded live ordinance collector proof against the official City of Topeka ordinance page with `--limit 2` wrote two ordinance PDF records with no failures.
@@ -88,12 +88,12 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - Official ordinance PDF API ingestion proof on 2026-08-28 loaded all `364` ordinance PDF Markdown documents into clean vector store `vs_d4185d1004604f08a55299fa`. Database proof showed combined store totals of `3,066` documents, `3,066` distinct official source URLs, `6,153` active chunks, and `6,153` indexed chunks, including `364` ordinance documents and `3,154` ordinance chunks.
 - The ordinance ingest path now preserves charter ordinance filenames as `CharterOrdinance{number}.md`, keeps unnumbered records such as `STO.pdf` out of the `ordinance_number` field, stores a separate `source_record_id`, and uses a vector-store/source payload fingerprint idempotency key. The shared ingestion service now refreshes existing document and vector-store-file metadata on idempotent re-ingest, which fixed stale citation/filename/source metadata in the local store.
 - Ordinance-specific recall proof on 2026-08-28 passed `5/5` live ExAIS API searches with official PDF citations. Proof artifact: `.release/cells/ks-state-civics/evals/topeka-ordinance-recall-20260828.json`.
-- Aggregate Topeka GraphRAG artifact extraction/eval proof on 2026-08-28 now passes artifact-level gates with `4,969` nodes, `10,167` edges, `2,646` parsed internal `REFERENCES` edges, `2,726` `HAS_ORDINANCE_HISTORY` edges, `536` ordinance-to-section edges, no dangling edges, and citation URLs on all edges. Graph load/search remains blocked because no ExAIS municipal-code graph API handler exists yet, and WAVE-118 forbids direct Postgres graph writes for Topeka.
+- Aggregate Topeka GraphRAG artifact extraction/eval proof on 2026-08-28 now passes artifact-level gates with `4,969` nodes, `10,167` edges, `2,646` parsed internal `REFERENCES` edges, `2,726` `HAS_ORDINANCE_HISTORY` edges, `536` ordinance-to-section edges, no dangling edges, and citation URLs on all edges. WAVE-122 added the ExAIS graph load/search API handler and locally loaded the graph through `POST /v1/vector_stores/vs_d4185d1004604f08a55299fa/graph`.
 
 ## Acceptance Criteria
 
 - The source-package validator passes for `ks-state-civics`.
-- Both Topeka source packages remain `productionReady: false` until graph load/search proof and production/VPS promotion gates complete. Official ordinance PDF extraction/local API ingestion and artifact-level graph proof completed on 2026-08-28.
+- Both Topeka source packages remain `productionReady: false` until production/VPS promotion gates complete. Official ordinance PDF extraction/local API ingestion, artifact-level graph proof, local graph API load, and local graph-lens search proof completed on 2026-08-28.
 - Codified-code artifact generation and quality check run before vectorization.
 - Operator capture import parses supplied HTML captures through the same JSON artifact, citation, graph, and quality-gate path as live fetching.
 - Quality-gate worklists identify every missing required URL, crawl failure, unexpected section URL, and section-level text/citation issue.
@@ -105,7 +105,7 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - The ordinance collector writes a nonempty `ordinances.jsonl` with stable identity fields, SHA-256, PDF URL, and saved path.
 - API ingestion creates or finds the real Topeka vector store and writes source records with clickable citations.
 - Graph artifact proof includes `CONTAINS`, `REFERENCES`, `DEFINES`, `HAS_ORDINANCE_HISTORY`, and at least one ordinance-to-section edge when data supports it.
-- Graph load/search is not complete until a supported ExAIS municipal-code graph API handler exists and is verified through the caller-facing search route.
+- Local graph load/search is complete when the supported ExAIS municipal-code graph API handler is verified through the caller-facing search route; VPS/public-route proof remains a separate production gate.
 - GraphRAG rows preserve `source_url`/`citation_url` so graph-expanded context can render clickable citations.
 - Recall proof includes at least five current-code questions and five amendment-history questions.
 - Topeka vector-store search does not inherit Kansas court-decision query filters.
@@ -123,7 +123,7 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 1. Run a bounded Playwright full-corpus discovery crawl and inspect skipped/challenge-only URLs.
 2. Produce codified-code seed artifacts and verify section count, citation URL count, graph node/edge count, and failure list.
 3. Build and test the official ordinance PDF collector and manifest.
-4. Full-corpus gate: keep `productionReady: false` until codified-code acquisition, ordinance PDF extraction/ingestion, graph load/search, broad recall, and production promotion gates are run and accepted.
+4. Full-corpus gate: keep `productionReady: false` until codified-code acquisition, ordinance PDF extraction/ingestion, graph load/search, broad recall, and production promotion gates are run and accepted. As of WAVE-122, the local graph load/search gate has passed; production promotion remains separate.
 5. Implement codified-code and ordinance API ingestion, using `citation_url`/`pdf_url` as document `source_uri`.
 6. Implement graph load/eval proof for codified references, definitions, ordinance history, and ordinance-to-section edges.
 7. Run recall proof for current-law and amendment-history questions.

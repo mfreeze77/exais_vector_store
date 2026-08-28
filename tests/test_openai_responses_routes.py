@@ -10,7 +10,13 @@ from fastapi.responses import StreamingResponse
 
 from svs_api import main as api_main
 from svs_common.openai_compat import OpenAICompatError, vector_store_search_results_page
-from svs_common.schemas import ChunkRecord, OpenAIVectorStoreSearchRequest, Principal, SearchResponse
+from svs_common.schemas import (
+    ChunkRecord,
+    OpenAIVectorStoreSearchRequest,
+    Principal,
+    SearchResponse,
+    VectorStoreGraphLoadRequest,
+)
 
 
 class _Db:
@@ -29,6 +35,13 @@ class _Db:
         class _Rows:
             def mappings(self):
                 return self
+
+            def all(self):
+                if row is None:
+                    return []
+                if isinstance(row, list):
+                    return row
+                return [row]
 
             def first(self):
                 return row
@@ -1511,6 +1524,209 @@ def test_vector_store_search_lenses_returns_court_graph_contract(monkeypatch):
     assert any("not a proven full-corpus Kansas citator" in warning for warning in lenses["court_citator"]["warnings"])
 
 
+def test_vector_store_search_lenses_returns_topeka_graph_contract(monkeypatch):
+    monkeypatch.setenv("SVS_QUERY_PLANNER_PROFILE_ID", "ks_civics_legal_v1")
+    monkeypatch.setenv("SVS_TOPEKA_GRAPHRAG_ENABLED", "true")
+    monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        api_main,
+        "_vector_store_attributes_for_search",
+        lambda *args, **kwargs: {"source_collection": "topeka-municipal-code", "corpus": "topeka_municipal_code"},
+    )
+    monkeypatch.setattr(
+        api_main,
+        "_graph_coverage_for_vector_store",
+        lambda *args, **kwargs: {
+            "documents_indexed": 3066,
+            "active_chunks": 6153,
+            "node_count": 4969,
+            "edge_count": 10167,
+            "node_type_counts": {"section": 2702, "ordinance_pdf": 363},
+            "edge_type_counts": {"REFERENCES": 2646, "ORDINANCE_AMENDS_SECTION": 536},
+        },
+    )
+
+    payload = api_main.vector_store_search_lenses("vs_topeka", _principal(), object())
+
+    lenses = {lens["id"]: lens for lens in payload["data"]}
+    assert lenses["semantic"]["status"] == "available"
+    assert lenses["municipal_code_history"]["status"] == "available"
+    assert lenses["municipal_code_history"]["graph_profile_id"] == "topeka_municipal_code_postgres_graph_v1"
+    assert lenses["municipal_code_history"]["coverage"]["edge_type_counts"]["ORDINANCE_AMENDS_SECTION"] == 536
+
+
+def test_vector_store_graph_load_normalizes_topeka_properties_and_rejects_dangling_edges():
+    req = VectorStoreGraphLoadRequest(
+        nodes=[
+            {
+                "id": "ks-topeka:tmc:18.200.010",
+                "type": "section",
+                "label": "18.200.010 Purpose and regulations.",
+                "properties": {"citation": "18.200.010", "citation_url": "https://topeka.municipal.codes/TMC/18.200.010"},
+            },
+            {
+                "id": "topeka-ordinance-pdf:20340",
+                "type": "ordinance_pdf",
+                "label": "20340",
+                "properties": {"ordinance_number": "20340", "pdf_url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20340.pdf"},
+            },
+        ],
+        edges=[
+            {
+                "id": "edge:20340:18.200.010",
+                "type": "ORDINANCE_AMENDS_SECTION",
+                "source": "topeka-ordinance-pdf:20340",
+                "target": "ks-topeka:tmc:18.200.010",
+                "properties": {"ordinance_number": "20340"},
+            }
+        ],
+    )
+
+    node_rows, edge_rows, dangling = api_main._normalized_graph_load_rows(req, _principal(), "vs_topeka")
+
+    assert dangling == []
+    assert node_rows[0]["node_key"] == "18.200.010"
+    assert '"citation":"18.200.010"' in node_rows[0]["attributes"]
+    assert edge_rows[0]["edge_type"] == "ORDINANCE_AMENDS_SECTION"
+
+    bad_req = VectorStoreGraphLoadRequest(
+        nodes=[{"id": "a", "type": "section"}],
+        edges=[{"id": "dangling", "type": "REFERENCES", "source": "a", "target": "missing"}],
+    )
+    with pytest.raises(ValueError, match="dangling"):
+        api_main._load_vector_store_graph(_Db(), _principal(), "vs_topeka", bad_req)
+
+
+def test_topeka_structure_relation_rows_walks_contains_descendants():
+    relation = {
+        "edge_id": "edge_article_section",
+        "relation_type": "CONTAINS",
+        "source_node_id": "ks-topeka:tmc:14.40_ArtII",
+        "target_node_id": "ks-topeka:tmc:14.40.030",
+        "seed_node_id": "ks-topeka:tmc:14.40",
+        "seed_node_type": "chapter",
+        "seed_node_key": "14.40",
+        "seed_label": "Chapter 14.40",
+        "seed_attributes": {"citation": "14.40"},
+        "direction": "descendant",
+        "related_node_id": "ks-topeka:tmc:14.40.030",
+        "related_node_type": "section",
+        "related_node_key": "14.40.030",
+        "related_label": "14.40.030 Permit required.",
+        "related_attributes": {
+            "citation": "14.40.030",
+            "source_url": "https://topeka.municipal.codes/TMC/14.40.030",
+        },
+        "attributes": {},
+        "provenance": {},
+        "graph_distance": 2,
+    }
+    db = _Db([[relation]])
+
+    rows = api_main._topeka_municipal_graph_relation_rows(
+        db,
+        _principal(),
+        "vs_topeka",
+        ["ks-topeka:tmc:14.40"],
+        ("CONTAINS",),
+        limit=8,
+    )
+
+    sql, params = db.calls[0]
+    assert "WITH RECURSIVE seed_nodes" in sql
+    assert "contains_walk AS" in sql
+    assert "related_node_type IN ('section', 'table')" in sql
+    assert params["relation_types"] == ["CONTAINS"]
+    assert rows == [relation]
+    metadata = api_main._topeka_graph_metadata(relation)
+    assert metadata["citation_url"] == "https://topeka.municipal.codes/TMC/14.40.030"
+    assert metadata["relationship_target_url"] == "https://topeka.municipal.codes/TMC/14.40.030"
+
+
+def test_topeka_graph_metadata_uses_related_url_for_incoming_reference():
+    relation = {
+        "edge_id": "edge_reference",
+        "relation_type": "REFERENCES",
+        "source_node_id": "ks-topeka:tmc:10.60.160",
+        "target_node_id": "ks-topeka:tmc:10.10.060",
+        "seed_node_id": "ks-topeka:tmc:10.10.060",
+        "seed_node_type": "section",
+        "seed_node_key": "10.10.060",
+        "seed_label": "10.10.060 Speed limits.",
+        "seed_attributes": {
+            "citation": "10.10.060",
+            "source_url": "https://topeka.municipal.codes/TMC/10.10.060",
+        },
+        "direction": "incoming",
+        "related_node_id": "ks-topeka:tmc:10.60.160",
+        "related_node_type": "section",
+        "related_node_key": "10.60.160",
+        "related_label": "10.60.160 Parking meters.",
+        "related_attributes": {
+            "citation": "10.60.160",
+            "source_url": "https://topeka.municipal.codes/TMC/10.60.160",
+        },
+        "attributes": {
+            "source_url": "https://topeka.municipal.codes/TMC/10.60.160",
+            "target_url": "https://topeka.municipal.codes/TMC/10.10.060",
+        },
+        "provenance": {},
+        "graph_distance": 1,
+    }
+
+    metadata = api_main._topeka_graph_metadata(relation)
+
+    assert metadata["citation_url"] == "https://topeka.municipal.codes/TMC/10.60.160"
+    assert metadata["relationship_source_url"] == "https://topeka.municipal.codes/TMC/10.60.160"
+    assert metadata["relationship_target_url"] == "https://topeka.municipal.codes/TMC/10.10.060"
+
+
+def test_topeka_metadata_for_document_prefers_returned_document_url_for_ordinance_pdf():
+    document_row = {
+        "source_uri": None,
+        "file_attributes": {
+            "ordinance_number": "20340",
+            "citation_url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20340.pdf",
+        },
+    }
+    relation = {
+        "edge_id": "edge_ordinance_amends_section",
+        "relation_type": "ORDINANCE_AMENDS_SECTION",
+        "source_node_id": "ks-topeka:ordinance-pdf:20340",
+        "target_node_id": "ks-topeka:tmc:18.200.010",
+        "seed_node_id": "ks-topeka:ordinance-pdf:20340",
+        "seed_node_type": "ordinance_pdf",
+        "seed_node_key": "20340",
+        "seed_label": "20340",
+        "seed_attributes": {
+            "ordinance_number": "20340",
+            "pdf_url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20340.pdf",
+        },
+        "direction": "outgoing",
+        "related_node_id": "ks-topeka:tmc:18.200.010",
+        "related_node_type": "section",
+        "related_node_key": "18.200.010",
+        "related_label": "18.200.010 Definitions.",
+        "related_attributes": {
+            "citation": "18.200.010",
+            "source_url": "https://topeka.municipal.codes/TMC/18.200.010",
+        },
+        "attributes": {
+            "source_url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20340.pdf",
+            "target_url": "https://topeka.municipal.codes/TMC/18.200.010",
+            "ordinance_number": "20340",
+        },
+        "provenance": {},
+        "graph_distance": 1,
+    }
+
+    metadata = api_main._topeka_metadata_for_document(document_row, [relation])
+
+    assert metadata["citation_url"] == "https://files.topeka.gov/community/ordinances/2022/Ordinance20340.pdf"
+    assert metadata["relationship_source_url"] == "https://files.topeka.gov/community/ordinances/2022/Ordinance20340.pdf"
+    assert metadata["relationship_target_url"] == "https://topeka.municipal.codes/TMC/18.200.010"
+
+
 def test_openai_vector_store_search_page_adds_opt_in_graphrag_expansion(monkeypatch):
     metadata = {
         "profile": "kscourts_postgres_graph_v1",
@@ -1734,6 +1950,259 @@ def test_openai_vector_store_search_page_explicit_court_lens_forces_graphrag(mon
     assert page["graph_expansion"]["applied"] is True
     assert page["graph_expansion"]["relation_types"] == ["same_docket"]
     assert page["graph_expansion"]["coverage"]["edge_type_counts"] == {"cites_case": 404}
+
+
+def test_openai_vector_store_search_page_explicit_topeka_history_lens_expands_ordinance_pdf(monkeypatch):
+    calls = []
+    hydrated_relation_rows = []
+    metadata = {
+        "profile": "topeka_municipal_code_postgres_graph_v1",
+        "relation_type": "ORDINANCE_AMENDS_SECTION",
+        "edge_id": "edge_20340_section",
+        "seed_node_id": "ks-topeka:tmc:18.200.010",
+        "related_node_id": "topeka-ordinance-pdf:20340",
+        "related_node_type": "ordinance_pdf",
+        "citation_url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20340.pdf",
+    }
+
+    async def fake_retrieval_search(db_session, principal, search_req):
+        calls.append(search_req)
+        return SearchResponse(
+            query=search_req.query,
+            results=[
+                ChunkRecord(
+                    id="chk_section",
+                    document_id="doc_section",
+                    ordinal=0,
+                    text="18.200.010 Purpose and regulations.",
+                    source_uri="https://topeka.municipal.codes/TMC/18.200.010",
+                    score=0.91,
+                ),
+            ],
+        )
+
+    def fail_court_relation_rows(*args, **kwargs):
+        raise AssertionError("Topeka municipal graph search must not query the Kansas court graph handler")
+
+    def fake_seed_rows(db_session, principal, vector_store_id, chunks, inputs, *, limit):
+        assert inputs == {"citation": "18.200.010", "ordinance_number": "20340"}
+        return [{"id": "ks-topeka:tmc:18.200.010", "node_type": "section"}]
+
+    def fake_relation_rows(db_session, principal, vector_store_id, seed_node_ids, relation_types, *, limit):
+        assert seed_node_ids == ["ks-topeka:tmc:18.200.010"]
+        assert relation_types == ("HAS_ORDINANCE_HISTORY", "ORDINANCE_AMENDS_SECTION")
+        return [{
+            "edge_id": "edge_20340_section",
+            "relation_type": "ORDINANCE_AMENDS_SECTION",
+            "source_node_id": "topeka-ordinance-pdf:20340",
+            "target_node_id": "ks-topeka:tmc:18.200.010",
+            "seed_node_id": "ks-topeka:tmc:18.200.010",
+            "seed_node_type": "section",
+            "seed_node_key": "18.200.010",
+            "direction": "incoming",
+            "related_node_id": "topeka-ordinance-pdf:20340",
+            "related_node_type": "ordinance_pdf",
+            "related_node_key": "20340",
+            "related_label": "20340",
+            "related_attributes": {"ordinance_number": "20340"},
+            "attributes": {"citation_url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20340.pdf"},
+            "provenance": {},
+        }]
+
+    def fake_hydrate(db_session, principal, vector_store_id, relation_rows, existing_document_ids, *, limit):
+        hydrated_relation_rows.extend(relation_rows)
+        chunk = ChunkRecord(
+            id="chk_ordinance_pdf",
+            document_id="doc_ordinance_pdf",
+            ordinal=0,
+            text="Ordinance 20340 amended downtown zoning and design standards.",
+            source_uri="https://files.topeka.gov/community/ordinances/2022/Ordinance20340.pdf",
+            score=0.63,
+            source="topeka_municipal_graph_expansion",
+            citation={"graph_expansion": metadata},
+        )
+        return [chunk], {"chk_ordinance_pdf": metadata}, {"doc_ordinance_pdf": metadata}
+
+    def fake_file_lookup(db_session, principal, vector_store_id, document_ids):
+        return {
+            "doc_section": {"file_id": "file_section", "filename": "TMC-18.200.010.md"},
+            "doc_ordinance_pdf": {"file_id": "file_ordinance", "filename": "20340.md"},
+        }
+
+    monkeypatch.setenv("SVS_QUERY_PLANNER_PROFILE_ID", "ks_civics_legal_v1")
+    monkeypatch.setenv("SVS_TOPEKA_GRAPHRAG_ENABLED", "true")
+    monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        api_main,
+        "_vector_store_attributes_for_search",
+        lambda *args, **kwargs: {"source_collection": "topeka-municipal-code", "corpus": "topeka_municipal_code"},
+    )
+    monkeypatch.setattr(
+        api_main,
+        "_graph_coverage_for_vector_store",
+        lambda *args, **kwargs: {
+            "documents_indexed": 3066,
+            "active_chunks": 6153,
+            "node_count": 4969,
+            "edge_count": 10167,
+            "node_type_counts": {"section": 2702, "ordinance_pdf": 363},
+            "edge_type_counts": {"HAS_ORDINANCE_HISTORY": 2726, "ORDINANCE_AMENDS_SECTION": 536},
+        },
+    )
+    monkeypatch.setattr(api_main, "_vector_store_file_lookup", fake_file_lookup)
+    monkeypatch.setattr(api_main, "_kscourts_graphrag_relation_rows", fail_court_relation_rows)
+    monkeypatch.setattr(api_main, "_topeka_graph_seed_rows", fake_seed_rows)
+    monkeypatch.setattr(api_main, "_topeka_municipal_graph_relation_rows", fake_relation_rows)
+    monkeypatch.setattr(api_main, "_hydrate_topeka_municipal_graph_chunks", fake_hydrate)
+    monkeypatch.setattr(api_main.retrieval, "search", fake_retrieval_search)
+
+    page = asyncio.run(api_main._openai_vector_store_search_page(
+        "vs_topeka",
+        OpenAIVectorStoreSearchRequest(
+            query="downtown zoning history",
+            lens="municipal_code_history",
+            inputs={"citation": "18.200.010", "ordinance_number": "20340"},
+            max_num_results=5,
+        ),
+        _principal(),
+        _Db(),
+    ))
+
+    assert calls[0].query == "downtown zoning history 18.200.010 20340"
+    assert [row["relation_type"] for row in hydrated_relation_rows] == ["ORDINANCE_AMENDS_SECTION"]
+    assert [item["file_id"] for item in page["data"][:2]] == ["file_section", "file_ordinance"]
+    assert page["search_lens"]["id"] == "municipal_code_history"
+    assert page["search_lens"]["source"] == "explicit"
+    assert page["graph_expansion"]["profile"] == "topeka_municipal_code_postgres_graph_v1"
+    assert page["graph_expansion"]["applied"] is True
+    assert page["graph_expansion"]["seed_node_count"] == 1
+    assert page["graph_expansion"]["candidate_count"] == 1
+    assert page["graph_expansion"]["inserted_chunk_count"] == 1
+    assert page["data"][1]["citation"]["graph_expansion"]["related_node_type"] == "ordinance_pdf"
+
+
+def test_openai_vector_store_search_page_explicit_topeka_structure_lens_expands_descendant_section(monkeypatch):
+    hydrated_relation_rows = []
+    metadata = {
+        "profile": "topeka_municipal_code_postgres_graph_v1",
+        "relation_type": "CONTAINS",
+        "edge_id": "edge_article_section",
+        "seed_node_id": "ks-topeka:tmc:14.40",
+        "related_node_id": "ks-topeka:tmc:14.40.030",
+        "related_node_type": "section",
+        "related_node_key": "14.40.030",
+        "graph_distance": 2,
+        "citation_url": "https://topeka.municipal.codes/TMC/14.40.030",
+    }
+
+    async def fake_retrieval_search(db_session, principal, search_req):
+        return SearchResponse(
+            query=search_req.query,
+            results=[
+                ChunkRecord(
+                    id="chk_chapter",
+                    document_id="doc_chapter_result",
+                    ordinal=0,
+                    text="Chapter 14.40 municipal facilities.",
+                    score=0.91,
+                ),
+            ],
+        )
+
+    def fake_seed_rows(db_session, principal, vector_store_id, chunks, inputs, *, limit):
+        assert inputs == {"chapter": "14.40"}
+        return [{"id": "ks-topeka:tmc:14.40", "node_type": "chapter"}]
+
+    def fake_relation_rows(db_session, principal, vector_store_id, seed_node_ids, relation_types, *, limit):
+        assert seed_node_ids == ["ks-topeka:tmc:14.40"]
+        assert relation_types == ("CONTAINS",)
+        return [{
+            "edge_id": "edge_article_section",
+            "relation_type": "CONTAINS",
+            "source_node_id": "ks-topeka:tmc:14.40_ArtII",
+            "target_node_id": "ks-topeka:tmc:14.40.030",
+            "seed_node_id": "ks-topeka:tmc:14.40",
+            "seed_node_type": "chapter",
+            "seed_node_key": "14.40",
+            "seed_label": "Chapter 14.40",
+            "direction": "descendant",
+            "related_node_id": "ks-topeka:tmc:14.40.030",
+            "related_node_type": "section",
+            "related_node_key": "14.40.030",
+            "related_label": "14.40.030 Permit required.",
+            "related_attributes": {
+                "citation": "14.40.030",
+                "source_url": "https://topeka.municipal.codes/TMC/14.40.030",
+            },
+            "attributes": {},
+            "provenance": {},
+            "graph_distance": 2,
+        }]
+
+    def fake_hydrate(db_session, principal, vector_store_id, relation_rows, existing_document_ids, *, limit):
+        hydrated_relation_rows.extend(relation_rows)
+        chunk = ChunkRecord(
+            id="chk_section_14_40_030",
+            document_id="doc_section_14_40_030",
+            ordinal=0,
+            text="14.40.030 Permit required before work begins.",
+            source_uri="https://topeka.municipal.codes/TMC/14.40.030",
+            score=0.63,
+            source="topeka_municipal_graph_expansion",
+            citation={"graph_expansion": metadata},
+        )
+        return [chunk], {"chk_section_14_40_030": metadata}, {"doc_section_14_40_030": metadata}
+
+    def fake_file_lookup(db_session, principal, vector_store_id, document_ids):
+        return {
+            "doc_chapter_result": {"file_id": "file_chapter", "filename": "chapter.md"},
+            "doc_section_14_40_030": {"file_id": "file_section", "filename": "TMC-14.40.030.md"},
+        }
+
+    monkeypatch.setenv("SVS_QUERY_PLANNER_PROFILE_ID", "ks_civics_legal_v1")
+    monkeypatch.setenv("SVS_TOPEKA_GRAPHRAG_ENABLED", "true")
+    monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        api_main,
+        "_vector_store_attributes_for_search",
+        lambda *args, **kwargs: {"source_collection": "topeka-municipal-code", "corpus": "topeka_municipal_code"},
+    )
+    monkeypatch.setattr(
+        api_main,
+        "_graph_coverage_for_vector_store",
+        lambda *args, **kwargs: {
+            "documents_indexed": 3066,
+            "active_chunks": 6153,
+            "node_count": 4969,
+            "edge_count": 10167,
+            "node_type_counts": {"chapter": 216, "article": 211, "section": 2702},
+            "edge_type_counts": {"CONTAINS": 3203},
+        },
+    )
+    monkeypatch.setattr(api_main, "_vector_store_file_lookup", fake_file_lookup)
+    monkeypatch.setattr(api_main, "_topeka_graph_seed_rows", fake_seed_rows)
+    monkeypatch.setattr(api_main, "_topeka_municipal_graph_relation_rows", fake_relation_rows)
+    monkeypatch.setattr(api_main, "_hydrate_topeka_municipal_graph_chunks", fake_hydrate)
+    monkeypatch.setattr(api_main.retrieval, "search", fake_retrieval_search)
+
+    page = asyncio.run(api_main._openai_vector_store_search_page(
+        "vs_topeka",
+        OpenAIVectorStoreSearchRequest(
+            query="show chapter 14.40 structure",
+            lens="municipal_code_structure",
+            inputs={"chapter": "14.40"},
+            max_num_results=5,
+        ),
+        _principal(),
+        _Db(),
+    ))
+
+    assert [row["graph_distance"] for row in hydrated_relation_rows] == [2]
+    assert [item["file_id"] for item in page["data"][:2]] == ["file_chapter", "file_section"]
+    assert page["search_lens"]["id"] == "municipal_code_structure"
+    assert page["graph_expansion"]["applied"] is True
+    assert page["graph_expansion"]["inserted_chunk_count"] == 1
+    assert page["data"][1]["citation"]["graph_expansion"]["graph_distance"] == 2
 
 
 def test_openai_vector_store_search_page_rejects_unsupported_lens(monkeypatch):

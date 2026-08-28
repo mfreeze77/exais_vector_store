@@ -56,6 +56,7 @@ from svs_common.schemas import (
     UsageEventListResponse,
     VectorizationModesResponse,
     VectorStoreDeletedResponse,
+    VectorStoreGraphLoadResponse,
     VectorStoreListResponse,
     VectorStoreResponse,
     VectorStoreSearchLensesResponse,
@@ -120,6 +121,7 @@ post /v1/vector_stores
 get /v1/vector_stores
 get /v1/vector_stores/{vector_store_id}
 get /v1/vector_stores/{vector_store_id}/search_lenses
+post /v1/vector_stores/{vector_store_id}/graph
 post /v1/vector_stores/{vector_store_id}
 patch /v1/vector_stores/{vector_store_id}
 delete /v1/vector_stores/{vector_store_id}
@@ -175,8 +177,8 @@ def test_every_documented_operation_uses_named_request_and_success_components():
         for method in path_item
         if method in HTTP_METHODS
     }
-    assert len(spec['paths']) == 52
-    assert len(components) == 120
+    assert len(spec['paths']) == 53
+    assert len(components) == 124
     assert operations == EXPECTED_OPERATIONS
 
     request_media: set[tuple[str, str, str]] = set()
@@ -819,6 +821,25 @@ def test_vector_store_search_lenses_openapi_uses_named_response_component():
             "status": "available",
         }],
     }).object == "vector_store.search_lenses"
+
+
+def test_vector_store_graph_load_openapi_uses_named_components():
+    api_main.app.openapi_schema = None
+    spec = api_main.app.openapi()
+
+    request_schema = _request_schema(spec, "/v1/vector_stores/{vector_store_id}/graph")
+    response_schema = _response_schema(spec, "/v1/vector_stores/{vector_store_id}/graph")
+
+    assert _ref_name(request_schema["$ref"]) == "VectorStoreGraphLoadRequest"
+    assert _ref_name(response_schema["$ref"]) == "VectorStoreGraphLoadResponse"
+    assert VectorStoreGraphLoadResponse.model_validate({
+        "vector_store_id": "vs_topeka",
+        "status": "loaded",
+        "nodes": 1,
+        "edges": 1,
+        "loaded_nodes": 1,
+        "loaded_edges": 1,
+    }).object == "vector_store.graph_load"
 
 
 def test_vector_store_search_page_model_preserves_citation_payload_shape():

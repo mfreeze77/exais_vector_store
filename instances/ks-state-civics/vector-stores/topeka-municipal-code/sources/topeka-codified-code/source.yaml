@@ -223,10 +223,26 @@ graph:
     - scripts/release/topeka-code-graphrag-load.py
     - --graph-artifact
     - .release/cells/ks-state-civics/graphrag/topeka-code
+    - --vector-store-id
+    - vs_d4185d1004604f08a55299fa
     - --api-transport
     - docker-network
     - --output
     - .release/cells/ks-state-civics/graphrag/topeka-code/load-proof.json
+  lastProof:
+    observedAt: '2026-08-28'
+    status: loaded_and_search_verified_local
+    graphApiRoute: /v1/vector_stores/vs_d4185d1004604f08a55299fa/graph
+    vectorStoreId: vs_d4185d1004604f08a55299fa
+    apiDigest: sha256:a0c1509efe4efdd2f134349aa7df89908f06f1ff1bba1df037340617177c1556
+    loadedNodes: 4969
+    loadedEdges: 10167
+    danglingEdges: 0
+    verifiedSearchLenses:
+      - municipal_code_structure
+      - municipal_code_cross_reference
+      - municipal_code_history
+    publicRoutePending: https://topks.statecivics.ai/local
   evalCommand:
     - python
     - scripts/release/topeka-code-graphrag-eval.py

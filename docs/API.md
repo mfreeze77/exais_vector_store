@@ -5,7 +5,7 @@ The API has two layers:
 1. **Native SVS API** for ingestion, mode routing, retrieval, admin, model registry, and instance operations.
 2. **OpenAI-compatible vector-store API** for clients that expect `/v1/vector_stores`-style behavior.
 
-Generated `/openapi.json` currently contains 51 paths, 68 operations, and 118
+Generated `/openapi.json` currently contains 53 paths, 70 operations, and 124
 schema components. All documented native and OpenAI-compatible operations have
 named 2xx response components, and every JSON request body resolves directly to
 a named component. Native responses are runtime-bound through FastAPI response
@@ -15,7 +15,7 @@ retain named `multipart/form-data` components. Metrics and extracted OpenAI file
 content use HTTP-proven `text/plain` responses with named string schemas.
 
 `tests/test_openapi_contract.py` freezes all valid OpenAPI HTTP methods across
-the exact 68-operation inventory, verifies
+the exact 70-operation inventory, verifies
 that every request and successful response body is a direct component reference,
 and validates representative runtime payloads against the promoted contracts.
 This is contract closure, not new OpenAI parity behavior.
@@ -284,6 +284,7 @@ GET    /v1/vector_stores/{vector_store_id}/file_batches/{batch_id}
 POST   /v1/vector_stores/{vector_store_id}/file_batches/{batch_id}/cancel
 GET    /v1/vector_stores/{vector_store_id}/file_batches/{batch_id}/files
 GET    /v1/vector_stores/{vector_store_id}/search_lenses
+POST   /v1/vector_stores/{vector_store_id}/graph
 POST   /v1/vector_stores/{vector_store_id}/search
 POST   /v1/responses
 POST   /v1/responses/compact
@@ -692,6 +693,13 @@ returns the lenses supported by that store, their input schema, graph
 relationship types, graph coverage counts, and warnings. Graph lenses fail
 closed when they are unsupported, disabled, empty, or declared only for a future
 handler.
+
+`POST /v1/vector_stores/{vector_store_id}/graph` loads graph artifacts into the
+selected vector store. The route requires `vector_stores:write`, uses the same
+tenant/business-instance principal as the rest of the OpenAI-compatible API,
+accepts `nodes`, `edges`, `replace`, and `dry_run`, and rejects dangling edges
+with `422`. Source-package loaders should use this API route instead of direct
+Postgres writes.
 
 Retrieval uses dense embedding search plus sparse text search with reciprocal
 rank fusion. Sparse text search is phrase-aware on both local backends:

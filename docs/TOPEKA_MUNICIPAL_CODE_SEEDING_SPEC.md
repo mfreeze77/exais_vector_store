@@ -96,7 +96,7 @@ Deep-search proof from 2026-08-28 completed 24 live Topeka API searches against 
 
 The Topeka store must not use the Kansas court-decision query planner. That planner extracts docket numbers, decision years, court names, and publication status for court cases. On municipal code text, ordinance numbers and passed dates can otherwise be misread as court filters. The API route now disables that planner when vector-store attributes identify a non-court corpus such as `topeka_municipal_code`, and store-scoped searches no longer fall back to unavailable private embedding profiles when a planned filter matches zero indexed rows.
 
-Current operating rule: codified-code and ordinance PDF vectorization are allowed only from artifact-quality-passed source outputs. Official ordinance PDF ingestion is complete in the local KS Civics cell. Topeka graph artifact extraction/eval now passes at artifact level, including parsed internal references and ordinance-to-section edges. Keep Topeka graph load/search and production/VPS promotion behind their own proof gates.
+Current operating rule: codified-code and ordinance PDF vectorization are allowed only from artifact-quality-passed source outputs. Official ordinance PDF ingestion is complete in the local KS Civics cell. Topeka graph artifact extraction/eval, graph API load, and explicit graph-lens search are locally verified for the clean store. Keep production/VPS promotion and the public `https://topks.statecivics.ai/local` caller route behind their own proof gates.
 
 Public-access escalation packet: `docs/TOPEKA_PUBLIC_LAW_ACCESS_PACKET.md`.
 
@@ -287,16 +287,29 @@ Ordinance PDF payload:
 
 ## GraphRAG Plan
 
-Load codified scraper graph rows first, then add ordinance-derived cross-source edges:
+Load codified scraper graph rows first, then add ordinance-derived cross-source
+edges through `POST /v1/vector_stores/{vector_store_id}/graph`. Direct Postgres
+graph writes remain forbidden for Topeka source packages.
 
+Current local graph relation types:
+
+- `CONTAINS`
+- `REFERENCES`
+- `DEFINES`
+- `HAS_ORDINANCE_HISTORY`
 - `ORDINANCE_AMENDS_SECTION`
-- `ORDINANCE_REPEALS_SECTION`
-- `ORDINANCE_ADOPTS_CODE`
-- `SECTION_HAS_HISTORY`
+- `SAME_ORDINANCE`
 
 Graph expansion remains secondary to semantic search. The caller asks a question, semantic search finds candidate sections/ordinances, then graph expansion pulls the legal neighborhood.
 
-GraphRAG citation rule: every graph-expanded section, definition, reference target, or ordinance-history edge must expose a `citation_url` when the source material provides one. For codified-code graph rows that URL is the canonical TMC section URL. For ordinance-derived rows that URL is the official PDF URL until a better section-specific ordinance URL exists.
+GraphRAG citation rule: every graph-expanded section, definition, reference
+target, or ordinance-history edge must expose a `citation_url` when the source
+material provides one. For codified-code graph rows that URL is the canonical
+TMC section URL. For ordinance-derived rows that URL is the official PDF URL
+until a better section-specific ordinance URL exists. Caller renderers should
+prefer result-level `citation.url` for the clickable source, and may use
+`citation.graph_expansion.relationship_source_url` /
+`relationship_target_url` for explaining the graph relationship.
 
 ## GitHub Research Notes
 
@@ -319,4 +332,6 @@ Do not copy evasion code into this repo. Treat any publisher-gated acquisition a
 - Zero extracted sections exits nonzero unless explicitly allowed for diagnostics.
 - The seeded local store returns clickable citations for both `source_url` and `pdf_url`.
 - Semantic recall proof includes current-law, amendment-history, and official ordinance PDF queries.
-- Graph artifact proof shows section-reference edges, ordinance-history edges, ordinance-to-section edges, and `citation_url` properties. Production GraphRAG is not claimed live until those artifacts are loaded through a supported ExAIS graph API handler and search expansion is verified.
+- Graph artifact proof shows section-reference edges, ordinance-history edges, ordinance-to-section edges, and `citation_url` properties.
+- Local GraphRAG proof loads the artifact through `POST /v1/vector_stores/{vector_store_id}/graph` and verifies `municipal_code_structure`, `municipal_code_cross_reference`, and `municipal_code_history` through the caller-facing search route.
+- Production GraphRAG is not claimed live until the VPS/public API route repeats those graph-load/search checks after deployment.

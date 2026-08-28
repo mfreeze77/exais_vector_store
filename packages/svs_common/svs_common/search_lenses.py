@@ -11,6 +11,7 @@ SearchLensKind = Literal["semantic", "graph"]
 
 DEFAULT_SEARCH_LENS_ID = "semantic"
 KSCOURTS_GRAPH_HANDLER_ID = "kscourts_postgres_graph_v1"
+TOPEKA_GRAPH_HANDLER_ID = "topeka_municipal_code_postgres_graph_v1"
 KSCOURTS_CORPUS_KIND = "kansas_court_decisions"
 TOPEKA_CORPUS_KIND = "topeka_municipal_code"
 
@@ -95,10 +96,12 @@ SEARCH_LENS_REGISTRY: tuple[SearchLensDefinition, ...] = (
     SearchLensDefinition(
         id="municipal_code_structure",
         label="Municipal Code Structure",
-        description="Planned Topeka code lens for title, chapter, article, appendix, and section hierarchy.",
+        description="Expands Topeka code results through title, chapter, article, appendix, and section hierarchy.",
         kind="graph",
         corpus_kinds=(TOPEKA_CORPUS_KIND,),
         requires_graph=True,
+        graph_profile_id=TOPEKA_GRAPH_HANDLER_ID,
+        handler_id=TOPEKA_GRAPH_HANDLER_ID,
         relation_types=("CONTAINS",),
         input_schema=_object_schema({
             "citation": {"type": "string", "description": "Municipal code citation, for example TMC 8.60.150."},
@@ -106,35 +109,39 @@ SEARCH_LENS_REGISTRY: tuple[SearchLensDefinition, ...] = (
             "chapter": {"type": "string", "description": "Optional chapter identifier."},
             "section": {"type": "string", "description": "Optional section identifier."},
         }),
-        caveats=("This lens is planned until a municipal-code graph search handler is wired to the API.",),
+        caveats=("This lens uses the loaded Topeka municipal-code graph artifact and only reports relationships present in that artifact.",),
     ),
     SearchLensDefinition(
         id="municipal_code_cross_reference",
         label="Municipal Code Cross Reference",
-        description="Planned Topeka code lens for referenced sections, definitions, penalties, and see-also relationships.",
+        description="Expands Topeka code results through referenced sections, definitions, penalties, and see-also relationships.",
         kind="graph",
         corpus_kinds=(TOPEKA_CORPUS_KIND,),
         requires_graph=True,
+        graph_profile_id=TOPEKA_GRAPH_HANDLER_ID,
+        handler_id=TOPEKA_GRAPH_HANDLER_ID,
         relation_types=("REFERENCES", "DEFINES"),
         input_schema=_object_schema({
             "citation": {"type": "string", "description": "Municipal code citation, for example TMC 8.60.150."},
             "term": {"type": "string", "description": "Optional defined term or topic."},
         }),
-        caveats=("This lens is planned until a municipal-code graph search handler is wired to the API.",),
+        caveats=("This lens uses extracted internal code references and definitions; it is not a full outside-law citator.",),
     ),
     SearchLensDefinition(
         id="municipal_code_history",
         label="Municipal Code History",
-        description="Planned Topeka code lens for ordinance adoption and amendment history.",
+        description="Expands Topeka code results through ordinance adoption and amendment history.",
         kind="graph",
         corpus_kinds=(TOPEKA_CORPUS_KIND,),
         requires_graph=True,
+        graph_profile_id=TOPEKA_GRAPH_HANDLER_ID,
+        handler_id=TOPEKA_GRAPH_HANDLER_ID,
         relation_types=("HAS_ORDINANCE_HISTORY", "ORDINANCE_AMENDS_SECTION"),
         input_schema=_object_schema({
             "citation": {"type": "string", "description": "Municipal code citation, for example TMC 8.60.150."},
             "ordinance_number": {"type": "string", "description": "Optional ordinance number."},
         }),
-        caveats=("This lens is planned until a municipal-code graph search handler is wired to the API.",),
+        caveats=("This lens links codified section history to official ordinance PDFs where the artifact contains a matching ordinance number.",),
     ),
 )
 

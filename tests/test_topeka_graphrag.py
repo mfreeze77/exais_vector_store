@@ -135,20 +135,43 @@ def test_graph_load_dry_run_validates_without_direct_db_writes():
     assert result["edges"] == 1
 
 
-def test_graph_load_fails_closed_without_supported_api_path():
+def test_graph_load_uses_default_vector_store_graph_api_path(monkeypatch):
     module = load_script("topeka_code_graphrag_load_blocked", "topeka-code-graphrag-load.py")
+    calls = []
 
-    with pytest.raises(RuntimeError, match="forbids that for Topeka"):
-        module.load_graph(
-            api_base="http://api.test",
-            graph_api_path=None,
-            headers={},
-            vector_store_id="vs_topeka",
-            nodes=[{"id": "a"}, {"id": "b"}],
-            edges=[{"id": "ab", "source": "a", "target": "b"}],
-            dry_run=False,
-            timeout=1,
-        )
+    def fake_api_json(method, api_base, path, payload, *, headers, timeout, cell, transport):
+        calls.append((method, api_base, path, payload, headers, timeout, cell, transport))
+        return {
+            "object": "vector_store.graph_load",
+            "vector_store_id": "vs_topeka",
+            "status": "loaded",
+            "nodes": 2,
+            "edges": 1,
+            "loaded_nodes": 2,
+            "loaded_edges": 1,
+        }
+
+    monkeypatch.setattr(module, "api_json", fake_api_json)
+
+    result = module.load_graph(
+        api_base="http://api.test",
+        graph_api_path=None,
+        headers={},
+        vector_store_id="vs_topeka",
+        nodes=[{"id": "a"}, {"id": "b"}],
+        edges=[{"id": "ab", "source": "a", "target": "b"}],
+        dry_run=False,
+        timeout=1,
+    )
+
+    assert result["status"] == "submitted"
+    assert result["response"]["status"] == "loaded"
+    assert calls[0][2] == "/v1/vector_stores/vs_topeka/graph"
+    assert calls[0][3] == {
+        "nodes": [{"id": "a"}, {"id": "b"}],
+        "edges": [{"id": "ab", "source": "a", "target": "b"}],
+        "replace": True,
+    }
 
 
 def test_recall_eval_dry_run_has_five_current_and_five_history_queries():

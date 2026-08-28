@@ -752,6 +752,54 @@ class VectorStoreSearchLensesResponse(BaseModel):
     data: list[VectorStoreSearchLens] = Field(default_factory=list)
 
 
+class VectorStoreGraphNode(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str = Field(min_length=1)
+    type: str = Field(min_length=1)
+    key: str | None = None
+    label: str | None = None
+    attributes: dict[str, Any] | None = None
+    properties: dict[str, Any] | None = None
+    provenance: list[dict[str, Any]] | dict[str, Any] | None = None
+
+
+class VectorStoreGraphEdge(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str = Field(min_length=1)
+    type: str = Field(min_length=1)
+    source: str = Field(min_length=1)
+    target: str = Field(min_length=1)
+    attributes: dict[str, Any] | None = None
+    properties: dict[str, Any] | None = None
+    provenance: dict[str, Any] | list[dict[str, Any]] | None = None
+
+
+class VectorStoreGraphLoadRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    nodes: list[VectorStoreGraphNode] = Field(default_factory=list)
+    edges: list[VectorStoreGraphEdge] = Field(default_factory=list)
+    replace: bool = True
+    dry_run: bool = False
+
+
+class VectorStoreGraphLoadResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    object: str = 'vector_store.graph_load'
+    vector_store_id: str
+    status: Literal['loaded', 'dry_run']
+    dry_run: bool = False
+    replaced: bool = True
+    nodes: int = 0
+    edges: int = 0
+    loaded_nodes: int = 0
+    loaded_edges: int = 0
+    skipped_edges: int = 0
+
+
 class OpenAIResponseFileSearchResult(BaseModel):
     model_config = ConfigDict(extra='allow')
 

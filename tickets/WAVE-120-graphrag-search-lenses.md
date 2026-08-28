@@ -113,6 +113,8 @@ Known limitations:
   `exais-vector-store-ks-state-civics` API container was rebuilt/restarted in
   the local cell and `GET /v1/vector_stores/vs_d4185d1004604f08a55299fa/search_lenses`
   returned HTTP `200`.
-- Topeka municipal-code lenses are declared as planned registry entries only;
-  they intentionally fail closed until a municipal-code graph search handler is
-  implemented.
+- WAVE-120 originally left Topeka municipal-code graph handlers out of scope.
+  WAVE-122 supersedes that limitation for the local KS Civics cell by loading
+  the Topeka graph through the ExAIS graph API and verifying the structure,
+  cross-reference, and ordinance-history lenses through
+  `/v1/vector_stores/{vector_store_id}/search`.

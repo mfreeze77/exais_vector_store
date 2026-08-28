@@ -33,6 +33,7 @@ from svs_common.schemas import (
     OpenAIVectorStoreFileBatchFilesPage, OpenAIVectorStoreFileContentResponse,
     OpenAIVectorStoreFileDeletedResponse, OpenAIVectorStoreFileListResponse,
     OpenAIVectorStoreSearchRequest, OpenAIVectorStoreSearchResultsPage,
+    VectorStoreGraphLoadRequest, VectorStoreGraphLoadResponse,
     VectorStoreSearchLensesResponse,
     VectorStoreUpdateRequest,
     OpenAIResponseCompactRequest, OpenAIResponseCompactionResponse, OpenAIResponseDeletedResponse,
@@ -70,6 +71,10 @@ from svs_common.openai_metadata import validate_openai_file_attributes
 from svs_common.query_planner import KANSAS_CIVICS_LEGAL_PROFILE_ID, merge_query_filters, plan_query
 from svs_common.search_lenses import (
     DEFAULT_SEARCH_LENS_ID,
+    KSCOURTS_CORPUS_KIND,
+    TOPEKA_CORPUS_KIND,
+    TOPEKA_GRAPH_HANDLER_ID,
+    corpus_kind_for_vector_store,
     normalize_search_lens_id,
     resolve_search_lens,
     search_lens_relation_types,
@@ -1847,6 +1852,224 @@ def vector_store_search_lenses(vector_store_id: str, principal: Principal = Depe
     return _vector_store_search_lenses_payload(db, principal, vector_store_id)
 
 
+def _graph_payload_attributes(value: Any) -> dict[str, Any]:
+    attributes = getattr(value, "attributes", None)
+    properties = getattr(value, "properties", None)
+    if isinstance(attributes, dict):
+        return dict(attributes)
+    if isinstance(properties, dict):
+        return dict(properties)
+    return {}
+
+
+def _graph_node_key(node: Any, attributes: dict[str, Any]) -> str:
+    explicit = getattr(node, "key", None)
+    if isinstance(explicit, str) and explicit.strip():
+        return explicit.strip()
+    for key in ("node_key", "section_id", "citation", "ordinance_number", "ordinance", "source_url", "citation_url", "url"):
+        value = attributes.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+        if value is not None and not isinstance(value, (dict, list)):
+            return str(value)
+    return str(node.id).strip()
+
+
+def _graph_node_provenance(value: Any) -> list[dict[str, Any]]:
+    if isinstance(value, list):
+        return [dict(item) for item in value if isinstance(item, dict)]
+    if isinstance(value, dict):
+        return [dict(value)]
+    return []
+
+
+def _graph_edge_provenance(value: Any) -> dict[str, Any]:
+    if isinstance(value, dict):
+        return dict(value)
+    if isinstance(value, list):
+        return {"items": [dict(item) for item in value if isinstance(item, dict)]}
+    return {}
+
+
+def _normalized_graph_load_rows(
+    req: VectorStoreGraphLoadRequest,
+    principal: Principal,
+    vector_store_id: str,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
+    node_rows: list[dict[str, Any]] = []
+    node_ids: set[str] = set()
+    for node in req.nodes:
+        node_id = str(node.id).strip()
+        node_type = str(node.type).strip()
+        if not node_id:
+            raise ValueError("graph node id must be non-empty")
+        if not node_type:
+            raise ValueError(f"graph node {node_id!r} type must be non-empty")
+        attributes = _graph_payload_attributes(node)
+        node_ids.add(node_id)
+        node_rows.append({
+            "id": node_id,
+            "tenant_id": principal.tenant_id,
+            "business_instance_id": principal.business_instance_id,
+            "vector_store_id": vector_store_id,
+            "node_type": node_type,
+            "node_key": _graph_node_key(node, attributes),
+            "label": str(node.label or node_id).strip() or node_id,
+            "attributes": jsonb_param(attributes),
+            "provenance": jsonb_param(_graph_node_provenance(node.provenance)),
+        })
+
+    edge_rows: list[dict[str, Any]] = []
+    dangling_edge_ids: list[str] = []
+    for edge in req.edges:
+        edge_id = str(edge.id).strip()
+        edge_type = str(edge.type).strip()
+        source_node_id = str(edge.source).strip()
+        target_node_id = str(edge.target).strip()
+        if not edge_id:
+            raise ValueError("graph edge id must be non-empty")
+        if not edge_type:
+            raise ValueError(f"graph edge {edge_id!r} type must be non-empty")
+        if source_node_id not in node_ids or target_node_id not in node_ids:
+            dangling_edge_ids.append(edge_id)
+            continue
+        edge_rows.append({
+            "id": edge_id,
+            "tenant_id": principal.tenant_id,
+            "business_instance_id": principal.business_instance_id,
+            "vector_store_id": vector_store_id,
+            "edge_type": edge_type,
+            "source_node_id": source_node_id,
+            "target_node_id": target_node_id,
+            "attributes": jsonb_param(_graph_payload_attributes(edge)),
+            "provenance": jsonb_param(_graph_edge_provenance(edge.provenance)),
+        })
+    return node_rows, edge_rows, dangling_edge_ids
+
+
+def _load_vector_store_graph(
+    db: Session,
+    principal: Principal,
+    vector_store_id: str,
+    req: VectorStoreGraphLoadRequest,
+) -> dict[str, Any]:
+    node_rows, edge_rows, dangling_edge_ids = _normalized_graph_load_rows(req, principal, vector_store_id)
+    if dangling_edge_ids:
+        raise ValueError(
+            "graph load contains dangling edges: "
+            + ", ".join(dangling_edge_ids[:20])
+            + (f" and {len(dangling_edge_ids) - 20} more" if len(dangling_edge_ids) > 20 else "")
+        )
+    if req.dry_run:
+        return {
+            "object": "vector_store.graph_load",
+            "vector_store_id": vector_store_id,
+            "status": "dry_run",
+            "dry_run": True,
+            "replaced": bool(req.replace),
+            "nodes": len(node_rows),
+            "edges": len(edge_rows),
+            "loaded_nodes": 0,
+            "loaded_edges": 0,
+            "skipped_edges": 0,
+        }
+
+    scope_params = {
+        "tenant_id": principal.tenant_id,
+        "biz_id": principal.business_instance_id,
+        "vector_store_id": vector_store_id,
+    }
+    if req.replace:
+        db.execute(text("""
+            DELETE FROM graph_edges
+            WHERE tenant_id=:tenant_id
+              AND business_instance_id=:biz_id
+              AND vector_store_id=:vector_store_id
+        """), scope_params)
+        db.execute(text("""
+            DELETE FROM graph_nodes
+            WHERE tenant_id=:tenant_id
+              AND business_instance_id=:biz_id
+              AND vector_store_id=:vector_store_id
+        """), scope_params)
+
+    if node_rows:
+        db.execute(jsonb_text("""
+            INSERT INTO graph_nodes (
+              id, tenant_id, business_instance_id, vector_store_id,
+              node_type, node_key, label, attributes, provenance
+            )
+            VALUES (
+              :id, :tenant_id, :business_instance_id, :vector_store_id,
+              :node_type, :node_key, :label, CAST(:attributes AS jsonb), CAST(:provenance AS jsonb)
+            )
+            ON CONFLICT (tenant_id, business_instance_id, vector_store_id, id) DO UPDATE
+            SET node_type=excluded.node_type,
+                node_key=excluded.node_key,
+                label=excluded.label,
+                attributes=excluded.attributes,
+                provenance=excluded.provenance,
+                updated_at=now()
+        """, "attributes", "provenance"), node_rows)
+    if edge_rows:
+        db.execute(jsonb_text("""
+            INSERT INTO graph_edges (
+              id, tenant_id, business_instance_id, vector_store_id,
+              edge_type, source_node_id, target_node_id, attributes, provenance
+            )
+            VALUES (
+              :id, :tenant_id, :business_instance_id, :vector_store_id,
+              :edge_type, :source_node_id, :target_node_id, CAST(:attributes AS jsonb), CAST(:provenance AS jsonb)
+            )
+            ON CONFLICT (tenant_id, business_instance_id, vector_store_id, id) DO UPDATE
+            SET edge_type=excluded.edge_type,
+                source_node_id=excluded.source_node_id,
+                target_node_id=excluded.target_node_id,
+                attributes=excluded.attributes,
+                provenance=excluded.provenance,
+                updated_at=now()
+        """, "attributes", "provenance"), edge_rows)
+
+    counts = db.execute(text("""
+        SELECT
+          (SELECT count(*)::int FROM graph_nodes
+           WHERE tenant_id=:tenant_id AND business_instance_id=:biz_id AND vector_store_id=:vector_store_id) AS nodes,
+          (SELECT count(*)::int FROM graph_edges
+           WHERE tenant_id=:tenant_id AND business_instance_id=:biz_id AND vector_store_id=:vector_store_id) AS edges
+    """), scope_params).mappings().first() or {}
+    return {
+        "object": "vector_store.graph_load",
+        "vector_store_id": vector_store_id,
+        "status": "loaded",
+        "dry_run": False,
+        "replaced": bool(req.replace),
+        "nodes": int(counts.get("nodes") or 0),
+        "edges": int(counts.get("edges") or 0),
+        "loaded_nodes": len(node_rows),
+        "loaded_edges": len(edge_rows),
+        "skipped_edges": 0,
+    }
+
+
+@app.post('/v1/vector_stores/{vector_store_id}/graph', response_model=VectorStoreGraphLoadResponse)
+def load_vector_store_graph(
+    vector_store_id: str,
+    req: VectorStoreGraphLoadRequest,
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
+    ensure_scope(principal, 'vector_stores:write')
+    enforce_rate_limit(db, principal, 'vector_stores.graph.load')
+    _refresh_vector_store_activity_or_404(db, principal, vector_store_id)
+    try:
+        result = _load_vector_store_graph(db, principal, vector_store_id, req)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    if not req.dry_run:
+        db.commit()
+    return result
+
+
 @app.post('/v1/vector_stores/{vector_store_id}', response_model=VectorStoreResponse)
 @app.patch('/v1/vector_stores/{vector_store_id}', response_model=VectorStoreResponse)
 def update_vector_store(
@@ -2049,7 +2272,7 @@ def _vector_store_search_lenses_payload(
 ) -> dict[str, Any]:
     attrs = _vector_store_attributes_for_search(db, principal, vector_store_id)
     query_planner_profile_id = _query_planner_profile_id_from_vector_store_attributes(attrs)
-    graph_enabled = _kscourts_graphrag_enabled(query_planner_profile_id)
+    graph_enabled = _graphrag_enabled_for_vector_store(attrs, query_planner_profile_id)
     graph_coverage = None
     if include_graph_coverage and graph_enabled:
         graph_coverage = _graph_coverage_for_vector_store(db, principal, vector_store_id)
@@ -2094,6 +2317,10 @@ KSCOURTS_GRAPHRAG_INTENT_RE = re.compile(
     r"\b(?:cited\s+by|cites?|cited|authority|authorities|related|same\s+docket|same\s+party|precedent|citation|citations)\b",
     re.I,
 )
+TOPEKA_GRAPHRAG_INTENT_RE = re.compile(
+    r"\b(?:amend(?:ed|ment|s)?|ordinance|charter\s+ordinance|history|references?|defines?|definition|chapter|title|section|contained\s+in)\b",
+    re.I,
+)
 
 
 def _env_truthy(name: str) -> bool:
@@ -2104,9 +2331,27 @@ def _kscourts_graphrag_enabled(query_planner_profile_id: str | None) -> bool:
     return query_planner_profile_id == KANSAS_CIVICS_LEGAL_PROFILE_ID and _env_truthy("SVS_KSCOURTS_GRAPHRAG_ENABLED")
 
 
+def _topeka_graphrag_enabled() -> bool:
+    return _env_truthy("SVS_TOPEKA_GRAPHRAG_ENABLED") or _env_truthy("SVS_MUNICIPAL_GRAPHRAG_ENABLED")
+
+
+def _graphrag_enabled_for_vector_store(attrs: dict[str, Any], query_planner_profile_id: str | None) -> bool:
+    corpus_kind = corpus_kind_for_vector_store(attrs, query_planner_profile_id)
+    if corpus_kind == KSCOURTS_CORPUS_KIND:
+        return _kscourts_graphrag_enabled(query_planner_profile_id)
+    if corpus_kind == TOPEKA_CORPUS_KIND:
+        return _topeka_graphrag_enabled()
+    return False
+
+
 def _query_has_kscourts_graphrag_intent(query: str | list[str]) -> bool:
     values = query if isinstance(query, list) else [query]
     return any(KSCOURTS_GRAPHRAG_INTENT_RE.search(value or "") for value in values)
+
+
+def _query_has_topeka_graphrag_intent(query: str | list[str]) -> bool:
+    values = query if isinstance(query, list) else [query]
+    return any(TOPEKA_GRAPHRAG_INTENT_RE.search(value or "") for value in values)
 
 
 def _graph_expansion_limit() -> int:
@@ -2115,6 +2360,14 @@ def _graph_expansion_limit() -> int:
         return max(0, min(int(raw), 10))
     except ValueError:
         return 3
+
+
+def _topeka_graph_expansion_limit() -> int:
+    raw = os.getenv("SVS_TOPEKA_GRAPHRAG_MAX_EXPANSIONS", "6")
+    try:
+        return max(0, min(int(raw), 20))
+    except ValueError:
+        return 6
 
 
 def _kscourts_graphrag_relation_rows(
@@ -2392,6 +2645,770 @@ def _kscourts_graphrag_metadata_by_document(relation_rows: list[dict[str, Any]])
     return metadata
 
 
+def _topeka_input_citation_values(inputs: dict[str, Any] | None) -> list[str]:
+    values: list[str] = []
+    for key in ("citation", "title", "chapter", "section"):
+        value = (inputs or {}).get(key)
+        if not isinstance(value, str) or not value.strip():
+            continue
+        raw = value.strip()
+        candidates = {
+            raw,
+            raw.replace("TMC ", "").replace("tmc ", "").strip(),
+            raw.replace("TMC/", "").replace("tmc/", "").strip(),
+        }
+        if "/TMC/" in raw:
+            candidates.add(raw.rsplit("/TMC/", 1)[-1].strip("/"))
+        for candidate in candidates:
+            normalized = candidate.strip().strip("/")
+            if normalized:
+                values.append(normalized.lower())
+    return sorted(set(values))
+
+
+def _topeka_input_ordinance_values(inputs: dict[str, Any] | None) -> list[str]:
+    value = (inputs or {}).get("ordinance_number")
+    if not isinstance(value, str) or not value.strip():
+        return []
+    raw = value.strip()
+    candidates = {
+        raw,
+        re.sub(r"(?i)^ordinance\s+", "", raw).strip(),
+        re.sub(r"(?i)^charter\s+ordinance\s+", "", raw).strip(),
+    }
+    return sorted({candidate.lower() for candidate in candidates if candidate})
+
+
+def _topeka_input_term_like(inputs: dict[str, Any] | None) -> str | None:
+    value = (inputs or {}).get("term")
+    if not isinstance(value, str) or not value.strip():
+        return None
+    return f"%{value.strip().lower()}%"
+
+
+def _topeka_graph_seed_rows(
+    db: Session,
+    principal: Principal,
+    vector_store_id: str,
+    chunks: list[ChunkRecord],
+    inputs: dict[str, Any] | None,
+    *,
+    limit: int,
+) -> list[dict[str, Any]]:
+    seed_rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+
+    def append_rows(rows: list[dict[str, Any]]) -> None:
+        for row in rows:
+            node_id = str(row.get("id") or "")
+            if not node_id or node_id in seen:
+                continue
+            seen.add(node_id)
+            seed_rows.append(row)
+
+    document_ids = []
+    for chunk in chunks:
+        if chunk.document_id and chunk.document_id not in document_ids:
+            document_ids.append(chunk.document_id)
+        if len(document_ids) >= 12:
+            break
+    scope_params = {"tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "vector_store_id": vector_store_id}
+    if document_ids:
+        rows = db.execute(text("""
+            WITH wanted_documents(document_id, graph_rank) AS (
+              SELECT document_id, graph_rank
+              FROM unnest(CAST(:document_ids AS text[])) WITH ORDINALITY AS t(document_id, graph_rank)
+            )
+            SELECT DISTINCT ON (n.id)
+                   n.id,
+                   n.node_type,
+                   n.node_key,
+                   n.label,
+                   n.attributes,
+                   wanted_documents.graph_rank,
+                   wanted_documents.document_id AS matched_document_id
+            FROM wanted_documents
+            JOIN documents d
+              ON d.id=wanted_documents.document_id
+             AND d.tenant_id=:tenant_id
+             AND d.business_instance_id=:biz_id
+            LEFT JOIN vector_store_files f
+              ON f.tenant_id=d.tenant_id
+             AND f.business_instance_id=d.business_instance_id
+             AND f.document_id=d.id
+             AND f.vector_store_id=:vector_store_id
+             AND f.status <> 'cancelled'
+            JOIN graph_nodes n
+              ON n.tenant_id=d.tenant_id
+             AND n.business_instance_id=d.business_instance_id
+             AND n.vector_store_id=:vector_store_id
+             AND (
+                  d.source_uri = n.attributes->>'source_url'
+               OR d.source_uri = n.attributes->>'citation_url'
+               OR d.source_uri = n.attributes->>'pdf_url'
+               OR d.source_uri = n.attributes->>'url'
+               OR f.attributes->>'source_url' = n.attributes->>'source_url'
+               OR f.attributes->>'citation_url' = n.attributes->>'citation_url'
+               OR f.attributes->>'pdf_url' = n.attributes->>'pdf_url'
+               OR f.attributes->>'section_id' = n.id
+               OR f.attributes->>'section_id' = n.attributes->>'section_id'
+               OR f.attributes->>'citation' = n.attributes->>'citation'
+               OR f.attributes->>'ordinance_number' = n.attributes->>'ordinance_number'
+               OR f.attributes->>'ordinance_number' = n.attributes->>'ordinance'
+             )
+            ORDER BY n.id, wanted_documents.graph_rank
+            LIMIT :limit
+        """), {**scope_params, "document_ids": document_ids, "limit": limit}).mappings().all()
+        append_rows([dict(row) for row in rows])
+
+    citation_values = _topeka_input_citation_values(inputs) or ["__svs_no_citation__"]
+    ordinance_values = _topeka_input_ordinance_values(inputs) or ["__svs_no_ordinance__"]
+    term_like = _topeka_input_term_like(inputs)
+    if citation_values != ["__svs_no_citation__"] or ordinance_values != ["__svs_no_ordinance__"] or term_like:
+        rows = db.execute(text("""
+            SELECT DISTINCT ON (n.id)
+                   n.id,
+                   n.node_type,
+                   n.node_key,
+                   n.label,
+                   n.attributes,
+                   0 AS graph_rank,
+                   NULL::text AS matched_document_id
+            FROM graph_nodes n
+            WHERE n.tenant_id=:tenant_id
+              AND n.business_instance_id=:biz_id
+              AND n.vector_store_id=:vector_store_id
+              AND (
+                   lower(coalesce(n.node_key, '')) = ANY(CAST(:citation_values AS text[]))
+                OR lower(coalesce(n.attributes->>'citation', '')) = ANY(CAST(:citation_values AS text[]))
+                OR lower(coalesce(n.attributes->>'manifest_id', '')) = ANY(CAST(:citation_values AS text[]))
+                OR lower(coalesce(n.attributes->>'section_id', '')) = ANY(CAST(:citation_values AS text[]))
+                OR lower(coalesce(n.attributes->>'ordinance_number', '')) = ANY(CAST(:ordinance_values AS text[]))
+                OR lower(coalesce(n.attributes->>'ordinance', '')) = ANY(CAST(:ordinance_values AS text[]))
+                OR (CAST(:term_like AS text) IS NOT NULL AND n.node_type='definition' AND lower(n.label) LIKE CAST(:term_like AS text))
+              )
+            ORDER BY n.id
+            LIMIT :limit
+        """), {
+            **scope_params,
+            "citation_values": citation_values,
+            "ordinance_values": ordinance_values,
+            "term_like": term_like,
+            "limit": limit,
+        }).mappings().all()
+        append_rows([dict(row) for row in rows])
+    return seed_rows[:limit]
+
+
+def _topeka_municipal_graph_relation_rows(
+    db: Session,
+    principal: Principal,
+    vector_store_id: str,
+    seed_node_ids: list[str],
+    relation_types: tuple[str, ...],
+    *,
+    limit: int,
+) -> list[dict[str, Any]]:
+    if not seed_node_ids or not relation_types or limit <= 0:
+        return []
+    rows = db.execute(text("""
+        WITH RECURSIVE seed_nodes AS (
+          SELECT n.id AS seed_node_id,
+                 n.node_type AS seed_node_type,
+                 n.node_key AS seed_node_key,
+                 n.label AS seed_label,
+                 n.attributes AS seed_attributes,
+                 wanted.seed_rank
+          FROM unnest(CAST(:seed_node_ids AS text[])) WITH ORDINALITY AS wanted(id, seed_rank)
+          JOIN graph_nodes n
+            ON n.id=wanted.id
+           AND n.tenant_id=:tenant_id
+           AND n.business_instance_id=:biz_id
+           AND n.vector_store_id=:vector_store_id
+        ),
+        direct_relations AS (
+          SELECT e.id AS edge_id,
+                 e.edge_type AS relation_type,
+                 e.source_node_id,
+                 e.target_node_id,
+                 s.seed_node_id,
+                 s.seed_node_type,
+                 s.seed_node_key,
+                 s.seed_label,
+                 s.seed_attributes,
+                 CASE WHEN e.source_node_id=s.seed_node_id THEN 'outgoing' ELSE 'incoming' END AS direction,
+                 related.id AS related_node_id,
+                 related.node_type AS related_node_type,
+                 related.node_key AS related_node_key,
+                 related.label AS related_label,
+                 related.attributes AS related_attributes,
+                 e.attributes,
+                 e.provenance,
+                 s.seed_rank,
+                 1::int AS graph_distance
+          FROM seed_nodes s
+          JOIN graph_edges e
+            ON e.tenant_id=:tenant_id
+           AND e.business_instance_id=:biz_id
+           AND e.vector_store_id=:vector_store_id
+           AND e.edge_type = ANY(CAST(:relation_types AS text[]))
+           AND (e.source_node_id=s.seed_node_id OR e.target_node_id=s.seed_node_id)
+          JOIN graph_nodes related
+            ON related.tenant_id=e.tenant_id
+           AND related.business_instance_id=e.business_instance_id
+           AND related.vector_store_id=e.vector_store_id
+           AND related.id = CASE
+               WHEN e.source_node_id=s.seed_node_id THEN e.target_node_id
+               ELSE e.source_node_id
+             END
+          WHERE related.id <> s.seed_node_id
+        ),
+        contains_walk AS (
+          SELECT e.id AS edge_id,
+                 e.edge_type AS relation_type,
+                 e.source_node_id,
+                 e.target_node_id,
+                 s.seed_node_id,
+                 s.seed_node_type,
+                 s.seed_node_key,
+                 s.seed_label,
+                 s.seed_attributes,
+                 'outgoing'::text AS direction,
+                 related.id AS related_node_id,
+                 related.node_type AS related_node_type,
+                 related.node_key AS related_node_key,
+                 related.label AS related_label,
+                 related.attributes AS related_attributes,
+                 e.attributes,
+                 e.provenance,
+                 s.seed_rank,
+                 1::int AS graph_distance,
+                 ARRAY[s.seed_node_id, related.id]::text[] AS visited_nodes
+          FROM seed_nodes s
+          JOIN graph_edges e
+            ON e.tenant_id=:tenant_id
+           AND e.business_instance_id=:biz_id
+           AND e.vector_store_id=:vector_store_id
+           AND e.edge_type='CONTAINS'
+           AND e.source_node_id=s.seed_node_id
+           AND 'CONTAINS' = ANY(CAST(:relation_types AS text[]))
+          JOIN graph_nodes related
+            ON related.tenant_id=e.tenant_id
+           AND related.business_instance_id=e.business_instance_id
+           AND related.vector_store_id=e.vector_store_id
+           AND related.id=e.target_node_id
+          WHERE related.id <> s.seed_node_id
+          UNION ALL
+          SELECT e.id AS edge_id,
+                 e.edge_type AS relation_type,
+                 e.source_node_id,
+                 e.target_node_id,
+                 cw.seed_node_id,
+                 cw.seed_node_type,
+                 cw.seed_node_key,
+                 cw.seed_label,
+                 cw.seed_attributes,
+                 'descendant'::text AS direction,
+                 related.id AS related_node_id,
+                 related.node_type AS related_node_type,
+                 related.node_key AS related_node_key,
+                 related.label AS related_label,
+                 related.attributes AS related_attributes,
+                 e.attributes,
+                 e.provenance,
+                 cw.seed_rank,
+                 cw.graph_distance + 1 AS graph_distance,
+                 array_append(cw.visited_nodes, related.id) AS visited_nodes
+          FROM contains_walk cw
+          JOIN graph_edges e
+            ON e.tenant_id=:tenant_id
+           AND e.business_instance_id=:biz_id
+           AND e.vector_store_id=:vector_store_id
+           AND e.edge_type='CONTAINS'
+           AND e.source_node_id=cw.related_node_id
+          JOIN graph_nodes related
+            ON related.tenant_id=e.tenant_id
+           AND related.business_instance_id=e.business_instance_id
+           AND related.vector_store_id=e.vector_store_id
+           AND related.id=e.target_node_id
+          WHERE cw.graph_distance < 4
+            AND NOT related.id = ANY(cw.visited_nodes)
+        ),
+        contains_descendants AS (
+          SELECT edge_id,
+                 relation_type,
+                 source_node_id,
+                 target_node_id,
+                 seed_node_id,
+                 seed_node_type,
+                 seed_node_key,
+                 seed_label,
+                 seed_attributes,
+                 direction,
+                 related_node_id,
+                 related_node_type,
+                 related_node_key,
+                 related_label,
+                 related_attributes,
+                 attributes,
+                 provenance,
+                 seed_rank,
+                 graph_distance
+          FROM contains_walk
+          WHERE graph_distance > 1
+            AND related_node_type IN ('section', 'table')
+        ),
+        all_relations AS (
+          SELECT * FROM direct_relations
+          UNION ALL
+          SELECT * FROM contains_descendants
+        ),
+        deduped_relations AS (
+          SELECT DISTINCT ON (related_node_id, relation_type)
+                 edge_id,
+                 relation_type,
+                 source_node_id,
+                 target_node_id,
+                 seed_node_id,
+                 seed_node_type,
+                 seed_node_key,
+                 seed_label,
+                 seed_attributes,
+                 direction,
+                 related_node_id,
+                 related_node_type,
+                 related_node_key,
+                 related_label,
+                 related_attributes,
+                 attributes,
+                 provenance,
+                 seed_rank,
+                 graph_distance
+          FROM all_relations
+          ORDER BY related_node_id, relation_type, graph_distance, seed_rank, edge_id
+        )
+        SELECT
+               edge_id,
+               relation_type,
+               source_node_id,
+               target_node_id,
+               seed_node_id,
+               seed_node_type,
+               seed_node_key,
+               seed_label,
+               seed_attributes,
+               direction,
+               related_node_id,
+               related_node_type,
+               related_node_key,
+               related_label,
+               related_attributes,
+               attributes,
+               provenance,
+               graph_distance
+        FROM deduped_relations
+        ORDER BY graph_distance, seed_rank, relation_type, related_node_key, edge_id
+        LIMIT :limit
+    """), {
+        "tenant_id": principal.tenant_id,
+        "biz_id": principal.business_instance_id,
+        "vector_store_id": vector_store_id,
+        "seed_node_ids": seed_node_ids,
+        "relation_types": list(relation_types),
+        "limit": limit,
+    }).mappings().all()
+    return [dict(row) for row in rows]
+
+
+def _topeka_graph_metadata(row: dict[str, Any]) -> dict[str, Any]:
+    attributes = dict(row.get("attributes") or {})
+    related_attributes = dict(row.get("related_attributes") or {})
+    seed_attributes = dict(row.get("seed_attributes") or {})
+
+    def node_url(node_attributes: dict[str, Any]) -> Any:
+        return (
+            node_attributes.get("citation_url")
+            or node_attributes.get("source_url")
+            or node_attributes.get("pdf_url")
+            or node_attributes.get("url")
+        )
+
+    related_node_url = node_url(related_attributes)
+    seed_node_url = node_url(seed_attributes)
+    edge_source_url = (
+        attributes.get("observed_in_section_url")
+        or attributes.get("source_url")
+        or attributes.get("citation_url")
+    )
+    edge_target_url = attributes.get("target_url") or attributes.get("pdf_url")
+    source_node_id = row.get("source_node_id")
+    target_node_id = row.get("target_node_id")
+    seed_node_id = row.get("seed_node_id")
+    related_node_id = row.get("related_node_id")
+    relationship_source_url = edge_source_url
+    if related_node_id == source_node_id:
+        relationship_source_url = related_node_url or relationship_source_url
+    elif seed_node_id == source_node_id:
+        relationship_source_url = seed_node_url or relationship_source_url
+    relationship_target_url = edge_target_url
+    if related_node_id == target_node_id:
+        relationship_target_url = related_node_url or relationship_target_url
+    elif seed_node_id == target_node_id:
+        relationship_target_url = seed_node_url or relationship_target_url
+    citation_url = (
+        related_node_url
+        or (
+            relationship_target_url
+            if row.get("relation_type") in {"CONTAINS", "REFERENCES", "DEFINES"}
+            else None
+        )
+        or attributes.get("pdf_url")
+        or attributes.get("citation_url")
+        or relationship_target_url
+        or relationship_source_url
+    )
+    return {
+        "profile": TOPEKA_GRAPH_HANDLER_ID,
+        "relation_type": row.get("relation_type"),
+        "edge_id": row.get("edge_id"),
+        "direction": row.get("direction"),
+        "seed_node_id": row.get("seed_node_id"),
+        "seed_node_type": row.get("seed_node_type"),
+        "seed_node_key": row.get("seed_node_key"),
+        "source_node_id": row.get("source_node_id"),
+        "target_node_id": row.get("target_node_id"),
+        "related_node_id": row.get("related_node_id"),
+        "related_node_type": row.get("related_node_type"),
+        "related_node_key": row.get("related_node_key"),
+        "related_label": row.get("related_label"),
+        "seed_label": row.get("seed_label"),
+        "graph_distance": row.get("graph_distance"),
+        "citation_url": citation_url,
+        "relationship_source_url": relationship_source_url,
+        "relationship_target_url": relationship_target_url,
+        "attributes": attributes,
+        "related_attributes": related_attributes,
+        "provenance": dict(row.get("provenance") or {}),
+    }
+
+
+def _topeka_relation_candidate_values(relation_rows: list[dict[str, Any]]) -> dict[str, list[str]]:
+    values: dict[str, set[str]] = {
+        "node_ids": set(),
+        "source_uris": set(),
+        "citations": set(),
+        "ordinance_numbers": set(),
+    }
+    for row in relation_rows:
+        node_id = str(row.get("related_node_id") or "").strip()
+        if node_id:
+            values["node_ids"].add(node_id)
+        related_node_key = str(row.get("related_node_key") or "").strip()
+        if related_node_key:
+            if str(row.get("related_node_type") or "").strip() == "ordinance_pdf":
+                values["ordinance_numbers"].add(related_node_key)
+            else:
+                values["citations"].add(related_node_key)
+        related_label = str(row.get("related_label") or "").strip()
+        if related_label and str(row.get("related_node_type") or "").strip() == "ordinance_pdf":
+            values["ordinance_numbers"].add(related_label)
+        for attrs in (row.get("related_attributes"), row.get("attributes")):
+            if not isinstance(attrs, dict):
+                continue
+            for key in ("source_url", "citation_url", "pdf_url", "url", "observed_in_section_url", "target_url"):
+                value = attrs.get(key)
+                if isinstance(value, str) and value.strip():
+                    values["source_uris"].add(value.strip())
+            for key in ("citation", "target_citation"):
+                value = attrs.get(key)
+                if isinstance(value, str) and value.strip():
+                    values["citations"].add(value.strip())
+            for key in ("ordinance_number", "ordinance"):
+                value = attrs.get(key)
+                if isinstance(value, str) and value.strip():
+                    values["ordinance_numbers"].add(value.strip())
+                elif value is not None and not isinstance(value, (dict, list)):
+                    values["ordinance_numbers"].add(str(value))
+    return {key: sorted(value) or [f"__svs_no_{key}__"] for key, value in values.items()}
+
+
+def _topeka_relation_matches_document(row: dict[str, Any], document_row: Any) -> bool:
+    document_values = {
+        str(document_row.get("source_uri") or ""),
+        str(document_row.get("node_id") or ""),
+    }
+    file_attributes = dict(document_row.get("file_attributes") or {})
+    for key in ("source_url", "citation_url", "pdf_url", "url", "section_id", "citation", "ordinance_number"):
+        value = file_attributes.get(key)
+        if value is not None:
+            document_values.add(str(value))
+    document_values = {value for value in document_values if value}
+
+    related_attributes = dict(row.get("related_attributes") or {})
+    relation_attributes = dict(row.get("attributes") or {})
+    candidate_values = {
+        str(row.get("related_node_id") or ""),
+        str(row.get("related_node_key") or ""),
+        str(row.get("related_label") or ""),
+    }
+    for attrs in (related_attributes, relation_attributes):
+        for key in (
+            "source_url",
+            "citation_url",
+            "pdf_url",
+            "url",
+            "observed_in_section_url",
+            "target_url",
+            "section_id",
+            "citation",
+            "target_citation",
+            "ordinance_number",
+            "ordinance",
+        ):
+            value = attrs.get(key)
+            if value is not None:
+                candidate_values.add(str(value))
+    return bool(document_values & {value for value in candidate_values if value})
+
+
+def _topeka_document_citation_url(document_row: Any) -> str | None:
+    file_attributes = dict(document_row.get("file_attributes") or {})
+    for key in ("citation_url", "source_url", "pdf_url", "url"):
+        value = file_attributes.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    source_uri = document_row.get("source_uri")
+    if isinstance(source_uri, str) and source_uri.strip():
+        return source_uri.strip()
+    return None
+
+
+def _topeka_metadata_for_document(row: Any, relation_rows: list[dict[str, Any]]) -> dict[str, Any]:
+    for relation_row in relation_rows:
+        if _topeka_relation_matches_document(relation_row, row):
+            metadata = _topeka_graph_metadata(relation_row)
+            document_citation_url = _topeka_document_citation_url(row)
+            if document_citation_url:
+                metadata = {**metadata, "citation_url": document_citation_url}
+            return metadata
+    return {}
+
+
+def _hydrate_topeka_municipal_graph_chunks(
+    db: Session,
+    principal: Principal,
+    vector_store_id: str,
+    relation_rows: list[dict[str, Any]],
+    existing_document_ids: set[str],
+    *,
+    limit: int,
+) -> tuple[list[ChunkRecord], dict[str, dict[str, Any]], dict[str, dict[str, Any]]]:
+    if not relation_rows or limit <= 0:
+        return [], {}, {}
+    candidates = _topeka_relation_candidate_values(relation_rows)
+    has_candidates = any(not (len(value) == 1 and value[0].startswith("__svs_no_")) for value in candidates.values())
+    if not has_candidates:
+        return [], {}, {}
+    rows = db.execute(text("""
+        WITH candidate_documents AS (
+          SELECT DISTINCT ON (d.id)
+                 d.id AS document_id,
+                 d.title,
+                 d.filename,
+                 d.source_uri,
+                 f.attributes AS file_attributes,
+                 coalesce(
+                   f.attributes->>'attached_from_file_id',
+                   dv.metadata #>> '{attributes,_openai_file_id}',
+                   f.document_id,
+                   f.id
+                 ) AS file_id,
+                 CASE
+                   WHEN d.source_uri = ANY(CAST(:source_uris AS text[])) THEN array_position(CAST(:source_uris AS text[]), d.source_uri)
+                   WHEN f.attributes->>'source_url' = ANY(CAST(:source_uris AS text[])) THEN array_position(CAST(:source_uris AS text[]), f.attributes->>'source_url')
+                   WHEN f.attributes->>'citation_url' = ANY(CAST(:source_uris AS text[])) THEN array_position(CAST(:source_uris AS text[]), f.attributes->>'citation_url')
+                   WHEN f.attributes->>'pdf_url' = ANY(CAST(:source_uris AS text[])) THEN array_position(CAST(:source_uris AS text[]), f.attributes->>'pdf_url')
+                   WHEN f.attributes->>'section_id' = ANY(CAST(:node_ids AS text[])) THEN array_position(CAST(:node_ids AS text[]), f.attributes->>'section_id')
+                   WHEN f.attributes->>'citation' = ANY(CAST(:citations AS text[])) THEN array_position(CAST(:citations AS text[]), f.attributes->>'citation')
+                   WHEN f.attributes->>'ordinance_number' = ANY(CAST(:ordinance_numbers AS text[])) THEN array_position(CAST(:ordinance_numbers AS text[]), f.attributes->>'ordinance_number')
+                   ELSE 999999
+                 END AS graph_rank
+          FROM documents d
+          JOIN vector_store_files f
+            ON f.tenant_id=d.tenant_id
+           AND f.business_instance_id=d.business_instance_id
+           AND f.document_id=d.id
+           AND f.vector_store_id=:vector_store_id
+           AND f.status <> 'cancelled'
+          LEFT JOIN document_versions dv
+            ON dv.id=d.current_version_id
+           AND dv.document_id=d.id
+           AND dv.tenant_id=d.tenant_id
+           AND dv.business_instance_id=d.business_instance_id
+          WHERE d.tenant_id=:tenant_id
+            AND d.business_instance_id=:biz_id
+            AND (
+                 d.source_uri = ANY(CAST(:source_uris AS text[]))
+              OR f.attributes->>'source_url' = ANY(CAST(:source_uris AS text[]))
+              OR f.attributes->>'citation_url' = ANY(CAST(:source_uris AS text[]))
+              OR f.attributes->>'pdf_url' = ANY(CAST(:source_uris AS text[]))
+              OR f.attributes->>'section_id' = ANY(CAST(:node_ids AS text[]))
+              OR f.attributes->>'citation' = ANY(CAST(:citations AS text[]))
+              OR f.attributes->>'ordinance_number' = ANY(CAST(:ordinance_numbers AS text[]))
+            )
+          ORDER BY d.id, graph_rank
+        ),
+        ranked_chunks AS (
+          SELECT c.id,
+                 c.document_id,
+                 c.document_version_id,
+                 c.ordinal,
+                 c.text,
+                 c.heading_path,
+                 c.page_start,
+                 c.page_end,
+                 c.metadata,
+                 c.security_level,
+                 c.classification,
+                 c.allowed_groups,
+                 c.allowed_roles,
+                 cd.title,
+                 cd.filename,
+                 cd.source_uri,
+                 cd.file_id,
+                 cd.file_attributes,
+                 cd.graph_rank,
+                 row_number() OVER (PARTITION BY c.document_id ORDER BY c.ordinal) AS chunk_rank
+          FROM candidate_documents cd
+          JOIN chunks c
+            ON c.document_id=cd.document_id
+           AND c.tenant_id=:tenant_id
+           AND c.business_instance_id=:biz_id
+           AND c.vector_store_id=:vector_store_id
+           AND c.active=true
+           AND c.security_level <= :max_security_level
+        )
+        SELECT *
+        FROM ranked_chunks
+        WHERE chunk_rank=1
+        ORDER BY graph_rank, ordinal
+        LIMIT :limit
+    """), {
+        "tenant_id": principal.tenant_id,
+        "biz_id": principal.business_instance_id,
+        "vector_store_id": vector_store_id,
+        "max_security_level": principal.max_security_level,
+        "node_ids": candidates["node_ids"],
+        "source_uris": candidates["source_uris"],
+        "citations": candidates["citations"],
+        "ordinance_numbers": candidates["ordinance_numbers"],
+        "limit": max(limit, 50),
+    }).mappings().all()
+    scope = build_retrieval_scope(principal)
+    chunks: list[ChunkRecord] = []
+    metadata_by_chunk_id: dict[str, dict[str, Any]] = {}
+    metadata_by_document_id: dict[str, dict[str, Any]] = {}
+    seen_documents: set[str] = set()
+    for index, row in enumerate(rows, start=1):
+        metadata = _topeka_metadata_for_document(row, relation_rows)
+        metadata_by_document_id.setdefault(str(row["document_id"]), metadata)
+        document_id = str(row["document_id"])
+        if document_id in existing_document_ids or document_id in seen_documents:
+            continue
+        chunk = ChunkRecord(
+            id=row["id"],
+            document_id=document_id,
+            document_version_id=row["document_version_id"],
+            file_id=row["file_id"],
+            title=row["title"],
+            filename=row["filename"],
+            source_uri=row["source_uri"],
+            ordinal=row["ordinal"],
+            text=row["text"],
+            heading_path=list(row["heading_path"] or []),
+            page_start=row["page_start"],
+            page_end=row["page_end"],
+            metadata=dict(row["metadata"] or {}),
+            security_level=row["security_level"],
+            classification=row["classification"],
+            allowed_groups=list(row["allowed_groups"] or []),
+            allowed_roles=list(row["allowed_roles"] or []),
+            score=max(0.01, round(0.64 - (index * 0.01), 6)),
+            source="topeka_municipal_graph_expansion",
+        )
+        if not chunk_allowed_by_scope(chunk, scope):
+            continue
+        chunk.citation = {"graph_expansion": metadata}
+        metadata_by_chunk_id[chunk.id] = metadata
+        chunks.append(chunk)
+        seen_documents.add(document_id)
+        if len(chunks) >= limit:
+            break
+    return chunks, metadata_by_chunk_id, metadata_by_document_id
+
+
+def _apply_topeka_municipal_graphrag_expansion(
+    db: Session,
+    principal: Principal,
+    vector_store_id: str,
+    chunks: list[ChunkRecord],
+    *,
+    enabled: bool,
+    query: str | list[str],
+    force: bool = False,
+    lens: dict[str, Any] | None = None,
+    inputs: dict[str, Any] | None = None,
+    relation_types: tuple[str, ...] = (),
+    graph_coverage: dict[str, Any] | None = None,
+) -> tuple[list[ChunkRecord], dict[str, dict[str, Any]], dict[str, dict[str, Any]], dict[str, Any] | None]:
+    if not enabled:
+        return chunks, {}, {}, None
+    lens_id = (lens or {}).get("id")
+    summary_base = {
+        "enabled": True,
+        "profile": TOPEKA_GRAPH_HANDLER_ID,
+        "lens": lens_id,
+        "coverage": graph_coverage or {},
+        "warnings": list((lens or {}).get("warnings") or []),
+    }
+    if not force and not _query_has_topeka_graphrag_intent(query):
+        return chunks, {}, {}, {**summary_base, "applied": False, "reason": "no_graph_intent"}
+    limit = _topeka_graph_expansion_limit()
+    if limit <= 0:
+        return chunks, {}, {}, {**summary_base, "applied": False, "reason": "graph_expansion_limit_zero"}
+    seed_rows = _topeka_graph_seed_rows(db, principal, vector_store_id, chunks, inputs, limit=24)
+    seed_node_ids = [str(row["id"]) for row in seed_rows]
+    if not seed_node_ids:
+        return chunks, {}, {}, {**summary_base, "applied": False, "reason": "no_seed_nodes"}
+    relation_rows = _topeka_municipal_graph_relation_rows(
+        db,
+        principal,
+        vector_store_id,
+        seed_node_ids,
+        relation_types,
+        limit=limit * 8,
+    )
+    graph_chunks, metadata_by_chunk_id, metadata_by_document_id = _hydrate_topeka_municipal_graph_chunks(
+        db,
+        principal,
+        vector_store_id,
+        relation_rows,
+        {chunk.document_id for chunk in chunks},
+        limit=limit,
+    )
+    expanded = _interleave_graph_expansion_chunks(chunks, graph_chunks[:limit])
+    relation_type_values = sorted({str(row["relation_type"]) for row in relation_rows})
+    return expanded, metadata_by_document_id, metadata_by_chunk_id, {
+        **summary_base,
+        "enabled": True,
+        "applied": bool(relation_rows),
+        "seed_node_count": len(seed_node_ids),
+        "candidate_count": len(relation_rows),
+        "inserted_chunk_count": len(graph_chunks),
+        "relation_types": relation_type_values,
+    }
+
+
 def _interleave_graph_expansion_chunks(chunks: list[ChunkRecord], graph_chunks: list[ChunkRecord]) -> list[ChunkRecord]:
     if not graph_chunks:
         return chunks
@@ -2508,7 +3525,8 @@ async def _openai_vector_store_search_page(
     _refresh_vector_store_activity_or_404(db, principal, vector_store_id)
     vector_store_attrs = _vector_store_attributes_for_search(db, principal, vector_store_id)
     query_planner_profile_id = _query_planner_profile_id_from_vector_store_attributes(vector_store_attrs)
-    graphrag_enabled = _kscourts_graphrag_enabled(query_planner_profile_id)
+    corpus_kind = corpus_kind_for_vector_store(vector_store_attrs, query_planner_profile_id)
+    graphrag_enabled = _graphrag_enabled_for_vector_store(vector_store_attrs, query_planner_profile_id)
     requested_lens_id = req.lens
     graph_coverage: dict[str, Any] | None = None
     search_lens: dict[str, Any] | None = None
@@ -2586,7 +3604,12 @@ async def _openai_vector_store_search_page(
         chunks = _document_diversified_chunks(chunks)
     inferred_graph_lens = False
     default_search_lens = search_lens
-    if not requested_lens_id and graphrag_enabled and _query_has_kscourts_graphrag_intent(search_query_input):
+    if (
+        not requested_lens_id
+        and corpus_kind == KSCOURTS_CORPUS_KIND
+        and graphrag_enabled
+        and _query_has_kscourts_graphrag_intent(search_query_input)
+    ):
         graph_coverage = _graph_coverage_for_vector_store(db, principal, vector_store_id)
         try:
             search_lens = resolve_search_lens(
@@ -2605,18 +3628,38 @@ async def _openai_vector_store_search_page(
             graph_relation_types = search_lens_relation_types(search_lens["id"], req.inputs)
         except ValueError as exc:
             raise OpenAICompatError(str(exc)) from exc
-    chunks, graph_metadata_by_document_id, graph_metadata_by_chunk_id, graph_summary = _apply_kscourts_graphrag_expansion(
-        db,
-        principal,
-        vector_store_id,
-        chunks,
-        enabled=graphrag_enabled,
-        query=search_query_input,
-        force=bool(requested_lens_id and search_lens and search_lens.get("requires_graph")),
-        lens=search_lens if search_lens and search_lens.get("requires_graph") else None,
-        relation_types=graph_relation_types,
-        graph_coverage=search_lens.get("coverage") if search_lens and search_lens.get("requires_graph") else graph_coverage,
-    )
+    graph_lens = search_lens if search_lens and search_lens.get("requires_graph") else None
+    graph_force = bool(requested_lens_id and graph_lens)
+    graph_metadata_by_document_id: dict[str, dict[str, Any]] = {}
+    graph_metadata_by_chunk_id: dict[str, dict[str, Any]] = {}
+    graph_summary: dict[str, Any] | None = None
+    if graph_lens and corpus_kind == TOPEKA_CORPUS_KIND:
+        chunks, graph_metadata_by_document_id, graph_metadata_by_chunk_id, graph_summary = _apply_topeka_municipal_graphrag_expansion(
+            db,
+            principal,
+            vector_store_id,
+            chunks,
+            enabled=graphrag_enabled,
+            query=search_query_input,
+            force=graph_force,
+            lens=graph_lens,
+            inputs=req.inputs,
+            relation_types=graph_relation_types,
+            graph_coverage=graph_lens.get("coverage"),
+        )
+    elif corpus_kind == KSCOURTS_CORPUS_KIND:
+        chunks, graph_metadata_by_document_id, graph_metadata_by_chunk_id, graph_summary = _apply_kscourts_graphrag_expansion(
+            db,
+            principal,
+            vector_store_id,
+            chunks,
+            enabled=graphrag_enabled,
+            query=search_query_input,
+            force=graph_force,
+            lens=graph_lens,
+            relation_types=graph_relation_types,
+            graph_coverage=graph_lens.get("coverage") if graph_lens else graph_coverage,
+        )
     chunks, next_page = vector_store_search_page_window(req, chunks)
     file_lookup = _vector_store_file_lookup(db, principal, vector_store_id, [ch.document_id for ch in chunks])
     page = vector_store_search_results_page(req, chunks, file_lookup, search_query=effective_search_query, next_page=next_page)

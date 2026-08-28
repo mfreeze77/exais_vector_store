@@ -475,6 +475,7 @@ def test_openai_search_page_uses_next_page_cursor(monkeypatch):
         return SimpleNamespace(results=chunks[:req.top_k])
 
     monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", fake_refresh)
+    monkeypatch.setattr(api_main, "_vector_store_attributes_for_search", lambda *_args, **_kwargs: {})
     monkeypatch.setattr(api_main.retrieval, "search", fake_search)
     monkeypatch.setattr(api_main, "_vector_store_file_lookup", lambda *_args, **_kwargs: {})
 
