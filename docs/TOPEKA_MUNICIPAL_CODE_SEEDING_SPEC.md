@@ -4,6 +4,9 @@
 
 Seed a `topeka-municipal-code` vector store under the `ks-state-civics` instance with both current codified code sections and official ordinance PDFs. The store must support semantic search, graph expansion, source citations, and reproducible source refreshes.
 
+This is the first concrete municipal-code implementation of the reusable
+[Jurisdiction Vector Store Playbook](JURISDICTION_VECTOR_STORE_PLAYBOOK.md).
+
 ## Corpus Model
 
 Use one vector store with two source packages:

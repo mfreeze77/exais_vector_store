@@ -136,6 +136,9 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 The reusable Codex ticket execution model lives in
 [codex-agents/README.md](./codex-agents/README.md).
 
+The reusable jurisdiction/vector-store build contract lives in
+[../docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md](../docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md).
+
 Short discoverable skills live under `.agents/skills`:
 
 - `.agents/skills/exais-ticket-orchestrator/SKILL.md`

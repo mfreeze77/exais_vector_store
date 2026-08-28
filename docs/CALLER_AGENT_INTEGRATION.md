@@ -30,6 +30,10 @@ host:
   compatibility contract. Do not search an existing collection with a different
   provider/model/dimension query embedding.
 
+For new jurisdictions, vector stores, or customer instances, use
+[Jurisdiction Vector Store Playbook](JURISDICTION_VECTOR_STORE_PLAYBOOK.md) as
+the build contract before exposing caller tools.
+
 For each customer instance, give the caller only these values:
 
 ```text
