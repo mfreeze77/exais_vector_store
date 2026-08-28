@@ -8,6 +8,23 @@ structure, source provenance, citation URLs, update paths, and optional graph
 relationships so a caller agent can search the store today and a legislative
 workbench can reuse the same corpus later.
 
+## Durable Mental Model
+
+Use this model for every jurisdiction:
+
+```text
+seed/source package = canonical legal corpus + reproducibility
+vector store = searchable generated index
+graph = relationship layer
+caller API = controlled access surface
+```
+
+Do not treat Qdrant rows, Postgres ingestion records, graph tables, or caller
+search results as the archival legal corpus. They are generated projections of
+the source package. If the source package is tight, structured, and reproducible,
+we can rebuild search, graph, citation maps, and future workbench imports without
+guessing what the law looked like at ingestion time.
+
 ## Core Decisions
 
 ### 1. Caller agents only call ExAIS
@@ -255,6 +272,9 @@ Current local proof from 2026-08-28:
 
 The important reusable lessons from Topeka:
 
+- the source package is the legal source of truth for downstream products; keep
+  the scraped structure as intact as possible instead of flattening it only for
+  embeddings;
 - hierarchy can come from a URL manifest even when container pages are hard to
   fetch;
 - official PDF extractions should stay attached to the same vector store as the
@@ -263,6 +283,9 @@ The important reusable lessons from Topeka:
   vectorization path;
 - ordinance PDFs, extracted Markdown, citation maps, graph artifacts, and proof
   files are part of the source package;
+- future workbench support requires a canonical projection layer with stable
+  section/component IDs, heading tree, effective text blocks, ordinance history
+  links, and amendment or strike-through-ready spans;
 - GraphRAG must expose caveats per lens, especially when it is not a full legal
   citator.
 
