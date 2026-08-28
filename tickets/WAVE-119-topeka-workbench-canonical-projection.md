@@ -150,6 +150,9 @@ Verification:
 - Real saved batch projection, batch 002:
   `docker run --rm -v "${PWD}:/work" -w /work -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python scripts/release/topeka-code-workbench-project.py --source-output .tmp/topeka-decodo-window-batches-20260827220454/output/batch-002 --output-dir .tmp/topeka-decodo-window-batches-20260827220454/output/batch-002/workbench`
   -> projection quality passed, 200 source sections, 888 components, 1,235 relations, 23 slices, zero projection errors.
+- Real saved batch projection, batch 003:
+  `docker run --rm -v "${PWD}:/work" -w /work -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent localhost:5000/expertaiservices/exai-vector-store-api:0.9.8-production-candidate python scripts/release/topeka-code-workbench-project.py --source-output .tmp/topeka-decodo-window-batches-20260827220454/output/batch-003 --output-dir .tmp/topeka-decodo-window-batches-20260827220454/output/batch-003/workbench`
+  -> projection quality passed, 200 source sections, 1,265 components, 1,499 relations, 22 slices, zero projection errors.
 
 Known limitations:
 
