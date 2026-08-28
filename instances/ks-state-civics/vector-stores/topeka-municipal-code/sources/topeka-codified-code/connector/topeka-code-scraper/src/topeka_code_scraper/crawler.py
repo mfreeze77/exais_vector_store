@@ -11,6 +11,7 @@ from .graph import GraphBuilder
 from .models import CrawlReport, ParsedPage
 from .normalize import BASE_URL, canonicalize_url, sha256_text
 from .parser import MunicipalCodeParser
+from .url_manifest import UrlManifestEntry
 
 
 class MunicipalCodeCrawler:
@@ -29,6 +30,10 @@ class MunicipalCodeCrawler:
         user_agent: str = "TopekaCodeScraper/0.1 (public municipal-code indexing)",
         fetcher: str = "http",
         render_wait_ms: int = 1500,
+        isolate_playwright_context: bool = False,
+        seed_urls: list[str] | None = None,
+        page_hints: dict[str, UrlManifestEntry] | None = None,
+        follow_links: bool = True,
     ) -> None:
         canonical = canonicalize_url(root_url)
         if not canonical:
@@ -45,12 +50,17 @@ class MunicipalCodeCrawler:
         self.user_agent = user_agent
         self.fetcher = fetcher
         self.render_wait_ms = render_wait_ms
+        self.isolate_playwright_context = isolate_playwright_context
+        self.seed_urls = [url for url in (canonicalize_url(item) for item in (seed_urls or [])) if url]
+        self.page_hints = page_hints or {}
+        self.follow_links = follow_links
         self.parser = MunicipalCodeParser()
 
     async def crawl(self) -> tuple[list[ParsedPage], list, list, CrawlReport]:
         started = datetime.now(UTC)
-        queue: deque[str] = deque([self.root_url])
-        queued = {self.root_url}
+        start_urls = self.seed_urls or [self.root_url]
+        queue: deque[str] = deque(start_urls)
+        queued = set(start_urls)
         seen: set[str] = set()
         pages: list[ParsedPage] = []
         failures: list[dict[str, str]] = []
@@ -65,16 +75,26 @@ class MunicipalCodeCrawler:
                 seen.add(url)
                 try:
                     fetched = await fetcher.fetch(url)
-                    page = self.parser.parse(fetched.url, fetched.html, fetched.retrieved_at)
+                    fetched_url = canonicalize_url(fetched.url) or url
+                    hint = self.page_hints.get(fetched_url)
+                    page = self.parser.parse(
+                        fetched.url,
+                        fetched.html,
+                        fetched.retrieved_at,
+                        forced_page_type=hint.parser_page_type if hint else None,
+                        forced_citation=hint.citation if hint else None,
+                        forced_title=hint.name if hint else None,
+                    )
                     pages.append(page)
                     if self.archive_raw:
                         self._archive_html(page, fetched)
                     if self.archive_network:
                         self._archive_network(page, fetched)
-                    for link in page.internal_links:
-                        if link not in seen and link not in queued:
-                            queued.add(link)
-                            queue.append(link)
+                    if self.follow_links:
+                        for link in page.internal_links:
+                            if link not in seen and link not in queued:
+                                queued.add(link)
+                                queue.append(link)
                 except Exception as exc:  # keep crawl resumable and report individual failures
                     failures.append({"url": url, "error": f"{type(exc).__name__}: {exc}"})
 
@@ -111,6 +131,7 @@ class MunicipalCodeCrawler:
                 retries=self.retries,
                 user_agent=self.user_agent,
                 render_wait_ms=self.render_wait_ms,
+                isolate_context=self.isolate_playwright_context,
             )
         raise ValueError(f"Unsupported fetcher: {self.fetcher}")
 

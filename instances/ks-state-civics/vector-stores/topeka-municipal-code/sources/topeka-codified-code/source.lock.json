@@ -3,9 +3,9 @@
   "lockedAt": "2026-08-27T19:48:32Z",
   "sourceType": "topeka_codified_municipal_code",
   "acquisitionStatus": {
-    "status": "playwright_crawler_integrated_pending_full_seed",
-    "observedAt": "2026-08-27",
-    "details": "Plain HTTP smoke from Docker received 403/cf-mitigated challenge. The vendored scraper now supports stock Playwright Chromium fetching, rendered HTML/network archives, citation-url-map output, and GraphRAG rows with citation_url/source_url fields. Full corpus seeding and API ingestion remain pending."
+    "status": "url_manifest_playwright_partial_pending_retry_resume",
+    "observedAt": "2026-08-28",
+    "details": "Plain HTTP smoke from Docker received 403/cf-mitigated challenge. The vendored scraper now supports stock Playwright Chromium fetching, rendered HTML/network archives, citation-url-map output, URL-manifest section fetching, CSV-derived CONTAINS graph hierarchy, isolated Playwright contexts, and GraphRAG rows with citation_url/source_url fields. Full corpus seeding remains blocked on publisher challenge failures in batch runs."
   },
   "lastPlaywrightProbe": {
     "observedAt": "2026-08-27T20:24:10Z",
@@ -73,9 +73,40 @@
     "zipSha256": "bf143b147b70259a8b31adf3340553e633bfe54006617f7f6d5080830d2a2e51"
   },
   "vendoredConnector": {
-    "version": "0.1.2",
-    "revision": "topeka-code-scraper-v0.1.2-exais-playwright",
-    "notes": "Adds stock Playwright fetch mode, challenge-only-page detection, rendered HTML/network archive support, citation-url-map output, and GraphRAG citation_url/source_url properties."
+    "version": "0.1.3",
+    "revision": "topeka-code-scraper-v0.1.3-exais-url-manifest",
+    "notes": "Adds stock Playwright fetch mode, challenge-only-page detection, rendered HTML/network archive support, citation-url-map output, URL-manifest section fetching, CSV-derived hierarchy graph output, isolated Playwright context mode, and GraphRAG citation_url/source_url properties."
+  },
+  "urlManifest": {
+    "path": "seed/raw/topeka_municipal_code_urls.csv",
+    "sha256": "0f7a081250615a882b105c5f9d558f0eb2e224c603695fa2702b0942d0d4800b",
+    "rows": 3204,
+    "fetchLevels": [
+      "Section",
+      "Subsection"
+    ],
+    "fetchUrlCount": 2702,
+    "mode": "manifest_only"
+  },
+  "lastUrlManifestCliProof": {
+    "observedAt": "2026-08-28T00:49:48Z",
+    "runtime": "mcr.microsoft.com/playwright/python:v1.55.0-noble",
+    "commandScope": "bounded manifest-only section/subsection crawl",
+    "fetcher": "playwright",
+    "isolatePlaywrightContext": true,
+    "maxPages": 50,
+    "pagesFetched": 31,
+    "pagesFailed": 19,
+    "sections": 31,
+    "definitions": 0,
+    "nodes": 3217,
+    "edges": 3240,
+    "edgeTypes": {
+      "CONTAINS": 3203,
+      "HAS_ORDINANCE_HISTORY": 37
+    },
+    "failureClass": "publisher challenge page returned",
+    "boundary": "No Cloudflare evasion, stealth plugin, captcha solving, proxy rotation, or challenge bypass was used. Isolated stock Playwright contexts improved section acquisition but did not make the full corpus seed production-ready."
   },
   "sourceManifest": {
     "format": "jsonl",

@@ -19,6 +19,7 @@ from .models import (
     TableRecord,
     TocGraphEdge,
     TocGraphNode,
+    PageType,
 )
 from .normalize import (
     BASE_URL,
@@ -81,7 +82,16 @@ _REMOVE_SELECTORS = (
 
 
 class MunicipalCodeParser:
-    def parse(self, url: str, html: str, retrieved_at: datetime | None = None) -> ParsedPage:
+    def parse(
+        self,
+        url: str,
+        html: str,
+        retrieved_at: datetime | None = None,
+        *,
+        forced_page_type: PageType | None = None,
+        forced_citation: str | None = None,
+        forced_title: str | None = None,
+    ) -> ParsedPage:
         retrieved_at = retrieved_at or datetime.now(UTC)
         canonical = canonicalize_url(url)
         if not canonical:
@@ -97,6 +107,9 @@ class MunicipalCodeParser:
         heading_tag = self._find_primary_heading(root, canonical)
         heading = normalize_space(heading_tag.get_text(" ", strip=True)) if heading_tag else self._fallback_heading(canonical)
         page_type, citation, title = self._classify(heading, canonical)
+        page_type = forced_page_type or page_type
+        citation = forced_citation or citation
+        title = forced_title or title
         version = self._extract_version(root.get_text("\n", strip=True))
         internal_links = self._extract_internal_links(root)
         structural_edges = self._extract_nested_list_edges(root)

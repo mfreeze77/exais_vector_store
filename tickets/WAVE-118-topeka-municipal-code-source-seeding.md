@@ -61,6 +61,8 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - Bounded live proof on `https://topeka.municipal.codes/TMC/18.55.010` produced 1 section, 326 definitions, 17 numbered ordinance-history rows, 336 graph nodes, 343 graph edges, and 328 citation URL rows.
 - Bounded live ordinance collector proof against the official City of Topeka ordinance page with `--limit 2` wrote two ordinance PDF records with no failures.
 - Topeka source packages remain `productionReady: false`; the local pilot vector store is `vs_268b119a2cd84b568af62155`, but broad recall is still blocked until the full codified corpus can be acquired.
+- Operator URL manifest `seed/raw/topeka_municipal_code_urls.csv` is preserved and wired into the scraper. Manifest-only Playwright fetching of `Section`/`Subsection` rows now bypasses root discovery and emits CSV-derived `CONTAINS` graph hierarchy.
+- Isolated Playwright browser contexts materially improve batch acquisition but do not fully defeat publisher challenge behavior: 2026-08-28 proof fetched 31 of the first 50 section URLs and failed 19 challenge pages.
 
 ## Acceptance Criteria
 

@@ -57,6 +57,30 @@ Probe result from 2026-08-27:
 - The page still loaded Cloudflare challenge-platform scripts, so the crawler must distinguish "content loaded with browser verification scripts present" from "blocked challenge page."
 - The implemented Playwright fetch mode emits rendered HTML, network logs, and `citation-url-map.jsonl` without adding stealth, proxy, captcha, or challenge-bypass code.
 
+### 2A. CSV URL Manifest Adapter
+
+The operator-provided `topeka_municipal_code_urls.csv` is preserved under the codified-code seed folder at `seed/raw/topeka_municipal_code_urls.csv`. It contains 3,204 rows:
+
+- 2,675 `Section` rows;
+- 27 `Subsection` rows;
+- 502 hierarchy rows across code, index, titles, appendices, divisions, chapters, articles, subarticles, and tables.
+
+The scraper supports:
+
+- `--url-list` for the CSV manifest;
+- `--url-list-levels Section,Subsection` to fetch only content-bearing section URLs;
+- `--manifest-only` to avoid following publisher navigation links;
+- `--isolate-playwright-context` to create a fresh browser context per section page;
+- CSV-derived `CONTAINS` graph nodes/edges so hierarchy does not depend on fetching challenged title/container pages.
+
+Proof from 2026-08-28:
+
+- A 10-page manifest-only Playwright run without isolated contexts fetched 1 section and failed 9 challenge pages.
+- A 10-page manifest-only Playwright run with isolated contexts fetched 8 sections and failed 2 challenge pages.
+- A 50-page manifest-only Playwright run with isolated contexts and one retry fetched 31 sections, failed 19 challenge pages, emitted 3,203 `CONTAINS` edges from the CSV hierarchy, and emitted 37 `HAS_ORDINANCE_HISTORY` edges from fetched section text.
+
+This solves root discovery and graph hierarchy. It does not fully solve publisher challenge behavior. Full production seeding still needs a retry/resume acquisition pass or an operator-owned authorized export that satisfies the same artifact contract.
+
 ### 3. Operator-Owned Publisher-Gated Acquisition Slot
 
 If an operator obtains a legally authorized export, API access, records request, licensed data feed, or an out-of-band publisher-gated acquisition method, it plugs in by producing the same artifact contract:

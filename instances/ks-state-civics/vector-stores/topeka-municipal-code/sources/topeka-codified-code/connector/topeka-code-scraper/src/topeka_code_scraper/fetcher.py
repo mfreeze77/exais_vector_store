@@ -117,6 +117,7 @@ class PlaywrightFetcher:
         user_agent: str = "TopekaCodeScraper/0.1 (public municipal-code indexing)",
         render_wait_ms: int = 1500,
         headless: bool = True,
+        isolate_context: bool = False,
     ) -> None:
         self.retries = max(0, retries)
         self.rate_limiter = PoliteRateLimiter(delay_seconds)
@@ -124,6 +125,7 @@ class PlaywrightFetcher:
         self.user_agent = user_agent
         self.render_wait_ms = max(0, render_wait_ms)
         self.headless = headless
+        self.isolate_context = isolate_context
         self._playwright = None
         self._browser = None
         self._context = None
@@ -136,11 +138,8 @@ class PlaywrightFetcher:
 
         self._playwright = await async_playwright().start()
         self._browser = await self._playwright.chromium.launch(headless=self.headless)
-        self._context = await self._browser.new_context(
-            user_agent=self.user_agent,
-            locale="en-US",
-            service_workers="block",
-        )
+        if not self.isolate_context:
+            self._context = await self._new_context()
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
@@ -152,13 +151,16 @@ class PlaywrightFetcher:
             await self._playwright.stop()
 
     async def fetch(self, url: str) -> FetchResult:
-        if self._context is None:
+        if self._browser is None:
             raise RuntimeError("PlaywrightFetcher must be used as an async context manager")
 
         last_error: Exception | None = None
         for attempt in range(self.retries + 1):
             await self.rate_limiter.wait()
-            page = await self._context.new_page()
+            context = await self._new_context() if self.isolate_context else self._context
+            if context is None:
+                raise RuntimeError("PlaywrightFetcher context was not initialized")
+            page = await context.new_page()
             network_events: list[dict[str, Any]] = []
             page.on("request", lambda request: network_events.append({
                 "event": "request",
@@ -207,7 +209,18 @@ class PlaywrightFetcher:
                 await asyncio.sleep(min(30.0, (2**attempt) + random.random()))
             finally:
                 await page.close()
+                if self.isolate_context:
+                    await context.close()
         raise RuntimeError(f"Failed to fetch {url}") from last_error
+
+    async def _new_context(self):
+        if self._browser is None:
+            raise RuntimeError("PlaywrightFetcher browser was not initialized")
+        return await self._browser.new_context(
+            user_agent=self.user_agent,
+            locale="en-US",
+            service_workers="block",
+        )
 
 
 def has_municipal_code_content(html: str) -> bool:

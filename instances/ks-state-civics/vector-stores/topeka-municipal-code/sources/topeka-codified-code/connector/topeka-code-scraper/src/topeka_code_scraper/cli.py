@@ -8,6 +8,7 @@ import typer
 
 from .crawler import MunicipalCodeCrawler
 from .exporter import export_corpus
+from .url_manifest import load_url_manifest, manifest_graph, merge_graphs, parse_level_filter, read_url_manifest
 
 app = typer.Typer(add_completion=False, help="Scrape the Topeka Municipal Code into clean JSONL + GraphRAG graph files.")
 
@@ -22,9 +23,25 @@ def scrape(
     max_pages: int | None = typer.Option(None, min=1, help="Optional crawl cap for testing."),
     fetcher: Literal["http", "playwright"] = typer.Option("http", help="Fetch mode: plain HTTP or stock Playwright Chromium."),
     render_wait_ms: int = typer.Option(1500, min=0, help="Extra milliseconds to wait after DOMContentLoaded in Playwright mode."),
+    isolate_playwright_context: bool = typer.Option(
+        False,
+        "--isolate-playwright-context",
+        help="Create a fresh browser context per Playwright page fetch.",
+    ),
     archive_raw: bool = typer.Option(False, help="Also save fetched HTML under output/raw/."),
     archive_network: bool = typer.Option(False, help="Also save per-page network event logs under output/network/."),
     allow_zero_sections: bool = typer.Option(False, help="Allow a crawl that fetched pages but extracted no code sections."),
+    url_list: Path | None = typer.Option(None, "--url-list", help="CSV URL manifest with level,citation,name,url columns."),
+    url_list_levels: str = typer.Option(
+        "Section,Subsection",
+        "--url-list-levels",
+        help="Comma-separated manifest levels to fetch when --url-list is supplied.",
+    ),
+    manifest_only: bool = typer.Option(
+        False,
+        "--manifest-only",
+        help="When --url-list is supplied, fetch only listed URLs instead of following discovered links.",
+    ),
     user_agent: str = typer.Option(
         "TopekaCodeScraper/0.1 (public municipal-code indexing)",
         help="HTTP User-Agent header.",
@@ -33,6 +50,10 @@ def scrape(
     """Crawl Topeka Municipal Code and export clean, graph-ready data."""
 
     async def run() -> None:
+        manifest_entries = read_url_manifest(url_list) if url_list else []
+        fetch_levels = parse_level_filter(url_list_levels)
+        fetch_entries = load_url_manifest(url_list, fetch_levels=fetch_levels) if url_list else []
+        page_hints = {entry.url: entry for entry in fetch_entries}
         crawler = MunicipalCodeCrawler(
             root_url=root_url,
             delay_seconds=delay,
@@ -46,8 +67,17 @@ def scrape(
             user_agent=user_agent,
             fetcher=fetcher,
             render_wait_ms=render_wait_ms,
+            isolate_playwright_context=isolate_playwright_context,
+            seed_urls=[entry.url for entry in fetch_entries] if fetch_entries else None,
+            page_hints=page_hints,
+            follow_links=not manifest_only,
         )
         pages, nodes, edges, report = await crawler.crawl()
+        if manifest_entries:
+            manifest_nodes, manifest_edges = manifest_graph(manifest_entries)
+            nodes, edges = merge_graphs(manifest_nodes, manifest_edges, nodes, edges)
+            report.node_count = len(nodes)
+            report.edge_count = len(edges)
         export_corpus(output, pages, nodes, edges, report)
         typer.echo(f"Fetched pages: {report.pages_fetched} ({report.pages_failed} failed)")
         typer.echo(f"Fetcher: {report.fetcher}")

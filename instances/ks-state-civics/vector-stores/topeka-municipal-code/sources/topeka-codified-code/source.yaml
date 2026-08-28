@@ -17,10 +17,17 @@ source:
     kind: vendored_python_package
     repository: local-instance-source://instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-codified-code/connector/topeka-code-scraper
     entrypoint: instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-codified-code/connector/topeka-code-scraper/src/topeka_code_scraper/cli.py
-    revision: topeka-code-scraper-v0.1.2-exais-playwright
+    revision: topeka-code-scraper-v0.1.3-exais-url-manifest
     acquisitionSpec: docs/TOPEKA_MUNICIPAL_CODE_SEEDING_SPEC.md
     upstreamZip: seed/raw/vendor/topeka-code-scraper-v0.1.1.zip
     upstreamZipSha256: bf143b147b70259a8b31adf3340553e633bfe54006617f7f6d5080830d2a2e51
+    urlManifest: seed/raw/topeka_municipal_code_urls.csv
+    urlManifestSha256: 0f7a081250615a882b105c5f9d558f0eb2e224c603695fa2702b0942d0d4800b
+    urlManifestRows: 3204
+    fetchLevels:
+      - Section
+      - Subsection
+    fetchMode: playwright_manifest_only_isolated_context
   storage:
     rawCorpusUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-codified-code/seed/raw/
     manifestUri: object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-codified-code/seed/manifests/sections.jsonl

@@ -15,4 +15,4 @@ seed/
   citation-url-map.jsonl    # optional source identity -> caller-hosted URL mapping
 ```
 
-Current status: the upstream scraper ZIP is preserved in `raw/vendor/`. Plain HTTP is blocked by the publisher challenge, but a normal Playwright Chromium probe loaded real TMC root and section content on 2026-08-27, and the existing parser successfully extracted section `18.55.010`. A full Playwright crawler has not been implemented yet. The source package must fail closed if `sections.jsonl` is missing or empty.
+Current status: the upstream scraper ZIP is preserved in `raw/vendor/`, and the operator-provided URL manifest is preserved as `raw/topeka_municipal_code_urls.csv`. Plain HTTP is blocked by the publisher challenge. Stock Playwright can fetch individual section pages, and the scraper now supports manifest-only fetching of `Section`/`Subsection` rows plus CSV-derived `CONTAINS` graph edges. Bounded proof on 2026-08-28 fetched 31 of the first 50 section URLs with isolated Playwright contexts; 19 still returned publisher challenge pages. The source package must remain `productionReady: false` and fail closed until a full seed has no required missing sections.
