@@ -52,3 +52,34 @@ def test_collect_ordinances_discovers_official_pdfs_and_writes_citations(tmp_pat
     assert "20345" in manifest
     assert "https://topeka.gov/files/assets/public/v/1/city-clerk/documents/ordinances/ordinance-20345.pdf" in citation_map
     assert (tmp_path / "raw" / "pdfs" / "20345.pdf").exists()
+
+
+def test_collect_ordinances_normalizes_compact_charter_ordinance_urls(tmp_path):
+    module = load_module()
+    html = """
+    <html><body>
+      <a href="/community/ordinances/charter/CharterOrdinance126.pdf">126</a>
+    </body></html>
+    """
+
+    def fake_download(url: str, *, timeout: int) -> bytes:
+        assert "CharterOrdinance126" in url
+        return b"%PDF-1.4 charter ordinance 126"
+
+    summary = module.collect_ordinances(
+        source_url="https://topeka.gov/community/ordinances/index.php",
+        html=html,
+        output_dir=tmp_path,
+        limit=0,
+        timeout=9,
+        downloader=fake_download,
+    )
+
+    rows = [
+        module.json.loads(line)
+        for line in (tmp_path / "manifests" / "ordinances.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert summary["status"] == "success"
+    assert rows[0]["category"] == "charter_ordinance"
+    assert rows[0]["ordinance_number"] == "126"
+    assert (tmp_path / "raw" / "pdfs" / "CharterOrdinance126.pdf").exists()

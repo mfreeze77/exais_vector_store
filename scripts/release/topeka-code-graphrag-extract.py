@@ -12,6 +12,7 @@ from topeka_pipeline_common import CODIFIED_SEED, stable_id, read_jsonl, write_j
 
 
 ORDINANCE_SECTION_EDGE_TYPES = {"ORDINANCE_AMENDS_SECTION", "ORDINANCE_REPEALS_SECTION", "ORDINANCE_ADOPTS_CODE"}
+TMC_CITATION_RE = re.compile(r"\b(?:TMC\s+|section\s+|sections\s+|chapter\s+|§\s*)?((?:[1-9]|1[0-9])\.\d{2,3}(?:\.\d{3})?)\b", re.IGNORECASE)
 
 
 def graph_node_url(node: dict[str, Any]) -> str:
@@ -53,13 +54,72 @@ def classify_relation(row: dict[str, Any], history_edge: dict[str, Any]) -> str:
     return "ORDINANCE_AMENDS_SECTION"
 
 
+def citation_node_index(nodes: list[dict[str, Any]]) -> dict[str, str]:
+    indexed: dict[str, str] = {}
+    for node in nodes:
+        props = node.get("properties") if isinstance(node.get("properties"), dict) else {}
+        citation = str(props.get("citation") or "").strip()
+        if citation and node.get("id"):
+            indexed[citation] = str(node["id"])
+    return indexed
+
+
+def section_url(nodes_by_id: dict[str, dict[str, Any]], node_id: str) -> str:
+    node = nodes_by_id.get(node_id) or {}
+    props = node.get("properties") if isinstance(node.get("properties"), dict) else {}
+    return str(props.get("citation_url") or props.get("source_url") or props.get("url") or "")
+
+
+def add_reference_edges_from_sections(
+    nodes_by_id: dict[str, dict[str, Any]],
+    edge_by_id: dict[str, dict[str, Any]],
+    sections: list[dict[str, Any]],
+) -> int:
+    citation_to_node_id = citation_node_index(list(nodes_by_id.values()))
+    added = 0
+    for section in sections:
+        source_id = str(section.get("id") or "")
+        source_citation = str(section.get("citation") or "").strip()
+        source_url = str(section.get("source_url") or section_url(nodes_by_id, source_id))
+        if not source_id or source_id not in nodes_by_id:
+            continue
+        text = str(section.get("text") or "")
+        for match in TMC_CITATION_RE.finditer(text):
+            target_citation = match.group(1).strip()
+            target_id = citation_to_node_id.get(target_citation)
+            if not target_id or target_id == source_id or target_citation == source_citation:
+                continue
+            edge_id = stable_id("edge", source_id, target_id, "REFERENCES", target_citation)
+            if edge_id in edge_by_id:
+                continue
+            edge_by_id[edge_id] = {
+                "id": edge_id,
+                "source": source_id,
+                "target": target_id,
+                "type": "REFERENCES",
+                "properties": {
+                    "citation": source_citation,
+                    "target_citation": target_citation,
+                    "source": "section_text_reference_scan",
+                    "source_url": source_url,
+                    "citation_url": source_url,
+                    "target_url": section_url(nodes_by_id, target_id),
+                    "match_text": match.group(0),
+                },
+            }
+            added += 1
+    return added
+
+
 def enrich_graph_with_ordinances(
     nodes: list[dict[str, Any]],
     edges: list[dict[str, Any]],
     ordinance_rows: list[dict[str, Any]],
+    sections: list[dict[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
     nodes_by_id = {str(node.get("id")): dict(node) for node in nodes if node.get("id")}
     edge_by_id = {str(edge.get("id")): dict(edge) for edge in edges if edge.get("id")}
+    text_reference_edges_added = add_reference_edges_from_sections(nodes_by_id, edge_by_id, sections or [])
     ordinance_node_by_number = ordinance_index(list(nodes_by_id.values()))
     ordinance_row_by_number = {
         normalize_ordinance_number(str(row.get("ordinance_number") or "")): row
@@ -118,21 +178,22 @@ def enrich_graph_with_ordinances(
         relation_type = classify_relation(row, edge)
         section_node_id = str(edge.get("source") or "")
         relation_edge_id = stable_id("edge", pdf_node_id, section_node_id, relation_type)
-        edge_by_id.setdefault(relation_edge_id, {
-            "id": relation_edge_id,
-            "source": pdf_node_id,
-            "target": section_node_id,
-            "type": relation_type,
-            "properties": {
-                "ordinance_number": row_number,
-                "pdf_url": pdf_url,
-                "source_url": pdf_url,
-                "citation_url": pdf_url,
-                "derived_from_edge_id": edge.get("id"),
-            },
-        })
         matched_history_edges += 1
-        added_section_edges += 1
+        if relation_edge_id not in edge_by_id:
+            edge_by_id[relation_edge_id] = {
+                "id": relation_edge_id,
+                "source": pdf_node_id,
+                "target": section_node_id,
+                "type": relation_type,
+                "properties": {
+                    "ordinance_number": row_number,
+                    "pdf_url": pdf_url,
+                    "source_url": pdf_url,
+                    "citation_url": pdf_url,
+                    "derived_from_edge_id": edge.get("id"),
+                },
+            }
+            added_section_edges += 1
 
     edge_counts = Counter(str(edge.get("type")) for edge in edge_by_id.values())
     summary = {
@@ -141,6 +202,7 @@ def enrich_graph_with_ordinances(
         "nodes": len(nodes_by_id),
         "edges": len(edge_by_id),
         "edge_types": dict(sorted(edge_counts.items())),
+        "text_reference_edges_added": text_reference_edges_added,
         "ordinance_pdf_nodes_added": added_pdf_nodes,
         "ordinance_section_edges_added": added_section_edges,
         "matched_history_edges": matched_history_edges,
@@ -155,8 +217,9 @@ def enrich_graph_with_ordinances(
 def extract_graph(source_output: Path, ordinance_manifest: Path | None, output_dir: Path) -> dict[str, Any]:
     nodes = read_jsonl(source_output / "nodes.jsonl")
     edges = read_jsonl(source_output / "edges.jsonl")
+    sections = read_jsonl(source_output / "sections.jsonl")
     ordinance_rows = read_jsonl(ordinance_manifest) if ordinance_manifest and ordinance_manifest.exists() else []
-    enriched_nodes, enriched_edges, summary = enrich_graph_with_ordinances(nodes, edges, ordinance_rows)
+    enriched_nodes, enriched_edges, summary = enrich_graph_with_ordinances(nodes, edges, ordinance_rows, sections)
     write_jsonl(output_dir / "nodes.jsonl", enriched_nodes)
     write_jsonl(output_dir / "edges.jsonl", enriched_edges)
     write_json(output_dir / "graph-summary.json", summary)

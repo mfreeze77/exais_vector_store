@@ -54,6 +54,41 @@ def test_graph_extract_enriches_codified_history_with_official_pdf_edges():
     assert any(edge["type"] == "ORDINANCE_AMENDS_SECTION" and edge["target"] == "section-18.55.010" for edge in enriched_edges)
 
 
+def test_graph_extract_adds_text_reference_edges_to_known_sections():
+    module = load_script("topeka_code_graphrag_extract_refs", "topeka-code-graphrag-extract.py")
+    nodes = [
+        {"id": "ks-topeka:tmc:14.40.010", "type": "section", "label": "14.40.010", "properties": {"citation": "14.40.010", "citation_url": "https://topeka.municipal.codes/TMC/14.40.010"}},
+        {"id": "ks-topeka:tmc:2.235.010", "type": "section", "label": "2.235.010", "properties": {"citation": "2.235.010", "citation_url": "https://topeka.municipal.codes/TMC/2.235.010"}},
+    ]
+    edges = []
+    sections = [{
+        "id": "ks-topeka:tmc:14.40.010",
+        "citation": "14.40.010",
+        "source_url": "https://topeka.municipal.codes/TMC/14.40.010",
+        "text": "Appeals are governed by TMC 2.235.010.",
+    }]
+
+    enriched_nodes, enriched_edges, summary = module.enrich_graph_with_ordinances(nodes, edges, [], sections)
+
+    assert enriched_nodes == nodes
+    assert summary["text_reference_edges_added"] == 1
+    assert enriched_edges == [{
+        "id": enriched_edges[0]["id"],
+        "source": "ks-topeka:tmc:14.40.010",
+        "target": "ks-topeka:tmc:2.235.010",
+        "type": "REFERENCES",
+        "properties": {
+            "citation": "14.40.010",
+            "target_citation": "2.235.010",
+            "source": "section_text_reference_scan",
+            "source_url": "https://topeka.municipal.codes/TMC/14.40.010",
+            "citation_url": "https://topeka.municipal.codes/TMC/14.40.010",
+            "target_url": "https://topeka.municipal.codes/TMC/2.235.010",
+            "match_text": "TMC 2.235.010",
+        },
+    }]
+
+
 def test_graph_eval_requires_core_edges_citations_and_ordinance_edges():
     extract = load_script("topeka_code_graphrag_extract_eval", "topeka-code-graphrag-extract.py")
     eval_module = load_script("topeka_code_graphrag_eval", "topeka-code-graphrag-eval.py")
@@ -124,3 +159,13 @@ def test_recall_eval_dry_run_has_five_current_and_five_history_queries():
     assert proof["passed"] is True
     assert proof["categories"] == {"current_code": 5, "amendment_history": 5}
     assert len(proof["queries"]) == 10
+
+
+def test_recall_eval_includes_content_by_default(monkeypatch):
+    module = load_script("topeka_code_recall_eval_defaults", "topeka-code-recall-eval.py")
+
+    monkeypatch.setattr(sys, "argv", ["topeka-code-recall-eval.py"])
+
+    args = module.parse_args()
+
+    assert args.include_content is True

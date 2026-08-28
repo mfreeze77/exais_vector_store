@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The goal is to obtain the current Topeka Municipal Code in a complete, searchable, auditable format before vectorization. Residents and businesses should be able to inspect the rules they are expected to follow. ExAIS will not mark the source production-ready until the text, citations, graph rows, and coverage pass the JSON artifact quality gate.
+The goal is to obtain and retain the current Topeka Municipal Code in a complete, searchable, auditable format before vectorization. Residents and businesses should be able to inspect the rules they are expected to follow. ExAIS does not mark a source production-ready until text, citations, graph rows, coverage, ingestion, recall, and deployment gates pass.
 
 ## Current Request
 
@@ -54,4 +54,4 @@ The source can proceed to vectorization only after:
 - crawl/import failures are zero;
 - `scripts/release/topeka-code-artifact-quality.py` reports `passed: true` and `vectorization_allowed: true`.
 
-Until then, Topeka codified-code remains JSON-only and `productionReady: false`.
+The local KS Civics cell later acquired, validated, and ingested the complete codified-code source through the operator-owned acquisition path. This packet remains useful as an escalation template for future official exports, refreshes, or disputed publisher-access failures. The source package can still remain `productionReady: false` while graph load/search or VPS promotion gates are open.

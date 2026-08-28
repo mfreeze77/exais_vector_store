@@ -13,19 +13,37 @@ vectorStore:
   consumerBaseUrl: https://topks.statecivics.ai/local
   currentLocalProof:
     observedAt: '2026-08-28'
-    status: full_codified_code_ingested_recall_passed
-    documentCount: 2702
-    distinctSourceUriCount: 2702
-    activeChunkCount: 2999
-    indexedChunkCount: 2999
+    status: full_codified_code_and_ordinance_pdfs_ingested_recall_passed
+    documentCount: 3066
+    distinctSourceUriCount: 3066
+    activeChunkCount: 6153
+    indexedChunkCount: 6153
+    codifiedDocumentCount: 2702
+    codifiedChunkCount: 2999
+    ordinancePdfDocumentCount: 364
+    ordinancePdfChunkCount: 3154
     recallPassed: true
-    recallProof: .release/cells/ks-state-civics/evals/topeka-code-recall-20260828-012315.json
+    recallProof: .release/cells/ks-state-civics/evals/topeka-code-recall-after-ordinances-20260828.json
+    recallQueryCount: 10
+    recallP95Ms: 1079.144
+    ordinanceRecallPassed: true
+    ordinanceRecallProof: .release/cells/ks-state-civics/evals/topeka-ordinance-recall-20260828.json
+    ordinanceRecallQueryCount: 5
+    ordinanceRecallP95Ms: 1107.402
     deepSearchProof: .release/cells/ks-state-civics/evals/topeka-code-deep-search-20260828.json
     deepSearchQueryCount: 24
     deepSearchBasicPasses: 19
     deepSearchReviewCount: 5
+    graphArtifactPassed: true
+    graphArtifactProof: .release/cells/ks-state-civics/graphrag/topeka-code/graph-summary.json
+    graphEvalProof: .release/cells/ks-state-civics/graphrag/topeka-code/eval-proof.json
+    graphNodeCount: 4969
+    graphEdgeCount: 10167
+    graphReferenceEdgeCount: 2646
+    graphOrdinanceSectionEdgeCount: 536
+    graphLoadStatus: blocked_no_graph_api
     apiSearchHardening: Topeka code stores now bypass the Kansas-court query planner and store-scoped searches do not fall back to unavailable private embedding profiles when planned filters match zero rows.
-    note: Clean local vector store contains the full codified Topeka Municipal Code source corpus for the topks.statecivics.ai local surface. The ExAIS API search path is locally verified; the public topks.statecivics.ai caller route itself is not yet wired or DNS-verified. Official ordinance PDF ingestion and graph reference extraction remain separate follow-up gates.
+    note: Clean local vector store contains the full codified Topeka Municipal Code source corpus plus 364 official Topeka ordinance PDF Markdown extractions for the topks.statecivics.ai local surface. Semantic ExAIS API search is locally verified; the aggregate Topeka graph artifact passes artifact-level eval. The public topks.statecivics.ai caller route itself is not yet wired or DNS-verified, and Topeka graph load/search remains blocked until an ExAIS graph API path exists.
   priorPilotStore:
     id: vs_268b119a2cd84b568af62155
     status: partial_pilot_store

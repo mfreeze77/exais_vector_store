@@ -54,6 +54,11 @@ class IngestionService:
     def _link_vector_store_file(self, db: Session, principal: Principal, req: DocumentIngestRequest, document_id: str, *, status: str = "completed") -> str | None:
         if not req.vector_store_id:
             return None
+        file_attrs = {
+            k: v for k, v in req.attributes.items()
+            if not k.startswith("_") or k == VECTOR_STORE_FILE_CHUNKING_STRATEGY_ATTRIBUTE
+        }
+        usage_bytes = len(req.content.encode())
         existing = db.execute(text("""
             SELECT id FROM vector_store_files
             WHERE tenant_id=:tenant_id AND business_instance_id=:biz_id
@@ -61,17 +66,80 @@ class IngestionService:
             LIMIT 1
         """), {"tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "vs_id": req.vector_store_id, "doc_id": document_id}).mappings().first()
         if existing:
+            db.execute(jsonb_text("""
+                UPDATE vector_store_files
+                SET status=:status,
+                    attributes=CAST(:attrs AS jsonb),
+                    usage_bytes=:bytes,
+                    last_error=NULL,
+                    completed_at=CASE WHEN :status='completed' THEN now() ELSE completed_at END,
+                    file_batch_id=COALESCE(:file_batch_id, file_batch_id)
+                WHERE id=:id AND tenant_id=:tenant_id AND business_instance_id=:biz_id
+            """, 'attrs'), {
+                "id": existing["id"],
+                "tenant_id": principal.tenant_id,
+                "biz_id": principal.business_instance_id,
+                "status": status,
+                "attrs": jsonb_param(file_attrs),
+                "bytes": usage_bytes,
+                "file_batch_id": req.attributes.get("_file_batch_id"),
+            })
             return existing["id"]
         vsf_id = new_id("vsf")
-        file_attrs = {
-            k: v for k, v in req.attributes.items()
-            if not k.startswith("_") or k == VECTOR_STORE_FILE_CHUNKING_STRATEGY_ATTRIBUTE
-        }
         db.execute(jsonb_text("""
             INSERT INTO vector_store_files(id, tenant_id, business_instance_id, vector_store_id, document_id, file_batch_id, status, attributes, usage_bytes, completed_at)
             VALUES (:id, :tenant_id, :biz_id, :vs_id, :doc_id, :file_batch_id, :status, CAST(:attrs AS jsonb), :bytes, now())
-        """, 'attrs'), {"id": vsf_id, "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "vs_id": req.vector_store_id, "doc_id": document_id, "file_batch_id": req.attributes.get("_file_batch_id"), "status": status, "attrs": jsonb_param(file_attrs), "bytes": len(req.content.encode())})
+        """, 'attrs'), {"id": vsf_id, "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "vs_id": req.vector_store_id, "doc_id": document_id, "file_batch_id": req.attributes.get("_file_batch_id"), "status": status, "attrs": jsonb_param(file_attrs), "bytes": usage_bytes})
         return vsf_id
+
+    def _refresh_document_metadata(
+        self,
+        db: Session,
+        principal: Principal,
+        req: DocumentIngestRequest,
+        document_id: str,
+        *,
+        content_hash: str | None = None,
+        current_version_id: str | None = None,
+    ) -> None:
+        assignments = [
+            "title=:title",
+            "filename=:filename",
+            "mime_type=:mime_type",
+            "source_uri=:source_uri",
+            "security_level=:security_level",
+            "classification=:classification",
+            "allowed_groups=:allowed_groups",
+            "allowed_roles=:allowed_roles",
+            "source_trust=:source_trust",
+            "status='active'",
+            "updated_at=now()",
+        ]
+        params = {
+            "doc_id": document_id,
+            "tenant_id": principal.tenant_id,
+            "biz_id": principal.business_instance_id,
+            "title": req.title,
+            "filename": req.filename,
+            "mime_type": req.mime_type,
+            "source_uri": req.source_uri,
+            "security_level": req.security_level,
+            "classification": req.classification,
+            "allowed_groups": req.allowed_groups,
+            "allowed_roles": req.allowed_roles,
+            "source_trust": req.source_trust,
+        }
+        if content_hash is not None:
+            assignments.append("content_hash=:hash")
+            params["hash"] = content_hash
+        if current_version_id is not None:
+            assignments.append("current_version_id=:docv_id")
+            params["docv_id"] = current_version_id
+        db.execute(text(f"""
+            UPDATE documents
+            SET {", ".join(assignments)}
+            WHERE id=:doc_id AND tenant_id=:tenant_id AND business_instance_id=:biz_id
+        """), params)
 
     def _find_exact_duplicate(self, db: Session, principal: Principal, req: DocumentIngestRequest, content_hash: str):
         # Dedupe is only safe when the target document's current version is
@@ -141,6 +209,7 @@ class IngestionService:
         if not req.attributes.get(OPENAI_FILE_ID_ATTRIBUTE):
             exact = self._find_exact_duplicate(db, principal, req, content_hash)
             if exact:
+                self._refresh_document_metadata(db, principal, req, exact["id"])
                 vsf_id = self._link_vector_store_file(db, principal, req, exact["id"], status="completed")
                 if req.vector_store_id:
                     if not refresh_vector_store_activity(db, principal, req.vector_store_id):
@@ -188,10 +257,14 @@ class IngestionService:
         self.object_store.put_text(parsed_key, req.content, "text/markdown")
 
         if version_target:
-            db.execute(text("""
-                UPDATE documents SET content_hash=:hash, current_version_id=:docv_id, status='active'
-                WHERE id=:doc_id AND tenant_id=:tenant_id AND business_instance_id=:biz_id
-            """), {"hash": content_hash, "docv_id": docv_id, "doc_id": doc_id, "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id})
+            self._refresh_document_metadata(
+                db,
+                principal,
+                req,
+                doc_id,
+                content_hash=content_hash,
+                current_version_id=docv_id,
+            )
         else:
             db.execute(text("""
                 INSERT INTO documents(id, tenant_id, business_instance_id, knowledge_base_id, vector_store_id, title, filename,

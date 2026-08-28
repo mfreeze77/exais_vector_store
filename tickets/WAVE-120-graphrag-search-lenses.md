@@ -109,9 +109,10 @@ Verification:
 
 Known limitations:
 
-- The existing live `exais-vector-store-ks-state-civics` API container was not
-  rebuilt or restarted by this ticket. The running container needs an image
-  rebuild/deploy before this route is available live.
+- Superseding local runtime proof on 2026-08-28: the running
+  `exais-vector-store-ks-state-civics` API container was rebuilt/restarted in
+  the local cell and `GET /v1/vector_stores/vs_d4185d1004604f08a55299fa/search_lenses`
+  returned HTTP `200`.
 - Topeka municipal-code lenses are declared as planned registry entries only;
   they intentionally fail closed until a municipal-code graph search handler is
   implemented.

@@ -3,18 +3,100 @@
   "lockedAt": "2026-08-27T19:48:32Z",
   "sourceType": "topeka_ordinance_pdfs",
   "acquisitionStatus": {
-    "status": "collector_implemented_pending_full_seed",
-    "observedAt": "2026-08-27",
-    "details": "The City of Topeka Ordinances page exposes recent ordinance and charter ordinance document links. The collector now discovers official Topeka PDF links, writes ordinances.jsonl plus citation-url-map.jsonl, and stores PDFs under seed/raw/pdfs. Full live collection, external markdown extraction, API ingestion, and recall proof remain pending."
+    "status": "full_pdf_collection_marker_extraction_and_api_ingest_complete_local",
+    "observedAt": "2026-08-28",
+    "details": "The City of Topeka Ordinances page produced 364 official ordinance PDF records with zero collection failures. The PDFs are retained under the local instance seed folder, and the external RunPod Marker extraction pass produced 364 Markdown artifacts with zero extraction failures. The local ExAIS API ingest loaded all 364 ordinance documents into vector store vs_d4185d1004604f08a55299fa with 3,154 ordinance chunks indexed and 5/5 ordinance recall checks passing."
   },
   "sourceManifest": {
     "format": "jsonl",
-    "status": "pending",
-    "manifestUri": "object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-ordinances/seed/manifests/ordinances.jsonl"
+    "status": "full_pdf_collection_complete",
+    "manifestUri": "object-store://exai-vector-store-ks-state-civics/instances/ks-state-civics/sources/topeka-ordinances/seed/manifests/ordinances.jsonl",
+    "localManifestPath": "instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-ordinances/seed/manifests/ordinances.jsonl",
+    "rowCount": 364,
+    "byteCount": 208098,
+    "sha256": "631a4ea5dc759ca5835306571da652ce98626cb32628b3473bb7fbf12d7902a8",
+    "pdfCount": 364,
+    "pdfByteCount": 79436936,
+    "citationUrlMap": {
+      "localPath": "instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-ordinances/seed/citation-url-map.jsonl",
+      "byteCount": 138840,
+      "sha256": "d49f1ccf479b2f621c041c2b9710abde8f3174292aa623816cbfc6091e454161"
+    }
+  },
+  "extractionManifest": {
+    "status": "complete",
+    "runner": "scripts/release/topeka-ordinance-pdf-extract.py",
+    "localManifestPath": "instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-ordinances/seed/manifests/ordinance-extractions.jsonl",
+    "reportPath": "instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-ordinances/seed/manifests/ordinance-extraction-report.json",
+    "rowCount": 364,
+    "markdownCount": 364,
+    "markdownByteCount": 5722945,
+    "failureCount": 0,
+    "manifestSha256": "9f7511961bd52ae2e17f9da49dc973d1132d0a2f27813509456f454b5fb0f803",
+    "reportSha256": "a3aec641a3cda493f1002079dab13f7b9ac645b3658414aa2fabe286ac11a400"
+  },
+  "lastApiIngestProof": {
+    "observedAt": "2026-08-28",
+    "status": "full_ordinance_pdf_ingest_recall_passed",
+    "apiTransport": "docker-network",
+    "vectorStoreId": "vs_d4185d1004604f08a55299fa",
+    "vectorStoreName": "City of Topeka Municipal Code",
+    "consumerBaseUrl": "https://topks.statecivics.ai/local",
+    "sourceManifest": "instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-ordinances/seed/manifests/ordinances.jsonl",
+    "extractionManifest": "instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-ordinances/seed/manifests/ordinance-extractions.jsonl",
+    "payloadCount": 364,
+    "submittedCount": 364,
+    "fileCounts": {
+      "total": 364,
+      "completed": 364,
+      "failed": 0,
+      "cancelled": 0,
+      "inProgress": 0
+    },
+    "databaseCounts": {
+      "sourceCollectionDocuments": 364,
+      "sourceCollectionActiveChunks": 3154,
+      "combinedDocuments": 3066,
+      "combinedDistinctSourceUris": 3066,
+      "combinedActiveChunks": 6153,
+      "combinedIndexedChunks": 6153,
+      "charterFiles": 41,
+      "ordinanceFiles": 323,
+      "badOrdinanceNumberRows": 0
+    },
+    "recallProof": ".release/cells/ks-state-civics/evals/topeka-ordinance-recall-20260828.json",
+    "recallProofCounts": {
+      "queries": 5,
+      "passed": 5,
+      "p95Ms": 1107.402
+    },
+    "metadataRepair": "The ingestion service now refreshes existing document and vector_store_file metadata on idempotent re-ingest so corrected charter filenames, citation fields, source_record_id, and unnumbered STO identity are retained."
+  },
+  "lastGraphArtifactProof": {
+    "observedAt": "2026-08-28",
+    "status": "artifact_eval_passed_load_blocked_no_graph_api",
+    "artifactPath": ".release/cells/ks-state-civics/graphrag/topeka-code",
+    "evalProof": ".release/cells/ks-state-civics/graphrag/topeka-code/eval-proof.json",
+    "loadProof": ".release/cells/ks-state-civics/graphrag/topeka-code/load-proof.json",
+    "nodeCount": 4969,
+    "edgeCount": 10167,
+    "edgeTypes": {
+      "CONTAINS": 3203,
+      "DEFINES": 980,
+      "HAS_ORDINANCE_HISTORY": 2726,
+      "ORDINANCE_AMENDS_SECTION": 536,
+      "REFERENCES": 2646,
+      "SAME_ORDINANCE": 76
+    },
+    "urlCoverage": {
+      "nodesWithCitationUrl": 4547,
+      "edgesWithCitationUrl": 10167
+    },
+    "loadBlocker": "No ExAIS Topeka graph load/search API path exists yet; direct Postgres graph writes remain forbidden for this source package."
   },
   "vectorStore": {
-    "id": "vs_268b119a2cd84b568af62155",
-    "name": "Topeka Municipal Code",
+    "id": "vs_d4185d1004604f08a55299fa",
+    "name": "City of Topeka Municipal Code",
     "tenantId": "ten_ks_state_civics",
     "businessInstanceId": "biz_ks_state_civics",
     "knowledgeBaseId": "kb_ks_civics"

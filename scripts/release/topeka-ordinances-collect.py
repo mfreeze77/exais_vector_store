@@ -91,8 +91,10 @@ def is_official_pdf_candidate(url: str, source_url: str) -> bool:
 
 def parse_ordinance_identity(label: str, url: str) -> dict[str, str]:
     text = " ".join(f"{label} {Path(urlsplit(url).path).stem}".replace("_", " ").replace("-", " ").split())
-    category = "charter_ordinance" if re.search(r"\bcharter\b", text, re.I) else "ordinance"
-    match = re.search(r"\b(?:charter\s+)?ordinance\s*(?:no\.?|number|#)?\s*([A-Z]?\d{3,6}[A-Z]?)\b", text, re.I)
+    category = "charter_ordinance" if re.search(r"charter", text, re.I) else "ordinance"
+    match = re.search(r"\b(?:charter\s*)?ordinance\s*(?:no\.?|number|#)?\s*([A-Z]?\d{2,6}[A-Z]?)\b", text, re.I)
+    if not match:
+        match = re.search(r"\bcharterordinance([A-Z]?\d{2,6}[A-Z]?)\b", text, re.I)
     if not match:
         match = re.search(r"\bord(?:inance)?\s*([A-Z]?\d{3,6}[A-Z]?)\b", text, re.I)
     ordinance_number = match.group(1).upper() if match else ""
@@ -149,7 +151,10 @@ def collect_ordinances(
         try:
             pdf_bytes = downloader(link.url, timeout=timeout)
             name_parts = parse_ordinance_identity(link.label, link.url)
-            name_seed = name_parts["ordinance_number"] or Path(urlsplit(link.url).path).stem or stable_id("pdf", link.url)
+            if name_parts["category"] == "charter_ordinance" and name_parts["ordinance_number"]:
+                name_seed = f"CharterOrdinance{name_parts['ordinance_number']}"
+            else:
+                name_seed = name_parts["ordinance_number"] or Path(urlsplit(link.url).path).stem or stable_id("pdf", link.url)
             saved_path = pdf_dir / safe_filename(name_seed, suffix=".pdf")
             saved_path.parent.mkdir(parents=True, exist_ok=True)
             saved_path.write_bytes(pdf_bytes)

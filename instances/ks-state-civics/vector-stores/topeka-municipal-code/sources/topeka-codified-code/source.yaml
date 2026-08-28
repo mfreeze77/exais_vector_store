@@ -6,8 +6,8 @@ metadata:
   sourceSlug: topeka-codified-code
   productionReady: false
 vectorStore:
-  id: vs_268b119a2cd84b568af62155
-  name: Topeka Municipal Code
+  id: vs_d4185d1004604f08a55299fa
+  name: City of Topeka Municipal Code
   tenantId: ten_ks_state_civics
   businessInstanceId: biz_ks_state_civics
   knowledgeBaseId: kb_ks_civics
@@ -170,7 +170,7 @@ workbenchProjection:
     - article
 qualityGate:
   requiredBeforeIngestion: true
-  vectorizationAllowed: false
+  vectorizationAllowed: true
   runner: scripts/release/topeka-code-artifact-quality.py
   command:
     - python
@@ -187,7 +187,6 @@ ingestion:
   mode: api
   runner: scripts/release/topeka-code-ingest.py
   gatedBy: topeka-code-artifact-quality.passed
-  disabledUntil: full_json_quality_pass
   command:
     - python
     - scripts/release/topeka-code-ingest.py
@@ -196,12 +195,14 @@ ingestion:
     - --source-output
     - ${TOPEKA_CODE_OUTPUT}
     - --vector-store-name
-    - Topeka Municipal Code
+    - City of Topeka Municipal Code
+    - --vector-store-id
+    - vs_d4185d1004604f08a55299fa
     - --knowledge-base-id
     - kb_ks_civics
     - --api-transport
     - docker-network
-  idempotency: source_identity_sha256
+  idempotency: vector_store_source_identity_sha256
 updatePolicy:
   diffMode: stable_identity_and_checksum
   removedRecords: soft_delete_or_expire_after_operator_approval
@@ -213,6 +214,8 @@ graph:
     - scripts/release/topeka-code-graphrag-extract.py
     - --source-output
     - ${TOPEKA_CODE_OUTPUT}
+    - --ordinance-manifest
+    - ${TOPEKA_ORDINANCE_MANIFEST}
     - --output-dir
     - .release/cells/ks-state-civics/graphrag/topeka-code
   loadCommand:
@@ -230,7 +233,7 @@ graph:
     - --cell
     - ks-state-civics
     - --vector-store-id
-    - vs_268b119a2cd84b568af62155
+    - vs_d4185d1004604f08a55299fa
     - --graph-artifact
     - .release/cells/ks-state-civics/graphrag/topeka-code
     - --output
@@ -246,7 +249,7 @@ eval:
     - --cell
     - ks-state-civics
     - --vector-store-id
-    - vs_268b119a2cd84b568af62155
+    - vs_d4185d1004604f08a55299fa
     - --api-transport
     - docker-network
     - --output

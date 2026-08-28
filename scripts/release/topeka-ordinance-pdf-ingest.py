@@ -44,6 +44,15 @@ def find_markdown(row: dict[str, Any], manifest_path: Path, extracted_dir: Path 
     return None
 
 
+def ordinance_document_filename(row: dict[str, Any]) -> str:
+    ordinance_number = str(row.get("ordinance_number") or "")
+    category = str(row.get("category") or "")
+    if category == "charter_ordinance" and ordinance_number:
+        return safe_filename(f"CharterOrdinance{ordinance_number}", suffix=".md")
+    saved_path = str(row.get("saved_path") or "")
+    return safe_filename(ordinance_number or Path(saved_path).stem or str(row.get("title") or row.get("id") or "Topeka ordinance"), suffix=".md")
+
+
 def build_payload(
     row: dict[str, Any],
     markdown: str,
@@ -56,10 +65,12 @@ def build_payload(
     pdf_url = str(row.get("pdf_url") or "")
     if not public_url(pdf_url):
         raise ValueError(f"Ordinance {row.get('id')} does not have a public pdf_url")
-    ordinance_number = str(row.get("ordinance_number") or row.get("id") or "")
-    title = str(row.get("title") or ordinance_number or "Topeka ordinance")
+    ordinance_number = str(row.get("ordinance_number") or "")
+    source_record_id = str(row.get("id") or "")
+    title = str(row.get("title") or ordinance_number or source_record_id or "Topeka ordinance")
     attributes = {
         "source_collection": "topeka-ordinances",
+        "source_record_id": source_record_id,
         "jurisdiction": "City of Topeka, Kansas",
         "jurisdiction_id": row.get("jurisdiction_id") or "ks-topeka",
         "category": row.get("category") or "",
@@ -81,7 +92,7 @@ def build_payload(
         "vector_store_id": vector_store_id,
         "knowledge_base_id": knowledge_base_id,
         "title": title,
-        "filename": safe_filename(ordinance_number or title, suffix=".md"),
+        "filename": ordinance_document_filename(row),
         "mime_type": "text/markdown",
         "content": markdown,
         "mode": "pdf_markdown_external_v1",
@@ -121,6 +132,17 @@ def load_ordinance_payloads(
     return payloads, skipped
 
 
+def ingest_idempotency_key(payload: dict[str, Any]) -> str:
+    fingerprint = {
+        "vector_store_id": payload["vector_store_id"],
+        "source_uri": payload["source_uri"],
+        "title": payload["title"],
+        "filename": payload["filename"],
+        "attributes": payload["attributes"],
+    }
+    return "topeka-ordinance-ingest-" + sha256_text(json.dumps(fingerprint, sort_keys=True, separators=(",", ":")))[:48]
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
@@ -156,13 +178,13 @@ def main() -> None:
             api_base=api_base,
             headers=headers,
             vector_store_id=args.vector_store_id,
-        vector_store_name=args.vector_store_name,
-        knowledge_base_id=args.knowledge_base_id,
-        allow_create=args.allow_create_vector_store,
-        timeout=args.api_timeout_seconds,
-        cell=args.cell,
-        transport=args.api_transport,
-    )
+            vector_store_name=args.vector_store_name,
+            knowledge_base_id=args.knowledge_base_id,
+            allow_create=args.allow_create_vector_store,
+            timeout=args.api_timeout_seconds,
+            cell=args.cell,
+            transport=args.api_transport,
+        )
     payloads, skipped = load_ordinance_payloads(
         args.manifest,
         extracted_dir=args.extracted_dir,
@@ -176,7 +198,7 @@ def main() -> None:
     submitted: list[dict[str, Any]] = []
     if not args.dry_run:
         for payload in payloads:
-            key = "topeka-ordinance-ingest-" + sha256_text(f"{payload['source_uri']}|{payload['attributes']['sha256']}")[:48]
+            key = ingest_idempotency_key(payload)
             response = submit_document(
                 api_base=api_base,
                 headers=headers,

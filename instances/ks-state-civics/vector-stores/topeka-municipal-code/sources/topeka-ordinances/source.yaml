@@ -6,8 +6,8 @@ metadata:
   sourceSlug: topeka-ordinances
   productionReady: false
 vectorStore:
-  id: vs_268b119a2cd84b568af62155
-  name: Topeka Municipal Code
+  id: vs_d4185d1004604f08a55299fa
+  name: City of Topeka Municipal Code
   tenantId: ten_ks_state_civics
   businessInstanceId: biz_ks_state_civics
   knowledgeBaseId: kb_ks_civics
@@ -43,6 +43,33 @@ source:
     checksumField: sha256
     savedPathField: saved_path
     lockFile: source.lock.json
+    rowCount: 364
+    sha256: 631a4ea5dc759ca5835306571da652ce98626cb32628b3473bb7fbf12d7902a8
+    byteCount: 208098
+artifactGeneration:
+  mode: pdf_markdown_external_v1
+  runner: scripts/release/topeka-ordinance-pdf-extract.py
+  boundary: uses external RunPod Marker only; no local Marker install, no Qdrant/Postgres/MinIO/OpenSearch writes
+  lastProof:
+    observedAt: '2026-08-28'
+    status: complete
+    selectedCount: 364
+    resultCount: 364
+    failureCount: 0
+    reportPath: instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-ordinances/seed/manifests/ordinance-extraction-report.json
+    extractionManifestPath: instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-ordinances/seed/manifests/ordinance-extractions.jsonl
+    extractionManifestSha256: 9f7511961bd52ae2e17f9da49dc973d1132d0a2f27813509456f454b5fb0f803
+  command:
+    - python
+    - scripts/release/topeka-ordinance-pdf-extract.py
+    - --manifest
+    - instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-ordinances/seed/manifests/ordinances.jsonl
+    - --concurrency
+    - "3"
+  outputContract:
+    - extracted/*.md
+    - manifests/ordinance-extractions.jsonl
+    - manifests/ordinance-extraction-report.json
 ingestion:
   mode: api
   runner: scripts/release/topeka-ordinance-pdf-ingest.py
@@ -53,13 +80,34 @@ ingestion:
     - ks-state-civics
     - --manifest
     - ${TOPEKA_ORDINANCE_MANIFEST}
+    - --vector-store-id
+    - vs_d4185d1004604f08a55299fa
     - --vector-store-name
-    - Topeka Municipal Code
+    - City of Topeka Municipal Code
     - --knowledge-base-id
     - kb_ks_civics
     - --api-transport
     - docker-network
-  idempotency: source_identity_sha256
+  idempotency: vector_store_source_payload_fingerprint_sha256
+  lastProof:
+    observedAt: '2026-08-28'
+    status: full_ordinance_pdf_ingest_recall_passed
+    vectorStoreId: vs_d4185d1004604f08a55299fa
+    payloadCount: 364
+    submittedCount: 364
+    fileCounts:
+      completed: 364
+      failed: 0
+      cancelled: 0
+      inProgress: 0
+    databaseCounts:
+      ordinanceDocuments: 364
+      ordinanceChunks: 3154
+      charterFiles: 41
+      ordinanceFiles: 323
+      badOrdinanceNumberRows: 0
+    recallProof: .release/cells/ks-state-civics/evals/topeka-ordinance-recall-20260828.json
+    recallQueryCount: 5
 updatePolicy:
   diffMode: stable_identity_and_checksum
   removedRecords: soft_delete_or_expire_after_operator_approval
@@ -74,31 +122,31 @@ graph:
     - --ordinance-manifest
     - ${TOPEKA_ORDINANCE_MANIFEST}
     - --output-dir
-    - .release/cells/ks-state-civics/graphrag/topeka-ordinances
+    - .release/cells/ks-state-civics/graphrag/topeka-code
   loadCommand:
     - python
     - scripts/release/topeka-code-graphrag-load.py
     - --graph-artifact
-    - .release/cells/ks-state-civics/graphrag/topeka-ordinances
+    - .release/cells/ks-state-civics/graphrag/topeka-code
     - --api-transport
     - docker-network
     - --output
-    - .release/cells/ks-state-civics/graphrag/topeka-ordinances/load-proof.json
+    - .release/cells/ks-state-civics/graphrag/topeka-code/load-proof.json
   evalCommand:
     - python
     - scripts/release/topeka-code-graphrag-eval.py
     - --cell
     - ks-state-civics
     - --vector-store-id
-    - vs_268b119a2cd84b568af62155
+    - vs_d4185d1004604f08a55299fa
     - --graph-artifact
-    - .release/cells/ks-state-civics/graphrag/topeka-ordinances
+    - .release/cells/ks-state-civics/graphrag/topeka-code
     - --output
-    - .release/cells/ks-state-civics/graphrag/topeka-ordinances/eval-proof.json
+    - .release/cells/ks-state-civics/graphrag/topeka-code/eval-proof.json
   expectedProofArtifacts:
-    - .release/cells/ks-state-civics/graphrag/topeka-ordinances/graph-summary.json
-    - .release/cells/ks-state-civics/graphrag/topeka-ordinances/load-proof.json
-    - .release/cells/ks-state-civics/graphrag/topeka-ordinances/eval-proof.json
+    - .release/cells/ks-state-civics/graphrag/topeka-code/graph-summary.json
+    - .release/cells/ks-state-civics/graphrag/topeka-code/load-proof.json
+    - .release/cells/ks-state-civics/graphrag/topeka-code/eval-proof.json
 eval:
   command:
     - python
@@ -106,10 +154,11 @@ eval:
     - --cell
     - ks-state-civics
     - --vector-store-id
-    - vs_268b119a2cd84b568af62155
+    - vs_d4185d1004604f08a55299fa
     - --api-transport
     - docker-network
     - --output
     - .release/cells/ks-state-civics/topeka-code-recall-eval.json
   expectedProofArtifacts:
     - .release/cells/ks-state-civics/topeka-code-recall-eval.json
+    - .release/cells/ks-state-civics/evals/topeka-ordinance-recall-20260828.json

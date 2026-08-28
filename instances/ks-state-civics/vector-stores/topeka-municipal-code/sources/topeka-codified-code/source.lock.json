@@ -234,6 +234,28 @@
     "identityPolicy": "source_component_key is preserved from Topeka source/graph identity; workbench_component_id is deterministic UUIDv5 from source_component_key.",
     "boundary": "Projection-only from saved JSON/JSONL/HTML artifacts. No ingestion, vectorization, Qdrant, Postgres, MinIO, OpenSearch, or graph writes."
   },
+  "lastGraphArtifactProof": {
+    "observedAt": "2026-08-28",
+    "status": "artifact_eval_passed_load_blocked_no_graph_api",
+    "artifactPath": ".release/cells/ks-state-civics/graphrag/topeka-code",
+    "evalProof": ".release/cells/ks-state-civics/graphrag/topeka-code/eval-proof.json",
+    "loadProof": ".release/cells/ks-state-civics/graphrag/topeka-code/load-proof.json",
+    "nodeCount": 4969,
+    "edgeCount": 10167,
+    "edgeTypes": {
+      "CONTAINS": 3203,
+      "DEFINES": 980,
+      "HAS_ORDINANCE_HISTORY": 2726,
+      "ORDINANCE_AMENDS_SECTION": 536,
+      "REFERENCES": 2646,
+      "SAME_ORDINANCE": 76
+    },
+    "urlCoverage": {
+      "nodesWithCitationUrl": 4547,
+      "edgesWithCitationUrl": 10167
+    },
+    "loadBlocker": "No ExAIS Topeka graph load/search API path exists yet; direct Postgres graph writes remain forbidden for this source package."
+  },
   "qualityPolicy": {
     "artifactOnlyUntilQualityPass": true,
     "qualityReport": "quality-report.json",
@@ -246,7 +268,7 @@
       "worklists/section-quality-issues.jsonl",
       "worklists/unexpected-section-urls.jsonl"
     ],
-    "notes": "Codified-code artifact quality passed and the clean local full-corpus vector store was ingested on 2026-08-28. Keep ordinance PDF ingestion and graph reference extraction behind their own proof gates."
+    "notes": "Codified-code artifact quality passed and the clean local full-corpus vector store was ingested on 2026-08-28. Official ordinance PDF ingestion proof is recorded in topeka-ordinances/source.lock.json. Topeka graph artifact eval now passes, including parsed REFERENCES and ordinance-to-section edges. Keep graph load/search and production/VPS promotion behind their own proof gates."
   },
   "acquisitionAdapters": {
     "operatorCaptureManifest": {
@@ -269,8 +291,8 @@
     }
   },
   "vectorStore": {
-    "id": "vs_268b119a2cd84b568af62155",
-    "name": "Topeka Municipal Code",
+    "id": "vs_d4185d1004604f08a55299fa",
+    "name": "City of Topeka Municipal Code",
     "tenantId": "ten_ks_state_civics",
     "businessInstanceId": "biz_ks_state_civics",
     "knowledgeBaseId": "kb_ks_civics"

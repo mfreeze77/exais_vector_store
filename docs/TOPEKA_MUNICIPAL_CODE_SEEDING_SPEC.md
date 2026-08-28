@@ -80,15 +80,23 @@ Proof from 2026-08-28:
 - A 50-page manifest-only Playwright run with isolated contexts and one retry fetched 31 sections, failed 19 challenge pages, emitted 3,203 `CONTAINS` edges from the CSV hierarchy, and emitted 37 `HAS_ORDINANCE_HISTORY` edges from fetched section text.
 - A 200-page manifest-only Playwright run with isolated contexts and one retry fetched 141 sections, failed 59 challenge pages, emitted 3,203 `CONTAINS` edges, 22 `DEFINES` edges, and 244 `HAS_ORDINANCE_HISTORY` edges. The artifact quality gate reported `passed: false`, `vectorization_allowed: false`, `5.218%` coverage, `2,561` missing required URLs, `59` failed crawl URLs, and zero section text/citation issues on fetched pages.
 
-This solves root discovery and graph hierarchy. It does not fully solve publisher challenge behavior. Full production seeding still needs a retry/resume acquisition pass or an operator-owned authorized export that satisfies the same artifact contract.
+This solved root discovery and graph hierarchy but did not fully solve publisher challenge behavior. The later complete corpus acquisition used the operator-owned Decodo route and still had to satisfy the same artifact contract and quality gate.
 
-Current status as of 2026-08-28: the Decodo-acquired full codified-code corpus passed the artifact quality gate and was ingested through the ExAIS API into clean local vector store `vs_d4185d1004604f08a55299fa` (`City of Topeka Municipal Code`) for the `https://topks.statecivics.ai/local` surface. The API reports `2,702` completed files with `0` failed files; database proof shows `2,702` documents, `2,702` distinct official source URLs, and `2,999` active/indexed chunks.
+Current status as of 2026-08-28: the Decodo-acquired full codified-code corpus passed the artifact quality gate and was ingested through the ExAIS API into clean local vector store `vs_d4185d1004604f08a55299fa` (`City of Topeka Municipal Code`) for the `https://topks.statecivics.ai/local` surface. The official ordinance PDF source was also collected, externally extracted through the RunPod Marker path, and ingested into the same local vector store. Database proof shows `3,066` documents, `3,066` distinct official source URLs, `6,153` active chunks, and `6,153` indexed chunks: `2,702` codified-code documents plus `364` ordinance PDF documents.
+
+Official ordinance PDF proof from 2026-08-28:
+
+- `364` official PDF records in `topeka-ordinances/seed/manifests/ordinances.jsonl`.
+- `364` retained PDFs under `topeka-ordinances/seed/raw/pdfs/`.
+- `364` retained Markdown extractions under `topeka-ordinances/seed/extracted/`.
+- `0` extraction failures in `topeka-ordinances/seed/manifests/ordinance-extraction-report.json`.
+- `5/5` ordinance PDF recall checks passed through the live local ExAIS API with official PDF citations. Proof artifact: `.release/cells/ks-state-civics/evals/topeka-ordinance-recall-20260828.json`.
 
 Deep-search proof from 2026-08-28 completed 24 live Topeka API searches against `vs_d4185d1004604f08a55299fa` with zero API errors after route hardening. The proof artifact is `.release/cells/ks-state-civics/evals/topeka-code-deep-search-20260828.json`; 19 searches passed the basic citation/content gate and five were marked for review because broad legal topics needed tighter query terms or caller-side answer framing.
 
 The Topeka store must not use the Kansas court-decision query planner. That planner extracts docket numbers, decision years, court names, and publication status for court cases. On municipal code text, ordinance numbers and passed dates can otherwise be misread as court filters. The API route now disables that planner when vector-store attributes identify a non-court corpus such as `topeka_municipal_code`, and store-scoped searches no longer fall back to unavailable private embedding profiles when a planned filter matches zero indexed rows.
 
-Current operating rule: codified-code vectorization is allowed only from artifact-quality-passed source outputs. Keep official ordinance PDF ingestion, graph reference extraction, and production/VPS promotion behind their own proof gates.
+Current operating rule: codified-code and ordinance PDF vectorization are allowed only from artifact-quality-passed source outputs. Official ordinance PDF ingestion is complete in the local KS Civics cell. Topeka graph artifact extraction/eval now passes at artifact level, including parsed internal references and ordinance-to-section edges. Keep Topeka graph load/search and production/VPS promotion behind their own proof gates.
 
 Public-access escalation packet: `docs/TOPEKA_PUBLIC_LAW_ACCESS_PACKET.md`.
 
@@ -251,12 +259,12 @@ are derived projections that can be regenerated.
 
 ### 4. Official Topeka Ordinance PDF Collector
 
-The City of Topeka Ordinances page exposes recent ordinance documents through the city document center. Build a collector that:
+The City of Topeka Ordinances page exposes recent ordinance documents through the city document center. The collector:
 
 - discovers ordinance and charter ordinance PDF links;
 - writes `ordinances.jsonl` with ordinance number, title, year/category, `pdf_url`, saved path, byte count, and SHA-256;
 - stores PDFs under `seed/raw/pdfs/`;
-- extracts markdown using the existing PDF path, with RunPod Marker as the external OCR/Marker endpoint for hard PDFs;
+- extracts markdown using the existing external RunPod Marker path for hard PDFs;
 - sets ExAIS document `source_uri` to `pdf_url`.
 
 ## Ingestion Path
@@ -274,8 +282,8 @@ Ordinance PDF payload:
 
 - `mode`: `pdf_markdown_external_v1`
 - `source_uri`: `pdf_url`
-- `filename`: ordinance number/title markdown filename
-- attributes: jurisdiction, ordinance number, category/year, title, PDF hash, extraction parser, page count
+- `filename`: ordinance number/title markdown filename, with charter ordinances normalized as `CharterOrdinance{number}.md`
+- attributes: jurisdiction, ordinance number, source record ID, category/year, title, PDF hash, extraction parser, and retained Markdown path
 
 ## GraphRAG Plan
 
@@ -309,6 +317,6 @@ Do not copy evasion code into this repo. Treat any publisher-gated acquisition a
 - Artifact quality runs write complete missing/failure/section-issue worklists for the next acquisition pass.
 - Zero fetched pages exits nonzero and cannot produce a successful seed manifest.
 - Zero extracted sections exits nonzero unless explicitly allowed for diagnostics.
-- A seeded pilot returns clickable citations for both `source_url` and `pdf_url`.
-- Graph proof shows section-reference edges, ordinance-history edges, and `citation_url` properties on graph-expanded results.
-- Recall proof includes current-law queries and amendment-history queries.
+- The seeded local store returns clickable citations for both `source_url` and `pdf_url`.
+- Semantic recall proof includes current-law, amendment-history, and official ordinance PDF queries.
+- Graph artifact proof shows section-reference edges, ordinance-history edges, ordinance-to-section edges, and `citation_url` properties. Production GraphRAG is not claimed live until those artifacts are loaded through a supported ExAIS graph API handler and search expansion is verified.

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import importlib.util
 import json
 import subprocess
@@ -119,6 +120,92 @@ def test_ordinance_ingest_uses_pdf_url_and_precomputed_markdown(tmp_path):
     assert payloads[0]["attributes"]["extraction_source"] == "precomputed_markdown"
 
 
+def test_ordinance_ingest_uses_charter_specific_filename(tmp_path):
+    module = load_script("topeka_ordinance_pdf_ingest_charter", "topeka-ordinance-pdf-ingest.py")
+    manifest = tmp_path / "manifests" / "ordinances.jsonl"
+    markdown = tmp_path / "extracted" / "topeka-ordinance-abc.md"
+    markdown.parent.mkdir(parents=True)
+    markdown.write_text("# Charter Ordinance 126\n\nTransient guest tax.", encoding="utf-8")
+    write_jsonl(manifest, [{
+        "id": "topeka-ordinance:abc",
+        "ordinance_number": "126",
+        "title": "Charter Ordinance 126",
+        "category": "charter_ordinance",
+        "pdf_url": "https://files.topeka.gov/community/ordinances/charter/CharterOrdinance126.pdf",
+        "saved_path": "raw/pdfs/CharterOrdinance126.pdf",
+        "sha256": "pdfhash",
+    }])
+
+    payloads, skipped = module.load_ordinance_payloads(
+        manifest,
+        extracted_dir=tmp_path / "extracted",
+        vector_store_id="vs_topeka",
+        knowledge_base_id="kb",
+        security_level=1,
+        allow_missing_markdown=False,
+    )
+
+    assert skipped == []
+    assert payloads[0]["filename"] == "CharterOrdinance126.md"
+    assert payloads[0]["title"] == "Charter Ordinance 126"
+    assert payloads[0]["attributes"]["category"] == "charter_ordinance"
+
+
+def test_ordinance_ingest_keeps_unnumbered_source_record_id_separate(tmp_path):
+    module = load_script("topeka_ordinance_pdf_ingest_unnumbered", "topeka-ordinance-pdf-ingest.py")
+    manifest = tmp_path / "manifests" / "ordinances.jsonl"
+    markdown = tmp_path / "extracted" / "topeka-ordinance-abc.md"
+    markdown.parent.mkdir(parents=True)
+    markdown.write_text("# Standard Traffic Ordinance\n\nFull source text.", encoding="utf-8")
+    write_jsonl(manifest, [{
+        "id": "topeka-ordinance:abc",
+        "ordinance_number": "",
+        "title": "Standard Traffic Ordinance",
+        "category": "ordinance",
+        "pdf_url": "https://files.topeka.gov/community/ordinances/other-ordinances/STO.pdf",
+        "saved_path": "raw/pdfs/STO.pdf",
+        "sha256": "pdfhash",
+    }])
+
+    payloads, skipped = module.load_ordinance_payloads(
+        manifest,
+        extracted_dir=tmp_path / "extracted",
+        vector_store_id="vs_topeka",
+        knowledge_base_id="kb",
+        security_level=1,
+        allow_missing_markdown=False,
+    )
+
+    assert skipped == []
+    assert payloads[0]["filename"] == "STO.md"
+    assert payloads[0]["attributes"]["ordinance_number"] == ""
+    assert payloads[0]["attributes"]["source_record_id"] == "topeka-ordinance:abc"
+
+
+def test_ordinance_ingest_idempotency_key_is_vector_store_specific():
+    module = load_script("topeka_ordinance_pdf_ingest_idempotency", "topeka-ordinance-pdf-ingest.py")
+    payload = {
+        "vector_store_id": "vs_one",
+        "source_uri": "https://topeka.gov/ordinance-20345.pdf",
+        "title": "Ordinance No. 20345",
+        "filename": "20345.md",
+        "attributes": {"sha256": "pdfhash", "category": "ordinance"},
+    }
+    same_source_other_store = {
+        **payload,
+        "vector_store_id": "vs_two",
+    }
+    same_source_updated_metadata = {
+        **payload,
+        "title": "Ordinance 20345",
+        "attributes": {"sha256": "pdfhash", "category": "charter_ordinance"},
+    }
+
+    assert module.ingest_idempotency_key(payload) == module.ingest_idempotency_key(payload)
+    assert module.ingest_idempotency_key(payload) != module.ingest_idempotency_key(same_source_other_store)
+    assert module.ingest_idempotency_key(payload) != module.ingest_idempotency_key(same_source_updated_metadata)
+
+
 def test_ordinance_ingest_reports_missing_markdown_as_external_marker_precondition(tmp_path):
     module = load_script("topeka_ordinance_pdf_ingest_missing", "topeka-ordinance-pdf-ingest.py")
     manifest = tmp_path / "manifests" / "ordinances.jsonl"
@@ -133,6 +220,108 @@ def test_ordinance_ingest_reports_missing_markdown_as_external_marker_preconditi
             security_level=1,
             allow_missing_markdown=False,
         )
+
+
+def test_ordinance_pdf_extract_writes_marker_markdown_and_report(tmp_path):
+    module = load_script("topeka_ordinance_pdf_extract", "topeka-ordinance-pdf-extract.py")
+    manifest = tmp_path / "manifests" / "ordinances.jsonl"
+    pdf = tmp_path / "raw" / "pdfs" / "20345.pdf"
+    pdf.parent.mkdir(parents=True)
+    pdf_bytes = b"%PDF-1.4 ordinance 20345"
+    pdf.write_bytes(pdf_bytes)
+    write_jsonl(manifest, [{
+        "id": "ord-20345",
+        "ordinance_number": "20345",
+        "title": "Ordinance No. 20345",
+        "pdf_url": "https://topeka.gov/ordinance-20345.pdf",
+        "saved_path": "raw/pdfs/20345.pdf",
+        "sha256": module.sha256_bytes(pdf_bytes),
+    }])
+
+    class FakeMarkerClient:
+        async def process_pdf_bytes(self, **kwargs):
+            kwargs["log_callback"]("completed status=COMPLETED")
+            kwargs["job_id_callback"]("job-20345")
+            return {"markdown": "## Ordinance body\n\nAmending section 18.55.010.", "pages": 1}
+
+    report = asyncio.run(
+        module.extract_rows(
+            module.read_jsonl(manifest),
+            manifest_path=manifest,
+            extracted_dir=tmp_path / "extracted",
+            pdf_dir=None,
+            output_manifest=tmp_path / "manifests" / "ordinance-extractions.jsonl",
+            report_path=tmp_path / "manifests" / "ordinance-extraction-report.json",
+            offset=0,
+            limit=0,
+            concurrency=1,
+            client=FakeMarkerClient(),
+        )
+    )
+
+    markdown = (tmp_path / "extracted" / "20345.md").read_text(encoding="utf-8")
+    rows = [json.loads(line) for line in (tmp_path / "manifests" / "ordinance-extractions.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert report["status"] == "complete"
+    assert report["status_counts"] == {"extracted": 1}
+    assert "Official PDF: https://topeka.gov/ordinance-20345.pdf" in markdown
+    assert "Amending section 18.55.010" in markdown
+    assert rows[0]["marker_job_ids"] == ["job-20345"]
+    assert rows[0]["markdown_path"] == "extracted/20345.md"
+
+
+def test_ordinance_pdf_extract_skips_existing_markdown(tmp_path):
+    module = load_script("topeka_ordinance_pdf_extract_resume", "topeka-ordinance-pdf-extract.py")
+    manifest = tmp_path / "manifests" / "ordinances.jsonl"
+    pdf = tmp_path / "raw" / "pdfs" / "20345.pdf"
+    markdown = tmp_path / "extracted" / "20345.md"
+    pdf.parent.mkdir(parents=True)
+    markdown.parent.mkdir(parents=True)
+    pdf.write_bytes(b"%PDF-1.4 ordinance 20345")
+    markdown.write_text("# Existing extraction\n\nAlready good enough to reuse.", encoding="utf-8")
+    write_jsonl(manifest, [{
+        "id": "ord-20345",
+        "ordinance_number": "20345",
+        "title": "Ordinance No. 20345",
+        "pdf_url": "https://topeka.gov/ordinance-20345.pdf",
+        "saved_path": "raw/pdfs/20345.pdf",
+    }])
+
+    class ShouldNotRunMarkerClient:
+        async def process_pdf_bytes(self, **kwargs):  # pragma: no cover - failure path
+            raise AssertionError("existing markdown should be reused")
+
+    report = asyncio.run(
+        module.extract_rows(
+            module.read_jsonl(manifest),
+            manifest_path=manifest,
+            extracted_dir=tmp_path / "extracted",
+            pdf_dir=None,
+            output_manifest=tmp_path / "manifests" / "ordinance-extractions.jsonl",
+            report_path=tmp_path / "manifests" / "ordinance-extraction-report.json",
+            offset=0,
+            limit=0,
+            concurrency=1,
+            client=ShouldNotRunMarkerClient(),
+            min_markdown_chars=10,
+        )
+    )
+
+    assert report["status"] == "complete"
+    assert report["status_counts"] == {"skipped_existing": 1}
+
+
+def test_ordinance_pdf_extract_uses_charter_specific_markdown_path(tmp_path):
+    module = load_script("topeka_ordinance_pdf_extract_charter", "topeka-ordinance-pdf-extract.py")
+    path = module.markdown_path_for(
+        {
+            "id": "topeka-ordinance:abc",
+            "ordinance_number": "126",
+            "category": "charter_ordinance",
+        },
+        extracted_dir=tmp_path / "extracted",
+    )
+
+    assert path == tmp_path / "extracted" / "CharterOrdinance126.md"
 
 
 def test_common_docker_network_transport_targets_cell_api_service(monkeypatch):
