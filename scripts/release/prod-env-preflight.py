@@ -53,6 +53,7 @@ REQUIRED_KEYS = {
     "MODEL_GATEWAY_URL",
     "SVS_API_KEY_PEPPER",
     "SVS_ALLOWED_CORS_ORIGINS",
+    "SVS_BIND_IP",
     "SVS_INDEX_STRICT",
     "SVS_OBJECT_STORE_STRICT",
 }
@@ -125,6 +126,11 @@ def bool_value(value: str | None) -> bool:
     return (value or "").strip().lower() in {"1", "true", "yes", "on"}
 
 
+def is_public_bind(value: str | None) -> bool:
+    normalized = (value or "").strip().lower()
+    return normalized in {"0.0.0.0", "::", "[::]", ""}
+
+
 def provider_requirements(provider: str) -> list[str]:
     normalized = provider.strip().lower().replace("_", "-")
     return PROVIDER_REQUIREMENTS.get(normalized, [])
@@ -185,6 +191,8 @@ def validate_env(values: dict[str, str], expected_version: str, *, allow_local_r
 
     if any(origin.strip() == "*" for origin in (values.get("SVS_ALLOWED_CORS_ORIGINS") or "").split(",")):
         issues.append(Issue("WILDCARD_CORS", ("SVS_ALLOWED_CORS_ORIGINS",)))
+    if is_public_bind(values.get("SVS_BIND_IP")):
+        issues.append(Issue("PUBLIC_COMPOSE_BIND", ("SVS_BIND_IP",)))
     if (values.get("OPENSEARCH_URL") or "").startswith("https://") and not bool_value(values.get("OPENSEARCH_VERIFY_CERTS")):
         issues.append(Issue("TLS_VERIFY_DISABLED", ("OPENSEARCH_VERIFY_CERTS",)))
     if not bool_value(values.get("SVS_OBJECT_STORE_STRICT")):

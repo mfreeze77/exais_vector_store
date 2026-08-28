@@ -44,6 +44,7 @@ def valid_env() -> dict[str, str]:
         "MODEL_GATEWAY_URL": "http://model-gateway:8081",
         "SVS_API_KEY_PEPPER": "age://configs/cell-secrets.example.sops.yaml#SVS_API_KEY_PEPPER",
         "SVS_ALLOWED_CORS_ORIGINS": "https://admin.internal.invalid,https://api.internal.invalid",
+        "SVS_BIND_IP": "127.0.0.1",
         "SVS_INDEX_STRICT": "true",
         "SVS_OBJECT_STORE_STRICT": "true",
         "OPENSEARCH_URL": "https://opensearch.internal.invalid:9200",
@@ -94,6 +95,15 @@ def test_preflight_rejects_dev_mode_placeholders_versions_and_ports():
     codes = issue_codes(prod_env_preflight.validate_env(values, "0.9.8-production-candidate"))
 
     assert {"DEV_MODE_ENABLED", "BAD_VERSION", "LATEST_TAG", "LOCAL_REGISTRY_PREFIX", "PLACEHOLDER", "PORT_COLLISION", "MISSING"} <= codes
+
+
+def test_preflight_rejects_public_compose_bind_in_production():
+    values = valid_env()
+    values["SVS_BIND_IP"] = "0.0.0.0"
+
+    codes = issue_codes(prod_env_preflight.validate_env(values, "0.9.8-production-candidate"))
+
+    assert "PUBLIC_COMPOSE_BIND" in codes
 
 
 def test_preflight_report_prints_names_not_secret_values():

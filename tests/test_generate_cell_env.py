@@ -54,6 +54,7 @@ def test_production_reference_import_copies_only_valid_secret_references():
         "docker.io/expertaiservices",
         18080,
     )
+    assert values["SVS_BIND_IP"] == "127.0.0.1"
     imported, issues = generate_cell_env.import_operator_secret_references(
         values,
         {

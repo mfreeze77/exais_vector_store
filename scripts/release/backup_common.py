@@ -120,10 +120,10 @@ STANDARD_ARTIFACT_SPECS = (
     ),
     StandardArtifactSpec(
         "qdrant_vectors",
-        ("qdrant/snapshot-create-response.json", "qdrant/vectors-unavailable.json"),
+        ("qdrant/snapshots.json", "qdrant/snapshot-create-response.json", "qdrant/vectors-unavailable.json"),
         "qdrant_snapshot_api",
         "metadata_marker",
-        "Qdrant vector snapshot response or explicit local preflight marker.",
+        "Qdrant vector snapshots, snapshot response, or explicit local preflight marker.",
     ),
     StandardArtifactSpec(
         "opensearch_sparse",
@@ -134,10 +134,10 @@ STANDARD_ARTIFACT_SPECS = (
     ),
     StandardArtifactSpec(
         "object_store",
-        ("object-store/local-files.txt", "object-store/object-store-unavailable.json"),
+        ("object-store/volumes.json", "object-store/local-files.txt", "object-store/object-store-unavailable.json"),
         "local_object_store_listing",
         "metadata_marker",
-        "Object-store artifact listing or explicit local preflight marker.",
+        "Object-store volume export, artifact listing, or explicit local preflight marker.",
     ),
     StandardArtifactSpec(
         "config_metadata",

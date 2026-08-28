@@ -1,8 +1,5 @@
 :80 {
   encode zstd gzip
-  handle_path /model-gateway/* {
-    reverse_proxy model-gateway:8081
-  }
   handle {
     reverse_proxy api:8080
   }

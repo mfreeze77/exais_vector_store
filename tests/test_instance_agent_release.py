@@ -291,6 +291,35 @@ def test_release_cell_agent_packages_docker_and_mounts_supported_inputs():
     assert "SVS_INSTANCE_PIN_ROOT: /workspace/.release/instances" in compose
 
 
+def test_vps_cell_compose_ports_are_bind_ip_controlled_and_edge_hides_gateway():
+    compose = (ROOT / "infra" / "docker" / "compose.cell.yml").read_text(encoding="utf-8")
+    caddyfile = (ROOT / "infra" / "caddy" / "Caddyfile").read_text(encoding="utf-8")
+
+    for port_key in [
+        "SVS_API_PORT",
+        "SVS_ADMIN_UI_PORT",
+        "SVS_MODEL_GATEWAY_PORT",
+        "SVS_POSTGRES_PORT",
+        "SVS_REDIS_PORT",
+        "SVS_QDRANT_HTTP_PORT",
+        "SVS_QDRANT_GRPC_PORT",
+        "SVS_MINIO_PORT",
+        "SVS_MINIO_CONSOLE_PORT",
+        "SVS_INSTANCE_AGENT_PORT",
+    ]:
+        assert f"${{SVS_BIND_IP:-0.0.0.0}}:${{{port_key}" in compose
+
+    assert "reverse_proxy api:8080" in caddyfile
+    assert "model-gateway" not in caddyfile
+
+
+def test_release_build_context_excludes_generated_handoff_artifacts():
+    dockerignore = set((ROOT / ".dockerignore").read_text(encoding="utf-8").splitlines())
+
+    for entry in [".release", ".tmp", "backups", "restore-work"]:
+        assert entry in dockerignore
+
+
 def test_instance_callers_forward_release_manifest_contract():
     svsctl = (ROOT / "scripts" / "svsctl.py").read_text(encoding="utf-8")
     deploy_script = (ROOT / "scripts" / "deploy-instance.sh").read_text(encoding="utf-8")

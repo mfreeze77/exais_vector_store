@@ -88,8 +88,9 @@ Expose only:
 - `80/tcp` and `443/tcp` for reverse proxy / certificate issuance.
 
 Do not expose Postgres, Redis, Qdrant, MinIO, model-gateway, or worker ports to
-the public internet. Keep Compose service ports private behind the reverse
-proxy where possible.
+the public internet. Production cell envs must set `SVS_BIND_IP=127.0.0.1` so
+Compose-published service ports bind to loopback only. Keep the public edge on
+`80/tcp` and `443/tcp` through the reverse proxy.
 
 ## Provider-Neutral Public API Mode
 
@@ -107,6 +108,9 @@ provider when these gates are met:
   network.
 - Docker published ports are audited with an external probe, not only `ufw`
   status, because Docker can install iptables rules outside `ufw` policy.
+- Production preflight rejects `SVS_BIND_IP=0.0.0.0` or an IPv6 wildcard bind.
+  Use loopback binds plus reverse proxy exposure unless a separate host-level
+  firewall proof explicitly replaces that control.
 - Agents receive only the public `EXAIS_API_BASE`, selected vector-store IDs,
   and read-only ExAIS bearer keys. They do not receive Qdrant, database,
   object-store, Marker, or embedding-provider credentials.
@@ -233,6 +237,24 @@ Hard rules:
 - After restore on the VPS, run readiness, caller lifecycle proof, recall eval,
   and graph-expansion smoke before exposing the endpoint.
 
+Export the local handoff bundle from the approved local cell:
+
+```bash
+export CELL=ks-state-civics
+
+python scripts/release/export-cell-restore-bundle.py \
+  --cell "$CELL" \
+  --quiesce-writes \
+  --output-root ".release/cells/$CELL/vps-handoff"
+```
+
+The exporter temporarily stops the local API and worker containers, captures a
+Postgres logical dump, creates and downloads Qdrant collection snapshots through
+the official snapshot API, archives the `object-store` and `minio-data` Docker
+volumes, writes `manifest.json` plus `CHECKSUMS.sha256`, and restarts the stopped
+containers. It excludes secret env files. The generated archive and `.sha256`
+file are the only local-data artifacts that should be copied to the VPS.
+
 This local-staging path can reduce the first VPS shape to a search-serving
 profile such as 4-8 GB RAM for a demo or 8-16 GB for a paid read-mostly pilot.
 It does not replace offsite backup/restore proof before customer production.
@@ -274,6 +296,7 @@ OPENSEARCH_INDEX_PREFIX=ks_civics_
 S3_BUCKET=exai-vector-store-ks-state-civics
 SVS_OBJECT_STORE_STRICT=true
 SVS_DEV_MODE=false
+SVS_BIND_IP=127.0.0.1
 DEFAULT_EMBEDDING_PROVIDER=voyage
 VOYAGE_API_KEY=sops://configs/cell-secrets.ks-state-civics.sops.yaml#VOYAGE_API_KEY
 MARKER_MODE=remote
@@ -291,6 +314,131 @@ Validate without printing secrets:
 
 ```bash
 python scripts/release/prod-env-preflight.py --env-file "$CELL_ENV_FILE"
+```
+
+## Restore Local Handoff Bundle
+
+Use this section only when promoting the local `ks-state-civics` corpus instead
+of replaying ingestion on the VPS.
+
+Copy these files from the local workstation to the VPS:
+
+- The approved `release-manifest.json`.
+- The `*-vps-restore-*.tar.gz` bundle from
+  `.release/cells/ks-state-civics/vps-handoff`.
+- The matching `*.tar.gz.sha256` file.
+
+On the VPS, verify the archive, boot the fresh cell, and keep write services
+stopped during restore:
+
+```bash
+export CELL=ks-state-civics
+export APP_DIR=/opt/exais/vector-store
+export BUNDLE_ARCHIVE=/opt/exais/proof/ks-state-civics-vps-restore-<stamp>.tar.gz
+export RESTORE_ROOT=/opt/exais/restore-work
+
+cd "$APP_DIR"
+sha256sum -c "$BUNDLE_ARCHIVE.sha256"
+
+python scripts/release/cell-up.py \
+  --cell "$CELL" \
+  --worker-scale 1 \
+  --no-wait \
+  --release-manifest /opt/exais/proof/operator-approved-release-manifest.json
+
+mkdir -p "$RESTORE_ROOT"
+tar -C "$RESTORE_ROOT" -xzf "$BUNDLE_ARCHIVE"
+export BUNDLE_DIR="$RESTORE_ROOT/$(tar -tzf "$BUNDLE_ARCHIVE" | sed -n '1{s#/.*##;p;q;}')"
+
+python scripts/release/backup_common.py validate "$BUNDLE_DIR/manifest.json" --print-artifacts
+( cd "$BUNDLE_DIR" && sha256sum -c CHECKSUMS.sha256 )
+python scripts/release/restore-cell-restore-bundle.py "$BUNDLE_DIR" --preflight-only
+
+docker stop \
+  exais-vector-store-ks-state-civics-api-1 \
+  exais-vector-store-ks-state-civics-worker-1 \
+  exais-vector-store-ks-state-civics-admin-ui-1 \
+  exais-vector-store-ks-state-civics-minio-1
+```
+
+Restore object volumes while their services are stopped:
+
+```bash
+cd "$BUNDLE_DIR"
+docker run --rm \
+  -v exais-vector-store-ks-state-civics_object-store:/dest \
+  -v "$PWD":/bundle \
+  alpine:3.20 \
+  sh -lc 'cd /dest && tar -xzf /bundle/object-store/volumes/object-store.tar.gz'
+
+docker run --rm \
+  -v exais-vector-store-ks-state-civics_minio-data:/dest \
+  -v "$PWD":/bundle \
+  alpine:3.20 \
+  sh -lc 'cd /dest && tar -xzf /bundle/object-store/volumes/minio-data.tar.gz'
+```
+
+Restore Postgres while the database is running and API/worker are stopped:
+
+```bash
+docker exec -i exais-vector-store-ks-state-civics-postgres-1 \
+  sh -lc 'pg_restore --clean --if-exists --no-owner -U "$POSTGRES_USER" -d "$POSTGRES_DB"' \
+  < "$BUNDLE_DIR/postgres/svs.dump"
+```
+
+Restore every Qdrant collection snapshot listed in
+`$BUNDLE_DIR/qdrant/snapshots.json` using `priority=snapshot`. This matches
+Qdrant's documented migration path for uploaded collection snapshots and keeps
+the target collection data authoritative from the snapshot.
+
+```bash
+python - "$BUNDLE_DIR" <<'PY'
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+from pathlib import Path
+from urllib.parse import quote
+
+bundle = Path(sys.argv[1])
+index = json.loads((bundle / "qdrant" / "snapshots.json").read_text(encoding="utf-8"))
+for row in index.get("collections", []):
+    collection = quote(row["collection"], safe="")
+    checksum = row["sha256"]
+    url = f"http://qdrant:6333/collections/{collection}/snapshots/upload?wait=true&priority=snapshot&checksum={checksum}"
+    subprocess.check_call([
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "exais-vector-store-ks-state-civics_default",
+        "-v",
+        f"{bundle}:/bundle",
+        "curlimages/curl:8.10.1",
+        "-fsS",
+        "-X",
+        "POST",
+        url,
+        "-F",
+        f"snapshot=@/bundle/{row['relative_path']}",
+    ])
+PY
+```
+
+If the VPS Qdrant instance uses an API key, add the `api-key` header in the
+restore snippet from a resolved secret env var; do not paste the key into shell
+history. The target Qdrant version must be the same minor version as the source
+or the next minor version. The checked Compose stack pins `qdrant/qdrant:v1.14.1`
+for this first restore.
+
+Restart the serving services and then run the normal launch proof:
+
+```bash
+python scripts/release/cell-up.py \
+  --cell "$CELL" \
+  --worker-scale 4 \
+  --release-manifest /opt/exais/proof/operator-approved-release-manifest.json
 ```
 
 ## Launch
