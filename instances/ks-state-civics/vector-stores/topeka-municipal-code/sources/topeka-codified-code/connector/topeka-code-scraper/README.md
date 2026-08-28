@@ -163,6 +163,21 @@ Optional non-secret Decodo knobs are available as flags or env vars:
 
 The Decodo token must remain a runtime secret and should not be committed. The scraper records Decodo task metadata in network archives, but never writes the API credential into artifacts.
 
+For controlled acquisition, run non-overlapping fetch windows while preserving the full URL manifest graph:
+
+```bash
+topeka-code-scraper \
+  --fetcher decodo \
+  --url-list ./seed/raw/topeka_municipal_code_urls.csv \
+  --url-list-levels Section,Subsection \
+  --url-list-offset 200 \
+  --url-list-limit 200 \
+  --manifest-only \
+  --archive-raw \
+  --archive-network \
+  --output ./output/topeka-decodo-batch-002
+```
+
 Import operator-owned HTML captures instead of fetching live pages:
 
 ```bash

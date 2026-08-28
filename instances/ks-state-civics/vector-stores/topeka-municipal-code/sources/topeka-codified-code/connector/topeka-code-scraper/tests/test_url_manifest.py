@@ -8,6 +8,7 @@ from topeka_code_scraper.url_manifest import (
     merge_graphs,
     parse_level_filter,
     read_url_manifest,
+    slice_url_manifest_entries,
     write_url_manifest_artifacts,
 )
 
@@ -91,6 +92,19 @@ def test_url_manifest_artifacts_are_written_and_added_to_manifest(tmp_path):
     assert manifest["files"]["url_manifest"] == "url-manifest.jsonl"
     assert manifest["files"]["expected_fetch_urls"] == "expected-fetch-urls.jsonl"
     assert manifest["counts"]["expected_fetch_urls"] == 1
+
+
+def test_url_manifest_fetch_slice_preserves_source_row_order():
+    entries = [
+        _entry("Section", "1.10.010", "One.", "https://topeka.municipal.codes/TMC/1.10.010", 10),
+        _entry("Section", "1.10.020", "Two.", "https://topeka.municipal.codes/TMC/1.10.020", 11),
+        _entry("Section", "1.10.030", "Three.", "https://topeka.municipal.codes/TMC/1.10.030", 12),
+    ]
+
+    sliced = slice_url_manifest_entries(entries, offset=1, limit=1)
+
+    assert [entry.citation for entry in sliced] == ["1.10.020"]
+    assert sliced[0].row_number == 11
 
 
 def _entry(level: str, citation: str, name: str, url: str, row_number: int):

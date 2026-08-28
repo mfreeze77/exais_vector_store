@@ -78,6 +78,18 @@ def load_url_manifest(path: Path, *, fetch_levels: set[str] | None = None) -> li
     return [entry for entry in all_entries if entry.normalized_level in fetch_levels]
 
 
+def slice_url_manifest_entries(
+    entries: list[UrlManifestEntry],
+    *,
+    offset: int = 0,
+    limit: int | None = None,
+) -> list[UrlManifestEntry]:
+    start = max(0, offset)
+    if limit is None:
+        return entries[start:]
+    return entries[start:start + max(0, limit)]
+
+
 def read_url_manifest(path: Path) -> list[UrlManifestEntry]:
     entries: list[UrlManifestEntry] = []
     seen_urls: set[str] = set()

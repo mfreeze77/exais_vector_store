@@ -15,6 +15,7 @@ from .url_manifest import (
     merge_graphs,
     parse_level_filter,
     read_url_manifest,
+    slice_url_manifest_entries,
     write_url_manifest_artifacts,
 )
 
@@ -69,6 +70,18 @@ def scrape(
         "--url-list-levels",
         help="Comma-separated manifest levels to fetch when --url-list is supplied.",
     ),
+    url_list_offset: int = typer.Option(
+        0,
+        "--url-list-offset",
+        min=0,
+        help="Skip this many filtered --url-list fetch entries while preserving the full manifest graph.",
+    ),
+    url_list_limit: int | None = typer.Option(
+        None,
+        "--url-list-limit",
+        min=1,
+        help="Fetch at most this many filtered --url-list entries while preserving the full manifest graph.",
+    ),
     manifest_only: bool = typer.Option(
         False,
         "--manifest-only",
@@ -95,6 +108,7 @@ def scrape(
         manifest_entries = read_url_manifest(url_list) if url_list else []
         fetch_levels = parse_level_filter(url_list_levels)
         fetch_entries = load_url_manifest(url_list, fetch_levels=fetch_levels) if url_list else []
+        fetch_entries = slice_url_manifest_entries(fetch_entries, offset=url_list_offset, limit=url_list_limit)
         page_hints = {entry.url: entry for entry in fetch_entries}
         if capture_manifest:
             pages, nodes, edges, report = import_capture_manifest(
