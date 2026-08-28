@@ -130,6 +130,7 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-120 GraphRAG Search Lenses](./WAVE-120-graphrag-search-lenses.md)
 - [WAVE-121 KS Civics VPS Go-Live Handoff](./WAVE-121-KS-civics-vps-go-live-handoff.md)
 - [WAVE-122 Topeka Municipal Code GraphRAG API Handler](./WAVE-122-topeka-municipal-code-graphrag-api-handler.md)
+- [WAVE-123 Expert Conversation Sessions](./WAVE-123-expert-conversation-sessions.md)
 
 ## Execution Model
 

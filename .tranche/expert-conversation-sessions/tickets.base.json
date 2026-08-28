@@ -1,0 +1,101 @@
+{
+  "canonical_goal": "Add server-side ExAIS expert conversation sessions so caller agents can ask a named vector-store expert in natural language while ExAIS owns retrieval, graph use, citations, memory, feedback, tenancy, and provider-agnostic LLM execution.",
+  "tickets": [
+    {
+      "id": "T-001",
+      "title": "Define expert profile registry",
+      "goal": "Create the registry contract that binds a named ExAIS expert to allowed vector stores, prompts, graph lenses, citation policy, answer caveats, model policy, and tool limits.",
+      "acceptance": "Expert profiles can be listed and resolved under the request principal; invalid or cross-scope store bindings fail closed before any retrieval or LLM call.",
+      "suspected_files": [
+        "packages/svs_common/svs_common/schemas.py",
+        "packages/svs_common/svs_common/search_lenses.py",
+        "apps/api/svs_api/main.py",
+        "docs/API.md",
+        "docs/CALLER_AGENT_INTEGRATION.md"
+      ]
+    },
+    {
+      "id": "T-002",
+      "title": "Persist expert sessions and forks",
+      "goal": "Add tenant-scoped persistence for expert sessions, messages, tool calls, retrieval runs, memory events, feedback, and session forks.",
+      "acceptance": "Sessions are keyed by principal plus expert plus caller-provided user/conversation identifiers; resume and fork preserve audit history without crossing tenant, business-instance, or API-key boundaries.",
+      "suspected_files": [
+        "migrations/versions",
+        "db/migrations",
+        "packages/svs_common/svs_common/db.py",
+        "packages/svs_common/svs_common/auth.py",
+        "packages/svs_common/svs_common/schemas.py",
+        "tests/test_migration_discipline.py",
+        "tests/test_openai_tenant_leakage_guards.py"
+      ]
+    },
+    {
+      "id": "T-003",
+      "title": "Add provider-agnostic expert LLM client",
+      "goal": "Introduce an internal chat/generation client abstraction for expert reasoning that can route to multiple providers and models without coupling expert behavior to one SDK.",
+      "acceptance": "Expert code calls one internal client contract; provider/model selection is policy-driven, observable, testable with fixtures, and separate from embedding/rerank provider code.",
+      "suspected_files": [
+        "apps/model_gateway/svs_model_gateway/main.py",
+        "packages/svs_common/svs_common/model_registry.py",
+        "packages/svs_common/svs_common/providers.py",
+        "packages/svs_common/svs_common/schemas.py",
+        "tests/test_embedding_providers.py",
+        "tests/test_private_endpoint_adapters.py"
+      ]
+    },
+    {
+      "id": "T-004",
+      "title": "Implement expert message API",
+      "goal": "Add the caller-facing route for natural-language expert requests and return a cited answer, retrieval trace, session identifiers, model metadata, caveats, and follow-up affordances.",
+      "acceptance": "`POST /v1/experts/{expert_id}/messages` requires bearer auth, `retrieval:read`, and a valid expert profile; it returns typed OpenAPI components and never exposes raw backend credentials or storage internals.",
+      "suspected_files": [
+        "apps/api/svs_api/main.py",
+        "packages/svs_common/svs_common/schemas.py",
+        "packages/svs_common/svs_common/request_controls.py",
+        "docs/API.md",
+        "tests/test_openapi_contract.py"
+      ]
+    },
+    {
+      "id": "T-005",
+      "title": "Wire expert retrieval planner",
+      "goal": "Create the server-side expert tool loop that turns natural language into scoped semantic searches, graph-lens searches, citation expansion, and answer synthesis.",
+      "acceptance": "The expert engine can call existing vector-store search and graph-lens code, records every retrieval run, applies citation integrity/output guard behavior, and does not alter default raw search behavior.",
+      "suspected_files": [
+        "packages/svs_common/svs_common/retrieval.py",
+        "packages/svs_common/svs_common/query_planner.py",
+        "packages/svs_common/svs_common/search_lenses.py",
+        "packages/svs_common/svs_common/openai_compat.py",
+        "tests/test_openai_compat_search.py",
+        "tests/test_topeka_graphrag.py"
+      ]
+    },
+    {
+      "id": "T-006",
+      "title": "Govern expert memory and feedback",
+      "goal": "Add strict memory and feedback rules so caller corrections can improve future expert behavior without becoming authoritative law or leaking between users.",
+      "acceptance": "Feedback is stored as scoped evidence about interaction quality; promoted memory is opt-in, typed, confidence-scored, deletable, audit-visible, and excluded from legal-source citations unless backed by retrieved source material.",
+      "suspected_files": [
+        "packages/svs_common/svs_common/security.py",
+        "packages/svs_common/svs_common/auth.py",
+        "apps/api/svs_api/main.py",
+        "docs/SECURITY.md",
+        "docs/CALLER_AGENT_INTEGRATION.md",
+        "tests/test_security.py"
+      ]
+    },
+    {
+      "id": "T-007",
+      "title": "Document caller MCP contract and evals",
+      "goal": "Document the thin caller-side MCP/tooling contract and add an eval harness that compares raw search against expert-session answers for store-specific tough queries.",
+      "acceptance": "Caller docs define `list_exais_experts`, `ask_exais_expert`, and `submit_expert_feedback`; tests prove expert answers preserve citations and beat or match raw search on selected legal/civics evals.",
+      "suspected_files": [
+        "docs/CALLER_AGENT_INTEGRATION.md",
+        "docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md",
+        "evals",
+        "tests/test_corpus_quality_eval.py",
+        "tickets/README.md"
+      ]
+    }
+  ]
+}

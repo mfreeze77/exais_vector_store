@@ -1,0 +1,244 @@
+{
+  "end_goal": "Add server-side ExAIS expert conversation sessions so caller agents can ask a named vector-store expert in natural language while ExAIS owns retrieval, graph use, citations, memory, feedback, tenancy, and provider-agnostic LLM execution.",
+  "shared_functions": [
+    {
+      "name": "resolve_expert_profile",
+      "signature": "resolve_expert_profile(db: Session, principal: Principal, expert_id: str) -> ExpertProfile",
+      "owner_file": "packages/svs_common/svs_common/expert_profiles.py",
+      "is_new": true,
+      "used_by": ["T-001", "T-004", "T-005", "T-007"]
+    },
+    {
+      "name": "expert_session_key",
+      "signature": "expert_session_key(principal: Principal, expert_id: str, external_user_id: str | None, conversation_id: str | None) -> str",
+      "owner_file": "packages/svs_common/svs_common/expert_sessions.py",
+      "is_new": true,
+      "used_by": ["T-002", "T-004", "T-006"]
+    },
+    {
+      "name": "fork_expert_session",
+      "signature": "fork_expert_session(db: Session, principal: Principal, session_id: str, *, label: str | None = None) -> ExpertSession",
+      "owner_file": "packages/svs_common/svs_common/expert_sessions.py",
+      "is_new": true,
+      "used_by": ["T-002", "T-004", "T-007"]
+    },
+    {
+      "name": "complete_expert_chat",
+      "signature": "complete_expert_chat(req: ExpertChatCompletionRequest) -> Awaitable[ExpertChatCompletionResponse]",
+      "owner_file": "packages/svs_common/svs_common/expert_llm.py",
+      "is_new": true,
+      "used_by": ["T-003", "T-005"]
+    },
+    {
+      "name": "run_expert_turn",
+      "signature": "run_expert_turn(db: Session, principal: Principal, req: ExpertMessageRequest) -> Awaitable[ExpertMessageResponse]",
+      "owner_file": "packages/svs_common/svs_common/expert_engine.py",
+      "is_new": true,
+      "used_by": ["T-004", "T-005", "T-006"]
+    },
+    {
+      "name": "record_expert_retrieval_run",
+      "signature": "record_expert_retrieval_run(db: Session, principal: Principal, session_id: str, payload: dict[str, Any]) -> str",
+      "owner_file": "packages/svs_common/svs_common/expert_sessions.py",
+      "is_new": true,
+      "used_by": ["T-002", "T-005", "T-007"]
+    },
+    {
+      "name": "extract_candidate_memory_events",
+      "signature": "extract_candidate_memory_events(turn: ExpertTurnRecord, policy: ExpertMemoryPolicy) -> list[ExpertMemoryEvent]",
+      "owner_file": "packages/svs_common/svs_common/expert_sessions.py",
+      "is_new": true,
+      "used_by": ["T-006"]
+    }
+  ],
+  "file_modification_map": [
+    {
+      "file": "packages/svs_common/svs_common/expert_profiles.py",
+      "ticket_ids": ["T-001"],
+      "is_new": true,
+      "what": "Own expert profile descriptors, vector-store binding validation, model policy metadata, prompt/caveat policy, and capability discovery helpers."
+    },
+    {
+      "file": "packages/svs_common/svs_common/expert_sessions.py",
+      "ticket_ids": ["T-002", "T-006"],
+      "is_new": true,
+      "what": "Own session keys, session CRUD, message/tool/retrieval persistence, forks, feedback records, and governed memory events."
+    },
+    {
+      "file": "packages/svs_common/svs_common/expert_llm.py",
+      "ticket_ids": ["T-003"],
+      "is_new": true,
+      "what": "Own provider-agnostic expert chat completion request/response contract and model-gateway client behavior."
+    },
+    {
+      "file": "packages/svs_common/svs_common/expert_engine.py",
+      "ticket_ids": ["T-004", "T-005", "T-006"],
+      "is_new": true,
+      "what": "Own the server-side expert turn loop: profile resolution, session resume/fork, retrieval planning, tool execution, cited synthesis, feedback hooks, and persistence."
+    },
+    {
+      "file": "packages/svs_common/svs_common/schemas.py",
+      "ticket_ids": ["T-001", "T-002", "T-003", "T-004", "T-006"],
+      "is_new": false,
+      "what": "Add typed Pydantic request/response objects for expert profiles, sessions, messages, retrieval traces, feedback, memory events, forks, and chat completions."
+    },
+    {
+      "file": "apps/api/svs_api/main.py",
+      "ticket_ids": ["T-001", "T-004", "T-006"],
+      "is_new": false,
+      "what": "Add expert discovery, message, session, fork, and feedback routes using existing principal, scope, rate-limit, and OpenAPI component patterns."
+    },
+    {
+      "file": "apps/model_gateway/svs_model_gateway/main.py",
+      "ticket_ids": ["T-003"],
+      "is_new": false,
+      "what": "Add internal expert chat/generation route or explicitly delegate to an existing provider gateway without mixing chat behavior into embedding/rerank routes."
+    },
+    {
+      "file": "packages/svs_common/svs_common/model_registry.py",
+      "ticket_ids": ["T-001", "T-003"],
+      "is_new": false,
+      "what": "Add expert chat model profiles, aliases, policy metadata, and fixture model support for deterministic tests."
+    },
+    {
+      "file": "packages/svs_common/svs_common/providers.py",
+      "ticket_ids": ["T-003"],
+      "is_new": false,
+      "what": "Extend or wrap provider adapter contracts for chat/generation while preserving existing embedding and rerank behavior."
+    },
+    {
+      "file": "packages/svs_common/svs_common/retrieval.py",
+      "ticket_ids": ["T-005"],
+      "is_new": false,
+      "what": "Expose a stable internal search call for expert tools so the expert engine does not duplicate retrieval logic."
+    },
+    {
+      "file": "packages/svs_common/svs_common/query_planner.py",
+      "ticket_ids": ["T-005"],
+      "is_new": false,
+      "what": "Reuse or extend planner profiles for expert-specific query decomposition and lens selection without changing raw-search defaults."
+    },
+    {
+      "file": "packages/svs_common/svs_common/search_lenses.py",
+      "ticket_ids": ["T-001", "T-005"],
+      "is_new": false,
+      "what": "Expose store-lens capabilities and graph expansion metadata to expert profiles and the expert planner."
+    },
+    {
+      "file": "packages/svs_common/svs_common/openai_compat.py",
+      "ticket_ids": ["T-005"],
+      "is_new": false,
+      "what": "Reuse citation marker, annotation, and output-guard helpers for expert-generated answers."
+    },
+    {
+      "file": "migrations/versions/003_expert_conversation_sessions.py",
+      "ticket_ids": ["T-002", "T-006"],
+      "is_new": true,
+      "what": "Create tenant-scoped expert tables and RLS policies for sessions, messages, tool calls, retrieval runs, feedback, memory events, and forks."
+    },
+    {
+      "file": "tests/test_expert_profiles.py",
+      "ticket_ids": ["T-001"],
+      "is_new": true,
+      "what": "Prove profile listing, resolution, store binding validation, and fail-closed cross-scope behavior."
+    },
+    {
+      "file": "tests/test_expert_sessions.py",
+      "ticket_ids": ["T-002", "T-006"],
+      "is_new": true,
+      "what": "Prove session keying, resume, fork, message/tool persistence, feedback, memory deletion, and tenant isolation."
+    },
+    {
+      "file": "tests/test_expert_llm_client.py",
+      "ticket_ids": ["T-003"],
+      "is_new": true,
+      "what": "Prove provider-agnostic model selection, fixture chat completions, fallback behavior, usage metadata, and no embedding-provider regressions."
+    },
+    {
+      "file": "tests/test_expert_messages_routes.py",
+      "ticket_ids": ["T-004", "T-005", "T-006"],
+      "is_new": true,
+      "what": "Prove API auth/scope, OpenAPI components, expert message response shape, session resume/fork, retrieval traces, feedback, and citation guard behavior."
+    },
+    {
+      "file": "tests/test_expert_corpus_eval.py",
+      "ticket_ids": ["T-007"],
+      "is_new": true,
+      "what": "Compare raw search and expert-session answers on KS courts and Topeka municipal-code tough query fixtures."
+    },
+    {
+      "file": "docs/API.md",
+      "ticket_ids": ["T-001", "T-003", "T-004", "T-006", "T-007"],
+      "is_new": false,
+      "what": "Document expert routes, schemas, scopes, session/fork behavior, provider metadata, memory rules, and response examples."
+    },
+    {
+      "file": "docs/CALLER_AGENT_INTEGRATION.md",
+      "ticket_ids": ["T-001", "T-004", "T-006", "T-007"],
+      "is_new": false,
+      "what": "Promote expert sessions as the recommended caller primitive while keeping raw vector-store search documented for advanced callers."
+    },
+    {
+      "file": "docs/SECURITY.md",
+      "ticket_ids": ["T-002", "T-006"],
+      "is_new": false,
+      "what": "Document no-cross-tenant memory, feedback-is-not-law, deletion, audit, and provider/runtime boundaries."
+    },
+    {
+      "file": "docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md",
+      "ticket_ids": ["T-001", "T-007"],
+      "is_new": false,
+      "what": "Add guidance that each graph-capable vector store should define an optional expert profile and eval set."
+    },
+    {
+      "file": "tickets/WAVE-123-expert-conversation-sessions.md",
+      "ticket_ids": ["T-001", "T-002", "T-003", "T-004", "T-005", "T-006", "T-007"],
+      "is_new": true,
+      "what": "Repo-facing implementation ticket wave generated from this build contract."
+    },
+    {
+      "file": "tickets/README.md",
+      "ticket_ids": ["T-007"],
+      "is_new": false,
+      "what": "Add WAVE-123 to the ticket index."
+    }
+  ],
+  "anti_duplication_rules": [
+    "All expert profile resolution goes through packages/svs_common/svs_common/expert_profiles.py:resolve_expert_profile; do not add route-local expert descriptor dictionaries.",
+    "All expert session, fork, feedback, and memory persistence goes through packages/svs_common/svs_common/expert_sessions.py; do not store expert memory inside OpenAI response payload JSON.",
+    "All expert chat/generation calls go through packages/svs_common/svs_common/expert_llm.py and the model-gateway boundary; do not call OpenAI, Anthropic, Gemini, Groq, Ollama, Codex, Claude Code, or OpenCode SDKs directly from route handlers.",
+    "All expert retrieval uses the existing retrieval/query_planner/search_lenses/openai_compat code paths; do not create a second search implementation for expert answers.",
+    "Feedback and memory events are not legal sources. Expert answers may cite only retrieved corpus/source-package material, never learned interaction memory by itself.",
+    "Caller-side MCP tools are thin HTTP adapters only; do not put retrieval planning, graph expansion, citation formatting, ACL checks, or provider credentials into the caller adapter."
+  ],
+  "tickets": [
+    {
+      "id": "T-001",
+      "expected_output": "Expert profile registry and typed profile schemas are available; profiles bind to allowed vector stores and graph lenses under principal scope; list/resolve tests pass."
+    },
+    {
+      "id": "T-002",
+      "expected_output": "Alembic migration adds RLS-protected expert session/message/tool/retrieval/feedback/memory/fork tables; resume and fork work under tenant/business/API-key boundaries."
+    },
+    {
+      "id": "T-003",
+      "expected_output": "Provider-agnostic expert chat client exists with model-policy resolution, fixture provider, usage metadata, fallback behavior, and tests proving no embedding/rerank regressions."
+    },
+    {
+      "id": "T-004",
+      "expected_output": "`POST /v1/experts/{expert_id}/messages` and companion discovery/session routes return typed responses with cited answers, traces, session IDs, caveats, and provider metadata."
+    },
+    {
+      "id": "T-005",
+      "expected_output": "Expert engine executes bounded retrieval tool loops over semantic search, graph lenses, and citation expansion while preserving raw search endpoint behavior."
+    },
+    {
+      "id": "T-006",
+      "expected_output": "Feedback and memory governance stores scoped corrections, supports opt-in memory promotion/deletion, records audit visibility, and blocks memory from being cited as source law."
+    },
+    {
+      "id": "T-007",
+      "expected_output": "Caller docs and eval harness define `list_exais_experts`, `ask_exais_expert`, and `submit_expert_feedback`, with raw-search versus expert-session quality proof."
+    }
+  ]
+}

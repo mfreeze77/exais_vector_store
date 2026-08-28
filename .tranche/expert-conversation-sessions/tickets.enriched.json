@@ -1,0 +1,328 @@
+{
+  "canonical_goal": "Add server-side ExAIS expert conversation sessions so caller agents can ask a named vector-store expert in natural language while ExAIS owns retrieval, graph use, citations, memory, feedback, tenancy, and provider-agnostic LLM execution.",
+  "tickets": [
+    {
+      "id": "T-001",
+      "title": "Define expert profile registry",
+      "goal": "Create the registry contract that binds a named ExAIS expert to allowed vector stores, prompts, graph lenses, citation policy, answer caveats, model policy, and tool limits.",
+      "acceptance": "Expert profiles can be listed and resolved under the request principal; invalid or cross-scope store bindings fail closed before any retrieval or LLM call.",
+      "suspected_files": [
+        "packages/svs_common/svs_common/schemas.py",
+        "packages/svs_common/svs_common/search_lenses.py",
+        "apps/api/svs_api/main.py",
+        "docs/API.md",
+        "docs/CALLER_AGENT_INTEGRATION.md"
+      ],
+      "code_refs": [
+        {
+          "file": "packages/svs_common/svs_common/search_lenses.py",
+          "symbol": "store lens descriptor resolution",
+          "note": "current per-store graph-lens discovery contract to reuse for expert capabilities"
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "vector_store_search_lenses",
+          "note": "existing authenticated route pattern for store-scoped capability discovery"
+        },
+        {
+          "file": "packages/svs_common/svs_common/schemas.py",
+          "symbol": "VectorStoreSearchLens",
+          "note": "typed response pattern for capability descriptors"
+        }
+      ],
+      "external_claims": [
+        {
+          "claim": "OpenCode exposes agent/session/provider/MCP patterns that are useful as product reference, not as ExAIS runtime authority.",
+          "source": "https://opencode.ai/",
+          "verification": "Verified against OpenCode public docs and repository landing pages researched on 2026-08-28."
+        }
+      ],
+      "patterns": [
+        {
+          "name": "profile-bound expert",
+          "source": "ExAIS search_lenses registry plus OpenCode agent profile patterns",
+          "applies_to": "T-001"
+        }
+      ]
+    },
+    {
+      "id": "T-002",
+      "title": "Persist expert sessions and forks",
+      "goal": "Add tenant-scoped persistence for expert sessions, messages, tool calls, retrieval runs, memory events, feedback, and session forks.",
+      "acceptance": "Sessions are keyed by principal plus expert plus caller-provided user/conversation identifiers; resume and fork preserve audit history without crossing tenant, business-instance, or API-key boundaries.",
+      "suspected_files": [
+        "migrations/versions",
+        "db/migrations",
+        "packages/svs_common/svs_common/db.py",
+        "packages/svs_common/svs_common/auth.py",
+        "packages/svs_common/svs_common/schemas.py",
+        "tests/test_migration_discipline.py",
+        "tests/test_openai_tenant_leakage_guards.py"
+      ],
+      "code_refs": [
+        {
+          "file": "packages/svs_common/svs_common/auth.py",
+          "symbol": "resolve_api_key_principal",
+          "note": "source of tenant/business/user/api_key principal used for session keys"
+        },
+        {
+          "file": "migrations/versions/001_initial_schema.py",
+          "symbol": "initial tenant-scoped schema",
+          "note": "Alembic owner for new expert-session tables"
+        },
+        {
+          "file": "tests/test_openai_tenant_leakage_guards.py",
+          "symbol": "tenant leakage guard tests",
+          "note": "test pattern for cross-scope fail-closed behavior"
+        }
+      ],
+      "external_claims": [
+        {
+          "claim": "LangGraph distinguishes thread-scoped checkpoints from longer-term stores, a useful pattern for session resume versus durable expert memory.",
+          "source": "https://github.com/langchain-ai/langgraph",
+          "verification": "Verified against LangGraph repository/docs research on 2026-08-28; ExAIS still owns tenancy and deletion."
+        }
+      ],
+      "patterns": [
+        {
+          "name": "checkpoint-and-store split",
+          "source": "LangGraph pattern adapted to ExAIS Postgres/RLS",
+          "applies_to": "T-002"
+        }
+      ]
+    },
+    {
+      "id": "T-003",
+      "title": "Add provider-agnostic expert LLM client",
+      "goal": "Introduce an internal chat/generation client abstraction for expert reasoning that can route to multiple providers and models without coupling expert behavior to one SDK.",
+      "acceptance": "Expert code calls one internal client contract; provider/model selection is policy-driven, observable, testable with fixtures, and separate from embedding/rerank provider code.",
+      "suspected_files": [
+        "apps/model_gateway/svs_model_gateway/main.py",
+        "packages/svs_common/svs_common/model_registry.py",
+        "packages/svs_common/svs_common/providers.py",
+        "packages/svs_common/svs_common/schemas.py",
+        "tests/test_embedding_providers.py",
+        "tests/test_private_endpoint_adapters.py"
+      ],
+      "code_refs": [
+        {
+          "file": "apps/model_gateway/svs_model_gateway/main.py",
+          "symbol": "embeddings/rerank/tokenize routes",
+          "note": "current provider-routing service boundary to extend with chat/generation"
+        },
+        {
+          "file": "packages/svs_common/svs_common/model_registry.py",
+          "symbol": "model_registry",
+          "note": "existing profile registry to add expert chat model policy metadata"
+        },
+        {
+          "file": "packages/svs_common/svs_common/providers.py",
+          "symbol": "provider_for and provider_for_rerank",
+          "note": "existing provider adapter pattern that should not be duplicated"
+        }
+      ],
+      "external_claims": [
+        {
+          "claim": "LiteLLM provides an OpenAI-compatible abstraction over many LLM providers and is the strongest gateway reference for provider/model routing.",
+          "source": "https://github.com/BerriAI/litellm",
+          "verification": "Verified against LiteLLM GitHub README/release research on 2026-08-28; ticket uses it as reference unless deliberately adopted."
+        },
+        {
+          "claim": "Pydantic AI is a Python-native reference for typed tools and structured outputs across multiple model providers.",
+          "source": "https://github.com/pydantic/pydantic-ai",
+          "verification": "Verified against Pydantic AI GitHub research on 2026-08-28; ticket treats it as a candidate client pattern."
+        }
+      ],
+      "patterns": [
+        {
+          "name": "single internal chat client",
+          "source": "LiteLLM gateway pattern plus ExAIS model_gateway service boundary",
+          "applies_to": "T-003"
+        }
+      ]
+    },
+    {
+      "id": "T-004",
+      "title": "Implement expert message API",
+      "goal": "Add the caller-facing route for natural-language expert requests and return a cited answer, retrieval trace, session identifiers, model metadata, caveats, and follow-up affordances.",
+      "acceptance": "`POST /v1/experts/{expert_id}/messages` requires bearer auth, `retrieval:read`, and a valid expert profile; it returns typed OpenAPI components and never exposes raw backend credentials or storage internals.",
+      "suspected_files": [
+        "apps/api/svs_api/main.py",
+        "packages/svs_common/svs_common/schemas.py",
+        "packages/svs_common/svs_common/request_controls.py",
+        "docs/API.md",
+        "tests/test_openapi_contract.py"
+      ],
+      "code_refs": [
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "get_request_principal",
+          "note": "request auth dependency to reuse"
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "create_response",
+          "note": "existing OpenAI-compatible response route shape to avoid conflicting contracts"
+        },
+        {
+          "file": "tests/test_openapi_contract.py",
+          "symbol": "OpenAPI named component checks",
+          "note": "test pattern for new expert request/response components"
+        }
+      ],
+      "external_claims": [
+        {
+          "claim": "Dify is a useful reference for productized conversation APIs and message feedback, but ExAIS must not copy caller-provided user trust semantics.",
+          "source": "https://github.com/langgenius/dify",
+          "verification": "Verified against Dify repository/docs research on 2026-08-28 and constrained by ExAIS auth principal rules."
+        }
+      ],
+      "patterns": [
+        {
+          "name": "expert-message endpoint",
+          "source": "ExAIS FastAPI route patterns plus Dify conversation feedback API reference",
+          "applies_to": "T-004"
+        }
+      ]
+    },
+    {
+      "id": "T-005",
+      "title": "Wire expert retrieval planner",
+      "goal": "Create the server-side expert tool loop that turns natural language into scoped semantic searches, graph-lens searches, citation expansion, and answer synthesis.",
+      "acceptance": "The expert engine can call existing vector-store search and graph-lens code, records every retrieval run, applies citation integrity/output guard behavior, and does not alter default raw search behavior.",
+      "suspected_files": [
+        "packages/svs_common/svs_common/retrieval.py",
+        "packages/svs_common/svs_common/query_planner.py",
+        "packages/svs_common/svs_common/search_lenses.py",
+        "packages/svs_common/svs_common/openai_compat.py",
+        "tests/test_openai_compat_search.py",
+        "tests/test_topeka_graphrag.py"
+      ],
+      "code_refs": [
+        {
+          "file": "packages/svs_common/svs_common/retrieval.py",
+          "symbol": "RetrievalService",
+          "note": "current retrieval orchestrator to call from expert tools"
+        },
+        {
+          "file": "packages/svs_common/svs_common/query_planner.py",
+          "symbol": "query planner profiles",
+          "note": "existing profile-aware query planning to reuse, not bypass"
+        },
+        {
+          "file": "packages/svs_common/svs_common/openai_compat.py",
+          "symbol": "citation integrity helpers",
+          "note": "existing citation marker and response construction behavior to preserve"
+        }
+      ],
+      "external_claims": [
+        {
+          "claim": "OpenAI Agents SDK and Mastra provide reference patterns for agents-as-tools, tool loops, structured outputs, and provider-agnostic runtime design.",
+          "source": "https://github.com/openai/openai-agents-python and https://github.com/mastra-ai/mastra",
+          "verification": "Verified against GitHub README research on 2026-08-28; ExAIS implementation remains native."
+        }
+      ],
+      "patterns": [
+        {
+          "name": "expert-owned retrieval tool loop",
+          "source": "Existing ExAIS retrieval stack plus typed-agent runtime references",
+          "applies_to": "T-005"
+        }
+      ]
+    },
+    {
+      "id": "T-006",
+      "title": "Govern expert memory and feedback",
+      "goal": "Add strict memory and feedback rules so caller corrections can improve future expert behavior without becoming authoritative law or leaking between users.",
+      "acceptance": "Feedback is stored as scoped evidence about interaction quality; promoted memory is opt-in, typed, confidence-scored, deletable, audit-visible, and excluded from legal-source citations unless backed by retrieved source material.",
+      "suspected_files": [
+        "packages/svs_common/svs_common/security.py",
+        "packages/svs_common/svs_common/auth.py",
+        "apps/api/svs_api/main.py",
+        "docs/SECURITY.md",
+        "docs/CALLER_AGENT_INTEGRATION.md",
+        "tests/test_security.py"
+      ],
+      "code_refs": [
+        {
+          "file": "packages/svs_common/svs_common/security.py",
+          "symbol": "redaction and security helpers",
+          "note": "existing security guard surface for memory extraction boundaries"
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "audit_events and usage routes",
+          "note": "existing audit visibility patterns for feedback and memory events"
+        },
+        {
+          "file": "docs/SECURITY.md",
+          "symbol": "security documentation",
+          "note": "documentation owner for tenant, memory, and provider boundaries"
+        }
+      ],
+      "external_claims": [
+        {
+          "claim": "Mem0 is a relevant reference for extracted user/agent memory and metadata filters.",
+          "source": "https://github.com/mem0ai/mem0",
+          "verification": "Verified against Mem0 GitHub README research on 2026-08-28; ExAIS must add legal-memory gates."
+        },
+        {
+          "claim": "Graphiti/Zep is a relevant reference for temporal episode/fact/provenance memory.",
+          "source": "https://github.com/getzep/graphiti",
+          "verification": "Verified against Graphiti GitHub README research on 2026-08-28; ExAIS must validate extracted graph facts before use."
+        }
+      ],
+      "patterns": [
+        {
+          "name": "feedback-is-not-law",
+          "source": "ExAIS security boundary plus Mem0/Graphiti memory references",
+          "applies_to": "T-006"
+        }
+      ]
+    },
+    {
+      "id": "T-007",
+      "title": "Document caller MCP contract and evals",
+      "goal": "Document the thin caller-side MCP/tooling contract and add an eval harness that compares raw search against expert-session answers for store-specific tough queries.",
+      "acceptance": "Caller docs define `list_exais_experts`, `ask_exais_expert`, and `submit_expert_feedback`; tests prove expert answers preserve citations and beat or match raw search on selected legal/civics evals.",
+      "suspected_files": [
+        "docs/CALLER_AGENT_INTEGRATION.md",
+        "docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md",
+        "evals",
+        "tests/test_corpus_quality_eval.py",
+        "tickets/README.md"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/CALLER_AGENT_INTEGRATION.md",
+          "symbol": "Current integration boundary",
+          "note": "existing caller-side boundary states MCP should be a thin HTTP adapter"
+        },
+        {
+          "file": "docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md",
+          "symbol": "jurisdiction vector-store playbook",
+          "note": "existing per-store source/graph/citation quality gate contract"
+        },
+        {
+          "file": "tests/test_corpus_quality_eval.py",
+          "symbol": "corpus quality eval patterns",
+          "note": "test owner for raw search versus expert-session comparison"
+        }
+      ],
+      "external_claims": [
+        {
+          "claim": "OpenCodex and Claude Code Router are useful references for provider routing over Codex/Claude-like clients, but not production legal-answer runtimes.",
+          "source": "https://github.com/lidge-jun/opencodex and https://github.com/musistudio/claude-code-router",
+          "verification": "Verified against GitHub repository README research on 2026-08-28; ticket constrains use to reference patterns."
+        }
+      ],
+      "patterns": [
+        {
+          "name": "thin MCP adapter",
+          "source": "Existing caller docs plus Codex-like session reference research",
+          "applies_to": "T-007"
+        }
+      ]
+    }
+  ]
+}
