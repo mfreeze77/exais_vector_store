@@ -520,6 +520,8 @@ class OpenAIVectorStoreSearchRequest(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
     query: str | list[str]
+    lens: str | None = None
+    inputs: dict[str, Any] | None = None
     filters: dict[str, Any] | None = None
     # Historical ExAIS planning docs used attribute_filter. Keep it as a
     # compatibility alias while preferring OpenAI's filters field.
@@ -551,6 +553,25 @@ class OpenAIVectorStoreSearchRequest(BaseModel):
             normalized.append(stripped)
         return normalized
 
+    @field_validator('lens')
+    @classmethod
+    def validate_lens(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError('lens must be a non-empty string')
+        return stripped
+
+    @field_validator('inputs')
+    @classmethod
+    def validate_inputs(cls, value: dict[str, Any] | None) -> dict[str, Any] | None:
+        if value is None:
+            return None
+        if not isinstance(value, dict):
+            raise ValueError('inputs must be an object')
+        return value
+
 
 OPENAI_RESPONSES_FILE_SEARCH_DEFAULT_MAX_NUM_RESULTS = 20
 
@@ -560,6 +581,8 @@ class OpenAIResponseFileSearchTool(BaseModel):
 
     type: str = Field(default='file_search', description='OpenAI Responses tool type. ExAIS currently implements file_search.')
     vector_store_ids: list[str] = Field(default_factory=list)
+    lens: str | None = None
+    inputs: dict[str, Any] | None = None
     filters: dict[str, Any] | None = None
     max_num_results: int = Field(default=OPENAI_RESPONSES_FILE_SEARCH_DEFAULT_MAX_NUM_RESULTS, ge=1, le=50)
     ranking_options: dict[str, Any] | None = None
@@ -699,10 +722,34 @@ class OpenAIVectorStoreSearchResultsPage(BaseModel):
 
     object: str = 'vector_store.search_results.page'
     search_query: str | list[str] | None = None
+    search_lens: dict[str, Any] | None = None
     data: list[OpenAIVectorStoreSearchResult] = Field(default_factory=list)
     citations: list[OpenAIVectorStoreSearchCitation | dict[str, Any]] = Field(default_factory=list)
     has_more: bool = False
     next_page: str | None = None
+
+
+class VectorStoreSearchLens(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    id: str
+    label: str
+    description: str
+    kind: Literal['semantic', 'graph']
+    status: Literal['available', 'disabled', 'empty', 'planned']
+    requires_graph: bool = False
+    graph_profile_id: str | None = None
+    relation_types: list[str] = Field(default_factory=list)
+    input_schema: dict[str, Any] = Field(default_factory=dict)
+    coverage: dict[str, Any] = Field(default_factory=dict)
+    warnings: list[str] = Field(default_factory=list)
+
+
+class VectorStoreSearchLensesResponse(BaseModel):
+    object: str = 'vector_store.search_lenses'
+    vector_store_id: str
+    default_lens: str = 'semantic'
+    data: list[VectorStoreSearchLens] = Field(default_factory=list)
 
 
 class OpenAIResponseFileSearchResult(BaseModel):

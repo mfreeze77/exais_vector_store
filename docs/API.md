@@ -283,6 +283,7 @@ POST   /v1/vector_stores/{vector_store_id}/file_batches
 GET    /v1/vector_stores/{vector_store_id}/file_batches/{batch_id}
 POST   /v1/vector_stores/{vector_store_id}/file_batches/{batch_id}/cancel
 GET    /v1/vector_stores/{vector_store_id}/file_batches/{batch_id}/files
+GET    /v1/vector_stores/{vector_store_id}/search_lenses
 POST   /v1/vector_stores/{vector_store_id}/search
 POST   /v1/responses
 POST   /v1/responses/compact
@@ -684,6 +685,13 @@ Direct search also accepts the opaque `next_page` token returned by a prior
 planning, hybrid retrieval, normalization, score-threshold filtering, and
 reranking, then returns the next ranked slice. Invalid or out-of-window cursor
 tokens return `422`.
+
+Direct search accepts ExAIS-native `lens` and `inputs` fields for per-store
+specialized search modes. `GET /v1/vector_stores/{vector_store_id}/search_lenses`
+returns the lenses supported by that store, their input schema, graph
+relationship types, graph coverage counts, and warnings. Graph lenses fail
+closed when they are unsupported, disabled, empty, or declared only for a future
+handler.
 
 Retrieval uses dense embedding search plus sparse text search with reciprocal
 rank fusion. Sparse text search is phrase-aware on both local backends:

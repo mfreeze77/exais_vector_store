@@ -234,6 +234,8 @@ def openai_search_options_to_search_request_kwargs(req: OpenAIVectorStoreSearchR
                 "top_k_alias": req.top_k,
                 "rewrite_query": req.rewrite_query,
                 "next_page": req.next_page,
+                "lens": req.lens,
+                "inputs": req.inputs or {},
                 "ranker": ranker,
                 "score_threshold": ranking.score_threshold if ranking else None,
                 "hybrid_search": hybrid_search,
@@ -1050,13 +1052,24 @@ def responses_file_search_tools(raw_tools: Any) -> list[dict[str, Any]]:
         filters = raw_tool.get("filters")
         if filters is not None and not isinstance(filters, dict):
             raise OpenAICompatError("file_search filters must be an object")
-        tools.append({
+        lens = raw_tool.get("lens")
+        if lens is not None and (not isinstance(lens, str) or not lens.strip()):
+            raise OpenAICompatError("file_search lens must be a non-empty string")
+        inputs = raw_tool.get("inputs")
+        if inputs is not None and not isinstance(inputs, dict):
+            raise OpenAICompatError("file_search inputs must be an object")
+        tool = {
             "type": "file_search",
             "vector_store_ids": public_ids,
             "filters": filters,
             "max_num_results": max_results,
             "ranking_options": ranking_options or {"ranker": "auto", "score_threshold": 0.0},
-        })
+        }
+        if isinstance(lens, str):
+            tool["lens"] = lens.strip()
+        if inputs is not None:
+            tool["inputs"] = inputs
+        tools.append(tool)
     return tools
 
 

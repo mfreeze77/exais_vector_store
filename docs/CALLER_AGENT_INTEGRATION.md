@@ -47,6 +47,52 @@ SVS_KSCOURTS_GRAPHRAG_ENABLED=true
 SVS_KSCOURTS_GRAPHRAG_MAX_EXPANSIONS=3
 ```
 
+## Search lenses
+
+Before wiring a specialized graph tool, discover the store's supported lenses:
+
+```http
+GET /v1/vector_stores/{vector_store_id}/search_lenses
+```
+
+The response returns `semantic` plus any corpus-specific graph lenses that the
+store can claim. Each graph lens includes an input schema, relation types,
+status, coverage counts, and warnings. Treat `status="available"` as the only
+search-ready status. `disabled`, `empty`, and `planned` are operator/developer
+states, not caller permissions to pretend graph search ran.
+
+Kansas court stores can expose:
+
+- `court_citator`: `cited_by`, `cited_authority`, `same_docket`, and
+  `related_party`.
+- `court_procedural_history`: same-docket relationships.
+
+Topeka municipal-code stores declare planned graph lenses for hierarchy,
+cross-reference, and ordinance-history search, but those should remain
+non-searchable until an API handler reports `status="available"`.
+
+Explicit lens search:
+
+```json
+{
+  "query": "Find related authority.",
+  "lens": "court_citator",
+  "inputs": {
+    "case_title": "State v. Harris",
+    "docket_number": "116515",
+    "relationship": "cited_by"
+  },
+  "max_num_results": 10,
+  "include_content": true,
+  "include_metadata": true
+}
+```
+
+When an explicit graph lens is accepted, the API forces the graph expansion path
+instead of relying on the query text to contain words such as "cited by" or
+"related." The response includes `search_lens` and `graph_expansion.coverage` so
+the caller can say exactly what graph was searched and what its limits are.
+
 ## API-key creation
 
 Production callers use bearer authentication:
@@ -320,6 +366,11 @@ Minimum HTTP body:
 ```json
 {
   "query": "Find cases cited by State v. Clapp and related authority.",
+  "lens": "court_citator",
+  "inputs": {
+    "case_title": "State v. Clapp",
+    "relationship": "cited_by"
+  },
   "max_num_results": 10,
   "rewrite_query": true,
   "include_content": true,
@@ -355,6 +406,19 @@ MCP tool schema:
         "type": "boolean",
         "default": false,
         "description": "Adapter-level flag. If true, report when graph_expansion is missing or not applied."
+      },
+      "relationship": {
+        "type": "string",
+        "enum": ["all", "cited_by", "cites", "cited_authority", "same_docket", "related_party"],
+        "default": "all"
+      },
+      "case_title": {
+        "type": "string",
+        "description": "Optional structured case title passed as lens input."
+      },
+      "docket_number": {
+        "type": "string",
+        "description": "Optional structured docket number passed as lens input."
       }
     },
     "required": ["query"]
@@ -365,6 +429,8 @@ MCP tool schema:
 Adapter behavior:
 
 - Call the same `/v1/vector_stores/{vector_store_id}/search` route.
+- Set `lens` to `court_citator` and pass `case_title`, `docket_number`, and
+  `relationship` through `inputs` when available.
 - Inspect top-level `graph_expansion`.
 - If `require_graph=true` and `graph_expansion.applied` is not true, return a
   tool-level warning but keep the semantic results.

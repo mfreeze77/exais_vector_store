@@ -127,6 +127,7 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-117 Instance Vector-Store Source Package Contract](./WAVE-117-instance-vector-store-source-package-contract.md)
 - [WAVE-118 Topeka Municipal Code Source Seeding](./WAVE-118-topeka-municipal-code-source-seeding.md)
 - [WAVE-119 Topeka Workbench Canonical Projection](./WAVE-119-topeka-workbench-canonical-projection.md)
+- [WAVE-120 GraphRAG Search Lenses](./WAVE-120-graphrag-search-lenses.md)
 
 ## Execution Model
 

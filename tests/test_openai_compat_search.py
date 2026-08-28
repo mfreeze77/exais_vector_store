@@ -79,6 +79,24 @@ def test_openai_search_accepts_next_page_cursor_and_records_metadata():
     assert kwargs["search_metadata"]["openai_compat"]["next_page"] == cursor
 
 
+def test_openai_search_records_lens_metadata():
+    req = OpenAIVectorStoreSearchRequest(
+        query="related authority",
+        lens="court_citator",
+        inputs={"case_title": "State v. Harris", "docket_number": "116515", "relationship": "cited_by"},
+        max_num_results=5,
+    )
+
+    kwargs = openai_search_options_to_search_request_kwargs(req)
+
+    assert kwargs["search_metadata"]["openai_compat"]["lens"] == "court_citator"
+    assert kwargs["search_metadata"]["openai_compat"]["inputs"] == {
+        "case_title": "State v. Harris",
+        "docket_number": "116515",
+        "relationship": "cited_by",
+    }
+
+
 def test_openai_search_rejects_invalid_next_page_cursor():
     with pytest.raises(OpenAICompatError, match="not a valid vector store search cursor"):
         vector_store_search_next_page_offset("bad-cursor")
@@ -835,6 +853,20 @@ def test_responses_file_search_tools_validate_openai_shape():
         "max_num_results": 3,
         "ranking_options": {"ranker": "auto", "score_threshold": 0.0},
     }]
+
+
+def test_responses_file_search_tools_accept_lens_metadata():
+    tools = responses_file_search_tools([
+        {
+            "type": "file_search",
+            "vector_store_ids": ["vs_123"],
+            "lens": "court_citator",
+            "inputs": {"case_title": "State v. Harris"},
+        }
+    ])
+
+    assert tools[0]["lens"] == "court_citator"
+    assert tools[0]["inputs"] == {"case_title": "State v. Harris"}
 
 
 def test_responses_file_search_tools_default_to_openai_result_count():

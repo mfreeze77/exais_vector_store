@@ -9,7 +9,7 @@ from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
 
 from svs_api import main as api_main
-from svs_common.openai_compat import vector_store_search_results_page
+from svs_common.openai_compat import OpenAICompatError, vector_store_search_results_page
 from svs_common.schemas import ChunkRecord, OpenAIVectorStoreSearchRequest, Principal, SearchResponse
 
 
@@ -1472,6 +1472,45 @@ def test_openai_vector_store_search_page_keeps_graphrag_disabled(monkeypatch):
     assert [item["file_id"] for item in page["data"]] == ["file_direct"]
 
 
+def test_vector_store_search_lenses_returns_court_graph_contract(monkeypatch):
+    monkeypatch.setenv("SVS_QUERY_PLANNER_PROFILE_ID", "ks_civics_legal_v1")
+    monkeypatch.setenv("SVS_KSCOURTS_GRAPHRAG_ENABLED", "true")
+    monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        api_main,
+        "_vector_store_attributes_for_search",
+        lambda *args, **kwargs: {"source_collection": "kscourts-decisions"},
+    )
+    monkeypatch.setattr(
+        api_main,
+        "_graph_coverage_for_vector_store",
+        lambda *args, **kwargs: {
+            "documents_indexed": 16484,
+            "active_chunks": 116200,
+            "node_count": 390,
+            "edge_count": 404,
+            "node_type_counts": {"opinion": 52, "case": 338},
+            "edge_type_counts": {"cites_case": 404},
+        },
+    )
+
+    payload = api_main.vector_store_search_lenses("vs_kscourts", _principal(), object())
+
+    lenses = {lens["id"]: lens for lens in payload["data"]}
+    assert payload["default_lens"] == "semantic"
+    assert lenses["semantic"]["status"] == "available"
+    assert lenses["court_citator"]["status"] == "available"
+    assert lenses["court_citator"]["relation_types"] == [
+        "cited_by",
+        "cited_authority",
+        "same_docket",
+        "related_party",
+    ]
+    assert lenses["court_citator"]["coverage"]["documents_indexed"] == 16484
+    assert lenses["court_citator"]["coverage"]["edge_type_counts"]["cites_case"] == 404
+    assert any("not a proven full-corpus Kansas citator" in warning for warning in lenses["court_citator"]["warnings"])
+
+
 def test_openai_vector_store_search_page_adds_opt_in_graphrag_expansion(monkeypatch):
     metadata = {
         "profile": "kscourts_postgres_graph_v1",
@@ -1527,6 +1566,23 @@ def test_openai_vector_store_search_page_adds_opt_in_graphrag_expansion(monkeypa
     monkeypatch.setenv("SVS_QUERY_PLANNER_PROFILE_ID", "ks_civics_legal_v1")
     monkeypatch.setenv("SVS_KSCOURTS_GRAPHRAG_ENABLED", "true")
     monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        api_main,
+        "_vector_store_attributes_for_search",
+        lambda *args, **kwargs: {"source_collection": "kscourts-decisions"},
+    )
+    monkeypatch.setattr(
+        api_main,
+        "_graph_coverage_for_vector_store",
+        lambda *args, **kwargs: {
+            "documents_indexed": 16484,
+            "active_chunks": 116200,
+            "node_count": 390,
+            "edge_count": 404,
+            "node_type_counts": {"opinion": 52, "case": 338},
+            "edge_type_counts": {"cites_case": 404},
+        },
+    )
     monkeypatch.setattr(api_main, "_vector_store_file_lookup", fake_file_lookup)
     monkeypatch.setattr(api_main, "_kscourts_graphrag_relation_rows", fake_relation_rows)
     monkeypatch.setattr(api_main, "_hydrate_kscourts_graphrag_chunks", fake_hydrate)
@@ -1543,19 +1599,165 @@ def test_openai_vector_store_search_page_adds_opt_in_graphrag_expansion(monkeypa
     ))
 
     assert [item["file_id"] for item in page["data"][:3]] == ["file_direct", "file_related", "file_other"]
-    assert page["graph_expansion"] == {
-        "enabled": True,
-        "applied": True,
-        "candidate_count": 1,
-        "inserted_chunk_count": 1,
-        "relation_types": ["same_docket"],
-        "annotated_result_count": 1,
+    assert page["graph_expansion"]["enabled"] is True
+    assert page["graph_expansion"]["lens"] == "court_citator"
+    assert page["graph_expansion"]["applied"] is True
+    assert page["graph_expansion"]["candidate_count"] == 1
+    assert page["graph_expansion"]["inserted_chunk_count"] == 1
+    assert page["graph_expansion"]["relation_types"] == ["same_docket"]
+    assert page["graph_expansion"]["annotated_result_count"] == 1
+    assert page["graph_expansion"]["coverage"]["documents_indexed"] == 16484
+    assert page["graph_expansion"]["coverage"]["edge_type_counts"]["cites_case"] == 404
+    assert page["graph_expansion"]["coverage"]["full_corpus_citator"] is False
+    assert any(
+        "not a proven full-corpus Kansas citator" in warning
+        for warning in page["graph_expansion"]["warnings"]
+    )
+    assert page["search_lens"] == {
+        "id": "court_citator",
+        "status": "available",
+        "source": "inferred",
+        "inputs": {},
+        "requires_graph": True,
     }
     graph_citation = page["data"][1]["citation"]["graph_expansion"]
     assert graph_citation["relation_type"] == "same_docket"
     assert graph_citation["edge_id"] == "edge_same_docket"
     assert graph_citation["source_document_id"] == "doc_direct"
     assert graph_citation["target_document_id"] == "doc_related"
+
+
+def test_openai_vector_store_search_page_explicit_court_lens_forces_graphrag(monkeypatch):
+    calls = []
+    hydrated_relation_rows = []
+    metadata = {
+        "profile": "kscourts_postgres_graph_v1",
+        "relation_type": "same_docket",
+        "edge_id": "edge_same_docket",
+        "source_document_id": "doc_direct",
+        "target_document_id": "doc_related",
+        "attributes": {"docket_number": "116515"},
+        "provenance": {"extraction_method": "metadata", "confidence": 1.0},
+    }
+
+    async def fake_retrieval_search(db_session, principal, search_req):
+        calls.append(search_req)
+        return SearchResponse(
+            query=search_req.query,
+            results=[
+                ChunkRecord(id="chk_direct", document_id="doc_direct", ordinal=0, text="Direct vector hit", score=0.9),
+            ],
+        )
+
+    def fake_relation_rows(db_session, principal, vector_store_id, seed_document_ids, *, limit):
+        return [
+            {
+                "edge_id": "edge_same_docket",
+                "relation_type": "same_docket",
+                "seed_document_id": "doc_direct",
+                "related_document_id": "doc_related",
+                "attributes": {"docket_number": "116515"},
+                "provenance": {"extraction_method": "metadata", "confidence": 1.0},
+            },
+            {
+                "edge_id": "edge_cited_by",
+                "relation_type": "cited_by",
+                "seed_document_id": "doc_direct",
+                "related_document_id": "doc_citing",
+                "attributes": {},
+                "provenance": {},
+            },
+        ]
+
+    def fake_hydrate(db_session, principal, vector_store_id, relation_rows, existing_document_ids, *, limit):
+        hydrated_relation_rows.extend(relation_rows)
+        chunk = ChunkRecord(
+            id="chk_related",
+            document_id="doc_related",
+            ordinal=0,
+            text="Graph-expanded same-docket opinion",
+            score=0.65,
+            source="kscourts_graphrag_expansion",
+            citation={"graph_expansion": metadata},
+        )
+        return [chunk], {"chk_related": metadata}
+
+    def fake_file_lookup(db_session, principal, vector_store_id, document_ids):
+        return {
+            "doc_direct": {"file_id": "file_direct", "filename": "direct.pdf"},
+            "doc_related": {"file_id": "file_related", "filename": "related.pdf"},
+        }
+
+    monkeypatch.setenv("SVS_QUERY_PLANNER_PROFILE_ID", "ks_civics_legal_v1")
+    monkeypatch.setenv("SVS_KSCOURTS_GRAPHRAG_ENABLED", "true")
+    monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        api_main,
+        "_vector_store_attributes_for_search",
+        lambda *args, **kwargs: {"source_collection": "kscourts-decisions"},
+    )
+    monkeypatch.setattr(
+        api_main,
+        "_graph_coverage_for_vector_store",
+        lambda *args, **kwargs: {
+            "documents_indexed": 16484,
+            "active_chunks": 116200,
+            "node_count": 390,
+            "edge_count": 404,
+            "node_type_counts": {"opinion": 52, "case": 338},
+            "edge_type_counts": {"cites_case": 404},
+        },
+    )
+    monkeypatch.setattr(api_main, "_vector_store_file_lookup", fake_file_lookup)
+    monkeypatch.setattr(api_main, "_kscourts_graphrag_relation_rows", fake_relation_rows)
+    monkeypatch.setattr(api_main, "_hydrate_kscourts_graphrag_chunks", fake_hydrate)
+    monkeypatch.setattr(api_main.retrieval, "search", fake_retrieval_search)
+
+    page = asyncio.run(api_main._openai_vector_store_search_page(
+        "vs_route",
+        OpenAIVectorStoreSearchRequest(
+            query="State v. Harris",
+            lens="court_citator",
+            inputs={"docket_number": "116515", "relationship": "same_docket"},
+            max_num_results=5,
+        ),
+        _principal(),
+        _Db(),
+    ))
+
+    assert calls[0].query == "State v. Harris"
+    assert calls[0].filters["file_attribute_filters"] == {"docket_number": "116515"}
+    assert [row["relation_type"] for row in hydrated_relation_rows] == ["same_docket"]
+    assert [item["file_id"] for item in page["data"][:2]] == ["file_direct", "file_related"]
+    assert page["search_lens"]["id"] == "court_citator"
+    assert page["search_lens"]["source"] == "explicit"
+    assert page["graph_expansion"]["applied"] is True
+    assert page["graph_expansion"]["relation_types"] == ["same_docket"]
+    assert page["graph_expansion"]["coverage"]["edge_type_counts"] == {"cites_case": 404}
+
+
+def test_openai_vector_store_search_page_rejects_unsupported_lens(monkeypatch):
+    monkeypatch.setenv("SVS_QUERY_PLANNER_PROFILE_ID", "ks_civics_legal_v1")
+    monkeypatch.setenv("SVS_KSCOURTS_GRAPHRAG_ENABLED", "true")
+    monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        api_main,
+        "_vector_store_attributes_for_search",
+        lambda *args, **kwargs: {"source_collection": "topeka-municipal-code", "corpus": "topeka_municipal_code"},
+    )
+    monkeypatch.setattr(
+        api_main,
+        "_graph_coverage_for_vector_store",
+        lambda *args, **kwargs: {"node_count": 1, "edge_count": 1},
+    )
+
+    with pytest.raises(OpenAICompatError, match="not supported"):
+        asyncio.run(api_main._openai_vector_store_search_page(
+            "vs_topeka",
+            OpenAIVectorStoreSearchRequest(query="State v. Harris", lens="court_citator"),
+            _principal(),
+            _Db(),
+        ))
 
 
 def test_openai_vector_store_search_page_accepts_query_array(monkeypatch):

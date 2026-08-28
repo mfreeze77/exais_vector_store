@@ -58,6 +58,7 @@ from svs_common.schemas import (
     VectorStoreDeletedResponse,
     VectorStoreListResponse,
     VectorStoreResponse,
+    VectorStoreSearchLensesResponse,
 )
 
 
@@ -118,6 +119,7 @@ get /v1/responses/{response_id}/input_items
 post /v1/vector_stores
 get /v1/vector_stores
 get /v1/vector_stores/{vector_store_id}
+get /v1/vector_stores/{vector_store_id}/search_lenses
 post /v1/vector_stores/{vector_store_id}
 patch /v1/vector_stores/{vector_store_id}
 delete /v1/vector_stores/{vector_store_id}
@@ -173,8 +175,8 @@ def test_every_documented_operation_uses_named_request_and_success_components():
         for method in path_item
         if method in HTTP_METHODS
     }
-    assert len(spec['paths']) == 51
-    assert len(components) == 118
+    assert len(spec['paths']) == 52
+    assert len(components) == 120
     assert operations == EXPECTED_OPERATIONS
 
     request_media: set[tuple[str, str, str]] = set()
@@ -789,6 +791,34 @@ def test_vector_store_search_openapi_uses_named_response_component():
     assert "OpenAIMessageFileCitationAnnotation" in _ref_names_in(citation["properties"]["message_annotation"])
     assert citation["properties"]["start_index"]["anyOf"][0]["minimum"] == 0
     assert citation["properties"]["end_index"]["anyOf"][0]["minimum"] == 0
+
+
+def test_vector_store_search_lenses_openapi_uses_named_response_component():
+    api_main.app.openapi_schema = None
+    spec = api_main.app.openapi()
+
+    response_schema = _response_schema(spec, "/v1/vector_stores/{vector_store_id}/search_lenses", "get")
+    assert _ref_name(response_schema["$ref"]) == "VectorStoreSearchLensesResponse"
+
+    components = spec["components"]["schemas"]
+    response = components["VectorStoreSearchLensesResponse"]
+    assert response["properties"]["object"]["default"] == "vector_store.search_lenses"
+    assert _ref_name(response["properties"]["data"]["items"]["$ref"]) == "VectorStoreSearchLens"
+
+    search_request = components["OpenAIVectorStoreSearchRequest"]
+    assert "lens" in search_request["properties"]
+    assert "inputs" in search_request["properties"]
+
+    assert VectorStoreSearchLensesResponse.model_validate({
+        "vector_store_id": "vs_contract",
+        "data": [{
+            "id": "semantic",
+            "label": "Semantic Search",
+            "description": "Default search.",
+            "kind": "semantic",
+            "status": "available",
+        }],
+    }).object == "vector_store.search_lenses"
 
 
 def test_vector_store_search_page_model_preserves_citation_payload_shape():

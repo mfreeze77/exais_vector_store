@@ -33,6 +33,7 @@ from svs_common.schemas import (
     OpenAIVectorStoreFileBatchFilesPage, OpenAIVectorStoreFileContentResponse,
     OpenAIVectorStoreFileDeletedResponse, OpenAIVectorStoreFileListResponse,
     OpenAIVectorStoreSearchRequest, OpenAIVectorStoreSearchResultsPage,
+    VectorStoreSearchLensesResponse,
     VectorStoreUpdateRequest,
     OpenAIResponseCompactRequest, OpenAIResponseCompactionResponse, OpenAIResponseDeletedResponse,
     OpenAIResponseInputItemsPage, OpenAIResponseInputTokensRequest, OpenAIResponseInputTokensResponse,
@@ -67,6 +68,14 @@ from svs_common.openai_compat import (
 )
 from svs_common.openai_metadata import validate_openai_file_attributes
 from svs_common.query_planner import KANSAS_CIVICS_LEGAL_PROFILE_ID, merge_query_filters, plan_query
+from svs_common.search_lenses import (
+    DEFAULT_SEARCH_LENS_ID,
+    normalize_search_lens_id,
+    resolve_search_lens,
+    search_lens_relation_types,
+    search_lenses_for_vector_store,
+    search_query_with_lens_inputs,
+)
 from svs_common.vector_store_repo import (
     VectorStoreRepository,
     VectorStoreUnavailableError,
@@ -1830,6 +1839,14 @@ def get_vector_store(vector_store_id: str, principal: Principal = Depends(get_re
     return result
 
 
+@app.get('/v1/vector_stores/{vector_store_id}/search_lenses', response_model=VectorStoreSearchLensesResponse)
+def vector_store_search_lenses(vector_store_id: str, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
+    ensure_scope(principal, ['retrieval:read', 'vector_stores:read'], any_of=True)
+    enforce_rate_limit(db, principal, 'vector_stores.search_lenses')
+    _refresh_vector_store_activity_or_404(db, principal, vector_store_id)
+    return _vector_store_search_lenses_payload(db, principal, vector_store_id)
+
+
 @app.post('/v1/vector_stores/{vector_store_id}', response_model=VectorStoreResponse)
 @app.patch('/v1/vector_stores/{vector_store_id}', response_model=VectorStoreResponse)
 def update_vector_store(
@@ -1947,11 +1964,7 @@ def _legal_exact_document_diversity_enabled(query_planner_profile_id: str | None
     return False
 
 
-def _query_planner_profile_id_for_vector_store(db: Session, principal: Principal, vector_store_id: str) -> str | None:
-    profile_id = os.getenv("SVS_QUERY_PLANNER_PROFILE_ID") or None
-    if profile_id != KANSAS_CIVICS_LEGAL_PROFILE_ID:
-        return profile_id
-
+def _vector_store_attributes_for_search(db: Session, principal: Principal, vector_store_id: str) -> dict[str, Any]:
     row = db.execute(text('''
         SELECT attributes
         FROM vector_stores
@@ -1961,15 +1974,96 @@ def _query_planner_profile_id_for_vector_store(db: Session, principal: Principal
           AND deleted_at IS NULL
         LIMIT 1
     '''), {'id': vector_store_id, 'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id}).mappings().first()
-    attrs = row['attributes'] if row and isinstance(row.get('attributes'), dict) else {}
+    return dict(row['attributes'] or {}) if row and isinstance(row.get('attributes'), dict) else {}
+
+
+def _query_planner_profile_id_from_vector_store_attributes(attrs: dict[str, Any]) -> str | None:
+    profile_id = os.getenv("SVS_QUERY_PLANNER_PROFILE_ID") or None
+    if profile_id != KANSAS_CIVICS_LEGAL_PROFILE_ID:
+        return profile_id
+
     if not attrs:
         return profile_id
 
-    source_collection = str(attrs.get('source_collection') or '')
-    corpus = str(attrs.get('corpus') or '')
-    if source_collection == 'kscourts-decisions' or corpus in {'kscourts_decisions', 'kansas_court_decisions'}:
+    source_collection = str(attrs.get('source_collection') or '').strip().lower()
+    corpus = str(attrs.get('corpus') or '').strip().lower()
+    if source_collection == 'kscourts-decisions' or corpus in {'kscourts_decisions', 'kansas_court_decisions', 'ks_courts'}:
         return profile_id
     return None
+
+
+def _query_planner_profile_id_for_vector_store(db: Session, principal: Principal, vector_store_id: str) -> str | None:
+    return _query_planner_profile_id_from_vector_store_attributes(
+        _vector_store_attributes_for_search(db, principal, vector_store_id)
+    )
+
+
+def _graph_coverage_for_vector_store(db: Session, principal: Principal, vector_store_id: str) -> dict[str, Any]:
+    scope_params = {'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id, 'vector_store_id': vector_store_id}
+    corpus_row = db.execute(text('''
+        SELECT
+          count(DISTINCT c.document_id)::int AS documents_indexed,
+          count(c.id)::int AS active_chunks
+        FROM chunks c
+        WHERE c.tenant_id=:tenant_id
+          AND c.business_instance_id=:biz_id
+          AND c.vector_store_id=:vector_store_id
+          AND c.active=true
+    '''), scope_params).mappings().first()
+    node_rows = db.execute(text('''
+        SELECT node_type, count(*)::int AS count
+        FROM graph_nodes
+        WHERE tenant_id=:tenant_id
+          AND business_instance_id=:biz_id
+          AND vector_store_id=:vector_store_id
+        GROUP BY node_type
+        ORDER BY node_type
+    '''), scope_params).mappings().all()
+    edge_rows = db.execute(text('''
+        SELECT edge_type, count(*)::int AS count
+        FROM graph_edges
+        WHERE tenant_id=:tenant_id
+          AND business_instance_id=:biz_id
+          AND vector_store_id=:vector_store_id
+        GROUP BY edge_type
+        ORDER BY edge_type
+    '''), scope_params).mappings().all()
+    node_type_counts = {str(row['node_type']): int(row['count'] or 0) for row in node_rows}
+    edge_type_counts = {str(row['edge_type']): int(row['count'] or 0) for row in edge_rows}
+    return {
+        'documents_indexed': int((corpus_row or {}).get('documents_indexed') or 0),
+        'active_chunks': int((corpus_row or {}).get('active_chunks') or 0),
+        'node_count': sum(node_type_counts.values()),
+        'edge_count': sum(edge_type_counts.values()),
+        'node_type_counts': node_type_counts,
+        'edge_type_counts': edge_type_counts,
+    }
+
+
+def _vector_store_search_lenses_payload(
+    db: Session,
+    principal: Principal,
+    vector_store_id: str,
+    *,
+    include_graph_coverage: bool = True,
+) -> dict[str, Any]:
+    attrs = _vector_store_attributes_for_search(db, principal, vector_store_id)
+    query_planner_profile_id = _query_planner_profile_id_from_vector_store_attributes(attrs)
+    graph_enabled = _kscourts_graphrag_enabled(query_planner_profile_id)
+    graph_coverage = None
+    if include_graph_coverage and graph_enabled:
+        graph_coverage = _graph_coverage_for_vector_store(db, principal, vector_store_id)
+    return {
+        'object': 'vector_store.search_lenses',
+        'vector_store_id': vector_store_id,
+        'default_lens': DEFAULT_SEARCH_LENS_ID,
+        'data': search_lenses_for_vector_store(
+            attrs,
+            query_planner_profile_id=query_planner_profile_id,
+            graph_enabled=graph_enabled,
+            graph_coverage=graph_coverage,
+        ),
+    }
 
 
 def _document_diversified_chunks(chunks: list[Any]) -> list[Any]:
@@ -2355,11 +2449,22 @@ def _apply_kscourts_graphrag_expansion(
     *,
     enabled: bool,
     query: str | list[str],
+    force: bool = False,
+    lens: dict[str, Any] | None = None,
+    relation_types: tuple[str, ...] = (),
+    graph_coverage: dict[str, Any] | None = None,
 ) -> tuple[list[ChunkRecord], dict[str, dict[str, Any]], dict[str, dict[str, Any]], dict[str, Any] | None]:
     if not enabled:
         return chunks, {}, {}, None
-    if not _query_has_kscourts_graphrag_intent(query):
-        return chunks, {}, {}, {"enabled": True, "applied": False, "reason": "no_graph_intent"}
+    lens_id = (lens or {}).get("id")
+    summary_base = {
+        "enabled": True,
+        "lens": lens_id,
+        "coverage": graph_coverage or {},
+        "warnings": list((lens or {}).get("warnings") or []),
+    }
+    if not force and not _query_has_kscourts_graphrag_intent(query):
+        return chunks, {}, {}, {**summary_base, "applied": False, "reason": "no_graph_intent"}
     seed_document_ids = []
     for chunk in chunks:
         if chunk.document_id not in seed_document_ids:
@@ -2368,8 +2473,11 @@ def _apply_kscourts_graphrag_expansion(
             break
     limit = _graph_expansion_limit()
     if not seed_document_ids or limit <= 0:
-        return chunks, {}, {}, {"enabled": True, "applied": False, "reason": "no_seed_documents"}
+        return chunks, {}, {}, {**summary_base, "applied": False, "reason": "no_seed_documents"}
     relation_rows = _kscourts_graphrag_relation_rows(db, principal, vector_store_id, seed_document_ids, limit=limit * 4)
+    if relation_types:
+        allowed_relation_types = set(relation_types)
+        relation_rows = [row for row in relation_rows if str(row.get("relation_type") or "") in allowed_relation_types]
     metadata_by_document_id = _kscourts_graphrag_metadata_by_document(relation_rows)
     graph_chunks, metadata_by_chunk_id = _hydrate_kscourts_graphrag_chunks(
         db,
@@ -2382,6 +2490,7 @@ def _apply_kscourts_graphrag_expansion(
     expanded = _interleave_graph_expansion_chunks(chunks, graph_chunks[:limit])
     relation_types = sorted({str(row["relation_type"]) for row in relation_rows})
     return expanded, metadata_by_document_id, metadata_by_chunk_id, {
+        **summary_base,
         "enabled": True,
         "applied": bool(relation_rows),
         "candidate_count": len(relation_rows),
@@ -2397,9 +2506,37 @@ async def _openai_vector_store_search_page(
     db: Session,
 ) -> dict[str, Any]:
     _refresh_vector_store_activity_or_404(db, principal, vector_store_id)
+    vector_store_attrs = _vector_store_attributes_for_search(db, principal, vector_store_id)
+    query_planner_profile_id = _query_planner_profile_id_from_vector_store_attributes(vector_store_attrs)
+    graphrag_enabled = _kscourts_graphrag_enabled(query_planner_profile_id)
+    requested_lens_id = req.lens
+    graph_coverage: dict[str, Any] | None = None
+    search_lens: dict[str, Any] | None = None
+    if requested_lens_id:
+        if normalize_search_lens_id(requested_lens_id) != DEFAULT_SEARCH_LENS_ID and graphrag_enabled:
+            graph_coverage = _graph_coverage_for_vector_store(db, principal, vector_store_id)
+        try:
+            search_lens = resolve_search_lens(
+                requested_lens_id,
+                vector_store_attrs,
+                query_planner_profile_id=query_planner_profile_id,
+                graph_enabled=graphrag_enabled,
+                graph_coverage=graph_coverage,
+            )
+            search_lens_relation_types(search_lens["id"], req.inputs)
+        except ValueError as exc:
+            raise OpenAICompatError(str(exc)) from exc
+    else:
+        search_lens = resolve_search_lens(
+            DEFAULT_SEARCH_LENS_ID,
+            vector_store_attrs,
+            query_planner_profile_id=query_planner_profile_id,
+            graph_enabled=graphrag_enabled,
+            graph_coverage=None,
+        )
     search_kwargs = openai_search_options_to_search_request_kwargs(req)
-    raw_queries = req.query if isinstance(req.query, list) else [req.query]
-    query_planner_profile_id = _query_planner_profile_id_for_vector_store(db, principal, vector_store_id)
+    search_query_input = search_query_with_lens_inputs(req.query, (search_lens or {}).get("id"), req.inputs)
+    raw_queries = search_query_input if isinstance(search_query_input, list) else [search_query_input]
     query_plans = [
         plan_query(query, rewrite_query=req.rewrite_query, profile_id=query_planner_profile_id)
         for query in raw_queries
@@ -2434,6 +2571,7 @@ async def _openai_vector_store_search_page(
         'query_planner_profile_id': query_planner_profile_id,
         'planned_filters': [query_plan.filters for query_plan in query_plans],
         'legal_exact_document_diversity': legal_exact_diversity,
+        'search_lens': {'id': search_lens.get('id'), 'inputs': req.inputs or {}} if search_lens else None,
         'search_fetch_limit': search_fetch_limit,
         'page_offset': page_offset,
     })
@@ -2446,18 +2584,50 @@ async def _openai_vector_store_search_page(
     chunks = apply_openai_ranking_options(req, chunks, limit=search_fetch_limit)
     if legal_exact_diversity:
         chunks = _document_diversified_chunks(chunks)
-    graphrag_enabled = _kscourts_graphrag_enabled(query_planner_profile_id)
+    inferred_graph_lens = False
+    default_search_lens = search_lens
+    if not requested_lens_id and graphrag_enabled and _query_has_kscourts_graphrag_intent(search_query_input):
+        graph_coverage = _graph_coverage_for_vector_store(db, principal, vector_store_id)
+        try:
+            search_lens = resolve_search_lens(
+                "court_citator",
+                vector_store_attrs,
+                query_planner_profile_id=query_planner_profile_id,
+                graph_enabled=graphrag_enabled,
+                graph_coverage=graph_coverage,
+            )
+            inferred_graph_lens = True
+        except ValueError:
+            search_lens = default_search_lens
+    graph_relation_types = ()
+    if search_lens and search_lens.get("requires_graph"):
+        try:
+            graph_relation_types = search_lens_relation_types(search_lens["id"], req.inputs)
+        except ValueError as exc:
+            raise OpenAICompatError(str(exc)) from exc
     chunks, graph_metadata_by_document_id, graph_metadata_by_chunk_id, graph_summary = _apply_kscourts_graphrag_expansion(
         db,
         principal,
         vector_store_id,
         chunks,
         enabled=graphrag_enabled,
-        query=req.query,
+        query=search_query_input,
+        force=bool(requested_lens_id and search_lens and search_lens.get("requires_graph")),
+        lens=search_lens if search_lens and search_lens.get("requires_graph") else None,
+        relation_types=graph_relation_types,
+        graph_coverage=search_lens.get("coverage") if search_lens and search_lens.get("requires_graph") else graph_coverage,
     )
     chunks, next_page = vector_store_search_page_window(req, chunks)
     file_lookup = _vector_store_file_lookup(db, principal, vector_store_id, [ch.document_id for ch in chunks])
     page = vector_store_search_results_page(req, chunks, file_lookup, search_query=effective_search_query, next_page=next_page)
+    if search_lens:
+        page["search_lens"] = {
+            "id": search_lens["id"],
+            "status": search_lens["status"],
+            "source": "explicit" if requested_lens_id else ("inferred" if inferred_graph_lens else "default"),
+            "inputs": req.inputs or {},
+            "requires_graph": bool(search_lens.get("requires_graph")),
+        }
     if graph_summary is not None:
         page = _annotate_openai_search_page_with_graph(
             page,
@@ -2630,6 +2800,8 @@ async def create_response(
             for vector_store_id in tool['vector_store_ids']:
                 req = OpenAIVectorStoreSearchRequest.model_validate({
                     'query': query,
+                    'lens': tool.get('lens'),
+                    'inputs': tool.get('inputs'),
                     'filters': tool.get('filters'),
                     'max_num_results': tool['max_num_results'],
                     'ranking_options': tool.get('ranking_options'),
