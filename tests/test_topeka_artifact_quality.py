@@ -99,6 +99,35 @@ def test_quality_gate_blocks_missing_sections_and_failed_crawl(tmp_path):
     assert report["section_coverage"]["missing"] == 1
 
 
+def test_quality_gate_writes_complete_worklists(tmp_path):
+    script = load_script()
+    expected = [_expected("1.05.010"), _expected("1.10.010")]
+    seed_common_artifacts(
+        tmp_path,
+        sections=[_section("1.05.010")],
+        expected=expected,
+        failures=[{"url": "https://topeka.municipal.codes/TMC/1.10.010", "error": "publisher challenge page returned"}],
+    )
+
+    report, worklists = script.build_artifact_diagnostics(tmp_path, Path("unused.csv"), {"section"})
+    files = script.write_worklists(tmp_path / "worklists", worklists)
+
+    missing = read_jsonl(tmp_path / "worklists" / "missing-required-urls.jsonl")
+    failures = read_jsonl(tmp_path / "worklists" / "failed-crawl-urls.jsonl")
+
+    assert report["worklists"]["missing-required-urls.jsonl"] == 1
+    assert files["missing_required_urls"].endswith("missing-required-urls.jsonl")
+    assert missing == [{
+        **_expected("1.10.010"),
+        "reason": "missing_required_section_url",
+    }]
+    assert failures == [{
+        "reason": "crawl_failure",
+        "url": "https://topeka.municipal.codes/TMC/1.10.010",
+        "error": "publisher challenge page returned",
+    }]
+
+
 def _expected(citation: str) -> dict:
     return {
         "level": "Section",
@@ -117,3 +146,7 @@ def _section(citation: str) -> dict:
         "source_url": f"https://topeka.municipal.codes/TMC/{citation}",
         "text": "A real section body.",
     }
+
+
+def read_jsonl(path: Path) -> list[dict]:
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]

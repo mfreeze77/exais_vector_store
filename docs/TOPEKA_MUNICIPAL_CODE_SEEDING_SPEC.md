@@ -83,6 +83,8 @@ This solves root discovery and graph hierarchy. It does not fully solve publishe
 
 Current operating rule: produce JSON/JSONL source artifacts only until the artifact quality gate passes. Do not call ExAIS document ingestion, embedding providers, Qdrant, or vector-store write paths for additional Topeka records until `scripts/release/topeka-code-artifact-quality.py` reports `passed: true`.
 
+Public-access escalation packet: `docs/TOPEKA_PUBLIC_LAW_ACCESS_PACKET.md`.
+
 ### 2B. Operator Capture Import Shim
 
 The scraper also supports a local capture manifest import path for operator-owned acquisition routes. This is the integration point for an authorized export, authenticated browser capture, records-response bundle, Cloudflare Worker route, or separately operated route that returns source HTML. The route itself stays outside this repository.
@@ -108,6 +110,13 @@ python -m topeka_code_scraper \
 ```
 
 This path reuses the same parser, graph builder, citation map, manifest augmentation, and JSON quality gate as live HTTP/Playwright fetching. It still rejects challenge-only captures and records them in `crawl_report.json`. Do not commit acquisition-route code, cookies, credentials, storage state, proxy logic, captcha solving, stealth plugins, or challenge-circumvention code.
+
+The artifact quality gate can write complete worklists with `--worklist-dir`. These worklists are the handoff to the external capture route or public-access/export request:
+
+- `missing-required-urls.jsonl`;
+- `failed-crawl-urls.jsonl`;
+- `section-quality-issues.jsonl`;
+- `unexpected-section-urls.jsonl`.
 
 ### 3. Operator-Owned Publisher-Gated Acquisition Slot
 
@@ -213,6 +222,7 @@ Do not copy evasion code into this repo. Treat any publisher-gated acquisition a
 - `topeka-code-scraper` tests pass from the vendored connector path.
 - Source-package validation passes while the source is explicitly marked `productionReady: false`.
 - Artifact generation emits JSON/JSONL files first; vectorization is blocked until the JSON artifact quality report passes.
+- Artifact quality runs write complete missing/failure/section-issue worklists for the next acquisition pass.
 - Zero fetched pages exits nonzero and cannot produce a successful seed manifest.
 - Zero extracted sections exits nonzero unless explicitly allowed for diagnostics.
 - A seeded pilot returns clickable citations for both `source_url` and `pdf_url`.

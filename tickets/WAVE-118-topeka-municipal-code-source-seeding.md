@@ -65,6 +65,7 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - Isolated Playwright browser contexts materially improve batch acquisition but do not fully defeat publisher challenge behavior: 2026-08-28 proof fetched 31 of the first 50 section URLs and failed 19 challenge pages.
 - Current operator rule: generate JSON/JSONL artifacts and run the artifact quality gate only. Do not ingest/vectorize additional Topeka records until artifact quality passes.
 - Operator-owned acquisition routes can now plug in through `--capture-manifest` by providing authorized HTML captures. The route implementation, cookies, credentials, proxy logic, captcha solving, stealth plugins, and challenge bypass code remain out of scope for this repository.
+- Public-access/export escalation is documented in `docs/TOPEKA_PUBLIC_LAW_ACCESS_PACKET.md`, and the artifact quality gate now emits complete worklists for missing URLs and capture failures.
 
 ## Acceptance Criteria
 
@@ -72,6 +73,7 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - Both Topeka source packages remain `productionReady: false` until a real corpus and vector store ID are proven.
 - Codified-code artifact generation and quality check run before any additional vectorization.
 - Operator capture import parses supplied HTML captures through the same JSON artifact, citation, graph, and quality-gate path as live fetching.
+- Quality-gate worklists identify every missing required URL, crawl failure, unexpected section URL, and section-level text/citation issue.
 - Full codified-code crawl writes nonempty `sections.jsonl`, `definitions.jsonl`, `nodes.jsonl`, `edges.jsonl`, `citation-url-map.jsonl`, `manifest.json`, and `crawl_report.json`.
 - Full codified-code crawl stores rendered HTML and network proof for fetched pages.
 - Full codified-code crawl fails closed on zero pages or zero sections.

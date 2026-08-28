@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
-from topeka_pipeline_common import CODIFIED_SEED, read_jsonl, write_json
+from topeka_pipeline_common import CODIFIED_SEED, read_jsonl, write_json, write_jsonl
 
 
 BASE_URL = "https://topeka.municipal.codes"
@@ -85,7 +85,7 @@ def duplicate_values(values: list[str]) -> list[str]:
     return sorted(value for value, count in counts.items() if count > 1)
 
 
-def build_quality_report(source_output: Path, url_list: Path, fetch_levels: set[str]) -> dict[str, Any]:
+def build_artifact_diagnostics(source_output: Path, url_list: Path, fetch_levels: set[str]) -> tuple[dict[str, Any], dict[str, list[dict[str, Any]]]]:
     expected = expected_urls(source_output, url_list, fetch_levels)
     sections = read_jsonl(source_output / "sections.jsonl") if (source_output / "sections.jsonl").exists() else []
     citations = read_jsonl(source_output / "citation-url-map.jsonl") if (source_output / "citation-url-map.jsonl").exists() else []
@@ -98,6 +98,7 @@ def build_quality_report(source_output: Path, url_list: Path, fetch_levels: set[
     section_urls = [canonicalize_tmc_url(str(row.get("source_url") or "")) for row in sections]
     section_ids = [str(row.get("id") or "") for row in sections]
     section_url_set = {url for url in section_urls if url}
+    sections_by_url = {canonicalize_tmc_url(str(row.get("source_url") or "")): row for row in sections}
     citation_rows_by_id = {str(row.get("id") or ""): row for row in citations if row.get("record_type") == "section"}
     edge_type_counts = Counter(str(row.get("type") or "") for row in edges)
 
@@ -163,8 +164,18 @@ def build_quality_report(source_output: Path, url_list: Path, fetch_levels: set[
     if manifest.get("status") != "success":
         failures.append("manifest_status_not_success")
 
+    worklists = build_worklists(
+        expected_by_url=expected_by_url,
+        sections_by_url=sections_by_url,
+        missing_urls=missing_urls,
+        unexpected_urls=unexpected_urls,
+        missing_text=missing_text,
+        missing_citation=missing_citation,
+        missing_source_url=missing_source_url,
+        crawl_failures=crawl_report.get("failures") or [],
+    )
     passed = not failures
-    return {
+    report = {
         "schema_version": 1,
         "source_output": str(source_output),
         "url_list": str(url_list),
@@ -188,8 +199,80 @@ def build_quality_report(source_output: Path, url_list: Path, fetch_levels: set[
             "sample_empty_text_ids": missing_text[:25],
         },
         "graph_quality": graph_quality,
+        "worklists": {name: len(rows) for name, rows in worklists.items()},
         "boundary": "Artifact-only quality gate. This script does not call ExAIS API ingestion, model gateways, embedding providers, Qdrant, or vector-store write paths.",
     }
+    return report, worklists
+
+
+def build_quality_report(source_output: Path, url_list: Path, fetch_levels: set[str]) -> dict[str, Any]:
+    return build_artifact_diagnostics(source_output, url_list, fetch_levels)[0]
+
+
+def build_worklists(
+    *,
+    expected_by_url: dict[str, dict[str, Any]],
+    sections_by_url: dict[str, dict[str, Any]],
+    missing_urls: list[str],
+    unexpected_urls: list[str],
+    missing_text: list[str],
+    missing_citation: list[str],
+    missing_source_url: list[str],
+    crawl_failures: list[Any],
+) -> dict[str, list[dict[str, Any]]]:
+    return {
+        "missing-required-urls.jsonl": [
+            dict(expected_by_url[url], reason="missing_required_section_url")
+            for url in missing_urls
+            if url in expected_by_url
+        ],
+        "failed-crawl-urls.jsonl": [
+            {
+                "reason": "crawl_failure",
+                "url": canonicalize_tmc_url(str(row.get("url") or "")) if isinstance(row, dict) else "",
+                "error": str(row.get("error") or "") if isinstance(row, dict) else str(row),
+            }
+            for row in crawl_failures
+        ],
+        "unexpected-section-urls.jsonl": [
+            {
+                "reason": "unexpected_section_url",
+                "url": url,
+                "id": str(sections_by_url.get(url, {}).get("id") or ""),
+                "citation": str(sections_by_url.get(url, {}).get("citation") or ""),
+                "title": str(sections_by_url.get(url, {}).get("title") or ""),
+            }
+            for url in unexpected_urls
+        ],
+        "section-quality-issues.jsonl": section_quality_issue_rows(
+            missing_text=missing_text,
+            missing_citation=missing_citation,
+            missing_source_url=missing_source_url,
+        ),
+    }
+
+
+def section_quality_issue_rows(
+    *,
+    missing_text: list[str],
+    missing_citation: list[str],
+    missing_source_url: list[str],
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    rows.extend({"reason": "section_missing_text", "id": item} for item in missing_text)
+    rows.extend({"reason": "section_missing_citation_url", "id": item} for item in missing_citation)
+    rows.extend({"reason": "section_missing_source_url", "id": item} for item in missing_source_url)
+    return rows
+
+
+def write_worklists(output_dir: Path, worklists: dict[str, list[dict[str, Any]]]) -> dict[str, str]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    files: dict[str, str] = {}
+    for filename, rows in worklists.items():
+        path = output_dir / filename
+        write_jsonl(path, rows)
+        files[filename.removesuffix(".jsonl").replace("-", "_")] = str(path)
+    return files
 
 
 def parse_args() -> argparse.Namespace:
@@ -198,6 +281,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--url-list", type=Path, default=DEFAULT_URL_LIST)
     parser.add_argument("--fetch-levels", default="Section,Subsection")
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--worklist-dir", type=Path, help="Optional directory for complete missing/failure/quality worklists.")
     parser.add_argument("--allow-fail", action="store_true", help="Write/print the report but return 0 when the quality gate fails.")
     return parser.parse_args()
 
@@ -205,7 +289,9 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     fetch_levels = {item.strip().lower() for item in args.fetch_levels.split(",") if item.strip()}
-    report = build_quality_report(args.source_output, args.url_list, fetch_levels or DEFAULT_FETCH_LEVELS)
+    report, worklists = build_artifact_diagnostics(args.source_output, args.url_list, fetch_levels or DEFAULT_FETCH_LEVELS)
+    if args.worklist_dir:
+        report["worklist_files"] = write_worklists(args.worklist_dir, worklists)
     if args.output:
         write_json(args.output, report)
     print(json.dumps(report, indent=2, sort_keys=True))

@@ -124,6 +124,8 @@ qualityGate:
     - instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-codified-code/seed/raw/topeka_municipal_code_urls.csv
     - --output
     - ${TOPEKA_CODE_OUTPUT}/quality-report.json
+    - --worklist-dir
+    - ${TOPEKA_CODE_OUTPUT}/worklists
 ingestion:
   mode: api
   runner: scripts/release/topeka-code-ingest.py

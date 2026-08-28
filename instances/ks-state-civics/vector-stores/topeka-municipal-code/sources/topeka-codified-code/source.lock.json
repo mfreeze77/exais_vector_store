@@ -119,6 +119,12 @@
     "vectorizationAllowed": false,
     "requiredBeforeIngestion": true,
     "gateScript": "scripts/release/topeka-code-artifact-quality.py",
+    "worklistFiles": [
+      "worklists/missing-required-urls.jsonl",
+      "worklists/failed-crawl-urls.jsonl",
+      "worklists/section-quality-issues.jsonl",
+      "worklists/unexpected-section-urls.jsonl"
+    ],
     "notes": "Do not ingest or vectorize additional Topeka codified-code records until JSON artifact coverage, citations, text presence, crawl failures, and graph hierarchy pass."
   },
   "acquisitionAdapters": {
