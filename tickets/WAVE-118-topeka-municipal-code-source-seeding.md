@@ -64,12 +64,14 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - Operator URL manifest `seed/raw/topeka_municipal_code_urls.csv` is preserved and wired into the scraper. Manifest-only Playwright fetching of `Section`/`Subsection` rows now bypasses root discovery and emits CSV-derived `CONTAINS` graph hierarchy.
 - Isolated Playwright browser contexts materially improve batch acquisition but do not fully defeat publisher challenge behavior: 2026-08-28 proof fetched 31 of the first 50 section URLs and failed 19 challenge pages.
 - Current operator rule: generate JSON/JSONL artifacts and run the artifact quality gate only. Do not ingest/vectorize additional Topeka records until artifact quality passes.
+- Operator-owned acquisition routes can now plug in through `--capture-manifest` by providing authorized HTML captures. The route implementation, cookies, credentials, proxy logic, captcha solving, stealth plugins, and challenge bypass code remain out of scope for this repository.
 
 ## Acceptance Criteria
 
 - The source-package validator passes for `ks-state-civics`.
 - Both Topeka source packages remain `productionReady: false` until a real corpus and vector store ID are proven.
 - Codified-code artifact generation and quality check run before any additional vectorization.
+- Operator capture import parses supplied HTML captures through the same JSON artifact, citation, graph, and quality-gate path as live fetching.
 - Full codified-code crawl writes nonempty `sections.jsonl`, `definitions.jsonl`, `nodes.jsonl`, `edges.jsonl`, `citation-url-map.jsonl`, `manifest.json`, and `crawl_report.json`.
 - Full codified-code crawl stores rendered HTML and network proof for fetched pages.
 - Full codified-code crawl fails closed on zero pages or zero sections.

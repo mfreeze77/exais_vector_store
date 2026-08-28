@@ -6,6 +6,7 @@ from typing import Literal
 
 import typer
 
+from .capture_import import import_capture_manifest
 from .crawler import MunicipalCodeCrawler
 from .exporter import export_corpus
 from .url_manifest import (
@@ -49,6 +50,16 @@ def scrape(
         "--manifest-only",
         help="When --url-list is supplied, fetch only listed URLs instead of following discovered links.",
     ),
+    capture_manifest: Path | None = typer.Option(
+        None,
+        "--capture-manifest",
+        help="JSONL manifest of operator-owned HTML captures to parse instead of fetching.",
+    ),
+    capture_root: Path | None = typer.Option(
+        None,
+        "--capture-root",
+        help="Base directory for relative html_path values in --capture-manifest.",
+    ),
     user_agent: str = typer.Option(
         "TopekaCodeScraper/0.1 (public municipal-code indexing)",
         help="HTTP User-Agent header.",
@@ -61,25 +72,35 @@ def scrape(
         fetch_levels = parse_level_filter(url_list_levels)
         fetch_entries = load_url_manifest(url_list, fetch_levels=fetch_levels) if url_list else []
         page_hints = {entry.url: entry for entry in fetch_entries}
-        crawler = MunicipalCodeCrawler(
-            root_url=root_url,
-            delay_seconds=delay,
-            retries=retries,
-            timeout_seconds=timeout,
-            max_pages=max_pages,
-            archive_raw=archive_raw,
-            archive_network=archive_network,
-            raw_dir=output / "raw",
-            network_dir=output / "network",
-            user_agent=user_agent,
-            fetcher=fetcher,
-            render_wait_ms=render_wait_ms,
-            isolate_playwright_context=isolate_playwright_context,
-            seed_urls=[entry.url for entry in fetch_entries] if fetch_entries else None,
-            page_hints=page_hints,
-            follow_links=not manifest_only,
-        )
-        pages, nodes, edges, report = await crawler.crawl()
+        if capture_manifest:
+            pages, nodes, edges, report = import_capture_manifest(
+                capture_manifest,
+                root_url=root_url,
+                capture_root=capture_root,
+                page_hints=page_hints,
+                raw_dir=output / "raw" if archive_raw else None,
+                network_dir=output / "network" if archive_network else None,
+            )
+        else:
+            crawler = MunicipalCodeCrawler(
+                root_url=root_url,
+                delay_seconds=delay,
+                retries=retries,
+                timeout_seconds=timeout,
+                max_pages=max_pages,
+                archive_raw=archive_raw,
+                archive_network=archive_network,
+                raw_dir=output / "raw",
+                network_dir=output / "network",
+                user_agent=user_agent,
+                fetcher=fetcher,
+                render_wait_ms=render_wait_ms,
+                isolate_playwright_context=isolate_playwright_context,
+                seed_urls=[entry.url for entry in fetch_entries] if fetch_entries else None,
+                page_hints=page_hints,
+                follow_links=not manifest_only,
+            )
+            pages, nodes, edges, report = await crawler.crawl()
         if manifest_entries:
             manifest_nodes, manifest_edges = manifest_graph(manifest_entries)
             nodes, edges = merge_graphs(manifest_nodes, manifest_edges, nodes, edges)

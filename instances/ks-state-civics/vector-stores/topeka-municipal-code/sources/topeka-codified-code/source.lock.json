@@ -121,6 +121,26 @@
     "gateScript": "scripts/release/topeka-code-artifact-quality.py",
     "notes": "Do not ingest or vectorize additional Topeka codified-code records until JSON artifact coverage, citations, text presence, crawl failures, and graph hierarchy pass."
   },
+  "acquisitionAdapters": {
+    "operatorCaptureManifest": {
+      "status": "available",
+      "runner": "topeka_code_scraper --capture-manifest",
+      "rowContract": {
+        "required": [
+          "url",
+          "html or html_path"
+        ],
+        "optional": [
+          "status_code",
+          "headers",
+          "retrieved_at",
+          "network_events",
+          "source"
+        ]
+      },
+      "boundary": "Accepts operator-owned authorized HTML captures as artifact input. Does not include Cloudflare evasion, stealth plugins, captcha solving, proxy rotation, cookies, credentials, storage state, route secrets, or challenge bypass code."
+    }
+  },
   "vectorStore": {
     "id": "vs_268b119a2cd84b568af62155",
     "name": "Topeka Municipal Code",

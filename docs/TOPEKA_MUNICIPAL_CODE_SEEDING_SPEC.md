@@ -83,6 +83,32 @@ This solves root discovery and graph hierarchy. It does not fully solve publishe
 
 Current operating rule: produce JSON/JSONL source artifacts only until the artifact quality gate passes. Do not call ExAIS document ingestion, embedding providers, Qdrant, or vector-store write paths for additional Topeka records until `scripts/release/topeka-code-artifact-quality.py` reports `passed: true`.
 
+### 2B. Operator Capture Import Shim
+
+The scraper also supports a local capture manifest import path for operator-owned acquisition routes. This is the integration point for an authorized export, authenticated browser capture, records-response bundle, Cloudflare Worker route, or separately operated route that returns source HTML. The route itself stays outside this repository.
+
+The capture manifest is JSONL. Each row must include:
+
+- canonical TMC `url`;
+- inline `html` or `html_path` relative to the capture root;
+- optional `status_code`, `headers`, `retrieved_at`, `network_events`, and `source`.
+
+Run shape:
+
+```bash
+python -m topeka_code_scraper \
+  --capture-manifest ./captures/pages.jsonl \
+  --capture-root ./captures \
+  --url-list seed/raw/topeka_municipal_code_urls.csv \
+  --url-list-levels Section,Subsection \
+  --manifest-only \
+  --archive-raw \
+  --archive-network \
+  --output ${TOPEKA_CODE_OUTPUT}
+```
+
+This path reuses the same parser, graph builder, citation map, manifest augmentation, and JSON quality gate as live HTTP/Playwright fetching. It still rejects challenge-only captures and records them in `crawl_report.json`. Do not commit acquisition-route code, cookies, credentials, storage state, proxy logic, captcha solving, stealth plugins, or challenge-circumvention code.
+
 ### 3. Operator-Owned Publisher-Gated Acquisition Slot
 
 If an operator obtains a legally authorized export, API access, records request, licensed data feed, or an out-of-band publisher-gated acquisition method, it plugs in by producing the same artifact contract:
