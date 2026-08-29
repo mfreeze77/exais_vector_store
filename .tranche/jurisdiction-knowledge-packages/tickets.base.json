@@ -1,0 +1,199 @@
+{
+  "canonical_goal": "Deliver a governed declarative jurisdiction knowledge package lifecycle that compiles corpus-backed jurisdiction experts into the existing ExAIS runtime registry with fail-closed validation, operator promotion, reference migrations, and reproducible proof.",
+  "tickets": [
+    {
+      "id": "T-001",
+      "title": "Define jurisdiction package schema",
+      "goal": "Create the declarative contract for jurisdiction knowledge packages, covering package identity, versioning, corpus cards, acquisition, normalization and chunking, semantic representation, graphing, search, explanation, citation, evals, and named expert exposure.",
+      "acceptance": "A package schema can express at least court decisions, statutes, municipal codes, administrative regulations, legislative materials, and meeting records, and validation reports missing required sections by corpus type.",
+      "suspected_files": [
+        "packages/jurisdiction-knowledge-packages/src/schema.ts",
+        "packages/jurisdiction-knowledge-packages/src/types.ts",
+        "packages/jurisdiction-knowledge-packages/src/index.ts",
+        "docs/jurisdiction-knowledge-packages/schema.md"
+      ]
+    },
+    {
+      "id": "T-002",
+      "title": "Add version and evidence digest model",
+      "goal": "Attach each package version to bounded, server-owned corpus evidence and deterministic digests so operators can prove which evidence produced a package.",
+      "acceptance": "A package validation run emits package version, corpus evidence identifiers, source digests, generated artifact digests, and a stable package digest that changes when evidence or declarations change.",
+      "suspected_files": [
+        "packages/jurisdiction-knowledge-packages/src/digests.ts",
+        "packages/jurisdiction-knowledge-packages/src/evidence.ts",
+        "packages/jurisdiction-knowledge-packages/src/schema.ts",
+        "docs/jurisdiction-knowledge-packages/versioning.md"
+      ]
+    },
+    {
+      "id": "T-003",
+      "title": "Implement package compiler",
+      "goal": "Compile package declarations into the existing shared ExAIS expert registry and runtime-facing descriptors without creating a second registry or changing caller-facing expert IDs.",
+      "acceptance": "Given a valid package with one or more experts, the compiler produces existing-registry-compatible expert entries and rejects output that would require a parallel runtime registry.",
+      "suspected_files": [
+        "packages/jurisdiction-knowledge-packages/src/compiler.ts",
+        "packages/jurisdiction-knowledge-packages/src/registry-adapter.ts",
+        "src/experts/registry.ts",
+        "src/experts/types.ts"
+      ]
+    },
+    {
+      "id": "T-004",
+      "title": "Enforce fail-closed governance boundaries",
+      "goal": "Prevent generated or declarative package content from activating tenancy, RLS, scopes, citation authority, provider and security routing, memory authority, output guards, or tool ceilings.",
+      "acceptance": "Validation fails closed when any package or generated draft attempts to set protected runtime controls, and tests show protected controls can only be referenced as externally managed constraints.",
+      "suspected_files": [
+        "packages/jurisdiction-knowledge-packages/src/governance.ts",
+        "packages/jurisdiction-knowledge-packages/src/validation.ts",
+        "src/security",
+        "src/tenancy",
+        "src/experts/guards"
+      ]
+    },
+    {
+      "id": "T-005",
+      "title": "Model corpus-type extension contracts",
+      "goal": "Add shared extension contracts for corpus connectors, metadata schemas, normalizers, chunkers, ontology selectors, caveats, search lenses, query planners, and eval families while allowing corpus-specific implementations.",
+      "acceptance": "Each supported corpus type can declare its connector, metadata, chunking, graph, search, caveat, and eval strategy through typed extension points without custom compiler branches per jurisdiction.",
+      "suspected_files": [
+        "packages/jurisdiction-knowledge-packages/src/corpus-types.ts",
+        "packages/jurisdiction-knowledge-packages/src/connectors.ts",
+        "packages/jurisdiction-knowledge-packages/src/normalization.ts",
+        "packages/jurisdiction-knowledge-packages/src/evals.ts"
+      ]
+    },
+    {
+      "id": "T-006",
+      "title": "Add graph and search descriptor contracts",
+      "goal": "Represent corpus-specific graph ontologies, extractors, search lenses, specialized tools, and query-planning hints as package-owned declarations that the runtime can consume through existing search and graph paths.",
+      "acceptance": "A package can declare both semantic search behavior and at least one specialized graph-backed search lens, and the compiled output exposes those descriptors to existing search/tool routing without bypassing governance.",
+      "suspected_files": [
+        "packages/jurisdiction-knowledge-packages/src/graph.ts",
+        "packages/jurisdiction-knowledge-packages/src/search.ts",
+        "src/search",
+        "src/graph",
+        "src/tools"
+      ]
+    },
+    {
+      "id": "T-007",
+      "title": "Implement scaffold CLI",
+      "goal": "Provide an operator command to scaffold a new jurisdiction package with manifest, corpus cards, expert declarations, eval stubs, and documentation placeholders.",
+      "acceptance": "Running the scaffold command for a jurisdiction creates a package directory with valid placeholder files that pass structural validation while remaining inactive.",
+      "suspected_files": [
+        "packages/jurisdiction-knowledge-packages/src/cli.ts",
+        "packages/jurisdiction-knowledge-packages/templates",
+        "scripts/jurisdiction-packages",
+        "package.json"
+      ]
+    },
+    {
+      "id": "T-008",
+      "title": "Build provider-agnostic drafting workflow",
+      "goal": "Generate draft corpus cards, tool descriptions, expert instructions, and eval candidates from bounded server-owned store metadata, declared capabilities, and representative retrieval evidence.",
+      "acceptance": "A generate command reads only bounded store metadata and representative retrieval evidence inputs, writes inactive draft package content with provenance, and never writes protected controls or activation state.",
+      "suspected_files": [
+        "packages/jurisdiction-knowledge-packages/src/drafting.ts",
+        "packages/jurisdiction-knowledge-packages/src/store-inspector.ts",
+        "packages/jurisdiction-knowledge-packages/src/provenance.ts",
+        "scripts/jurisdiction-packages/generate.ts"
+      ]
+    },
+    {
+      "id": "T-009",
+      "title": "Add package diff and validation commands",
+      "goal": "Give operators deterministic CLI feedback for generated versus promoted package content, schema errors, protected-control violations, digest changes, and registry compile results.",
+      "acceptance": "The CLI can diff drafts against promoted packages and validate a package with machine-readable diagnostics, nonzero exit codes on failure, and no mutation during validation.",
+      "suspected_files": [
+        "packages/jurisdiction-knowledge-packages/src/cli.ts",
+        "packages/jurisdiction-knowledge-packages/src/diff.ts",
+        "packages/jurisdiction-knowledge-packages/src/validation.ts",
+        "packages/jurisdiction-knowledge-packages/src/diagnostics.ts"
+      ]
+    },
+    {
+      "id": "T-010",
+      "title": "Add operator promotion lifecycle",
+      "goal": "Implement explicit operator promotion, rollback, and deactivation for package versions while preserving fail-closed activation and auditable state transitions.",
+      "acceptance": "Promote, rollback, and deactivate commands require an already-valid package digest, record lifecycle events, and never activate generated drafts without an explicit promotion command.",
+      "suspected_files": [
+        "packages/jurisdiction-knowledge-packages/src/lifecycle.ts",
+        "packages/jurisdiction-knowledge-packages/src/audit.ts",
+        "packages/jurisdiction-knowledge-packages/src/cli.ts",
+        "data/jurisdiction-packages"
+      ]
+    },
+    {
+      "id": "T-011",
+      "title": "Implement package drift detection",
+      "goal": "Detect drift between promoted package versions, corpus evidence digests, generated compiler outputs, and current server-owned store metadata.",
+      "acceptance": "A drift command reports unchanged, changed, missing, and stale package evidence states with deterministic exit behavior suitable for scheduler or CI use.",
+      "suspected_files": [
+        "packages/jurisdiction-knowledge-packages/src/drift.ts",
+        "packages/jurisdiction-knowledge-packages/src/digests.ts",
+        "packages/jurisdiction-knowledge-packages/src/store-inspector.ts",
+        "scripts/jurisdiction-packages/drift.ts"
+      ]
+    },
+    {
+      "id": "T-012",
+      "title": "Migrate Kansas Court Decisions package",
+      "goal": "Express Kansas Court Decisions as a reference jurisdiction package using the new lifecycle while preserving existing caller IDs, retrieval behavior, citation support, and expert behavior.",
+      "acceptance": "Kansas Court Decisions compiles through the package compiler into the existing expert registry with unchanged caller IDs and passing semantic search, graph, expert, session follow-up, and citation-support regression checks.",
+      "suspected_files": [
+        "packages/jurisdiction-knowledge-packages/reference/kansas-court-decisions",
+        "src/experts/kansas",
+        "src/search/kansas",
+        "tests/kansas-court-decisions"
+      ]
+    },
+    {
+      "id": "T-013",
+      "title": "Migrate Topeka Municipal Code package",
+      "goal": "Express Topeka Municipal Code as a reference jurisdiction package using municipal-code-specific corpus metadata, graph, search, caveats, evals, and expert declarations while preserving existing caller behavior.",
+      "acceptance": "Topeka Municipal Code compiles through the package compiler with unchanged caller IDs and passing ordinance/code retrieval, specialized search, expert, follow-up, and citation-support regression checks.",
+      "suspected_files": [
+        "packages/jurisdiction-knowledge-packages/reference/topeka-municipal-code",
+        "src/experts/topeka",
+        "src/search/topeka",
+        "tests/topeka-municipal-code"
+      ]
+    },
+    {
+      "id": "T-014",
+      "title": "Add deterministic compiler tests",
+      "goal": "Cover schema validation, package digests, governance rejection, compiler registry output, lifecycle commands, and migration behavior with deterministic automated tests.",
+      "acceptance": "A local test command proves valid packages compile, invalid protected controls fail closed, digests are stable, lifecycle transitions are explicit, and both reference migrations preserve expected IDs.",
+      "suspected_files": [
+        "packages/jurisdiction-knowledge-packages/test",
+        "tests/jurisdiction-knowledge-packages",
+        "vitest.config.ts",
+        "package.json"
+      ]
+    },
+    {
+      "id": "T-015",
+      "title": "Add Docker and live behavior proof",
+      "goal": "Provide reproducible Docker/live verification for semantic retrieval, specialized graph behavior, search tools, expert routing, session follow-up, and citation-support behavior for reference packages.",
+      "acceptance": "Documented Docker/live commands exercise Kansas Court Decisions and Topeka Municipal Code packages end to end and capture proof for semantic, graph, tool, expert, follow-up, and citation-support behavior without relying on GitHub CI as the only gate.",
+      "suspected_files": [
+        "docker-compose.yml",
+        "scripts/jurisdiction-packages/live-proof.ts",
+        "tests/live/jurisdiction-packages",
+        "docs/jurisdiction-knowledge-packages/proof.md"
+      ]
+    },
+    {
+      "id": "T-016",
+      "title": "Update setup and operator runbooks",
+      "goal": "Document the complete package lifecycle for new ExAIS instances, including scaffold, generate, diff, validate, promote, rollback, deactivate, drift detection, proof collection, and protected-control boundaries.",
+      "acceptance": "Setup and runbook documentation lets an operator create a new inactive jurisdiction package, draft it from bounded evidence, validate and promote it, roll it back or deactivate it, and run drift/proof commands without undocumented steps.",
+      "suspected_files": [
+        "README.md",
+        "docs/setup.md",
+        "docs/runbooks/jurisdiction-knowledge-packages.md",
+        "docs/jurisdiction-knowledge-packages/lifecycle.md"
+      ]
+    }
+  ]
+}

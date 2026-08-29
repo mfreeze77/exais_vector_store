@@ -1,0 +1,509 @@
+{
+  "end_goal": "Deliver a governed declarative jurisdiction knowledge package lifecycle that compiles corpus-backed jurisdiction experts into the existing ExAIS runtime registry with fail-closed validation, operator promotion, reference migrations, and reproducible proof.",
+  "shared_functions": [
+    {
+      "name": "load_package_manifest",
+      "signature": "load_package_manifest(path: Path) -> JurisdictionKnowledgePackage",
+      "owner_file": "packages/jurisdiction_knowledge_packages/schema.py",
+      "is_new": true,
+      "used_by": ["T-001", "T-002", "T-003", "T-004", "T-007", "T-009", "T-010", "T-011", "T-012", "T-013", "T-014"]
+    },
+    {
+      "name": "validate_package",
+      "signature": "validate_package(package: JurisdictionKnowledgePackage, *, instance: str, production: bool) -> PackageValidationResult",
+      "owner_file": "packages/jurisdiction_knowledge_packages/validation.py",
+      "is_new": true,
+      "used_by": ["T-001", "T-004", "T-005", "T-006", "T-007", "T-009", "T-010", "T-012", "T-013", "T-014"]
+    },
+    {
+      "name": "canonical_package_digest",
+      "signature": "canonical_package_digest(package: JurisdictionKnowledgePackage, evidence: PackageEvidenceSet) -> PackageDigestSet",
+      "owner_file": "packages/jurisdiction_knowledge_packages/digests.py",
+      "is_new": true,
+      "used_by": ["T-002", "T-009", "T-010", "T-011", "T-012", "T-013", "T-014"]
+    },
+    {
+      "name": "compile_package_to_expert_profiles",
+      "signature": "compile_package_to_expert_profiles(package: JurisdictionKnowledgePackage) -> tuple[ExpertProfileDefinition, ...]",
+      "owner_file": "packages/jurisdiction_knowledge_packages/compiler.py",
+      "is_new": true,
+      "used_by": ["T-003", "T-004", "T-006", "T-009", "T-012", "T-013", "T-014"]
+    },
+    {
+      "name": "compile_package_search_lenses",
+      "signature": "compile_package_search_lenses(package: JurisdictionKnowledgePackage) -> tuple[SearchLensDefinition, ...]",
+      "owner_file": "packages/jurisdiction_knowledge_packages/compiler.py",
+      "is_new": true,
+      "used_by": ["T-005", "T-006", "T-012", "T-013", "T-014"]
+    },
+    {
+      "name": "build_bounded_drafting_input",
+      "signature": "build_bounded_drafting_input(store_metadata: Mapping[str, Any], capabilities: Sequence[SearchLensDefinition], evidence: Sequence[ContextCitation]) -> DraftingInput",
+      "owner_file": "packages/jurisdiction_knowledge_packages/drafting.py",
+      "is_new": true,
+      "used_by": ["T-004", "T-008", "T-009", "T-014"]
+    },
+    {
+      "name": "generate_package_draft",
+      "signature": "generate_package_draft(input: DraftingInput, *, client: ExpertChatClient | None = None) -> DraftPackageResult",
+      "owner_file": "packages/jurisdiction_knowledge_packages/drafting.py",
+      "is_new": true,
+      "used_by": ["T-008", "T-009", "T-014"]
+    },
+    {
+      "name": "load_package_lifecycle_state",
+      "signature": "load_package_lifecycle_state(instance_root: Path) -> PackageLifecycleState",
+      "owner_file": "packages/jurisdiction_knowledge_packages/lifecycle.py",
+      "is_new": true,
+      "used_by": ["T-010", "T-011", "T-014", "T-016"]
+    },
+    {
+      "name": "record_package_lifecycle_event",
+      "signature": "record_package_lifecycle_event(state: PackageLifecycleState, event: PackageLifecycleEvent) -> PackageLifecycleState",
+      "owner_file": "packages/jurisdiction_knowledge_packages/lifecycle.py",
+      "is_new": true,
+      "used_by": ["T-010", "T-011", "T-014", "T-016"]
+    },
+    {
+      "name": "promote_package_version",
+      "signature": "promote_package_version(package_path: Path, digest: str, *, operator: str, dry_run: bool) -> PackageLifecycleResult",
+      "owner_file": "packages/jurisdiction_knowledge_packages/lifecycle.py",
+      "is_new": true,
+      "used_by": ["T-010", "T-014", "T-016"]
+    },
+    {
+      "name": "diff_package_versions",
+      "signature": "diff_package_versions(previous: PackageDigestSet | None, current: PackageDigestSet) -> PackageDiff",
+      "owner_file": "packages/jurisdiction_knowledge_packages/digests.py",
+      "is_new": true,
+      "used_by": ["T-002", "T-009", "T-011", "T-014"]
+    },
+    {
+      "name": "detect_package_drift",
+      "signature": "detect_package_drift(package: JurisdictionKnowledgePackage, state: PackageLifecycleState, evidence: PackageEvidenceSet) -> PackageDriftReport",
+      "owner_file": "packages/jurisdiction_knowledge_packages/lifecycle.py",
+      "is_new": true,
+      "used_by": ["T-011", "T-014", "T-015", "T-016"]
+    },
+    {
+      "name": "run_jurisdiction_package_cli",
+      "signature": "run_jurisdiction_package_cli(argv: Sequence[str] | None = None) -> int",
+      "owner_file": "packages/jurisdiction_knowledge_packages/cli.py",
+      "is_new": true,
+      "used_by": ["T-007", "T-008", "T-009", "T-010", "T-011", "T-015", "T-016"]
+    },
+    {
+      "name": "append_package_audit_record",
+      "signature": "append_package_audit_record(state: PackageLifecycleState, record: PackageAuditRecord) -> PackageLifecycleState",
+      "owner_file": "packages/jurisdiction_knowledge_packages/lifecycle.py",
+      "is_new": true,
+      "used_by": ["T-010", "T-011", "T-014", "T-016"]
+    }
+  ],
+  "file_modification_map": [
+    {
+      "file": "contracts/jurisdiction-knowledge-package.schema.json",
+      "ticket_ids": ["T-001", "T-004", "T-005", "T-006", "T-008", "T-012", "T-013", "T-014"],
+      "is_new": true,
+      "what": "Define the declarative package schema, corpus-type required sections, extension descriptor shapes, protected-control denial fields, draft provenance, and reference migration examples."
+    },
+    {
+      "file": "contracts/vector-store-source-package.schema.json",
+      "ticket_ids": ["T-001", "T-002", "T-005", "T-014"],
+      "is_new": false,
+      "what": "Keep existing source-package contract compatible and add only references needed for package evidence cards and corpus-type extension validation."
+    },
+    {
+      "file": "packages/jurisdiction_knowledge_packages/__init__.py",
+      "ticket_ids": ["T-001", "T-003", "T-007", "T-009", "T-010", "T-011"],
+      "is_new": true,
+      "what": "Expose the new package module's stable public entry points without registering runtime experts here."
+    },
+    {
+      "file": "packages/jurisdiction_knowledge_packages/schema.py",
+      "ticket_ids": ["T-001", "T-002", "T-004", "T-005", "T-006", "T-007", "T-008", "T-009", "T-012", "T-013", "T-014"],
+      "is_new": true,
+      "what": "Own typed package models and load_package_manifest; model package identity, corpora, evidence, drafting provenance, graph/search/eval descriptors, and expert declarations."
+    },
+    {
+      "file": "packages/jurisdiction_knowledge_packages/validation.py",
+      "ticket_ids": ["T-001", "T-004", "T-005", "T-006", "T-007", "T-009", "T-010", "T-012", "T-013", "T-014"],
+      "is_new": true,
+      "what": "Own validate_package and fail-closed diagnostics for required corpus sections, protected runtime controls, source evidence bounds, graph/search descriptors, and compile readiness."
+    },
+    {
+      "file": "packages/jurisdiction_knowledge_packages/digests.py",
+      "ticket_ids": ["T-002", "T-009", "T-010", "T-011", "T-012", "T-013", "T-014"],
+      "is_new": true,
+      "what": "Own deterministic package/evidence/artifact digests and diff_package_versions using svs_common hashing primitives."
+    },
+    {
+      "file": "packages/jurisdiction_knowledge_packages/compiler.py",
+      "ticket_ids": ["T-003", "T-004", "T-005", "T-006", "T-009", "T-012", "T-013", "T-014"],
+      "is_new": true,
+      "what": "Own compilation from declarative manifests into existing ExpertProfileDefinition and SearchLensDefinition objects; never create a runtime registry."
+    },
+    {
+      "file": "packages/jurisdiction_knowledge_packages/drafting.py",
+      "ticket_ids": ["T-004", "T-008", "T-009", "T-014"],
+      "is_new": true,
+      "what": "Own bounded drafting input and generated inactive draft content through expert_llm/model-gateway boundaries, excluding protected controls and direct provider SDK calls."
+    },
+    {
+      "file": "packages/jurisdiction_knowledge_packages/lifecycle.py",
+      "ticket_ids": ["T-010", "T-011", "T-014", "T-016"],
+      "is_new": true,
+      "what": "Own package lifecycle state, promotion, rollback, deactivation, lifecycle event append, audit append, and drift status; no other file persists package lifecycle state."
+    },
+    {
+      "file": "packages/jurisdiction_knowledge_packages/audit.py",
+      "ticket_ids": ["T-010", "T-011", "T-014", "T-016"],
+      "is_new": true,
+      "what": "Render and filter audit records by reading lifecycle.py state only; do not own a separate audit log or lifecycle store."
+    },
+    {
+      "file": "packages/jurisdiction_knowledge_packages/cli.py",
+      "ticket_ids": ["T-007", "T-008", "T-009", "T-010", "T-011", "T-015", "T-016"],
+      "is_new": true,
+      "what": "Own the shared jurisdiction-package CLI parser and command dispatch for scaffold, generate, diff, validate, promote, rollback, deactivate, drift, and proof subcommands."
+    },
+    {
+      "file": "scripts/release/jurisdiction-package.py",
+      "ticket_ids": ["T-007", "T-008", "T-009", "T-010", "T-011", "T-015", "T-016"],
+      "is_new": true,
+      "what": "Add a thin operator script wrapper that calls packages.jurisdiction_knowledge_packages.cli.run_jurisdiction_package_cli."
+    },
+    {
+      "file": "scripts/release/instance_source_packages.py",
+      "ticket_ids": ["T-001", "T-002", "T-004", "T-007", "T-009", "T-010", "T-011", "T-014"],
+      "is_new": false,
+      "what": "Bridge existing source-package validation, digest, manifest diff, seed scaffolding, and explicit execution primitives into the package lifecycle without moving source-package ownership."
+    },
+    {
+      "file": "scripts/release/validate-instance-source-packages.py",
+      "ticket_ids": ["T-007", "T-009", "T-014", "T-016"],
+      "is_new": false,
+      "what": "Document or delegate package validation command output shape to the shared CLI while preserving current source-package validation behavior."
+    },
+    {
+      "file": "scripts/release/instance-source-update.py",
+      "ticket_ids": ["T-009", "T-010", "T-011", "T-014"],
+      "is_new": false,
+      "what": "Keep existing source update dry-run/execute semantics and route package promote/diff/drift work to lifecycle.py rather than duplicating state here."
+    },
+    {
+      "file": "packages/svs_common/svs_common/hashing.py",
+      "ticket_ids": ["T-002", "T-014"],
+      "is_new": false,
+      "what": "Reuse sha256_bytes for package digest tests; add a tiny helper only if needed for canonical JSON bytes."
+    },
+    {
+      "file": "packages/svs_common/svs_common/expert_profiles.py",
+      "ticket_ids": ["T-003", "T-004", "T-006", "T-012", "T-013", "T-014"],
+      "is_new": false,
+      "what": "Remain the sole runtime expert registry; import or compose compiled package definitions while preserving existing expert IDs and runtime-owned policies."
+    },
+    {
+      "file": "packages/svs_common/svs_common/search_lenses.py",
+      "ticket_ids": ["T-005", "T-006", "T-012", "T-013", "T-014"],
+      "is_new": false,
+      "what": "Remain the sole runtime search lens registry; accept compiled lens descriptors without duplicating graph/search lens logic inside package files."
+    },
+    {
+      "file": "packages/svs_common/svs_common/query_planner.py",
+      "ticket_ids": ["T-005", "T-006", "T-012", "T-014"],
+      "is_new": false,
+      "what": "Keep query-planning implementations centralized and let package descriptors reference planner profile IDs or hints instead of embedding planner logic."
+    },
+    {
+      "file": "packages/svs_common/svs_common/retrieval.py",
+      "ticket_ids": ["T-004", "T-006", "T-008", "T-014", "T-015"],
+      "is_new": false,
+      "what": "Supply bounded representative evidence for drafting and preserve runtime citation/output guard enforcement outside package-generated content."
+    },
+    {
+      "file": "packages/svs_common/svs_common/expert_llm.py",
+      "ticket_ids": ["T-008", "T-014"],
+      "is_new": false,
+      "what": "Provide the provider-agnostic expert chat client boundary for draft generation; no package code calls provider SDKs directly."
+    },
+    {
+      "file": "packages/svs_common/svs_common/security.py",
+      "ticket_ids": ["T-004", "T-014"],
+      "is_new": false,
+      "what": "Keep retrieval scope and Qdrant filters runtime-owned; package validation may reference these controls only as external constraints."
+    },
+    {
+      "file": "packages/svs_common/svs_common/auth.py",
+      "ticket_ids": ["T-004", "T-014"],
+      "is_new": false,
+      "what": "Keep API scope enforcement principal-owned and verify package declarations cannot grant or mutate scopes."
+    },
+    {
+      "file": "packages/svs_common/svs_common/vectorization_router.py",
+      "ticket_ids": ["T-004", "T-005", "T-014"],
+      "is_new": false,
+      "what": "Keep provider/security routing in the existing ingestion planner; packages declare corpus needs but do not set provider routes or ceilings."
+    },
+    {
+      "file": "packages/svs_common/svs_common/expert_sessions.py",
+      "ticket_ids": ["T-004", "T-014", "T-015"],
+      "is_new": false,
+      "what": "Preserve explicit memory promotion authority and session follow-up behavior for reference package proof."
+    },
+    {
+      "file": "apps/api/svs_api/main.py",
+      "ticket_ids": ["T-003", "T-006", "T-012", "T-013", "T-014", "T-015"],
+      "is_new": false,
+      "what": "Keep existing expert, search, and lens routes; consume compiled registry/lens data without adding a parallel package route family."
+    },
+    {
+      "file": "apps/model_gateway/svs_model_gateway/main.py",
+      "ticket_ids": ["T-004", "T-008", "T-014"],
+      "is_new": false,
+      "what": "Preserve model-gateway provider resolution and ceiling checks used by provider-agnostic draft generation."
+    },
+    {
+      "file": "instances/ks-state-civics/vector-stores/kansas-court-decisions/package.yaml",
+      "ticket_ids": ["T-012", "T-014", "T-015", "T-016"],
+      "is_new": true,
+      "what": "Add the Kansas Court Decisions declarative jurisdiction package manifest preserving current vector store ID, expert ID, graph lenses, query planner profile, caveats, evals, and evidence locks."
+    },
+    {
+      "file": "instances/ks-state-civics/vector-stores/topeka-municipal-code/package.yaml",
+      "ticket_ids": ["T-013", "T-014", "T-015", "T-016"],
+      "is_new": true,
+      "what": "Add the Topeka Municipal Code declarative jurisdiction package manifest preserving current vector store ID, expert ID, municipal graph lenses, caveats, evals, and evidence locks."
+    },
+    {
+      "file": "instances/ks-state-civics/vector-stores/kansas-court-decisions/store.yaml",
+      "ticket_ids": ["T-012", "T-015"],
+      "is_new": false,
+      "what": "Reference the package manifest and preserve existing store identity and retrieval attributes."
+    },
+    {
+      "file": "instances/ks-state-civics/vector-stores/topeka-municipal-code/store.yaml",
+      "ticket_ids": ["T-013", "T-015"],
+      "is_new": false,
+      "what": "Reference the package manifest and preserve existing Topeka store identity and proof metadata."
+    },
+    {
+      "file": "instances/ks-state-civics/vector-stores/kansas-court-decisions/sources/kscourts-decisions/source.yaml",
+      "ticket_ids": ["T-002", "T-012", "T-014"],
+      "is_new": false,
+      "what": "Link source-package evidence into the Kansas package without hand-maintaining duplicate Kansas expert/profile data."
+    },
+    {
+      "file": "instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-codified-code/source.yaml",
+      "ticket_ids": ["T-002", "T-013", "T-014"],
+      "is_new": false,
+      "what": "Link codified-code evidence into the Topeka package without duplicating Topeka expert/profile data."
+    },
+    {
+      "file": "instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-ordinances/source.yaml",
+      "ticket_ids": ["T-002", "T-013", "T-014"],
+      "is_new": false,
+      "what": "Link ordinance evidence into the Topeka package and preserve ordinance-history citation support."
+    },
+    {
+      "file": "tests/test_jurisdiction_knowledge_packages.py",
+      "ticket_ids": ["T-001", "T-002", "T-003", "T-004", "T-005", "T-006", "T-007", "T-008", "T-009", "T-011", "T-012", "T-013", "T-014"],
+      "is_new": true,
+      "what": "Add deterministic schema, validation, digest, compiler, drafting, diff, drift, and migration tests for both reference packages."
+    },
+    {
+      "file": "tests/test_jurisdiction_package_lifecycle.py",
+      "ticket_ids": ["T-010", "T-011", "T-014", "T-016"],
+      "is_new": true,
+      "what": "Add lifecycle tests proving explicit promotion, rollback, deactivation, audit append, fail-closed activation, and one lifecycle state owner."
+    },
+    {
+      "file": "tests/test_instance_source_packages.py",
+      "ticket_ids": ["T-001", "T-002", "T-007", "T-009", "T-014"],
+      "is_new": false,
+      "what": "Preserve existing source-package validation while adding compatibility coverage for package evidence references."
+    },
+    {
+      "file": "tests/test_expert_profiles.py",
+      "ticket_ids": ["T-003", "T-004", "T-012", "T-013", "T-014"],
+      "is_new": false,
+      "what": "Prove compiled packages feed the existing expert registry and preserve principal scoping, caller-facing IDs, caveats, model policy, and tool limits."
+    },
+    {
+      "file": "tests/test_openapi_contract.py",
+      "ticket_ids": ["T-006", "T-014", "T-015"],
+      "is_new": false,
+      "what": "Ensure existing search lens and expert routes remain compatible after compiled descriptors are added."
+    },
+    {
+      "file": "tests/test_query_planner.py",
+      "ticket_ids": ["T-005", "T-006", "T-012", "T-014"],
+      "is_new": false,
+      "what": "Prove package descriptors reference existing query planner behavior without duplicating planner implementations."
+    },
+    {
+      "file": "tests/test_topeka_graphrag.py",
+      "ticket_ids": ["T-006", "T-013", "T-014", "T-015"],
+      "is_new": false,
+      "what": "Preserve Topeka graph-backed search behavior through the migrated package."
+    },
+    {
+      "file": "tests/test_kscourts_graphrag_load.py",
+      "ticket_ids": ["T-006", "T-012", "T-014", "T-015"],
+      "is_new": false,
+      "what": "Preserve Kansas court graph artifact/load behavior through the migrated package."
+    },
+    {
+      "file": "tests/test_expert_sessions.py",
+      "ticket_ids": ["T-004", "T-012", "T-013", "T-014", "T-015"],
+      "is_new": false,
+      "what": "Prove expert follow-up and explicit memory promotion remain governed after package migration."
+    },
+    {
+      "file": "tests/test_expert_llm_client.py",
+      "ticket_ids": ["T-008", "T-014"],
+      "is_new": false,
+      "what": "Prove drafting uses the provider-agnostic expert LLM client boundary and does not import provider SDKs."
+    },
+    {
+      "file": "evals/expert-sessions/run_eval.py",
+      "ticket_ids": ["T-008", "T-014", "T-015"],
+      "is_new": false,
+      "what": "Reuse existing expert-session eval validation and execution for generated eval candidates and reference package live proof."
+    },
+    {
+      "file": "scripts/release/corpus-quality-eval.py",
+      "ticket_ids": ["T-015", "T-016"],
+      "is_new": false,
+      "what": "Document and, if needed, add package-aware arguments for retrieval/citation proof against reference packages."
+    },
+    {
+      "file": "scripts/release/cell-smoke.py",
+      "ticket_ids": ["T-015", "T-016"],
+      "is_new": false,
+      "what": "Include package lifecycle checks in Docker/live proof without treating GitHub CI as the only acceptance gate."
+    },
+    {
+      "file": "scripts/release/local-proof.py",
+      "ticket_ids": ["T-015", "T-016"],
+      "is_new": false,
+      "what": "Add or document package proof orchestration for semantic retrieval, graph behavior, search tools, experts, follow-up, and citation support."
+    },
+    {
+      "file": "Makefile",
+      "ticket_ids": ["T-007", "T-009", "T-010", "T-011", "T-015", "T-016"],
+      "is_new": false,
+      "what": "Expose concise make targets for scaffold, generate, validate, diff, lifecycle, drift, and proof commands."
+    },
+    {
+      "file": "README.md",
+      "ticket_ids": ["T-016"],
+      "is_new": false,
+      "what": "Link the package lifecycle from local setup and operator paths."
+    },
+    {
+      "file": "docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md",
+      "ticket_ids": ["T-001", "T-007", "T-008", "T-009", "T-010", "T-011", "T-012", "T-013", "T-015", "T-016"],
+      "is_new": false,
+      "what": "Document schema, scaffold, generate, validate, diff, promote, rollback, deactivate, drift, migrations, proof, and protected-control boundaries."
+    },
+    {
+      "file": "docs/CALLER_AGENT_INTEGRATION.md",
+      "ticket_ids": ["T-003", "T-012", "T-013", "T-016"],
+      "is_new": false,
+      "what": "Document that caller-facing expert IDs and routes are preserved by compilation into the existing registry."
+    },
+    {
+      "file": "runbooks/customer-cell-launch.md",
+      "ticket_ids": ["T-015", "T-016"],
+      "is_new": false,
+      "what": "Add package proof and promotion checklist entries while preserving live-host proof boundaries."
+    },
+    {
+      "file": "runbooks/ks-state-civics-hetzner-vps-launch.md",
+      "ticket_ids": ["T-015", "T-016"],
+      "is_new": false,
+      "what": "Document reference package rollout/proof expectations for the Kansas civics cell."
+    }
+  ],
+  "anti_duplication_rules": [
+    "All jurisdiction package YAML/JSON loading goes through packages/jurisdiction_knowledge_packages/schema.py:load_package_manifest; do not add ad hoc YAML parsing in CLI, compiler, lifecycle, or tests.",
+    "All package validation goes through packages/jurisdiction_knowledge_packages/validation.py:validate_package; do not duplicate protected-control checks in command wrappers or migration files.",
+    "All package, evidence, artifact, diff, and drift digests go through packages/jurisdiction_knowledge_packages/digests.py using packages/svs_common/svs_common/hashing.py primitives; do not hand-roll JSON string hashing elsewhere.",
+    "Compiled experts must enter packages/svs_common/svs_common/expert_profiles.py:EXPERT_PROFILE_REGISTRY or its existing composition path; package manifests are declarative source inputs and are not a second runtime registry.",
+    "Compiled search lenses must enter packages/svs_common/svs_common/search_lenses.py:SEARCH_LENS_REGISTRY or its existing composition path; do not duplicate graph/search lens selection, query planning, or graph expansion logic in package files.",
+    "Kansas Court Decisions and Topeka Municipal Code profile definitions must have one authoritative declarative package manifest each; do not hand-maintain duplicate Kansas or Topeka profile definitions in both YAML and Python.",
+    "Generated draft content may include package declarations, descriptions, eval candidates, and provenance only; it must not contain tenancy, RLS, scopes, citation authority activation, provider routing, security routing, memory authority, output guards, or tool ceilings.",
+    "Draft generation must use packages/svs_common/svs_common/expert_llm.py and the model gateway boundary; no direct OpenAI, Anthropic, local provider, or provider SDK import is allowed in packages/jurisdiction_knowledge_packages/drafting.py.",
+    "Package lifecycle state is owned only by packages/jurisdiction_knowledge_packages/lifecycle.py; audit.py may render lifecycle records but must not write a separate audit store, status file, or activation marker.",
+    "No package command may autoactivate a generated draft; promote, rollback, and deactivate require explicit operator CLI subcommands, a valid package digest, and lifecycle event recording.",
+    "Reference migrations must preserve existing caller-facing expert IDs, vector store IDs, graph lens IDs, and route behavior; any renaming requires an explicit compatibility shim in the existing registry owner.",
+    "Do not include or depend on any external vendor-reference path from enrichment in implementation, file_modification_map, manifests, imports, tests, or docs; prior vendor inspection remains reference-only."
+  ],
+  "tickets": [
+    {
+      "id": "T-001",
+      "expected_output": "A new jurisdiction package schema and typed loader can express all required corpus families and reports corpus-type-specific missing sections through validate_package."
+    },
+    {
+      "id": "T-002",
+      "expected_output": "Package validation emits evidence identifiers, evidence digests, artifact digests, and a stable canonical package digest that changes when declarations or source evidence change."
+    },
+    {
+      "id": "T-003",
+      "expected_output": "Valid package expert declarations compile into existing ExpertProfileDefinition-compatible entries consumed by the current expert profile resolver without a parallel runtime registry or caller ID changes."
+    },
+    {
+      "id": "T-004",
+      "expected_output": "Validation fails closed on protected runtime controls in package manifests or generated drafts, while tests prove runtime-owned scope, RLS, provider, memory, citation, guard, and tool-limit controls remain external constraints."
+    },
+    {
+      "id": "T-005",
+      "expected_output": "Corpus types declare connector, metadata, chunking, graph, search, caveat, and eval extension descriptors through typed contracts without per-jurisdiction compiler branches."
+    },
+    {
+      "id": "T-006",
+      "expected_output": "Package graph/search descriptors compile into the existing search lens/query-planner/API routing surfaces, preserving specialized graph-backed behavior without duplicated graph expansion code."
+    },
+    {
+      "id": "T-007",
+      "expected_output": "The shared jurisdiction-package CLI can scaffold an inactive package directory with manifest, corpus cards, expert declarations, eval stubs, and docs placeholders that pass structural validation."
+    },
+    {
+      "id": "T-008",
+      "expected_output": "The generate command builds inactive draft package content from bounded store metadata, capability descriptors, and representative retrieval evidence through the model gateway boundary with provenance and no protected controls."
+    },
+    {
+      "id": "T-009",
+      "expected_output": "Operators get deterministic validate and diff commands with machine-readable diagnostics, nonzero failure exits, digest changes, protected-control violations, and compile-result reporting without mutation during validation."
+    },
+    {
+      "id": "T-010",
+      "expected_output": "Promote, rollback, and deactivate commands require an already-valid package digest, write lifecycle/audit events through lifecycle.py, and never activate generated drafts implicitly."
+    },
+    {
+      "id": "T-011",
+      "expected_output": "The drift command compares promoted package state, corpus evidence digests, compiler outputs, and current server-owned store metadata, reporting unchanged, changed, missing, and stale states with deterministic exits."
+    },
+    {
+      "id": "T-012",
+      "expected_output": "Kansas Court Decisions is represented as a reference package that compiles into unchanged expert/vector-store/search IDs with passing semantic search, graph, expert, follow-up, and citation-support regression checks."
+    },
+    {
+      "id": "T-013",
+      "expected_output": "Topeka Municipal Code is represented as a reference package that compiles into unchanged expert/vector-store/search IDs with passing code, ordinance-history, graph, expert, follow-up, and citation-support regression checks."
+    },
+    {
+      "id": "T-014",
+      "expected_output": "Focused deterministic tests prove schema validation, stable digests, fail-closed protected controls, compiler registry output, lifecycle transitions, drift reporting, and both reference migrations."
+    },
+    {
+      "id": "T-015",
+      "expected_output": "Documented Docker/live proof commands exercise both reference packages end to end for semantic retrieval, graph behavior, search tools, expert routing, follow-up, and citation support, without relying on GitHub CI as the only gate."
+    },
+    {
+      "id": "T-016",
+      "expected_output": "README, playbook, caller docs, and runbooks describe scaffold, generate, validate, diff, promote, rollback, deactivate, drift, proof collection, and protected-control boundaries for new ExAIS instances."
+    }
+  ]
+}

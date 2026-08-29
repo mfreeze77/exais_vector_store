@@ -1,0 +1,659 @@
+{
+  "canonical_goal": "Deliver a governed declarative jurisdiction knowledge package lifecycle that compiles corpus-backed jurisdiction experts into the existing ExAIS runtime registry with fail-closed validation, operator promotion, reference migrations, and reproducible proof.",
+  "tickets": [
+    {
+      "id": "T-001",
+      "title": "Define jurisdiction package schema",
+      "goal": "Create the declarative contract for jurisdiction knowledge packages, covering package identity, versioning, corpus cards, acquisition, normalization and chunking, semantic representation, graphing, search, explanation, citation, evals, and named expert exposure.",
+      "acceptance": "A package schema can express at least court decisions, statutes, municipal codes, administrative regulations, legislative materials, and meeting records, and validation reports missing required sections by corpus type.",
+      "suspected_files": [
+        "contracts/vector-store-source-package.schema.json",
+        "contracts/instance-manifest.schema.json",
+        "scripts/release/instance_source_packages.py",
+        "packages/svs_common/svs_common/schemas.py",
+        "docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md"
+      ],
+      "code_refs": [
+        {
+          "file": "contracts/vector-store-source-package.schema.json",
+          "symbol": "$.required",
+          "note": "Observed required top-level sections are apiVersion, kind, metadata, vectorStore, source, ingestion, updatePolicy, graph, and eval."
+        },
+        {
+          "file": "scripts/release/instance_source_packages.py",
+          "symbol": "validate_source_package",
+          "note": "Current validator is the concrete place where declarative source-package schema and policy requirements are enforced."
+        },
+        {
+          "file": "packages/svs_common/svs_common/schemas.py",
+          "symbol": "ExpertProfile",
+          "note": "Runtime-facing expert profile response schema that package compilation must preserve or extend rather than bypass."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [],
+      "flags": [
+        "No existing packages/jurisdiction-knowledge-packages package is present; this ticket should create a new package only after mapping to the current Python/YAML source-package contracts."
+      ]
+    },
+    {
+      "id": "T-002",
+      "title": "Add version and evidence digest model",
+      "goal": "Attach each package version to bounded, server-owned corpus evidence and deterministic digests so operators can prove which evidence produced a package.",
+      "acceptance": "A package validation run emits package version, corpus evidence identifiers, source digests, generated artifact digests, and a stable package digest that changes when evidence or declarations change.",
+      "suspected_files": [
+        "scripts/release/instance_source_packages.py",
+        "packages/svs_common/svs_common/hashing.py",
+        "instances/ks-state-civics/vector-stores/kansas-court-decisions/sources/kscourts-decisions/source.lock.json",
+        "instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-ordinances/source.lock.json"
+      ],
+      "code_refs": [
+        {
+          "file": "scripts/release/instance_source_packages.py",
+          "symbol": "manifest_file_sha256",
+          "note": "Current digest primitive for manifest evidence; package digesting should reuse this style and include declarations plus evidence pointers."
+        },
+        {
+          "file": "packages/svs_common/svs_common/hashing.py",
+          "symbol": "sha256_bytes",
+          "note": "Shared hashing helper for deterministic content digests."
+        },
+        {
+          "file": "scripts/release/instance_source_packages.py",
+          "symbol": "diff_manifest_records",
+          "note": "Existing stable-identity/checksum diff basis for changed, unchanged, added, and removed corpus evidence."
+        }
+      ],
+      "external_claims": [],
+      "patterns": []
+    },
+    {
+      "id": "T-003",
+      "title": "Implement package compiler",
+      "goal": "Compile package declarations into the existing shared ExAIS expert registry and runtime-facing descriptors without creating a second registry or changing caller-facing expert IDs.",
+      "acceptance": "Given a valid package with one or more experts, the compiler produces existing-registry-compatible expert entries and rejects output that would require a parallel runtime registry.",
+      "suspected_files": [
+        "packages/svs_common/svs_common/expert_profiles.py",
+        "packages/svs_common/svs_common/schemas.py",
+        "apps/api/svs_api/main.py",
+        "tests/test_expert_profiles.py"
+      ],
+      "code_refs": [
+        {
+          "file": "packages/svs_common/svs_common/expert_profiles.py",
+          "symbol": "EXPERT_PROFILE_REGISTRY",
+          "note": "Single current expert registry with Kansas Court Decisions and Topeka Municipal Code IDs that must remain caller-facing."
+        },
+        {
+          "file": "packages/svs_common/svs_common/expert_profiles.py",
+          "symbol": "resolve_expert_profile",
+          "note": "Runtime resolver scopes expert bindings to active vector stores and composes graph lens policy."
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "get_expert_profile",
+          "note": "Public expert profile API surface that compiled packages must feed without adding a parallel route family."
+        }
+      ],
+      "external_claims": [],
+      "patterns": []
+    },
+    {
+      "id": "T-004",
+      "title": "Enforce fail-closed governance boundaries",
+      "goal": "Prevent generated or declarative package content from activating tenancy, RLS, scopes, citation authority, provider and security routing, memory authority, output guards, or tool ceilings.",
+      "acceptance": "Validation fails closed when any package or generated draft attempts to set protected runtime controls, and tests show protected controls can only be referenced as externally managed constraints.",
+      "suspected_files": [
+        "scripts/release/instance_source_packages.py",
+        "packages/svs_common/svs_common/security.py",
+        "packages/svs_common/svs_common/expert_profiles.py",
+        "packages/svs_common/svs_common/expert_sessions.py",
+        "tests/test_expert_profiles.py",
+        "tests/test_expert_sessions.py"
+      ],
+      "code_refs": [
+        {
+          "file": "scripts/release/instance_source_packages.py",
+          "symbol": "validate_source_package",
+          "note": "Existing fail-closed policy checks for production path, seed, citation, lock, and graph constraints."
+        },
+        {
+          "file": "packages/svs_common/svs_common/security.py",
+          "symbol": "build_retrieval_scope",
+          "note": "Protected runtime retrieval scope is derived from the principal, not package declarations."
+        },
+        {
+          "file": "packages/svs_common/svs_common/auth.py",
+          "symbol": "ensure_scope",
+          "note": "API scopes are enforced from the authenticated principal and required route scope, not from generated package content."
+        },
+        {
+          "file": "db/migrations/004_hardening_wave1.sql",
+          "symbol": "tenant_scope_chunks",
+          "note": "RLS policy applies tenant, business instance, security-level, and active-row guards at the database layer."
+        },
+        {
+          "file": "packages/svs_common/svs_common/security.py",
+          "symbol": "build_qdrant_filter",
+          "note": "Qdrant filters mirror tenant, business instance, security-level, ACL, and caller filters from runtime scope."
+        },
+        {
+          "file": "packages/svs_common/svs_common/vectorization_router.py",
+          "symbol": "build_ingestion_plan",
+          "note": "Provider/security routing filters embedding candidates by security level, privacy, provider configuration, and dev fallback policy."
+        },
+        {
+          "file": "apps/model_gateway/svs_model_gateway/main.py",
+          "symbol": "_chat_candidate_unavailable_code",
+          "note": "Model gateway rejects expert chat candidates when security ceiling, local-only, or provider configuration checks fail."
+        },
+        {
+          "file": "packages/svs_common/svs_common/retrieval.py",
+          "symbol": "ensure_retrieval_answer_citation_integrity",
+          "note": "Output citation integrity guard requires visible markers and matching annotations before answer responses are returned."
+        },
+        {
+          "file": "packages/svs_common/svs_common/retrieval.py",
+          "symbol": "_merge_output_guard_metadata",
+          "note": "Output guard metadata is merged from redaction guards and exposed as a bounded response field."
+        },
+        {
+          "file": "packages/svs_common/svs_common/expert_profiles.py",
+          "symbol": "_RETRIEVED_CORPUS_CITATION_POLICY",
+          "note": "Citation authority and memory non-authority are runtime policy objects that packages should reference but not override into activation controls."
+        },
+        {
+          "file": "packages/svs_common/svs_common/expert_profiles.py",
+          "symbol": "_DEFAULT_MODEL_POLICY",
+          "note": "Default expert model policy is runtime-owned and points to the model gateway."
+        },
+        {
+          "file": "packages/svs_common/svs_common/expert_profiles.py",
+          "symbol": "_DEFAULT_TOOL_LIMITS",
+          "note": "Tool ceilings for retrieval runs, results, graph expansions, and context tokens are runtime-owned."
+        },
+        {
+          "file": "packages/svs_common/svs_common/expert_sessions.py",
+          "symbol": "promote_expert_memory_event",
+          "note": "Current memory promotion is explicit and scoped; package-generated content must not become memory authority implicitly."
+        }
+      ],
+      "external_claims": [],
+      "patterns": []
+    },
+    {
+      "id": "T-005",
+      "title": "Model corpus-type extension contracts",
+      "goal": "Add shared extension contracts for corpus connectors, metadata schemas, normalizers, chunkers, ontology selectors, caveats, search lenses, query planners, and eval families while allowing corpus-specific implementations.",
+      "acceptance": "Each supported corpus type can declare its connector, metadata, chunking, graph, search, caveat, and eval strategy through typed extension points without custom compiler branches per jurisdiction.",
+      "suspected_files": [
+        "contracts/vector-store-source-package.schema.json",
+        "configs/vectorization-modes.yaml",
+        "configs/retrieval-profiles.yaml",
+        "packages/svs_common/svs_common/chunking.py",
+        "packages/svs_common/svs_common/vectorization_router.py",
+        "packages/svs_common/svs_common/search_lenses.py",
+        "packages/svs_common/svs_common/query_planner.py"
+      ],
+      "code_refs": [
+        {
+          "file": "packages/svs_common/svs_common/search_lenses.py",
+          "symbol": "SearchLensDefinition",
+          "note": "Existing typed extension object for corpus-specific semantic and graph lenses."
+        },
+        {
+          "file": "packages/svs_common/svs_common/query_planner.py",
+          "symbol": "plan_query",
+          "note": "Current query planner extension seam keyed by profile_id, with Kansas legal planning as the first specialized implementation."
+        },
+        {
+          "file": "contracts/vector-store-source-package.schema.json",
+          "symbol": "$.properties.source.properties.connector.required",
+          "note": "Observed connector required fields are kind and entrypoint; repository and revision are optional declarative metadata."
+        }
+      ],
+      "external_claims": [],
+      "patterns": []
+    },
+    {
+      "id": "T-006",
+      "title": "Add graph and search descriptor contracts",
+      "goal": "Represent corpus-specific graph ontologies, extractors, search lenses, specialized tools, and query-planning hints as package-owned declarations that the runtime can consume through existing search and graph paths.",
+      "acceptance": "A package can declare both semantic search behavior and at least one specialized graph-backed search lens, and the compiled output exposes those descriptors to existing search/tool routing without bypassing governance.",
+      "suspected_files": [
+        "packages/svs_common/svs_common/search_lenses.py",
+        "apps/api/svs_api/main.py",
+        "packages/svs_common/svs_common/retrieval.py",
+        "packages/svs_common/svs_common/query_planner.py",
+        "tests/test_openapi_contract.py"
+      ],
+      "code_refs": [
+        {
+          "file": "packages/svs_common/svs_common/search_lenses.py",
+          "symbol": "SEARCH_LENS_REGISTRY",
+          "note": "Existing single registry for semantic, Kansas court graph, and Topeka municipal-code graph lens descriptors."
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "vector_store_search_lenses",
+          "note": "OpenAI-compatible route exposing per-store lens descriptors."
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "vector_store_search",
+          "note": "Current OpenAI-compatible vector-store search route where graph lens selection and annotation are applied."
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "_apply_topeka_municipal_graphrag_expansion",
+          "note": "Current specialized graph expansion handler for Topeka municipal-code lenses."
+        }
+      ],
+      "external_claims": [],
+      "patterns": []
+    },
+    {
+      "id": "T-007",
+      "title": "Implement scaffold CLI",
+      "goal": "Provide an operator command to scaffold a new jurisdiction package with manifest, corpus cards, expert declarations, eval stubs, and documentation placeholders.",
+      "acceptance": "Running the scaffold command for a jurisdiction creates a package directory with valid placeholder files that pass structural validation while remaining inactive.",
+      "suspected_files": [
+        "scripts/release/prepare-instance-source-seeds.py",
+        "scripts/release/validate-instance-source-packages.py",
+        "scripts/release/instance_source_packages.py",
+        "docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md",
+        "Makefile"
+      ],
+      "code_refs": [
+        {
+          "file": "scripts/release/prepare-instance-source-seeds.py",
+          "symbol": "main",
+          "note": "Existing operator command that dry-runs or creates seed-folder skeletons from validated source packages."
+        },
+        {
+          "file": "scripts/release/instance_source_packages.py",
+          "symbol": "prepare_seed_layout",
+          "note": "Current seed skeleton planner/creator that can guide package scaffold output."
+        },
+        {
+          "file": "docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md",
+          "symbol": "## Required Instance Layout",
+          "note": "Documented current source-package directory structure for new jurisdictions."
+        }
+      ],
+      "external_claims": [],
+      "patterns": []
+    },
+    {
+      "id": "T-008",
+      "title": "Build provider-agnostic drafting workflow",
+      "goal": "Generate draft corpus cards, tool descriptions, expert instructions, and eval candidates from bounded server-owned store metadata, declared capabilities, and representative retrieval evidence.",
+      "acceptance": "A generate command reads only bounded store metadata and representative retrieval evidence inputs, writes inactive draft package content with provenance, and never writes protected controls or activation state.",
+      "suspected_files": [
+        "packages/svs_common/svs_common/expert_profiles.py",
+        "packages/svs_common/svs_common/search_lenses.py",
+        "packages/svs_common/svs_common/retrieval.py",
+        "packages/svs_common/svs_common/expert_llm.py",
+        "apps/model_gateway/svs_model_gateway/main.py",
+        "evals/expert-sessions/run_eval.py"
+      ],
+      "code_refs": [
+        {
+          "file": "packages/svs_common/svs_common/expert_llm.py",
+          "symbol": "complete_expert_chat",
+          "note": "Current server-side typed expert-chat client to the model gateway; drafting should remain provider-agnostic through this style of gateway boundary."
+        },
+        {
+          "file": "packages/svs_common/svs_common/retrieval.py",
+          "symbol": "RetrievalService.context_pack",
+          "note": "Current bounded retrieval-evidence assembly path that can supply representative evidence to drafting without granting activation authority."
+        },
+        {
+          "file": "packages/svs_common/svs_common/search_lenses.py",
+          "symbol": "search_lenses_for_vector_store",
+          "note": "Current capability descriptor source for package draft search/tool descriptions."
+        },
+        {
+          "file": "apps/model_gateway/svs_model_gateway/main.py",
+          "symbol": "expert_chat",
+          "note": "Current provider-neutral chat execution route applies model policy resolution and provider availability before returning a draftable response."
+        },
+        {
+          "file": "evals/expert-sessions/run_eval.py",
+          "symbol": "validate_fixture",
+          "note": "Current repository-backed expert eval fixture validator can inform generated eval candidate shape without granting runtime activation."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [
+        {
+          "name": "statecivicsai-auto-summary-custom-prompt-reference-only",
+          "reference_only": true,
+          "source": "C:/Users/mfrie/Ai_Projects/Statecivicsai/vendors/multi-vector-mcp-server-node/src/core/summaryGenerator.js and src/core/promptManager.js",
+          "applies_to": "T-008",
+          "constraint": "Reference only for prior auto-summary/custom-prompt workflow; do not import it, depend on it, or add it to wave 3 file_modification_map."
+        }
+      ],
+      "flags": [
+        "The Statecivicsai vendor workflow was inspected only as a local reference for auto-summary/custom-prompt behavior and must not become a production dependency."
+      ]
+    },
+    {
+      "id": "T-009",
+      "title": "Add package diff and validation commands",
+      "goal": "Give operators deterministic CLI feedback for generated versus promoted package content, schema errors, protected-control violations, digest changes, and registry compile results.",
+      "acceptance": "The CLI can diff drafts against promoted packages and validate a package with machine-readable diagnostics, nonzero exit codes on failure, and no mutation during validation.",
+      "suspected_files": [
+        "scripts/release/validate-instance-source-packages.py",
+        "scripts/release/instance-source-update.py",
+        "scripts/release/instance_source_packages.py",
+        "tests/test_instance_source_packages.py"
+      ],
+      "code_refs": [
+        {
+          "file": "scripts/release/validate-instance-source-packages.py",
+          "symbol": "main",
+          "note": "Existing deterministic validation CLI with JSON reporting and nonzero exit on issues."
+        },
+        {
+          "file": "scripts/release/instance-source-update.py",
+          "symbol": "main",
+          "note": "Existing dry-run/execute operator command that produces update plans and enforces validation first."
+        },
+        {
+          "file": "scripts/release/instance_source_packages.py",
+          "symbol": "build_update_plan",
+          "note": "Current source-package diff plan builder for manifest changes."
+        },
+        {
+          "file": "scripts/release/instance_source_packages.py",
+          "symbol": "ValidationIssue",
+          "note": "Current machine-readable diagnostic model used by validation reports."
+        }
+      ],
+      "external_claims": [],
+      "patterns": []
+    },
+    {
+      "id": "T-010",
+      "title": "Add operator promotion lifecycle",
+      "goal": "Implement explicit operator promotion, rollback, and deactivation for package versions while preserving fail-closed activation and auditable state transitions.",
+      "acceptance": "Promote, rollback, and deactivate commands require an already-valid package digest, record lifecycle events, and never activate generated drafts without an explicit promotion command.",
+      "suspected_files": [
+        "scripts/release/instance-source-update.py",
+        "scripts/release/instance_source_packages.py",
+        "packages/jurisdiction_knowledge_packages/lifecycle.py",
+        "packages/jurisdiction_knowledge_packages/audit.py",
+        "scripts/release/instance-caller-lifecycle-proof.py",
+        "apps/instance_agent/svs_instance_agent/main.py",
+        "packages/svs_common/svs_common/expert_sessions.py",
+        "tests/test_instance_agent_release.py"
+      ],
+      "code_refs": [
+        {
+          "file": "scripts/release/instance-source-update.py",
+          "symbol": "main",
+          "note": "Primary existing content/source-package lifecycle command: validates a selected package, builds a diff/update plan, and requires explicit --dry-run or --execute."
+        },
+        {
+          "file": "scripts/release/instance_source_packages.py",
+          "symbol": "build_update_plan",
+          "note": "Primary existing package-content lifecycle primitive for comparing previous/current manifests and reporting added, changed, unchanged, and removed records."
+        },
+        {
+          "file": "scripts/release/instance_source_packages.py",
+          "symbol": "execute_update_command",
+          "note": "Primary existing explicit execution helper for validated source-package update commands."
+        },
+        {
+          "file": "scripts/release/instance_source_packages.py",
+          "symbol": "validate_instance_source_packages",
+          "note": "Primary existing validation gate that package lifecycle promotion must require before activation."
+        },
+        {
+          "file": "apps/instance_agent/svs_instance_agent/main.py",
+          "symbol": "deploy",
+          "note": "Deployment-lifecycle analog only: validates release images and compose plan before changing active pins; not the package promotion owner."
+        },
+        {
+          "file": "apps/instance_agent/svs_instance_agent/main.py",
+          "symbol": "rollback",
+          "note": "Deployment-lifecycle analog only: restores prior runtime image pins; package rollback needs its own lifecycle/audit owner."
+        },
+        {
+          "file": "scripts/release/instance-caller-lifecycle-proof.py",
+          "symbol": "run_lifecycle",
+          "note": "Existing proof script for create/search/responses/revoke caller lifecycle, useful model for package promotion proof."
+        }
+      ],
+      "external_claims": [],
+      "patterns": [],
+      "flags": [
+        "New package lifecycle/audit owner files do not exist yet; wave 3 should assign package promotion, rollback, deactivate, and audit ownership to packages/jurisdiction_knowledge_packages/lifecycle.py and packages/jurisdiction_knowledge_packages/audit.py or the final agreed new package module, not to the instance deployment agent."
+      ]
+    },
+    {
+      "id": "T-011",
+      "title": "Implement package drift detection",
+      "goal": "Detect drift between promoted package versions, corpus evidence digests, generated compiler outputs, and current server-owned store metadata.",
+      "acceptance": "A drift command reports unchanged, changed, missing, and stale package evidence states with deterministic exit behavior suitable for scheduler or CI use.",
+      "suspected_files": [
+        "scripts/release/instance_source_packages.py",
+        "scripts/release/instance-source-update.py",
+        "scripts/check-migration-drift.py",
+        "tests/test_instance_source_packages.py",
+        "tests/test_migration_discipline.py"
+      ],
+      "code_refs": [
+        {
+          "file": "scripts/release/instance_source_packages.py",
+          "symbol": "load_manifest_records",
+          "note": "Current source manifest loader used to compare current corpus records against locked evidence."
+        },
+        {
+          "file": "scripts/release/instance_source_packages.py",
+          "symbol": "diff_manifest_records",
+          "note": "Current deterministic added/changed/unchanged/removed drift primitive."
+        },
+        {
+          "file": "scripts/check-migration-drift.py",
+          "symbol": "main",
+          "note": "Existing drift-check command shape for deterministic CI/operator drift reporting."
+        }
+      ],
+      "external_claims": [],
+      "patterns": []
+    },
+    {
+      "id": "T-012",
+      "title": "Migrate Kansas Court Decisions package",
+      "goal": "Express Kansas Court Decisions as a reference jurisdiction package using the new lifecycle while preserving existing caller IDs, retrieval behavior, citation support, and expert behavior.",
+      "acceptance": "Kansas Court Decisions compiles through the package compiler into the existing expert registry with unchanged caller IDs and passing semantic search, graph, expert, session follow-up, and citation-support regression checks.",
+      "suspected_files": [
+        "instances/ks-state-civics/vector-stores/kansas-court-decisions/store.yaml",
+        "instances/ks-state-civics/vector-stores/kansas-court-decisions/sources/kscourts-decisions/source.yaml",
+        "packages/svs_common/svs_common/expert_profiles.py",
+        "scripts/release/kscourts-ingest.py",
+        "scripts/release/kscourts-graphrag-extract.py",
+        "scripts/release/kscourts-graphrag-load.py",
+        "scripts/release/kscourts-graphrag-eval.py",
+        "scripts/release/kscourts-recall-eval.py"
+      ],
+      "code_refs": [
+        {
+          "file": "instances/ks-state-civics/vector-stores/kansas-court-decisions/sources/kscourts-decisions/source.yaml",
+          "symbol": "$.source.type",
+          "note": "Observed value is kscourts_decisions; this current Kansas source package also carries source digests, ingestion command, graph commands, and eval command."
+        },
+        {
+          "file": "packages/svs_common/svs_common/expert_profiles.py",
+          "symbol": "KANSAS_COURT_DECISIONS_VECTOR_STORE_ID",
+          "note": "Existing caller-facing vector store ID that migration must preserve."
+        },
+        {
+          "file": "packages/svs_common/svs_common/query_planner.py",
+          "symbol": "KANSAS_CIVICS_LEGAL_PROFILE_ID",
+          "note": "Current Kansas legal query-planner profile that must stay wired for court-decision retrieval."
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "_apply_kscourts_graphrag_expansion",
+          "note": "Existing Kansas GraphRAG expansion path that the migrated package must keep reachable."
+        }
+      ],
+      "external_claims": [],
+      "patterns": []
+    },
+    {
+      "id": "T-013",
+      "title": "Migrate Topeka Municipal Code package",
+      "goal": "Express Topeka Municipal Code as a reference jurisdiction package using municipal-code-specific corpus metadata, graph, search, caveats, evals, and expert declarations while preserving existing caller behavior.",
+      "acceptance": "Topeka Municipal Code compiles through the package compiler with unchanged caller IDs and passing ordinance/code retrieval, specialized search, expert, follow-up, and citation-support regression checks.",
+      "suspected_files": [
+        "instances/ks-state-civics/vector-stores/topeka-municipal-code/store.yaml",
+        "instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-codified-code/source.yaml",
+        "instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-ordinances/source.yaml",
+        "packages/svs_common/svs_common/search_lenses.py",
+        "packages/svs_common/svs_common/expert_profiles.py",
+        "scripts/release/topeka-code-ingest.py",
+        "scripts/release/topeka-ordinance-pdf-ingest.py",
+        "scripts/release/topeka-code-graphrag-extract.py"
+      ],
+      "code_refs": [
+        {
+          "file": "instances/ks-state-civics/vector-stores/topeka-municipal-code/store.yaml",
+          "symbol": "$.vectorStore.id",
+          "note": "Observed value is vs_d4185d1004604f08a55299fa; this current Topeka store file also carries the local proof summary that migration must preserve."
+        },
+        {
+          "file": "packages/svs_common/svs_common/expert_profiles.py",
+          "symbol": "TOPEKA_MUNICIPAL_CODE_VECTOR_STORE_ID",
+          "note": "Existing Topeka expert binding ID that compiled output must not change."
+        },
+        {
+          "file": "packages/svs_common/svs_common/search_lenses.py",
+          "symbol": "municipal_code_history",
+          "note": "Existing Topeka graph lens ID and relation contract for ordinance-history behavior."
+        },
+        {
+          "file": "apps/api/svs_api/main.py",
+          "symbol": "_apply_topeka_municipal_graphrag_expansion",
+          "note": "Current Topeka specialized graph expansion path used by explicit graph lenses."
+        }
+      ],
+      "external_claims": [],
+      "patterns": []
+    },
+    {
+      "id": "T-014",
+      "title": "Add deterministic compiler tests",
+      "goal": "Cover schema validation, package digests, governance rejection, compiler registry output, lifecycle commands, and migration behavior with deterministic automated tests.",
+      "acceptance": "A local test command proves valid packages compile, invalid protected controls fail closed, digests are stable, lifecycle transitions are explicit, and both reference migrations preserve expected IDs.",
+      "suspected_files": [
+        "tests/test_instance_source_packages.py",
+        "tests/test_expert_profiles.py",
+        "tests/test_query_planner.py",
+        "tests/test_expert_llm_client.py",
+        "tests/test_expert_sessions.py",
+        "tests/test_topeka_graphrag.py",
+        "tests/test_kscourts_graphrag_load.py"
+      ],
+      "code_refs": [
+        {
+          "file": "tests/test_instance_source_packages.py",
+          "symbol": "test_ks_civics_source_package_validates_in_production",
+          "note": "Current deterministic source-package validation proof for ks-state-civics."
+        },
+        {
+          "file": "tests/test_expert_profiles.py",
+          "symbol": "test_resolve_expert_profile_is_principal_scoped_and_composes_search_lens_registry",
+          "note": "Current proof that expert resolution stays principal-scoped and uses the shared lens registry."
+        },
+        {
+          "file": "tests/test_query_planner.py",
+          "symbol": "test_kansas_civics_planner_extracts_docket_filter_and_query_text",
+          "note": "Current deterministic query-planner regression coverage for Kansas court retrieval."
+        },
+        {
+          "file": "tests/test_topeka_graphrag.py",
+          "symbol": "test_graph_load_uses_default_vector_store_graph_api_path",
+          "note": "Current proof that Topeka graph load uses the ExAIS graph API path instead of direct database writes."
+        }
+      ],
+      "external_claims": [],
+      "patterns": []
+    },
+    {
+      "id": "T-015",
+      "title": "Add Docker and live behavior proof",
+      "goal": "Provide reproducible Docker/live verification for semantic retrieval, specialized graph behavior, search tools, expert routing, session follow-up, and citation-support behavior for reference packages.",
+      "acceptance": "Documented Docker/live commands exercise Kansas Court Decisions and Topeka Municipal Code packages end to end and capture proof for semantic, graph, tool, expert, follow-up, and citation-support behavior without relying on GitHub CI as the only gate.",
+      "suspected_files": [
+        "docker-compose.yml",
+        "scripts/release/local-proof.py",
+        "scripts/release/cell-smoke.py",
+        "scripts/release/corpus-quality-eval.py",
+        "scripts/release/kscourts-recall-eval.py",
+        "scripts/release/topeka-code-recall-eval.py",
+        "evals/expert-sessions/run_eval.py",
+        "runbooks/customer-cell-launch.md"
+      ],
+      "code_refs": [
+        {
+          "file": "scripts/release/corpus-quality-eval.py",
+          "symbol": "main",
+          "note": "Current live quality gate script for retrieval/citation proof against a selected API/vector store."
+        },
+        {
+          "file": "evals/expert-sessions/run_eval.py",
+          "symbol": "main",
+          "note": "Current expert-session eval runner for testing expert answers and citations."
+        },
+        {
+          "file": "scripts/release/cell-smoke.py",
+          "symbol": "main",
+          "note": "Existing cell smoke proof command for Docker/runtime health."
+        },
+        {
+          "file": "runbooks/customer-cell-launch.md",
+          "symbol": "## Launch Proof",
+          "note": "Current runbook section separating selected-host live proof from local Docker or registry proof."
+        }
+      ],
+      "external_claims": [],
+      "patterns": []
+    },
+    {
+      "id": "T-016",
+      "title": "Update setup and operator runbooks",
+      "goal": "Document the complete package lifecycle for new ExAIS instances, including scaffold, generate, diff, validate, promote, rollback, deactivate, drift detection, proof collection, and protected-control boundaries.",
+      "acceptance": "Setup and runbook documentation lets an operator create a new inactive jurisdiction package, draft it from bounded evidence, validate and promote it, roll it back or deactivate it, and run drift/proof commands without undocumented steps.",
+      "suspected_files": [
+        "README.md",
+        "docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md",
+        "docs/CALLER_AGENT_INTEGRATION.md",
+        "runbooks/customer-cell-launch.md",
+        "runbooks/ks-state-civics-hetzner-vps-launch.md"
+      ],
+      "code_refs": [
+        {
+          "file": "docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md",
+          "symbol": "## New Jurisdiction Checklist",
+          "note": "Current operator checklist already describes source package, graph, lens, expert, eval, and proof sequence."
+        },
+        {
+          "file": "README.md",
+          "symbol": "## Local quick start",
+          "note": "Current setup entrypoint that should link to the new package lifecycle commands."
+        },
+        {
+          "file": "runbooks/customer-cell-launch.md",
+          "symbol": "## Acceptance Checklist",
+          "note": "Current live-host proof boundary that must be retained in operator documentation."
+        }
+      ],
+      "external_claims": [],
+      "patterns": []
+    }
+  ]
+}
