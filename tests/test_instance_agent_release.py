@@ -313,6 +313,20 @@ def test_vps_cell_compose_ports_are_bind_ip_controlled_and_edge_hides_gateway():
     assert "model-gateway" not in caddyfile
 
 
+def test_anthropic_chat_secret_is_scoped_to_model_gateway_containers():
+    for relative_path in [
+        "infra/docker/compose.cell.yml",
+        "infra/docker/compose.instance.yml",
+        "docker-compose.yml",
+    ]:
+        compose = (ROOT / relative_path).read_text(encoding="utf-8")
+        assert compose.count('ANTHROPIC_API_KEY: ""') >= 2
+
+    cell_compose = (ROOT / "infra" / "docker" / "compose.cell.yml").read_text(encoding="utf-8")
+    gateway_block = cell_compose.split("  model-gateway:", 1)[1].split("\n  api:", 1)[0]
+    assert 'ANTHROPIC_API_KEY: ""' not in gateway_block
+
+
 def test_release_build_context_excludes_generated_handoff_artifacts():
     dockerignore = set((ROOT / ".dockerignore").read_text(encoding="utf-8").splitlines())
 

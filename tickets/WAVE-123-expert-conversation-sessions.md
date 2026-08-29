@@ -388,9 +388,78 @@ Final verification:
   output guards, and graph metadata preservation passed in the combined and
   full suites.
 
-Claim boundary: these results prove repository behavior, Docker release proof,
-and disposable PostgreSQL RLS behavior. The KS cell readiness check did not
-deploy this uncommitted implementation into the long-running cell, and no live
-KS corpus expert answer, live model-gateway call, or external provider call was
-performed. External-provider behavior remains an explicit post-deployment
-integration proof item.
+### Post-deployment integration proof
+
+Completed on 2026-08-28 after explicit authorization to deploy, debug, and
+polish the long-running `ks-state-civics` local cell.
+
+- Created a pre-deployment PostgreSQL/custom-format rollback bundle and prior
+  image-pin/manifest snapshot under
+  `.release/cells/ks-state-civics/wave123-rollback-20260828-212710`. The dump
+  size is 305,932,176 bytes, its SHA-256 is
+  `5AE94FFC0DEC3067663A72CC3EEA9E6EC8F93091EE451B9CA102598D9E3D596D`,
+  and `pg_restore --list` validated its archive catalog.
+- Applied Alembic head `003_expert_conversation_sessions`. All seven expert
+  tables have RLS and FORCE RLS enabled; runtime role `svs_app` is neither
+  superuser nor `BYPASSRLS`.
+- Replaced the default external fallback profile with pinned
+  `gpt-5.5-2026-04-23`, added native Anthropic Messages API support for
+  `claude-sonnet-5`, and kept both behind the shared model-gateway contract.
+  GPT-5.5 uses `max_completion_tokens`; Sonnet 5 omits its deprecated
+  `temperature` parameter. Both adapters completed live authenticated probes.
+- The default policy used GPT-5.5 after the unconfigured private Qwen profile.
+  An isolated policy probe with OpenAI intentionally unavailable continued to
+  Sonnet 5 and returned successfully. No credential value was printed or
+  persisted in registry metadata.
+- Live bearer calls over the cell network returned `200` for raw Kansas and
+  Topeka searches, an initial Kansas expert turn, a resumed Kansas turn, and a
+  Topeka expert turn. The final acceptance turns returned respectively four,
+  two, and three citations, all with source URLs, using
+  `gpt-5.5-2026-04-23`.
+- Idempotent replay returned the identical cached expert response. A second API
+  key received `404` for the first key's session, and a key without
+  `retrieval:read` received `403` for expert discovery.
+- Feedback PII was redacted, memory remained non-authoritative and
+  non-citation-eligible, explicit promotion was applied to the resumed turn,
+  deletion produced a tombstone, and a fork preserved parentage. Governance
+  audit rows recorded feedback creation plus memory candidate, promotion, and
+  deletion actions. All temporary acceptance keys were revoked.
+- Live conversation testing exposed an exact-marker reliability failure on a
+  resumed turn. The model still failed closed with `502`; remediation added a
+  single bounded citation-format repair against only current retrieved
+  markers, revalidation, combined usage/latency accounting, and a disclosure
+  caveat. The expanded targeted regression gate passed `147 passed`.
+- Final active digests after remediation are API
+  `sha256:3bb1121c40d559a96b29cc3bd5a1c537807686f93a534d2a969889534c190c2b`,
+  worker
+  `sha256:2bceb3dae7d94fb711878747682e23f0cb2cfd3b809a1c10a55f7c411911ccbb`,
+  model gateway
+  `sha256:3090125bbaa38a5ea286aeadda026dd646f80d1669378a1d3e316f065581d4ab`,
+  and unchanged admin UI
+  `sha256:81bf557407e36eacf5bf23ee67bc03cb1957d6a91c3552b3755e848120b48dbb`.
+
+Updated claim boundary: WAVE-123 now has live local-cell corpus, model-gateway,
+GPT-5.5, Sonnet-5 fallback, bearer, session, fork, feedback, memory, citation,
+and RLS evidence. External models remain denied for security levels above 3;
+those requests require a configured private provider and fail closed otherwise.
+Windows host-port forwarding remains unavailable on this workstation, so live
+HTTP acceptance used the cell network. This is a local Docker-cell deployment,
+not evidence of an external customer/VPS production rollout.
+
+Post-remediation final verification:
+
+- `python scripts/release/cell-access-proof.py --cell ks-state-civics` returned
+  API `200` and admin UI `200` through the cell-network fallback; the Windows
+  host route remained explicitly unavailable.
+- `python scripts/release/local-proof.py --cell ks-state-civics` passed cell
+  readiness, Docker compile, `828 passed, 7 skipped`, and the admin UI
+  production build. The skips remain the explicit opt-in integration tests
+  enumerated by pytest.
+- Compose inspection and live container checks proved `ANTHROPIC_API_KEY` is
+  present in the model gateway and blank in API and worker containers.
+- Independent post-deployment QC returned `PASS WITH NOTES` after its own
+  focused Docker gate (`258 passed`) and final Docker-first proof
+  (`828 passed, 7 skipped`). Its only notes were the documented Windows
+  host-forwarding limitation, the explicit opt-in skips covered by live-cell
+  migration/RLS evidence, and the then-uncommitted working tree; no code fix was
+  required.

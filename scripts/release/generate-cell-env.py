@@ -11,6 +11,7 @@ sys.path.insert(0, str(ROOT / "packages" / "svs_common"))
 from svs_common.secrets import SecretIssue, is_secret_key, is_secret_reference, validate_secret_references
 
 OPERATOR_IMPORT_KEYS = {
+    "ANTHROPIC_API_KEY",
     "DEFAULT_EMBEDDING_PROVIDER",
     "OPENAI_API_KEY",
     "OPENAI_EMBEDDING_MODEL",
@@ -34,6 +35,7 @@ OPERATOR_IMPORT_KEYS = {
 
 
 PRODUCTION_REFERENCE_OPTIONAL_KEYS = {
+    "ANTHROPIC_API_KEY",
     "OPENSEARCH_PASSWORD",
     "QDRANT_API_KEY",
     "RUNPOD_API_KEY",
@@ -106,6 +108,7 @@ def build_env(cell: str, registry_prefix: str, api_port: int) -> dict[str, str]:
         "SVS_LOCAL_OBJECT_STORE_PATH": "/data/object-store",
         "SVS_OBJECT_STORE_STRICT": "false",
         "DEFAULT_EMBEDDING_PROVIDER": "hash_mock",
+        "ANTHROPIC_API_KEY": "",
         "OPENAI_API_KEY": "",
         "OPENAI_EMBEDDING_MODEL": "text-embedding-3-small",
         "OPENAI_EMBEDDING_DIMENSIONS": "1536",
@@ -203,6 +206,7 @@ def build_production_reference_env(
         "SVS_LOCAL_OBJECT_STORE_PATH": "/var/lib/svs/object-store",
         "SVS_OBJECT_STORE_STRICT": "true",
         "DEFAULT_EMBEDDING_PROVIDER": "openai",
+        "ANTHROPIC_API_KEY": "",
         "OPENAI_API_KEY": "",
         "OPENAI_EMBEDDING_MODEL": "text-embedding-3-small",
         "OPENAI_EMBEDDING_DIMENSIONS": "1536",

@@ -3,10 +3,14 @@ services:
   api:
     image: ${SVS_IMAGE_API:?SVS_IMAGE_API is required}
     env_file: ${SVS_CELL_ENV_FILE:?SVS_CELL_ENV_FILE is required}
+    environment:
+      ANTHROPIC_API_KEY: ""
     restart: unless-stopped
   worker:
     image: ${SVS_IMAGE_WORKER:?SVS_IMAGE_WORKER is required}
     env_file: ${SVS_CELL_ENV_FILE:?SVS_CELL_ENV_FILE is required}
+    environment:
+      ANTHROPIC_API_KEY: ""
     restart: unless-stopped
   model-gateway:
     image: ${SVS_IMAGE_MODEL_GATEWAY:?SVS_IMAGE_MODEL_GATEWAY is required}

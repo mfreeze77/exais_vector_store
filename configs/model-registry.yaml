@@ -132,6 +132,20 @@ chat_models:
     privacy: external_api
     max_security_level: 3
 
+  openai_gpt_5_5_expert:
+    provider: openai
+    kind: chat
+    model: gpt-5.5-2026-04-23
+    privacy: external_api
+    max_security_level: 3
+
+  anthropic_claude_sonnet_5_expert:
+    provider: anthropic
+    kind: chat
+    model: claude-sonnet-5
+    privacy: external_api
+    max_security_level: 3
+
   fixture_expert_chat_v1:
     provider: fixture
     kind: chat
@@ -143,7 +157,7 @@ chat_models:
 chat_policies:
   default_expert_chat_v1:
     preferred_model_profile_id: private_qwen3_32b_expert
-    fallback_model_profile_ids: [openai_gpt_4_1_mini_expert]
+    fallback_model_profile_ids: [openai_gpt_5_5_expert, anthropic_claude_sonnet_5_expert]
     allow_fallback: true
 
   fixture_expert_chat_v1:

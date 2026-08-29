@@ -19,6 +19,7 @@ def test_import_operator_values_copies_allowlisted_secrets_only():
     imported = generate_cell_env.import_operator_values(
         values,
         {
+            "ANTHROPIC_API_KEY": "sk-ant-test-not-real",
             "OPENAI_API_KEY": "sk-test-not-real",
             "RUNPOD_API_KEY": "rp-test-not-real",
             "UNRELATED_SECRET": "do-not-copy",
@@ -26,9 +27,11 @@ def test_import_operator_values_copies_allowlisted_secrets_only():
     )
 
     assert "OPENAI_API_KEY" in imported
+    assert "ANTHROPIC_API_KEY" in imported
     assert "RUNPOD_API_KEY" in imported
     assert "UNRELATED_SECRET" not in imported
     assert values["OPENAI_API_KEY"] == "sk-test-not-real"
+    assert values["ANTHROPIC_API_KEY"] == "sk-ant-test-not-real"
     assert "UNRELATED_SECRET" not in values
 
 

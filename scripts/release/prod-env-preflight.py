@@ -72,6 +72,7 @@ PORT_KEYS = [
 ]
 
 PROVIDER_REQUIREMENTS = {
+    "anthropic": ["ANTHROPIC_API_KEY"],
     "openai": ["OPENAI_API_KEY"],
     "runpod": ["RUNPOD_API_KEY", "RUNPOD_EMBEDDING_ENDPOINT_URL"],
     "voyage": ["VOYAGE_API_KEY"],

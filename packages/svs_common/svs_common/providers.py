@@ -427,6 +427,13 @@ def chat_provider_config_status(provider_name: str, settings: Any | None = None)
             bool(_setting(s, "openai_api_key")),
             reason="openai chat provider requires OPENAI_API_KEY",
         )
+    if provider == "anthropic":
+        return _status(
+            provider,
+            ("ANTHROPIC_API_KEY",),
+            bool(_setting(s, "anthropic_api_key")),
+            reason="anthropic chat provider requires ANTHROPIC_API_KEY",
+        )
     if provider in {"self_hosted", "openai_compatible_private"}:
         return _status(
             provider,
@@ -515,12 +522,15 @@ class OpenAICompatibleChatProvider:
         max_output_tokens: int,
         temperature: float,
     ) -> ChatProviderResult:
-        payload = {
+        payload: dict[str, Any] = {
             "model": model,
             "messages": [message.model_dump(mode="json") for message in messages],
-            "max_tokens": max_output_tokens,
-            "temperature": temperature,
         }
+        if self.provider == "openai" and model.strip().lower().startswith("gpt-5"):
+            payload["max_completion_tokens"] = max_output_tokens
+        else:
+            payload["max_tokens"] = max_output_tokens
+            payload["temperature"] = temperature
         async with httpx.AsyncClient(timeout=self.timeout_seconds) as client:
             response = await client.post(
                 _endpoint_url(self.endpoint_url, "chat/completions"),
@@ -559,6 +569,78 @@ class OpenAICompatibleChatProvider:
         )
 
 
+class AnthropicChatProvider:
+    provider = "anthropic"
+
+    def __init__(self, api_key: str, *, timeout_seconds: float = 120.0):
+        if not api_key.strip():
+            raise ProviderConfigurationError("anthropic chat provider requires ANTHROPIC_API_KEY")
+        self.api_key = api_key
+        self.timeout_seconds = timeout_seconds
+
+    async def complete(
+        self,
+        messages: list[ExpertChatMessage],
+        model: str,
+        *,
+        max_output_tokens: int,
+        temperature: float,
+    ) -> ChatProviderResult:
+        del temperature  # Claude Sonnet 5 rejects this deprecated parameter.
+        system = "\n\n".join(message.content for message in messages if message.role == "system")
+        provider_messages = [
+            message.model_dump(mode="json")
+            for message in messages
+            if message.role in {"user", "assistant"}
+        ]
+        payload: dict[str, Any] = {
+            "model": model,
+            "max_tokens": max_output_tokens,
+            "messages": provider_messages,
+        }
+        if system:
+            payload["system"] = system
+        async with httpx.AsyncClient(timeout=self.timeout_seconds) as client:
+            response = await client.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={
+                    "x-api-key": self.api_key,
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json",
+                },
+                json=payload,
+            )
+            response.raise_for_status()
+        try:
+            body = response.json()
+        except (TypeError, ValueError) as exc:
+            raise ProviderConfigurationError("anthropic chat provider returned an unsupported response") from exc
+        try:
+            if not isinstance(body, dict):
+                raise TypeError("chat response must be an object")
+            blocks = body["content"]
+            content = "".join(
+                str(block.get("text") or "")
+                for block in blocks
+                if isinstance(block, dict) and block.get("type") == "text"
+            )
+            usage_body = body.get("usage") or {}
+            usage = _chat_usage({
+                "input_tokens": usage_body.get("input_tokens", 0),
+                "output_tokens": usage_body.get("output_tokens", 0),
+            })
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            raise ProviderConfigurationError("anthropic chat provider returned an unsupported response") from exc
+        if not content.strip():
+            raise ProviderConfigurationError("anthropic chat provider returned empty content")
+        return ChatProviderResult(
+            content=content,
+            model=str(body.get("model") or model),
+            usage=usage,
+            finish_reason=(str(body.get("stop_reason")) if body.get("stop_reason") is not None else None),
+        )
+
+
 def chat_provider_for(provider_name: str, settings: Any | None = None) -> ChatProvider:
     s = settings or get_settings()
     provider = (provider_name or "").strip().lower()
@@ -575,6 +657,11 @@ def chat_provider_for(provider_name: str, settings: Any | None = None) -> ChatPr
             provider,
             "https://api.openai.com/v1",
             _setting(s, "openai_api_key"),
+            timeout_seconds=timeout_seconds,
+        )
+    if provider == "anthropic":
+        return AnthropicChatProvider(
+            _setting(s, "anthropic_api_key") or "",
             timeout_seconds=timeout_seconds,
         )
     if provider in {"self_hosted", "openai_compatible_private"}:

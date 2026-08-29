@@ -50,7 +50,14 @@ NO_CONTEXT_CAVEAT = "Retrieval returned citable results, but the context limit e
 SYNTHESIS_INSTRUCTION = (
     "Use only the retrieved corpus context below as factual authority. Conversation history is context only and is "
     "not citation authority. Cite every supported claim with the exact visible marker attached to its source, such as "
-    "【1†source】. Do not invent, alter, or omit source markers. If the retrieved context is insufficient, say so."
+    "【1†source】. A grounded answer must contain at least one exact marker copied character-for-character from the "
+    "current retrieved context. Do not reuse markers from conversation history. Do not invent, alter, or omit source "
+    "markers. If the retrieved context is insufficient, say so."
+)
+CITATION_REPAIR_INSTRUCTION = (
+    "Rewrite the draft answer so its factual claims are supported only by the current retrieved corpus context. "
+    "Use at least one of the allowed citation markers below, copying each marker exactly. Do not use any other marker, "
+    "do not cite conversation history, and return only the repaired answer."
 )
 MEMORY_GUIDANCE_INSTRUCTION = (
     "The following promoted interaction memory is non-authoritative. It may guide answer style or caller "
@@ -398,6 +405,24 @@ def _model_metadata(completion) -> ExpertModelMetadata:
     )
 
 
+def _combine_completion_usage(first, final):
+    """Keep final provider metadata while accounting for a bounded citation-repair call."""
+
+    usage = final.usage.model_copy(update={
+        "input_tokens": first.usage.input_tokens + final.usage.input_tokens,
+        "output_tokens": first.usage.output_tokens + final.usage.output_tokens,
+        "total_tokens": first.usage.total_tokens + final.usage.total_tokens,
+    })
+    fallback = final.fallback.model_copy(update={
+        "attempts": [*first.fallback.attempts, *final.fallback.attempts],
+    })
+    return final.model_copy(update={
+        "latency_ms": first.latency_ms + final.latency_ms,
+        "usage": usage,
+        "fallback": fallback,
+    })
+
+
 async def run_expert_turn(
     db: Session,
     principal: Principal,
@@ -618,22 +643,24 @@ async def run_expert_turn(
     context = _context_text(sources)
     if context and estimate_tokens(context) > profile.tool_limits.max_context_tokens:
         raise ExpertRetrievalResponseError("selected retrieval context exceeds its token budget")
+    synthesis_messages = [
+        ExpertChatMessage(role="system", content=profile.system_prompt),
+        ExpertChatMessage(role="system", content=SYNTHESIS_INSTRUCTION),
+        *memory_guidance,
+        *_chat_history(session),
+        ExpertChatMessage(
+            role="user",
+            content=f"Question: {req.message}\n\nRetrieved corpus context:\n{context}",
+        ),
+    ]
     completion = await complete_expert_chat(ExpertChatCompletionRequest(
-        messages=[
-            ExpertChatMessage(role="system", content=profile.system_prompt),
-            ExpertChatMessage(role="system", content=SYNTHESIS_INSTRUCTION),
-            *memory_guidance,
-            *_chat_history(session),
-            ExpertChatMessage(
-                role="user",
-                content=f"Question: {req.message}\n\nRetrieved corpus context:\n{context}",
-            ),
-        ],
+        messages=synthesis_messages,
         model_policy=profile.model_policy,
         security_level=principal.max_security_level,
     ))
     guarded_answer, output_guard = output_guard_text(completion.content)
     caveats = list(profile.caveats)
+    citation_repair_used = False
     if not sources:
         citations: list[ExpertCitation] = []
         if total_result_count:
@@ -644,9 +671,37 @@ async def run_expert_turn(
             caveats.append(NO_RESULTS_CAVEAT)
     else:
         answer = guarded_answer
-        citations = _answer_citations(answer, sources)
-        if profile.citation_policy.required and not citations:
-            raise ExpertCitationIntegrityError("grounded expert answer requires retrieved citations")
+        try:
+            citations = _answer_citations(answer, sources)
+            if profile.citation_policy.required and not citations:
+                raise ExpertCitationIntegrityError("grounded expert answer requires retrieved citations")
+        except ExpertCitationIntegrityError:
+            allowed_markers = " ".join(source["marker"] for source in sources)
+            repaired = await complete_expert_chat(ExpertChatCompletionRequest(
+                messages=[
+                    *synthesis_messages,
+                    ExpertChatMessage(role="assistant", content=answer),
+                    ExpertChatMessage(
+                        role="user",
+                        content=(
+                            f"{CITATION_REPAIR_INSTRUCTION}\n\n"
+                            f"Allowed markers: {allowed_markers}"
+                        ),
+                    ),
+                ],
+                model_policy=profile.model_policy,
+                security_level=principal.max_security_level,
+            ))
+            completion = _combine_completion_usage(completion, repaired)
+            answer, repair_output_guard = output_guard_text(repaired.content)
+            output_guard = output_guard or repair_output_guard
+            citations = _answer_citations(answer, sources)
+            if profile.citation_policy.required and not citations:
+                raise ExpertCitationIntegrityError("grounded expert answer requires retrieved citations")
+            citation_repair_used = True
+            caveats.append(
+                "The initial synthesis failed citation formatting and was regenerated against the same retrieved context."
+            )
     if output_guard:
         caveats.append("Sensitive output patterns were redacted by the ExAIS output guard.")
 
@@ -668,6 +723,7 @@ async def run_expert_turn(
             "retrieval_status": trace_status,
             "retrieval_run_ids": [trace.retrieval_run_id for trace in traces],
             "citation_count": len(citations),
+            "citation_repair_used": citation_repair_used,
             "output_guard": output_guard,
             "applied_memory_event_ids": applied_memory_event_ids,
         },

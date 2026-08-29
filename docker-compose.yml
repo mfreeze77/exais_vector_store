@@ -50,6 +50,8 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
     env_file: .env
+    environment:
+      ANTHROPIC_API_KEY: ""
     depends_on: [postgres, redis, qdrant, opensearch, minio, model-gateway]
     ports: ["8080:8080"]
     volumes:
@@ -61,6 +63,8 @@ services:
       context: .
       dockerfile: apps/worker/Dockerfile
     env_file: .env
+    environment:
+      ANTHROPIC_API_KEY: ""
     depends_on: [postgres, redis, qdrant, opensearch, minio, model-gateway]
     volumes:
       - ./configs:/app/configs:ro
@@ -90,6 +94,8 @@ services:
       context: .
       dockerfile: apps/instance_agent/Dockerfile
     env_file: .env
+    environment:
+      ANTHROPIC_API_KEY: ""
     profiles: ["agent"]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

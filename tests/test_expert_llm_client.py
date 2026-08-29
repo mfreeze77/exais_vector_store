@@ -16,6 +16,7 @@ from svs_common.model_registry import (
     resolve_expert_chat_profiles,
 )
 from svs_common.providers import (
+    AnthropicChatProvider,
     ChatProviderResult,
     FixtureChatProvider,
     OpenAICompatibleChatProvider,
@@ -58,6 +59,7 @@ def _chat_settings(**overrides):
         "svs_env": "test",
         "is_local_env": True,
         "openai_api_key": None,
+        "anthropic_api_key": None,
         "self_hosted_model_endpoint_url": None,
         "self_hosted_model_api_key": None,
         "expert_chat_timeout_sec": 12.0,
@@ -82,7 +84,8 @@ def test_registry_resolves_default_policy_without_mixing_embedding_profiles():
 
     assert [profile_id for profile_id, _ in candidates] == [
         "private_qwen3_32b_expert",
-        "openai_gpt_4_1_mini_expert",
+        "openai_gpt_5_5_expert",
+        "anthropic_claude_sonnet_5_expert",
     ]
     assert [profile_id for profile_id, _ in no_fallback] == ["private_qwen3_32b_expert"]
     assert registry["models"]["hash_mock_1536"]["kind"] == "embedding"
@@ -163,7 +166,8 @@ def test_security_policy_denies_external_fallback_for_regulated_content(monkeypa
     assert exc.value.status_code == 503
     assert [attempt["model_profile_id"] for attempt in attempts] == [
         "private_qwen3_32b_expert",
-        "openai_gpt_4_1_mini_expert",
+        "openai_gpt_5_5_expert",
+        "anthropic_claude_sonnet_5_expert",
     ]
     assert attempts[0]["error_code"] == "provider_unconfigured"
     assert attempts[1]["error_code"] == "security_policy_denied"
@@ -240,7 +244,7 @@ def test_gateway_records_unconfigured_preferred_as_fallback_reason(monkeypatch):
 
     assert response.provider == "openai"
     assert response.requested_model_profile_id == "private_qwen3_32b_expert"
-    assert response.model_profile_id == "openai_gpt_4_1_mini_expert"
+    assert response.model_profile_id == "openai_gpt_5_5_expert"
     assert response.fallback.occurred is True
     assert response.fallback.reason == "preferred_provider_unavailable"
     assert [attempt.status for attempt in response.fallback.attempts] == ["unavailable", "succeeded"]
@@ -361,21 +365,24 @@ def test_complete_expert_chat_normalizes_gateway_json_decode_failure(monkeypatch
     assert "malformed body" not in str(exc.value)
 
 
-def test_chat_provider_factory_supports_fixture_openai_and_private_without_affecting_embedding_factory():
+def test_chat_provider_factory_supports_fixture_openai_anthropic_and_private_without_affecting_embedding_factory():
     settings = _chat_settings(
         openai_api_key="test-openai-value",
+        anthropic_api_key="test-anthropic-value",
         self_hosted_model_endpoint_url="http://private-models.internal/v1",
         self_hosted_model_api_key="test-private-value",
     )
 
     fixture = chat_provider_for("fixture", settings)
     openai = chat_provider_for("openai", settings)
+    anthropic = chat_provider_for("anthropic", settings)
     private = chat_provider_for("openai_compatible_private", settings)
 
     assert isinstance(fixture, FixtureChatProvider)
     assert isinstance(openai, OpenAICompatibleChatProvider)
     assert openai.provider == "openai"
     assert openai.endpoint_url == "https://api.openai.com/v1"
+    assert isinstance(anthropic, AnthropicChatProvider)
     assert isinstance(private, OpenAICompatibleChatProvider)
     assert private.provider == "openai_compatible_private"
     assert private.endpoint_url == "http://private-models.internal/v1"
@@ -436,6 +443,103 @@ def test_openai_compatible_chat_adapter_normalizes_content_usage_and_request(mon
     assert result.model == "served-model-revision"
     assert result.usage == {"input_tokens": 11, "output_tokens": 3, "total_tokens": 14}
     assert result.finish_reason == "stop"
+    assert "secret-not-returned" not in repr(result)
+
+
+def test_openai_gpt_5_chat_adapter_uses_current_token_parameter_and_omits_temperature(monkeypatch):
+    captured = {}
+
+    class _Response:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {
+                "model": "gpt-5.5-2026-04-23",
+                "choices": [{"message": {"content": "Grounded answer"}, "finish_reason": "stop"}],
+                "usage": {"prompt_tokens": 11, "completion_tokens": 3, "total_tokens": 14},
+            }
+
+    class _Client:
+        def __init__(self, *, timeout):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+        async def post(self, url, *, headers, json):
+            captured["json"] = json
+            return _Response()
+
+    monkeypatch.setattr(providers_mod.httpx, "AsyncClient", _Client)
+    provider = OpenAICompatibleChatProvider("openai", "https://api.openai.com/v1", "secret")
+
+    asyncio.run(provider.complete(
+        _request().messages,
+        "gpt-5.5-2026-04-23",
+        max_output_tokens=500,
+        temperature=0.0,
+    ))
+
+    assert captured["json"]["max_completion_tokens"] == 500
+    assert "max_tokens" not in captured["json"]
+    assert "temperature" not in captured["json"]
+
+
+def test_anthropic_chat_adapter_normalizes_native_messages_response(monkeypatch):
+    captured = {}
+
+    class _Response:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {
+                "model": "claude-sonnet-5",
+                "content": [{"type": "text", "text": "Grounded answer"}],
+                "usage": {"input_tokens": 12, "output_tokens": 3},
+                "stop_reason": "end_turn",
+            }
+
+    class _Client:
+        def __init__(self, *, timeout):
+            captured["timeout"] = timeout
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+        async def post(self, url, *, headers, json):
+            captured.update({"url": url, "headers": headers, "json": json})
+            return _Response()
+
+    monkeypatch.setattr(providers_mod.httpx, "AsyncClient", _Client)
+    provider = AnthropicChatProvider("secret-not-returned", timeout_seconds=9.0)
+
+    result = asyncio.run(provider.complete(
+        _request().messages,
+        "claude-sonnet-5",
+        max_output_tokens=500,
+        temperature=0.0,
+    ))
+
+    assert captured["url"] == "https://api.anthropic.com/v1/messages"
+    assert captured["headers"]["x-api-key"] == "secret-not-returned"
+    assert captured["json"] == {
+        "model": "claude-sonnet-5",
+        "max_tokens": 500,
+        "messages": [{"role": "user", "content": "What is home rule?"}],
+        "system": "Answer only from supplied context.",
+    }
+    assert result.content == "Grounded answer"
+    assert result.model == "claude-sonnet-5"
+    assert result.usage == {"input_tokens": 12, "output_tokens": 3, "total_tokens": 15}
+    assert result.finish_reason == "end_turn"
     assert "secret-not-returned" not in repr(result)
 
 

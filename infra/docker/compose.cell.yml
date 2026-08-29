@@ -84,6 +84,8 @@ services:
     image: ${SVS_IMAGE_API:?SVS_IMAGE_API is required}
     env_file:
       - ${SVS_CELL_ENV_FILE:?SVS_CELL_ENV_FILE is required}
+    environment:
+      ANTHROPIC_API_KEY: ""
     ports:
       - "${SVS_BIND_IP:-0.0.0.0}:${SVS_API_PORT:-18080}:8080"
     depends_on:
@@ -110,6 +112,8 @@ services:
     image: ${SVS_IMAGE_WORKER:?SVS_IMAGE_WORKER is required}
     env_file:
       - ${SVS_CELL_ENV_FILE:?SVS_CELL_ENV_FILE is required}
+    environment:
+      ANTHROPIC_API_KEY: ""
     depends_on:
       postgres:
         condition: service_healthy
@@ -151,6 +155,7 @@ services:
     env_file:
       - ${SVS_CELL_ENV_FILE:?SVS_CELL_ENV_FILE is required}
     environment:
+      ANTHROPIC_API_KEY: ""
       SVS_AGENT_WORKDIR: /workspace
       SVS_INSTANCE_PIN_ROOT: /workspace/.release/instances
     profiles: ["agent"]

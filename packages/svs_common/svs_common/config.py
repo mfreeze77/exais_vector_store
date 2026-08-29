@@ -66,6 +66,7 @@ class Settings(BaseSettings):
 
     default_embedding_provider: str = 'hash_mock'
     openai_api_key: str | None = None
+    anthropic_api_key: str | None = None
     openai_embedding_model: str = 'text-embedding-3-small'
     openai_embedding_dimensions: int = 1536
     model_gateway_url: str = 'http://localhost:8081'

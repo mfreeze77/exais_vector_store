@@ -665,6 +665,54 @@ def test_synthesis_with_unknown_or_missing_citation_fails_closed(monkeypatch):
         ))
 
 
+def test_synthesis_repairs_missing_citation_once_with_only_current_allowed_markers(monkeypatch):
+    session = SimpleNamespace(
+        id="exps_1", expert_id="court-expert", parent_session_id=None,
+        external_user_id=None, conversation_id=None, messages=[],
+    )
+    requests = []
+    completions = iter([
+        _completion("The judgment was affirmed without a marker."),
+        _completion("The judgment was affirmed. 【1†source】"),
+    ])
+    persisted = []
+    monkeypatch.setattr(expert_engine, "resolve_expert_profile", lambda *args: _engine_profile())
+    monkeypatch.setattr(expert_engine, "get_expert_session", lambda *args: session)
+    monkeypatch.setattr(
+        expert_engine,
+        "record_expert_message",
+        lambda *args, **kwargs: persisted.append(kwargs) or "exmsg",
+    )
+    monkeypatch.setattr(expert_engine, "record_expert_retrieval_run", lambda *args, **kwargs: "exret")
+
+    async def complete(req):
+        requests.append(req)
+        return next(completions)
+
+    async def search(*args):
+        return _search_page()
+
+    monkeypatch.setattr(expert_engine, "complete_expert_chat", complete)
+    monkeypatch.setattr(expert_engine, "_search_page_executor", search)
+
+    response = asyncio.run(expert_engine.run_expert_turn(
+        object(),
+        _principal(),
+        ExpertMessageRequest(message="Question", session_id="exps_1").bind_expert_id("court-expert"),
+    ))
+
+    assert len(requests) == 2
+    assert "Allowed markers: 【1†source】" in requests[1].messages[-1].content
+    assert requests[1].messages[-2].content == "The judgment was affirmed without a marker."
+    assert response.answer == "The judgment was affirmed. 【1†source】"
+    assert response.citations[0].marker == "【1†source】"
+    assert response.model_metadata.usage.total_tokens == 36
+    assert response.model_metadata.latency_ms == 4
+    assert "regenerated against the same retrieved context" in response.caveats[-1]
+    assistant_metadata = next(item["metadata"] for item in persisted if item["role"] == "assistant")
+    assert assistant_metadata["citation_repair_used"] is True
+
+
 def test_run_expert_turn_rejects_external_caller_scope_mismatch_before_persistence_or_model(monkeypatch):
     session = SimpleNamespace(
         id="exps_1",
