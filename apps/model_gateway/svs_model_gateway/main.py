@@ -1,11 +1,38 @@
 from __future__ import annotations
-from fastapi import FastAPI
+from time import perf_counter
+
+from fastapi import FastAPI, HTTPException, status
 from fastapi.responses import PlainTextResponse
 import httpx
 from svs_common.config import get_settings
-from svs_common.model_registry import estimate_embedding_cost, model_registry
-from svs_common.providers import ProviderConfigurationError, provider_config_status, provider_for, provider_for_rerank
-from svs_common.schemas import EmbeddingRequest, EmbeddingResponse, RerankRequest, RerankResponse, RerankResult, TokenizeRequest, TokenizeResponse
+from svs_common.model_registry import (
+    ModelRegistryConfigurationError,
+    estimate_embedding_cost,
+    model_registry,
+    resolve_expert_chat_profiles,
+)
+from svs_common.providers import (
+    ProviderConfigurationError,
+    chat_provider_config_status,
+    chat_provider_for,
+    provider_config_status,
+    provider_for,
+    provider_for_rerank,
+)
+from svs_common.schemas import (
+    EmbeddingRequest,
+    EmbeddingResponse,
+    ExpertChatAttempt,
+    ExpertChatCompletionRequest,
+    ExpertChatCompletionResponse,
+    ExpertChatFallback,
+    ExpertChatUsage,
+    RerankRequest,
+    RerankResponse,
+    RerankResult,
+    TokenizeRequest,
+    TokenizeResponse,
+)
 from svs_common.chunking import estimate_tokens
 
 settings = get_settings()
@@ -76,6 +103,129 @@ async def embeddings(req: EmbeddingRequest):
     model = req.model or profile.get("model") or settings.openai_embedding_model
     dimensions = req.dimensions or int(profile.get("dimensions", settings.openai_embedding_dimensions))
     return await provider_for(provider_name).embed(texts, model, dimensions, input_type=req.input_type)
+
+
+def _chat_candidate_unavailable_code(req: ExpertChatCompletionRequest, profile: dict) -> str | None:
+    max_security_level = int(profile.get("max_security_level", 0))
+    if req.security_level > max_security_level:
+        return "security_policy_denied"
+    if profile.get("local_only") and not settings.is_local_env:
+        return "local_only_provider_denied"
+    status_value = chat_provider_config_status(str(profile.get("provider") or ""), settings)
+    if not status_value.configured:
+        return "provider_unconfigured"
+    return None
+
+
+def _fallback_reason(attempts: list[ExpertChatAttempt]) -> str | None:
+    if not attempts or attempts[0].status == "succeeded":
+        return None
+    if attempts[0].status == "unavailable":
+        return "preferred_provider_unavailable"
+    return "preferred_provider_failed"
+
+
+@app.post("/internal/models/expert-chat", response_model=ExpertChatCompletionResponse)
+async def expert_chat(req: ExpertChatCompletionRequest):
+    try:
+        candidates = resolve_expert_chat_profiles(req.model_policy)
+    except ModelRegistryConfigurationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={"code": "invalid_expert_chat_policy", "message": str(exc)},
+        ) from exc
+
+    attempts: list[ExpertChatAttempt] = []
+    requested_profile_id = candidates[0][0]
+    for profile_id, profile in candidates:
+        provider_name = str(profile["provider"])
+        model = str(profile["model"])
+        unavailable_code = _chat_candidate_unavailable_code(req, profile)
+        if unavailable_code:
+            attempts.append(
+                ExpertChatAttempt(
+                    model_profile_id=profile_id,
+                    provider=provider_name,
+                    model=model,
+                    status="unavailable",
+                    error_code=unavailable_code,
+                )
+            )
+            continue
+
+        try:
+            provider = chat_provider_for(provider_name, settings)
+        except ProviderConfigurationError:
+            attempts.append(
+                ExpertChatAttempt(
+                    model_profile_id=profile_id,
+                    provider=provider_name,
+                    model=model,
+                    status="unavailable",
+                    error_code="provider_unconfigured",
+                )
+            )
+            continue
+
+        started = perf_counter()
+        try:
+            completion = await provider.complete(
+                req.messages,
+                model,
+                max_output_tokens=req.max_output_tokens,
+                temperature=req.temperature,
+            )
+        except (ProviderConfigurationError, httpx.HTTPError, TimeoutError, OSError) as exc:
+            latency_ms = max(0, round((perf_counter() - started) * 1000))
+            attempts.append(
+                ExpertChatAttempt(
+                    model_profile_id=profile_id,
+                    provider=provider_name,
+                    model=model,
+                    status="failed",
+                    latency_ms=latency_ms,
+                    error_code=type(exc).__name__,
+                )
+            )
+            continue
+
+        latency_ms = max(0, round((perf_counter() - started) * 1000))
+        attempts.append(
+            ExpertChatAttempt(
+                model_profile_id=profile_id,
+                provider=provider_name,
+                model=completion.model,
+                status="succeeded",
+                latency_ms=latency_ms,
+            )
+        )
+        fallback_occurred = profile_id != requested_profile_id
+        return ExpertChatCompletionResponse(
+            content=completion.content,
+            policy_id=req.model_policy.policy_id,
+            requested_model_profile_id=requested_profile_id,
+            model_profile_id=profile_id,
+            provider=provider_name,
+            model=completion.model,
+            latency_ms=latency_ms,
+            usage=ExpertChatUsage(**completion.usage),
+            finish_reason=completion.finish_reason,
+            fallback=ExpertChatFallback(
+                occurred=fallback_occurred,
+                from_model_profile_id=requested_profile_id if fallback_occurred else None,
+                reason=_fallback_reason(attempts) if fallback_occurred else None,
+                attempts=attempts,
+            ),
+        )
+
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail={
+            "code": "expert_chat_provider_unavailable",
+            "policy_id": req.model_policy.policy_id,
+            "attempts": [attempt.model_dump(mode="json") for attempt in attempts],
+        },
+    )
 
 def _lexical_rerank(req: RerankRequest) -> RerankResponse:
     q = set(req.query.lower().split())

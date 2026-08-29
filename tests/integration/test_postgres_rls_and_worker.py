@@ -13,7 +13,9 @@ PROTECTED_TABLES = {
     'tenants','business_instances','users','groups','group_memberships','api_keys','knowledge_bases','vector_stores',
     'sources','documents','document_versions','chunks','embeddings','vector_store_files','file_batches','ingestion_jobs',
     'audit_events','usage_events','instance_deployments','eval_runs','model_endpoints','ingestion_plans','bakeoff_runs',
-    'bakeoff_results','idempotency_keys','rate_limit_counters','backup_bundles','deployment_locks','openai_responses'
+    'bakeoff_results','idempotency_keys','rate_limit_counters','backup_bundles','deployment_locks','openai_responses',
+    'expert_sessions','expert_messages','expert_tool_calls','expert_retrieval_runs','expert_feedback',
+    'expert_memory_events','expert_session_forks'
 }
 
 

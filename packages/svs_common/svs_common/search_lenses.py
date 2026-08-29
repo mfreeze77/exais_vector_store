@@ -162,6 +162,24 @@ def normalize_search_lens_id(value: str | None) -> str:
     return SEARCH_LENS_ALIASES.get(normalized, normalized)
 
 
+def infer_expert_search_lens_id(query: str, allowed_lens_ids: list[str] | tuple[str, ...]) -> str | None:
+    """Infer only an explicitly profile-authorized graph lens from natural language."""
+
+    allowed = {normalize_search_lens_id(value) for value in allowed_lens_ids}
+    text = " ".join(str(query or "").lower().split())
+    candidates: tuple[tuple[str, tuple[str, ...]], ...] = (
+        ("court_citator", ("cited by", "cites ", "citation history", "citator", "precedent", "related authority")),
+        ("court_procedural_history", ("procedural history", "same docket", "earlier opinion", "later opinion")),
+        ("municipal_code_history", ("ordinance history", "amendment history", "amended by", "adopted by", "ordinance number")),
+        ("municipal_code_cross_reference", ("cross reference", "cross-reference", "defined term", "definition of", "references section")),
+        ("municipal_code_structure", ("code structure", "contained in", "parent chapter", "parent title", "section hierarchy")),
+    )
+    for lens_id, phrases in candidates:
+        if lens_id in allowed and any(phrase in text for phrase in phrases):
+            return lens_id
+    return None
+
+
 def corpus_kind_for_vector_store(attributes: dict[str, Any] | None, query_planner_profile_id: str | None) -> str | None:
     attrs = attributes or {}
     source_collection = str(attrs.get("source_collection") or "").strip().lower()
@@ -183,6 +201,21 @@ def corpus_kind_for_vector_store(attributes: dict[str, Any] | None, query_planne
 
 def _lens_applies(definition: SearchLensDefinition, corpus_kind: str | None) -> bool:
     return "*" in definition.corpus_kinds or (corpus_kind is not None and corpus_kind in definition.corpus_kinds)
+
+
+def search_lens_definitions_for_vector_store(
+    attributes: dict[str, Any] | None,
+    *,
+    query_planner_profile_id: str | None,
+) -> tuple[SearchLensDefinition, ...]:
+    """Return the single registry's ordered, store-supported lens definitions."""
+
+    corpus_kind = corpus_kind_for_vector_store(attributes, query_planner_profile_id)
+    return tuple(
+        definition
+        for definition in SEARCH_LENS_REGISTRY
+        if _lens_applies(definition, corpus_kind)
+    )
 
 
 def _graph_count(coverage: dict[str, Any], key: str) -> int:
@@ -271,7 +304,6 @@ def search_lenses_for_vector_store(
     graph_enabled: bool,
     graph_coverage: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
-    corpus_kind = corpus_kind_for_vector_store(attributes, query_planner_profile_id)
     return [
         search_lens_payload(
             definition,
@@ -279,8 +311,10 @@ def search_lenses_for_vector_store(
             graph_enabled=graph_enabled,
             graph_coverage=graph_coverage,
         )
-        for definition in SEARCH_LENS_REGISTRY
-        if _lens_applies(definition, corpus_kind)
+        for definition in search_lens_definitions_for_vector_store(
+            attributes,
+            query_planner_profile_id=query_planner_profile_id,
+        )
     ]
 
 

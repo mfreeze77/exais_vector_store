@@ -1,10 +1,117 @@
 from __future__ import annotations
+import re
+from typing import Any
 from fastapi import Header, HTTPException, status
-from .openai_compat import file_attribute_payload_key
+from .openai_compat import OUTPUT_GUARD_ID, file_attribute_payload_key, output_guard_text
 from .config import get_settings
 from .schemas import Principal, RetrievalScope, ChunkRecord
 
 QDRANT_RANGE_OPERATORS = {"gt": "gt", "gte": "gte", "lt": "lt", "lte": "lte"}
+EXPERT_INTERACTION_MAX_DEPTH = 8
+EXPERT_INTERACTION_MAX_ITEMS = 100
+_SENSITIVE_INTERACTION_KEYS = {
+    "api_key",
+    "apikey",
+    "authorization",
+    "bearer",
+    "credential",
+    "credentials",
+    "password",
+    "passwd",
+    "private_key",
+    "pwd",
+    "refresh_token",
+    "secret",
+    "token",
+    "access_token",
+}
+_SENSITIVE_INTERACTION_KEY_FRAGMENTS = (
+    "accesskey",
+    "apikey",
+    "authorization",
+    "bearer",
+    "credential",
+    "password",
+    "passwd",
+    "privatekey",
+    "refreshtoken",
+    "secret",
+    "sessiontoken",
+)
+
+
+class ExpertInteractionSensitiveDataError(ValueError):
+    """Raised when governed feedback or memory cannot be stored safely."""
+
+
+def _normalized_interaction_key(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", value.strip().lower()).strip("_")
+
+
+def _interaction_key_is_sensitive(value: str) -> bool:
+    _, key_guard = output_guard_text(value)
+    if key_guard:
+        return True
+    normalized = _normalized_interaction_key(value)
+    compact = normalized.replace("_", "")
+    if normalized in _SENSITIVE_INTERACTION_KEYS:
+        return True
+    if any(fragment in compact for fragment in _SENSITIVE_INTERACTION_KEY_FRAGMENTS):
+        return True
+    parts = {part for part in normalized.split("_") if part}
+    return bool(parts.intersection({"token", "pwd"}))
+
+
+def _merge_interaction_guards(guards: list[dict[str, Any]]) -> dict[str, Any] | None:
+    totals: dict[str, int] = {}
+    for guard in guards:
+        for redaction in guard.get("redactions") or []:
+            kind = redaction.get("type")
+            count = redaction.get("count")
+            if isinstance(kind, str) and isinstance(count, int):
+                totals[kind] = totals.get(kind, 0) + count
+    if not totals:
+        return None
+    return {
+        "id": OUTPUT_GUARD_ID,
+        "redactions": [{"type": kind, "count": totals[kind]} for kind in sorted(totals)],
+    }
+
+
+def sanitize_expert_interaction_data(value: Any) -> tuple[Any, dict[str, Any] | None]:
+    """Redact obvious PII/secrets and reject secret-bearing structured keys before persistence."""
+
+    guards: list[dict[str, Any]] = []
+
+    def sanitize(item: Any, depth: int) -> Any:
+        if depth > EXPERT_INTERACTION_MAX_DEPTH:
+            raise ExpertInteractionSensitiveDataError("expert interaction payload is too deeply nested")
+        if item is None or isinstance(item, (bool, int, float)):
+            return item
+        if isinstance(item, str):
+            guarded, metadata = output_guard_text(item)
+            if metadata:
+                guards.append(metadata)
+            return guarded
+        if isinstance(item, list):
+            if len(item) > EXPERT_INTERACTION_MAX_ITEMS:
+                raise ExpertInteractionSensitiveDataError("expert interaction payload has too many items")
+            return [sanitize(child, depth + 1) for child in item]
+        if isinstance(item, dict):
+            if len(item) > EXPERT_INTERACTION_MAX_ITEMS:
+                raise ExpertInteractionSensitiveDataError("expert interaction payload has too many fields")
+            sanitized: dict[str, Any] = {}
+            for raw_key, child in item.items():
+                if not isinstance(raw_key, str):
+                    raise ExpertInteractionSensitiveDataError("expert interaction payload keys must be strings")
+                if _interaction_key_is_sensitive(raw_key):
+                    raise ExpertInteractionSensitiveDataError("expert interaction payload contains a sensitive field")
+                sanitized[raw_key] = sanitize(child, depth + 1)
+            return sanitized
+        raise ExpertInteractionSensitiveDataError("expert interaction payload contains an unsupported value")
+
+    sanitized_value = sanitize(value, 0)
+    return sanitized_value, _merge_interaction_guards(guards)
 
 def principal_from_dev_headers(
     x_svs_tenant_id: str | None = None,

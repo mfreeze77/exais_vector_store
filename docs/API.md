@@ -5,7 +5,7 @@ The API has two layers:
 1. **Native SVS API** for ingestion, mode routing, retrieval, admin, model registry, and instance operations.
 2. **OpenAI-compatible vector-store API** for clients that expect `/v1/vector_stores`-style behavior.
 
-Generated `/openapi.json` currently contains 53 paths, 70 operations, and 124
+Generated `/openapi.json` currently contains 57 paths, 74 operations, and 143
 schema components. All documented native and OpenAI-compatible operations have
 named 2xx response components, and every JSON request body resolves directly to
 a named component. Native responses are runtime-bound through FastAPI response
@@ -15,7 +15,7 @@ retain named `multipart/form-data` components. Metrics and extracted OpenAI file
 content use HTTP-proven `text/plain` responses with named string schemas.
 
 `tests/test_openapi_contract.py` freezes all valid OpenAPI HTTP methods across
-the exact 70-operation inventory, verifies
+the exact 74-operation inventory, verifies
 that every request and successful response body is a direct component reference,
 and validates representative runtime payloads against the promoted contracts.
 This is contract closure, not new OpenAI parity behavior.
@@ -124,11 +124,105 @@ GET /healthz
 GET /api/v1/vectorization/modes
 GET /api/v1/models/registry
 GET /api/v1/retrieval/profiles
+GET /v1/experts
+GET /v1/experts/{expert_id}
 ```
+
+Expert discovery requires bearer authentication and `retrieval:read`. The list
+returns only profiles whose complete vector-store binding is active and within
+the request principal's tenant and business instance. Detail lookup returns
+`404` for unknown, inactive, expired, or cross-scope bindings before retrieval
+or model execution. Each profile carries its server-owned prompt, model policy,
+tool limits, citation and caveat policies, authorized vector stores, and graph
+lens capabilities composed from the existing search-lens registry. Profile
+metadata contains no provider credentials or backend service URLs.
+
+### Expert messages, sessions, feedback, and governed memory
+
+```http
+POST /v1/experts/{expert_id}/messages
+POST /v1/experts/{expert_id}/sessions/{session_id}/fork
+POST /v1/experts/{expert_id}/feedback
+GET /v1/experts/{expert_id}/sessions/{session_id}/memory
+POST /v1/experts/{expert_id}/sessions/{session_id}/memory/{memory_event_id}/promote
+DELETE /v1/experts/{expert_id}/sessions/{session_id}/memory/{memory_event_id}
+```
+
+These routes require production bearer authentication and `retrieval:read`, use
+the standard ExAIS request rate limit, and accept `Idempotency-Key`. A message
+request supplies `message` plus optional `session_id`, `external_user_id`,
+`conversation_id`, and `session_label`. When resuming by `session_id`, the
+external-user and conversation values must exactly match the stored session;
+omitting a stored value also fails closed. The path `expert_id` is authoritative.
+
+The typed message response contains `expert_id`, `session_id`, optional
+`parent_session_id`, `answer`, `citations`, `retrieval_trace`,
+`model_metadata`, `caveats`, and `follow_up_suggestions`. Model metadata includes
+the policy/profile, provider, served model, latency, normalized usage, finish
+reason, and truthful fallback record, but never provider credentials or model-
+gateway URLs. Fork requests repeat the parent session's external-user and
+conversation scope and return the child session ID, parent ID, and new caller
+conversation ID.
+
+Expert messages execute bounded profile-authorized retrieval before synthesis.
+Only retrieved corpus/source-package results are citation authority; retrieval
+runs persist the attempted lens, truthful graph status, result IDs, selected
+context IDs, source URLs, graph metadata, and citations.
+
+Feedback accepts a scoped `session_id`, optional in-session `message_id`, exact
+`external_user_id` and `conversation_id`, a typed feedback category, optional
+rating/comment, and up to three typed memory candidates. Candidate memory types
+are `retrieval_strategy`, `answer_style`, and `preference`. Candidates are inert
+until the separate promotion route receives `{"confirm": true}` and the stored
+confidence satisfies policy. Listing and deletion require the same caller
+scope. Deletion is a soft-delete audit tombstone that scrubs the stored
+instruction. Feedback and memory text pass the existing PII/secret guard;
+secret-bearing structured fields and citation markers in memory are rejected.
+
+Promoted answer-style and preference memory may shape response presentation,
+but it is sent as explicitly non-authoritative guidance, never added to
+retrieved context, and never exposed as a citation source. Every feedback,
+candidate, promotion, and deletion mutation emits an `expert_governance` audit
+event containing scope and lifecycle metadata, not the feedback or memory text.
+
+Caller frameworks should expose this surface through the thin MCP tool names
+`list_exais_experts`, `ask_exais_expert`, and `submit_expert_feedback` documented
+in [Caller Agent Integration](CALLER_AGENT_INTEGRATION.md). Those adapters map
+typed inputs to the routes above and return typed bodies; they do not own
+retrieval, graph, ACL, citation, provider, feedback, or memory behavior.
+
+The repository-backed raw-search versus expert-session comparison is:
+
+```powershell
+python evals/expert-sessions/run_eval.py
+```
+
+That command is deterministic fixture proof only. Its result deliberately says
+that neither the current live corpus nor an external provider was verified.
 
 ## Model gateway
 
-Internal model-gateway routes include deterministic embedding cost estimates:
+Expert reasoning uses one internal, provider-neutral route:
+
+```http
+POST /internal/models/expert-chat
+```
+
+The request carries typed `system`, `user`, and `assistant` messages plus the
+server-resolved `ExpertModelPolicy`; callers do not select a vendor directly.
+The gateway resolves dedicated `chat_policies` and `chat_models`, applies the
+request security level, and returns the selected model profile, provider,
+served model, latency, normalized input/output/total token usage, finish reason,
+and per-attempt fallback evidence. `fallback.occurred` is true only when a
+later declared candidate actually succeeds. The deterministic fixture chat
+profile is restricted to local/dev/test/CI and is never a production fallback.
+
+The API service calls this route through
+`svs_common.expert_llm.complete_expert_chat`; customer-facing handlers do not
+call vendor SDKs or depend on personal Codex, Claude Code, OpenCode, browser,
+desktop, or subscription sessions.
+
+Internal model-gateway routes also include deterministic embedding cost estimates:
 
 ```http
 POST /internal/models/estimate-cost

@@ -5,6 +5,7 @@ from fastapi import HTTPException
 
 import svs_common.vector_store_repo as vector_store_repo
 from svs_api import main as api_main
+from svs_common.expert_sessions import get_expert_session
 from svs_common.schemas import Principal
 from svs_common.vector_store_repo import VectorStoreRepository
 
@@ -76,6 +77,27 @@ def test_openai_response_lookup_fails_closed_to_principal_scope():
     sql = _compact(sql)
     assert "WHERE id=:id AND tenant_id=:tenant_id AND business_instance_id=:biz_id" in sql
     assert params == {"id": "resp_shared", "tenant_id": "tenant_a", "biz_id": "biz_a"}
+
+
+def test_expert_session_lookup_fails_closed_to_tenant_business_api_key_and_user_scope():
+    db = _Db()
+
+    assert get_expert_session(db, _principal(), "exps_shared") is None
+
+    sql, params = db.calls[0]
+    sql = _compact(sql)
+    assert "WHERE id=:session_id" in sql
+    assert "tenant_id=:tenant_id" in sql
+    assert "business_instance_id=:biz_id" in sql
+    assert "api_key_id IS NOT DISTINCT FROM :api_key_id" in sql
+    assert "user_id IS NOT DISTINCT FROM :user_id" in sql
+    assert params == {
+        "session_id": "exps_shared",
+        "tenant_id": "tenant_a",
+        "biz_id": "biz_a",
+        "api_key_id": "key_a",
+        "user_id": "user_a",
+    }
 
 
 def test_openai_response_delete_mutates_only_principal_scope():

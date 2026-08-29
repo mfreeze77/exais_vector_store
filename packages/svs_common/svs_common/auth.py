@@ -224,6 +224,8 @@ def resolve_api_key_principal(db: Session, authorization: str | None) -> Princip
     db.execute(text("SELECT set_config('svs.tenant_id', :tenant_id, true)"), {"tenant_id": row["tenant_id"]})
     db.execute(text("SELECT set_config('svs.business_instance_id', :biz_id, true)"), {"biz_id": row["business_instance_id"] or ""})
     db.execute(text("SELECT set_config('svs.max_security_level', :lvl, true)"), {"lvl": str(row["max_security_level"])})
+    db.execute(text("SELECT set_config('svs.api_key_id', :api_key_id, true)"), {"api_key_id": row["id"]})
+    db.execute(text("SELECT set_config('svs.user_id', :user_id, true)"), {"user_id": row["user_id"] or ""})
     groups = []
     if row["user_id"]:
         group_rows = db.execute(text("""

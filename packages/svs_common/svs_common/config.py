@@ -69,6 +69,7 @@ class Settings(BaseSettings):
     openai_embedding_model: str = 'text-embedding-3-small'
     openai_embedding_dimensions: int = 1536
     model_gateway_url: str = 'http://localhost:8081'
+    expert_chat_timeout_sec: float = 120.0
     tei_endpoint_url: str | None = None
     infinity_endpoint_url: str | None = None
     self_hosted_model_endpoint_url: str | None = None

@@ -73,6 +73,14 @@ get /metrics
 get /api/v1/vectorization/modes
 get /api/v1/models/registry
 get /api/v1/retrieval/profiles
+get /v1/experts
+get /v1/experts/{expert_id}
+post /v1/experts/{expert_id}/messages
+post /v1/experts/{expert_id}/sessions/{session_id}/fork
+post /v1/experts/{expert_id}/feedback
+get /v1/experts/{expert_id}/sessions/{session_id}/memory
+post /v1/experts/{expert_id}/sessions/{session_id}/memory/{memory_event_id}/promote
+delete /v1/experts/{expert_id}/sessions/{session_id}/memory/{memory_event_id}
 post /api/v1/ingestion/preview
 post /api/v1/documents/ingest
 post /api/v1/documents/upload
@@ -177,8 +185,8 @@ def test_every_documented_operation_uses_named_request_and_success_components():
         for method in path_item
         if method in HTTP_METHODS
     }
-    assert len(spec['paths']) == 53
-    assert len(components) == 124
+    assert len(spec['paths']) == 61
+    assert len(components) == 151
     assert operations == EXPECTED_OPERATIONS
 
     request_media: set[tuple[str, str, str]] = set()

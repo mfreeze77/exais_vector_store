@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "id": "wave-123-expert-session-comparison-v1",
+  "proof_mode": "deterministic_fixture",
+  "live_corpus_verified": false,
+  "live_provider_verified": false,
+  "description": "Repository-backed comparisons of raw ExAIS search results and cited expert-session answers.",
+  "cases": [
+    {
+      "id": "ks-harris-same-docket-history",
+      "corpus": "kansas_courts",
+      "graph_capable": true,
+      "question": "How do the 2018 and 2020 State v. Harris decisions with docket 116515 relate, and what do they say about reliance on an official interpretation?",
+      "expected_answer_terms": ["state v. harris", "116515", "2018", "2020", "official interpretation"],
+      "expected_graph_relationships": ["same_docket"],
+      "raw_retrieval_trace": {"status": "completed", "runs": [{"query": "State v. Harris docket 116515 official interpretation 2018 2020", "vector_store_id": "vs_a0d3ac76893e4f6f83bf2992", "lens_id": "court_procedural_history"}]},
+      "raw_search_response": {
+        "object": "vector_store.search_results.page",
+        "search_query": "State v. Harris docket 116515 official interpretation 2018 2020",
+        "search_lens": {"id": "court_procedural_history", "status": "available", "source": "explicit"},
+        "graph_expansion": {"applied": true, "relation_types": ["same_docket"]},
+        "data": [
+          {
+            "file_id": "file_harris_2020",
+            "filename": "State-v-Harris-116515-2020.pdf",
+            "score": 1.0,
+            "content": [{"type": "text", "text": "State v. Harris, docket 116515, 2020, discusses reliance on an official interpretation in the mistake-of-law defense."}],
+            "citation": {
+              "file_id": "file_harris_2020",
+              "filename": "State-v-Harris-116515-2020.pdf",
+              "chunk_id": "chk_harris_2020",
+              "document_id": "doc_harris_2020",
+              "title": "State v. Harris (2020)",
+              "url": "https://searchdro.kscourts.gov/documents/pdf/caseDecisions/11c9dded-0908-4f18-8f1b-3207781f331d_116515_2020717_00.pdf"
+            }
+          },
+          {
+            "file_id": "file_harris_2018",
+            "filename": "State-v-Harris-116515-2018.pdf",
+            "score": 0.90076,
+            "content": [{"type": "text", "text": "The related 2018 State v. Harris appeal, docket 116515, discusses Department of Corrections guidance and parole-officer advice as an official interpretation argument."}],
+            "citation": {
+              "file_id": "file_harris_2018",
+              "filename": "State-v-Harris-116515-2018.pdf",
+              "chunk_id": "chk_harris_2018",
+              "document_id": "doc_harris_2018",
+              "title": "State v. Harris (2018)",
+              "url": "https://searchdro.kscourts.gov/documents/pdf/caseDecisions/39831f47-7fd6-4a88-b69f-6de03ee80ed1_116515_20180119_09.pdf",
+              "graph_expansion": {
+                "relation_type": "same_docket",
+                "edge_id": "fixture_edge_harris_same_docket",
+                "source_document_id": "doc_harris_2020",
+                "target_document_id": "doc_harris_2018",
+                "attributes": {"docket_number": "116515"}
+              }
+            }
+          }
+        ],
+        "has_more": false
+      },
+      "expert_session_response": {
+        "expert_id": "kansas-court-decisions",
+        "session_id": "fixture_session_ks_harris_history",
+        "parent_session_id": null,
+        "answer": "The 2018 and 2020 State v. Harris decisions are related appeals under docket 116515. The 2018 decision discusses Department of Corrections guidance and parole-officer advice, while the 2020 decision directly addresses reliance on an official interpretation for the asserted mistake-of-law defense. 【1†source】 【2†source】",
+        "citations": [
+          {
+            "file_id": "file_harris_2018",
+            "filename": "State-v-Harris-116515-2018.pdf",
+            "chunk_id": "chk_harris_2018",
+            "document_id": "doc_harris_2018",
+            "title": "State v. Harris (2018)",
+            "url": "https://searchdro.kscourts.gov/documents/pdf/caseDecisions/39831f47-7fd6-4a88-b69f-6de03ee80ed1_116515_20180119_09.pdf",
+            "marker": "【1†source】",
+            "graph_relationships": [{"relation_type": "same_docket", "edge_id": "fixture_edge_harris_same_docket", "source_document_id": "doc_harris_2020", "target_document_id": "doc_harris_2018", "attributes": {"docket_number": "116515"}}]
+          },
+          {
+            "file_id": "file_harris_2020",
+            "filename": "State-v-Harris-116515-2020.pdf",
+            "chunk_id": "chk_harris_2020",
+            "document_id": "doc_harris_2020",
+            "title": "State v. Harris (2020)",
+            "url": "https://searchdro.kscourts.gov/documents/pdf/caseDecisions/11c9dded-0908-4f18-8f1b-3207781f331d_116515_2020717_00.pdf",
+            "marker": "【2†source】"
+          }
+        ],
+        "retrieval_trace": {"status": "completed", "runs": [{"retrieval_run_id": "fixture_run_ks_harris_history", "query": "State v. Harris docket 116515 official interpretation 2018 2020", "vector_store_id": "vs_a0d3ac76893e4f6f83bf2992", "lens_id": "court_procedural_history", "requested_lens_id": "court_procedural_history", "lens_selection_source": "explicit", "graph_status": "applied", "result_ids": ["chk_harris_2020", "chk_harris_2018"], "selected_context_result_ids": ["chk_harris_2020", "chk_harris_2018"], "citation_count": 2}]},
+        "model_metadata": {"policy_id": "fixture-only", "requested_model_profile_id": "fixture", "model_profile_id": "fixture", "provider": "fixture", "model": "deterministic-fixture", "latency_ms": 0, "usage": {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}, "finish_reason": "fixture", "fallback": {"occurred": false, "from_model_profile_id": null, "reason": null, "attempts": []}},
+        "caveats": ["This deterministic fixture is not legal advice and does not prove the current live corpus or complete procedural history."],
+        "follow_up_suggestions": ["Review both cited opinions before relying on the procedural sequence."]
+      }
+    },
+    {
+      "id": "ks-harris-loaded-citator-backlink",
+      "corpus": "kansas_courts",
+      "graph_capable": true,
+      "question": "Which decision in the loaded Kansas graph cites State v. Harris, and what is the coverage limitation?",
+      "expected_answer_terms": ["state v. robinson", "122559", "loaded graph", "state v. harris"],
+      "expected_graph_relationships": ["cited_by"],
+      "raw_retrieval_trace": {"status": "completed", "runs": [{"query": "Which loaded decision cites State v. Harris?", "vector_store_id": "vs_a0d3ac76893e4f6f83bf2992", "lens_id": "court_citator"}]},
+      "raw_search_response": {
+        "object": "vector_store.search_results.page",
+        "search_query": "Which loaded decision cites State v. Harris?",
+        "search_lens": {"id": "court_citator", "status": "available", "source": "explicit"},
+        "graph_expansion": {"applied": true, "relation_types": ["cited_by"], "coverage": {"full_corpus_citator": false}},
+        "data": [
+          {
+            "file_id": "file_harris_2020",
+            "filename": "State-v-Harris-116515-2020.pdf",
+            "score": 1.0,
+            "content": [{"type": "text", "text": "State v. Harris is the requested cited authority in this loaded graph query."}],
+            "citation": {"file_id": "file_harris_2020", "filename": "State-v-Harris-116515-2020.pdf", "chunk_id": "chk_harris_2020", "document_id": "doc_harris_2020", "title": "State v. Harris", "url": "https://searchdro.kscourts.gov/documents/pdf/caseDecisions/11c9dded-0908-4f18-8f1b-3207781f331d_116515_2020717_00.pdf"}
+          },
+          {
+            "file_id": "file_robinson_122559",
+            "filename": "State-v-Robinson-122559.pdf",
+            "score": 0.94,
+            "content": [{"type": "text", "text": "State v. Robinson, docket 122559, is the decision found in the loaded graph as citing State v. Harris."}],
+            "citation": {
+              "file_id": "file_robinson_122559",
+              "filename": "State-v-Robinson-122559.pdf",
+              "chunk_id": "chk_41c48e7f09654ef9aace2392",
+              "document_id": "doc_robinson_122559",
+              "title": "State v. Robinson",
+              "url": "https://searchdro.kscourts.gov/documents/pdf/caseDecisions/e80180b7-e1b1-42a8-bb36-ac1eb7c22910_122559.pdf",
+              "graph_expansion": {"relation_type": "cited_by", "edge_id": "fixture_edge_robinson_cites_harris", "source_document_id": "doc_robinson_122559", "target_document_id": "doc_harris_2020", "evidence_chunk_id": "chk_41c48e7f09654ef9aace2392"}
+            }
+          }
+        ],
+        "has_more": false
+      },
+      "expert_session_response": {
+        "expert_id": "kansas-court-decisions",
+        "session_id": "fixture_session_ks_harris_backlink",
+        "parent_session_id": null,
+        "answer": "Within the loaded graph, State v. Robinson, docket 122559, cites State v. Harris. 【1†source】 This is a loaded-graph backlink, not proof that Robinson is the only Kansas decision that cites Harris.",
+        "citations": [{"file_id": "file_robinson_122559", "filename": "State-v-Robinson-122559.pdf", "chunk_id": "chk_41c48e7f09654ef9aace2392", "document_id": "doc_robinson_122559", "title": "State v. Robinson", "url": "https://searchdro.kscourts.gov/documents/pdf/caseDecisions/e80180b7-e1b1-42a8-bb36-ac1eb7c22910_122559.pdf", "marker": "【1†source】", "graph_relationships": [{"relation_type": "cited_by", "edge_id": "fixture_edge_robinson_cites_harris", "source_document_id": "doc_robinson_122559", "target_document_id": "doc_harris_2020", "evidence_chunk_id": "chk_41c48e7f09654ef9aace2392"}]}],
+        "retrieval_trace": {"status": "completed", "runs": [{"retrieval_run_id": "fixture_run_ks_harris_backlink", "query": "Which loaded decision cites State v. Harris?", "vector_store_id": "vs_a0d3ac76893e4f6f83bf2992", "lens_id": "court_citator", "requested_lens_id": "court_citator", "lens_selection_source": "explicit", "graph_status": "applied", "result_ids": ["chk_harris_2020", "chk_41c48e7f09654ef9aace2392"], "selected_context_result_ids": ["chk_41c48e7f09654ef9aace2392"], "citation_count": 1}]},
+        "model_metadata": {"policy_id": "fixture-only", "requested_model_profile_id": "fixture", "model_profile_id": "fixture", "provider": "fixture", "model": "deterministic-fixture", "latency_ms": 0, "usage": {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}, "finish_reason": "fixture", "fallback": {"occurred": false, "from_model_profile_id": null, "reason": null, "attempts": []}},
+        "caveats": ["The repository-backed fixture represents only relationships present in the loaded graph, not a complete Kansas citator."],
+        "follow_up_suggestions": ["Run live corpus proof before making a current coverage claim."]
+      }
+    },
+    {
+      "id": "topeka-20340-downtown-history",
+      "corpus": "topeka_municipal_code",
+      "graph_capable": true,
+      "question": "Which ordinance amended TMC 18.200.010 for downtown zoning and design standards, and where are the official sources?",
+      "expected_answer_terms": ["20340", "18.200.010", "downtown", "design"],
+      "expected_graph_relationships": ["ORDINANCE_AMENDS_SECTION"],
+      "raw_retrieval_trace": {"status": "completed", "runs": [{"query": "downtown zoning design standards amendment 18.200.010", "vector_store_id": "vs_d4185d1004604f08a55299fa", "lens_id": "municipal_code_history"}]},
+      "raw_search_response": {
+        "object": "vector_store.search_results.page",
+        "search_query": "downtown zoning design standards amendment 18.200.010",
+        "search_lens": {"id": "municipal_code_history", "status": "available", "source": "explicit"},
+        "graph_expansion": {"applied": true, "relation_types": ["ORDINANCE_AMENDS_SECTION"]},
+        "data": [
+          {
+            "file_id": "file_tmc_18_200_010",
+            "filename": "TMC-18.200.010.md",
+            "score": 1.0,
+            "content": [{"type": "text", "text": "TMC 18.200.010 sets out the purpose and regulations for downtown zoning and design standards."}],
+            "citation": {"file_id": "file_tmc_18_200_010", "filename": "TMC-18.200.010.md", "chunk_id": "chk_tmc_18_200_010", "document_id": "doc_tmc_18_200_010", "title": "TMC 18.200.010", "url": "https://topeka.municipal.codes/TMC/18.200.010"}
+          },
+          {
+            "file_id": "file_ordinance_20340",
+            "filename": "Ordinance20340.md",
+            "score": 0.98,
+            "content": [{"type": "text", "text": "Ordinance 20340 concerned downtown zoning and design standards and amended Topeka Municipal Code 18.200.010."}],
+            "citation": {"file_id": "file_ordinance_20340", "filename": "Ordinance20340.md", "chunk_id": "chk_ordinance_20340", "document_id": "doc_ordinance_20340", "title": "Topeka Ordinance 20340", "url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20340.pdf", "graph_expansion": {"relation_type": "ORDINANCE_AMENDS_SECTION", "edge_id": "edge:20340:18.200.010", "source_document_id": "doc_ordinance_20340", "target_document_id": "doc_tmc_18_200_010", "relationship_source_url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20340.pdf", "relationship_target_url": "https://topeka.municipal.codes/TMC/18.200.010"}}
+          }
+        ],
+        "has_more": false
+      },
+      "expert_session_response": {
+        "expert_id": "topeka-municipal-code",
+        "session_id": "fixture_session_topeka_20340",
+        "parent_session_id": null,
+        "answer": "TMC 18.200.010 is the codified downtown zoning and design section. 【1†source】 Ordinance 20340 is the official ordinance linked as amending that section. 【2†source】",
+        "citations": [
+          {"file_id": "file_tmc_18_200_010", "filename": "TMC-18.200.010.md", "chunk_id": "chk_tmc_18_200_010", "document_id": "doc_tmc_18_200_010", "title": "TMC 18.200.010", "url": "https://topeka.municipal.codes/TMC/18.200.010", "marker": "【1†source】"},
+          {"file_id": "file_ordinance_20340", "filename": "Ordinance20340.md", "chunk_id": "chk_ordinance_20340", "document_id": "doc_ordinance_20340", "title": "Topeka Ordinance 20340", "url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20340.pdf", "marker": "【2†source】", "graph_relationships": [{"relation_type": "ORDINANCE_AMENDS_SECTION", "edge_id": "edge:20340:18.200.010", "source_document_id": "doc_ordinance_20340", "target_document_id": "doc_tmc_18_200_010", "relationship_source_url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20340.pdf", "relationship_target_url": "https://topeka.municipal.codes/TMC/18.200.010"}]}
+        ],
+        "retrieval_trace": {"status": "completed", "runs": [{"retrieval_run_id": "fixture_run_topeka_20340", "query": "downtown zoning design standards amendment 18.200.010", "vector_store_id": "vs_d4185d1004604f08a55299fa", "lens_id": "municipal_code_history", "requested_lens_id": "municipal_code_history", "lens_selection_source": "explicit", "graph_status": "applied", "result_ids": ["chk_tmc_18_200_010", "chk_ordinance_20340"], "selected_context_result_ids": ["chk_tmc_18_200_010", "chk_ordinance_20340"], "citation_count": 2}]},
+        "model_metadata": {"policy_id": "fixture-only", "requested_model_profile_id": "fixture", "model_profile_id": "fixture", "provider": "fixture", "model": "deterministic-fixture", "latency_ms": 0, "usage": {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}, "finish_reason": "fixture", "fallback": {"occurred": false, "from_model_profile_id": null, "reason": null, "attempts": []}},
+        "caveats": ["This deterministic comparison validates fixture provenance only; confirm effective municipal law from official sources."],
+        "follow_up_suggestions": ["Open the codified section and ordinance PDF together."]
+      }
+    },
+    {
+      "id": "topeka-20407-fire-code-history",
+      "corpus": "topeka_municipal_code",
+      "graph_capable": true,
+      "question": "Which ordinance adopted the 2021 International Fire Code and amended TMC 14.40.010?",
+      "expected_answer_terms": ["20407", "2021 international fire code", "14.40.010"],
+      "expected_graph_relationships": ["ORDINANCE_AMENDS_SECTION"],
+      "raw_retrieval_trace": {"status": "completed", "runs": [{"query": "2021 International Fire Code ordinance amended 14.40.010", "vector_store_id": "vs_d4185d1004604f08a55299fa", "lens_id": "municipal_code_history"}]},
+      "raw_search_response": {
+        "object": "vector_store.search_results.page",
+        "search_query": "2021 International Fire Code ordinance amended 14.40.010",
+        "search_lens": {"id": "municipal_code_history", "status": "available", "source": "explicit"},
+        "graph_expansion": {"applied": true, "relation_types": ["ORDINANCE_AMENDS_SECTION"]},
+        "data": [
+          {
+            "file_id": "file_tmc_14_40_010",
+            "filename": "TMC-14.40.010.md",
+            "score": 1.0,
+            "content": [{"type": "text", "text": "TMC 14.40.010 is the Topeka section for adoption of the 2021 International Fire Code."}],
+            "citation": {"file_id": "file_tmc_14_40_010", "filename": "TMC-14.40.010.md", "chunk_id": "chk_tmc_14_40_010", "document_id": "doc_tmc_14_40_010", "title": "TMC 14.40.010", "url": "https://topeka.municipal.codes/TMC/14.40.010"}
+          },
+          {
+            "file_id": "file_ordinance_20407",
+            "filename": "Ordinance20407.md",
+            "score": 0.97,
+            "content": [{"type": "text", "text": "Ordinance 20407 adopted the 2021 International Fire Code and amended Topeka Municipal Code 14.40.010."}],
+            "citation": {"file_id": "file_ordinance_20407", "filename": "Ordinance20407.md", "chunk_id": "chk_ordinance_20407", "document_id": "doc_ordinance_20407", "title": "Topeka Ordinance 20407", "url": "https://files.topeka.gov/community/ordinances/2023/Ordinance20407.pdf", "graph_expansion": {"relation_type": "ORDINANCE_AMENDS_SECTION", "edge_id": "fixture_edge_20407_14_40_010", "source_document_id": "doc_ordinance_20407", "target_document_id": "doc_tmc_14_40_010", "relationship_source_url": "https://files.topeka.gov/community/ordinances/2023/Ordinance20407.pdf", "relationship_target_url": "https://topeka.municipal.codes/TMC/14.40.010"}}
+          }
+        ],
+        "has_more": false
+      },
+      "expert_session_response": {
+        "expert_id": "topeka-municipal-code",
+        "session_id": "fixture_session_topeka_20407",
+        "parent_session_id": null,
+        "answer": "TMC 14.40.010 is the codified fire-code adoption section. 【1†source】 Ordinance 20407 adopted the 2021 International Fire Code and amended that section. 【2†source】",
+        "citations": [
+          {"file_id": "file_tmc_14_40_010", "filename": "TMC-14.40.010.md", "chunk_id": "chk_tmc_14_40_010", "document_id": "doc_tmc_14_40_010", "title": "TMC 14.40.010", "url": "https://topeka.municipal.codes/TMC/14.40.010", "marker": "【1†source】"},
+          {"file_id": "file_ordinance_20407", "filename": "Ordinance20407.md", "chunk_id": "chk_ordinance_20407", "document_id": "doc_ordinance_20407", "title": "Topeka Ordinance 20407", "url": "https://files.topeka.gov/community/ordinances/2023/Ordinance20407.pdf", "marker": "【2†source】", "graph_relationships": [{"relation_type": "ORDINANCE_AMENDS_SECTION", "edge_id": "fixture_edge_20407_14_40_010", "source_document_id": "doc_ordinance_20407", "target_document_id": "doc_tmc_14_40_010", "relationship_source_url": "https://files.topeka.gov/community/ordinances/2023/Ordinance20407.pdf", "relationship_target_url": "https://topeka.municipal.codes/TMC/14.40.010"}]}
+        ],
+        "retrieval_trace": {"status": "completed", "runs": [{"retrieval_run_id": "fixture_run_topeka_20407", "query": "2021 International Fire Code ordinance amended 14.40.010", "vector_store_id": "vs_d4185d1004604f08a55299fa", "lens_id": "municipal_code_history", "requested_lens_id": "municipal_code_history", "lens_selection_source": "explicit", "graph_status": "applied", "result_ids": ["chk_tmc_14_40_010", "chk_ordinance_20407"], "selected_context_result_ids": ["chk_tmc_14_40_010", "chk_ordinance_20407"], "citation_count": 2}]},
+        "model_metadata": {"policy_id": "fixture-only", "requested_model_profile_id": "fixture", "model_profile_id": "fixture", "provider": "fixture", "model": "deterministic-fixture", "latency_ms": 0, "usage": {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}, "finish_reason": "fixture", "fallback": {"occurred": false, "from_model_profile_id": null, "reason": null, "attempts": []}},
+        "caveats": ["This deterministic fixture does not prove the current live Topeka corpus, graph, or effective-code status."],
+        "follow_up_suggestions": ["Review the ordinance PDF and current codified section together."]
+      }
+    }
+  ]
+}

@@ -117,6 +117,40 @@ models:
       input_per_1m_tokens_usd: 0.0
       source: local_dev
 
+chat_models:
+  private_qwen3_32b_expert:
+    provider: openai_compatible_private
+    kind: chat
+    model: Qwen/Qwen3-32B
+    privacy: private_gpu
+    max_security_level: 5
+
+  openai_gpt_4_1_mini_expert:
+    provider: openai
+    kind: chat
+    model: gpt-4.1-mini
+    privacy: external_api
+    max_security_level: 3
+
+  fixture_expert_chat_v1:
+    provider: fixture
+    kind: chat
+    model: deterministic-expert-fixture-v1
+    privacy: local_test_only
+    max_security_level: 5
+    local_only: true
+
+chat_policies:
+  default_expert_chat_v1:
+    preferred_model_profile_id: private_qwen3_32b_expert
+    fallback_model_profile_ids: [openai_gpt_4_1_mini_expert]
+    allow_fallback: true
+
+  fixture_expert_chat_v1:
+    preferred_model_profile_id: fixture_expert_chat_v1
+    fallback_model_profile_ids: []
+    allow_fallback: false
+
 rerankers:
   optional_voyage_or_qwen_reranker_v1:
     candidates: [voyage_rerank_lite, qwen3_reranker_local, infinity_reranker_local, disabled]

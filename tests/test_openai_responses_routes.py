@@ -1485,6 +1485,94 @@ def test_openai_vector_store_search_page_keeps_graphrag_disabled(monkeypatch):
     assert [item["file_id"] for item in page["data"]] == ["file_direct"]
 
 
+def test_kscourts_graph_expansion_reports_applied_not_applied_and_zero_limit(monkeypatch):
+    chunks = [
+        ChunkRecord(
+            id="chk_seed",
+            document_id="doc_seed",
+            ordinal=0,
+            text="Seed opinion",
+            score=0.9,
+        )
+    ]
+    lens = {"id": "court_citator", "warnings": [], "coverage": {"edge_count": 1}}
+
+    unchanged, _, _, no_intent = api_main._apply_kscourts_graphrag_expansion(
+        object(),
+        _principal(),
+        "vs_route",
+        chunks,
+        enabled=True,
+        query="ordinary semantic question",
+        force=False,
+        lens=lens,
+        max_expansions=1,
+    )
+    assert unchanged == chunks
+    assert no_intent["applied"] is False
+    assert no_intent["reason"] == "no_graph_intent"
+
+    unchanged, _, _, zero_limit = api_main._apply_kscourts_graphrag_expansion(
+        object(),
+        _principal(),
+        "vs_route",
+        chunks,
+        enabled=True,
+        query="related cases",
+        force=True,
+        lens=lens,
+        max_expansions=0,
+    )
+    assert unchanged == chunks
+    assert zero_limit["applied"] is False
+    assert zero_limit["reason"] == "graph_expansion_limit_zero"
+
+    relation = {
+        "edge_id": "edge_1",
+        "relation_type": "cited_by",
+        "seed_document_id": "doc_seed",
+        "related_document_id": "doc_related",
+        "attributes": {},
+        "provenance": {},
+    }
+    graph_metadata = {"relation_type": "cited_by", "related_document_id": "doc_related"}
+    monkeypatch.setattr(
+        api_main,
+        "_kscourts_graphrag_relation_rows",
+        lambda db, principal, vector_store_id, seed_document_ids, *, limit: [relation],
+    )
+    monkeypatch.setattr(api_main, "_kscourts_graphrag_metadata_by_document", lambda rows: {})
+    monkeypatch.setattr(
+        api_main,
+        "_hydrate_kscourts_graphrag_chunks",
+        lambda db, principal, vector_store_id, rows, existing_ids, *, limit: (
+            [ChunkRecord(
+                id="chk_graph",
+                document_id="doc_related",
+                ordinal=0,
+                text="Related opinion",
+                score=0.5,
+            )],
+            {"chk_graph": graph_metadata},
+        ),
+    )
+    expanded, _, _, applied = api_main._apply_kscourts_graphrag_expansion(
+        object(),
+        _principal(),
+        "vs_route",
+        chunks,
+        enabled=True,
+        query="related cases",
+        force=True,
+        lens=lens,
+        max_expansions=1,
+    )
+    assert [chunk.id for chunk in expanded] == ["chk_seed", "chk_graph"]
+    assert applied["applied"] is True
+    assert applied["inserted_chunk_count"] == 1
+    assert applied["relation_types"] == ["cited_by"]
+
+
 def test_vector_store_search_lenses_returns_court_graph_contract(monkeypatch):
     monkeypatch.setenv("SVS_QUERY_PLANNER_PROFILE_ID", "ks_civics_legal_v1")
     monkeypatch.setenv("SVS_KSCOURTS_GRAPHRAG_ENABLED", "true")

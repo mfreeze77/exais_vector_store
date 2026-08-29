@@ -73,3 +73,5 @@ def set_rls_context(db: Session, principal: Principal) -> None:
     db.execute(text("SELECT set_config('svs.tenant_id', :tenant_id, true)"), {"tenant_id": principal.tenant_id})
     db.execute(text("SELECT set_config('svs.business_instance_id', :biz_id, true)"), {"biz_id": principal.business_instance_id})
     db.execute(text("SELECT set_config('svs.max_security_level', :lvl, true)"), {"lvl": str(principal.max_security_level)})
+    db.execute(text("SELECT set_config('svs.api_key_id', :api_key_id, true)"), {"api_key_id": principal.api_key_id or ""})
+    db.execute(text("SELECT set_config('svs.user_id', :user_id, true)"), {"user_id": principal.user_id or ""})

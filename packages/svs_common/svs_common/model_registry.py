@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 from typing import Any
 import yaml
+from .schemas import ExpertModelPolicy
 
 CONFIG_DIR = Path(os.getenv("SVS_CONFIG_DIR") or ("configs" if Path("configs").exists() else "/app/configs"))
 ONE_MILLION_TOKENS = 1_000_000
@@ -25,6 +26,76 @@ def model_registry() -> dict[str, Any]:
 @lru_cache
 def retrieval_profiles() -> dict[str, Any]:
     return _load(CONFIG_DIR / "retrieval-profiles.yaml").get("profiles", {})
+
+
+class ModelRegistryConfigurationError(ValueError):
+    """Raised when a policy points at an absent or incompatible model profile."""
+
+
+def resolve_expert_chat_profiles(
+    model_policy: ExpertModelPolicy,
+    *,
+    registry: dict[str, Any] | None = None,
+) -> list[tuple[str, dict[str, Any]]]:
+    """Resolve ordered chat candidates without inspecting provider credentials."""
+
+    registry = registry or model_registry()
+    policies = registry.get("chat_policies") or {}
+    policy = policies.get(model_policy.policy_id)
+    if not isinstance(policy, dict):
+        raise ModelRegistryConfigurationError(f"Unknown expert chat policy: {model_policy.policy_id}")
+
+    preferred_id = (
+        (model_policy.preferred_model_profile_id or "").strip()
+        or str(policy.get("preferred_model_profile_id") or "").strip()
+    )
+    if not preferred_id:
+        raise ModelRegistryConfigurationError(
+            f"Expert chat policy {model_policy.policy_id!r} has no preferred model profile"
+        )
+
+    fallback_ids = [
+        str(profile_id).strip()
+        for profile_id in (
+            model_policy.fallback_model_profile_ids
+            or policy.get("fallback_model_profile_ids")
+            or []
+        )
+        if str(profile_id).strip()
+    ]
+    policy_allows_fallback = bool(policy.get("allow_fallback", True))
+    ordered_ids = [preferred_id]
+    if model_policy.allow_fallback and policy_allows_fallback:
+        ordered_ids.extend(fallback_ids)
+
+    profiles = registry.get("chat_models") or {}
+    resolved: list[tuple[str, dict[str, Any]]] = []
+    seen: set[str] = set()
+    for profile_id in ordered_ids:
+        if profile_id in seen:
+            continue
+        seen.add(profile_id)
+        profile = profiles.get(profile_id)
+        if not isinstance(profile, dict):
+            raise ModelRegistryConfigurationError(f"Unknown expert chat model profile: {profile_id}")
+        if profile.get("kind") != "chat":
+            raise ModelRegistryConfigurationError(f"Expert model profile {profile_id!r} is not a chat profile")
+        if not str(profile.get("provider") or "").strip() or not str(profile.get("model") or "").strip():
+            raise ModelRegistryConfigurationError(
+                f"Expert chat model profile {profile_id!r} must define provider and model"
+            )
+        try:
+            max_security_level = int(profile["max_security_level"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ModelRegistryConfigurationError(
+                f"Expert chat model profile {profile_id!r} must define max_security_level from 0 through 5"
+            ) from exc
+        if not 0 <= max_security_level <= 5:
+            raise ModelRegistryConfigurationError(
+                f"Expert chat model profile {profile_id!r} must define max_security_level from 0 through 5"
+            )
+        resolved.append((profile_id, dict(profile)))
+    return resolved
 
 def select_mode(filename: str | None, mime_type: str | None, requested_mode: str | None, metadata: dict | None = None) -> str:
     if requested_mode and requested_mode != "auto_detect_v1":

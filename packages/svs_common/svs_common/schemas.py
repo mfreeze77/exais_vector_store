@@ -1,7 +1,8 @@
 from __future__ import annotations
+from datetime import datetime
 from enum import IntEnum
-from typing import Any, Literal
-from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator, model_validator
+from typing import Any, Literal, get_args
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, RootModel, field_validator, model_validator
 from .openai_metadata import validate_openai_metadata
 from .secrets import parse_secret_reference
 
@@ -519,6 +520,8 @@ class OpenAIVectorStoreRankingOptions(BaseModel):
 class OpenAIVectorStoreSearchRequest(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
+    _graph_expansion_limit: int | None = PrivateAttr(default=None)
+
     query: str | list[str]
     lens: str | None = None
     inputs: dict[str, Any] | None = None
@@ -535,6 +538,17 @@ class OpenAIVectorStoreSearchRequest(BaseModel):
     mode: str | None = None
     include_content: bool = True
     include_metadata: bool = True
+
+    @property
+    def graph_expansion_limit(self) -> int | None:
+        return self._graph_expansion_limit
+
+    def bind_graph_expansion_limit(self, limit: int) -> OpenAIVectorStoreSearchRequest:
+        if isinstance(limit, bool) or not isinstance(limit, int) or limit < 0:
+            raise ValueError('graph expansion limit must be a non-negative integer')
+        bound = self.model_copy(deep=True)
+        bound._graph_expansion_limit = limit
+        return bound
 
     @field_validator('query', mode='before')
     @classmethod
@@ -750,6 +764,518 @@ class VectorStoreSearchLensesResponse(BaseModel):
     vector_store_id: str
     default_lens: str = 'semantic'
     data: list[VectorStoreSearchLens] = Field(default_factory=list)
+
+
+class ExpertGraphLens(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    label: str
+    description: str
+    graph_profile_id: str | None = None
+    relation_types: list[str] = Field(default_factory=list)
+    input_schema: dict[str, Any] = Field(default_factory=dict)
+    caveats: list[str] = Field(default_factory=list)
+
+
+class ExpertVectorStoreBinding(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    vector_store_id: str
+    name: str
+    corpus_kind: str | None = None
+    graph_lenses: list[ExpertGraphLens] = Field(default_factory=list)
+
+
+class ExpertGraphLensPolicy(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    allow_automatic_selection: bool = True
+    allowed_lens_ids: list[str] = Field(default_factory=list)
+
+
+class ExpertCitationPolicy(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    required: bool = True
+    authority: Literal['retrieved_corpus_only'] = 'retrieved_corpus_only'
+    preserve_source_urls: bool = True
+    preserve_graph_relationships: bool = True
+    memory_is_authority: Literal[False] = False
+
+
+class ExpertModelPolicy(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    policy_id: str
+    gateway: Literal['model_gateway'] = 'model_gateway'
+    preferred_model_profile_id: str | None = None
+    fallback_model_profile_ids: list[str] = Field(default_factory=list)
+    allow_fallback: bool = True
+
+
+class ExpertChatMessage(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    role: Literal['system', 'user', 'assistant']
+    content: str = Field(min_length=1)
+
+    @field_validator('content')
+    @classmethod
+    def _non_blank_content(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError('content must be a non-empty string')
+        return value
+
+
+class ExpertChatCompletionRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    messages: list[ExpertChatMessage] = Field(min_length=1)
+    model_policy: ExpertModelPolicy
+    security_level: int = Field(default=1, ge=0, le=5)
+    max_output_tokens: int = Field(default=1200, ge=1, le=32768)
+    temperature: float = Field(default=0.0, ge=0.0, le=2.0)
+
+
+class ExpertChatUsage(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    input_tokens: int = Field(default=0, ge=0)
+    output_tokens: int = Field(default=0, ge=0)
+    total_tokens: int = Field(default=0, ge=0)
+
+
+class ExpertChatAttempt(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    model_profile_id: str
+    provider: str
+    model: str
+    status: Literal['unavailable', 'failed', 'succeeded']
+    latency_ms: int = Field(default=0, ge=0)
+    error_code: str | None = None
+
+
+class ExpertChatFallback(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    occurred: bool = False
+    from_model_profile_id: str | None = None
+    reason: Literal['preferred_provider_unavailable', 'preferred_provider_failed'] | None = None
+    attempts: list[ExpertChatAttempt] = Field(default_factory=list)
+
+
+class ExpertChatCompletionResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    content: str = Field(min_length=1)
+    policy_id: str
+    requested_model_profile_id: str
+    model_profile_id: str
+    provider: str
+    model: str
+    latency_ms: int = Field(ge=0)
+    usage: ExpertChatUsage
+    finish_reason: str | None = None
+    fallback: ExpertChatFallback = Field(default_factory=ExpertChatFallback)
+
+
+class ExpertToolLimits(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    max_retrieval_runs: int = Field(ge=1, le=20)
+    max_results_per_run: int = Field(ge=1, le=50)
+    max_graph_expansions: int = Field(ge=0, le=20)
+    max_context_tokens: int = Field(ge=1)
+
+
+class ExpertProfile(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object: Literal['expert.profile'] = 'expert.profile'
+    label: str
+    description: str
+    system_prompt: str
+    vector_stores: list[ExpertVectorStoreBinding] = Field(min_length=1)
+    graph_lens_policy: ExpertGraphLensPolicy
+    citation_policy: ExpertCitationPolicy
+    caveats: list[str] = Field(default_factory=list)
+    model_policy: ExpertModelPolicy
+    tool_limits: ExpertToolLimits
+
+
+class ExpertProfileListResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    object: Literal['expert.profile.list'] = 'expert.profile.list'
+    data: list[ExpertProfile] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: Literal[False] = False
+
+
+class ExpertMessage(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    session_id: str
+    role: Literal['system', 'user', 'assistant', 'tool']
+    content: Any
+    sequence_no: int = Field(ge=0)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime | None = None
+
+
+class ExpertToolCall(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    session_id: str
+    message_id: str | None = None
+    tool_name: str
+    status: Literal['pending', 'running', 'completed', 'failed'] = 'completed'
+    input: dict[str, Any] = Field(default_factory=dict)
+    output: Any | None = None
+    error: str | None = None
+    sequence_no: int = Field(ge=0)
+    created_at: datetime | None = None
+    completed_at: datetime | None = None
+
+
+class ExpertRetrievalRun(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    session_id: str
+    message_id: str | None = None
+    tool_call_id: str | None = None
+    sequence_no: int = Field(ge=0)
+    payload: dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime | None = None
+
+
+class ExpertFeedbackRecord(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    session_id: str
+    message_id: str | None = None
+    feedback_type: str
+    rating: int | None = None
+    comment: str | None = None
+    payload: dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime | None = None
+
+
+ExpertMemoryType = Literal['retrieval_strategy', 'answer_style', 'preference']
+ExpertFeedbackType = Literal['helpful', 'unhelpful', 'correction', 'preference', 'rating', 'other']
+EXPERT_FEEDBACK_TYPES = frozenset(get_args(ExpertFeedbackType))
+
+
+class ExpertMemoryCandidateInput(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    memory_type: ExpertMemoryType
+    instruction: str = Field(min_length=1, max_length=2_000)
+    confidence: float = Field(ge=0.0, le=1.0)
+
+    @field_validator('instruction')
+    @classmethod
+    def _normalize_memory_instruction(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError('instruction must be a non-empty string')
+        return normalized
+
+
+class ExpertMemoryPolicy(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    enabled: bool = True
+    allowed_memory_types: list[ExpertMemoryType] = Field(
+        default_factory=lambda: ['retrieval_strategy', 'answer_style', 'preference'],
+        min_length=1,
+    )
+    minimum_promotion_confidence: float = Field(default=0.75, ge=0.0, le=1.0)
+    max_candidates_per_turn: int = Field(default=3, ge=1, le=10)
+    promotion_requires_explicit_opt_in: Literal[True] = True
+    memory_is_citation_authority: Literal[False] = False
+
+
+class ExpertTurnRecord(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    session_id: str = Field(min_length=1)
+    expert_id: str = Field(min_length=1)
+    source_message_id: str | None = None
+    source_feedback_id: str | None = None
+    memory_candidates: list[ExpertMemoryCandidateInput] = Field(default_factory=list, max_length=10)
+
+
+class ExpertMemoryEvent(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    session_id: str
+    source_message_id: str | None = None
+    source_feedback_id: str | None = None
+    event_type: ExpertMemoryType
+    status: Literal['candidate', 'promoted', 'rejected', 'deleted'] = 'candidate'
+    payload: dict[str, Any] = Field(default_factory=dict)
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
+    created_at: datetime | None = None
+    promoted_at: datetime | None = None
+    deleted_at: datetime | None = None
+
+
+class ExpertFeedbackRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    session_id: str = Field(min_length=1)
+    message_id: str | None = None
+    external_user_id: str | None = Field(default=None, max_length=255)
+    conversation_id: str | None = Field(default=None, max_length=255)
+    feedback_type: ExpertFeedbackType
+    rating: int | None = Field(default=None, ge=1, le=5)
+    comment: str | None = Field(default=None, max_length=8_000)
+    memory_candidates: list[ExpertMemoryCandidateInput] = Field(default_factory=list, max_length=3)
+
+    @field_validator('session_id', 'message_id', 'external_user_id', 'conversation_id', 'comment')
+    @classmethod
+    def _normalize_optional_feedback_string(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        normalized = value.strip()
+        return normalized or None
+
+    @model_validator(mode='after')
+    def _require_feedback_content(self):
+        if self.rating is None and self.comment is None and not self.memory_candidates:
+            raise ValueError('feedback requires a rating, comment, or memory candidate')
+        if self.feedback_type == 'rating' and self.rating is None:
+            raise ValueError('rating feedback requires rating')
+        return self
+
+
+class ExpertFeedbackResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    expert_id: str
+    session_id: str
+    feedback: ExpertFeedbackRecord
+    memory_candidates: list[ExpertMemoryEvent] = Field(default_factory=list)
+
+
+class ExpertMemoryScopeRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    external_user_id: str | None = Field(default=None, max_length=255)
+    conversation_id: str | None = Field(default=None, max_length=255)
+
+    @field_validator('external_user_id', 'conversation_id')
+    @classmethod
+    def _normalize_optional_memory_scope(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        normalized = value.strip()
+        return normalized or None
+
+
+class ExpertMemoryPromotionRequest(ExpertMemoryScopeRequest):
+    confirm: Literal[True]
+
+
+class ExpertMemoryListResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    object: Literal['expert.memory_event.list'] = 'expert.memory_event.list'
+    expert_id: str
+    session_id: str
+    data: list[ExpertMemoryEvent] = Field(default_factory=list)
+
+
+class ExpertMemoryDeletedResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object: Literal['expert.memory_event.deleted'] = 'expert.memory_event.deleted'
+    expert_id: str
+    session_id: str
+    deleted: Literal[True] = True
+
+
+class ExpertSessionFork(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    parent_session_id: str
+    child_session_id: str
+    label: str | None = None
+    created_at: datetime | None = None
+
+
+class ExpertSession(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object: Literal['expert.session'] = 'expert.session'
+    session_key: str
+    expert_id: str
+    api_key_id: str | None = None
+    user_id: str | None = None
+    external_user_id: str | None = None
+    conversation_id: str | None = None
+    label: str | None = None
+    parent_session_id: str | None = None
+    status: Literal['active', 'archived', 'deleted'] = 'active'
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    messages: list[ExpertMessage] = Field(default_factory=list)
+    tool_calls: list[ExpertToolCall] = Field(default_factory=list)
+    retrieval_runs: list[ExpertRetrievalRun] = Field(default_factory=list)
+    memory_events: list[ExpertMemoryEvent] = Field(default_factory=list)
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    last_active_at: datetime | None = None
+
+
+class ExpertMessageRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    _expert_id: str | None = PrivateAttr(default=None)
+
+    message: str = Field(min_length=1, max_length=32_000)
+    session_id: str | None = None
+    external_user_id: str | None = Field(default=None, max_length=255)
+    conversation_id: str | None = Field(default=None, max_length=255)
+    session_label: str | None = Field(default=None, max_length=255)
+    lens: str | None = Field(default=None, max_length=128)
+    lens_inputs: dict[str, Any] | None = None
+
+    @field_validator('session_id', 'external_user_id', 'conversation_id', 'session_label', 'lens')
+    @classmethod
+    def _normalize_optional_expert_message_string(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        normalized = value.strip()
+        return normalized or None
+
+    @field_validator('message')
+    @classmethod
+    def _non_blank_expert_message(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError('message must be a non-empty string')
+        return normalized
+
+    @property
+    def expert_id(self) -> str | None:
+        return self._expert_id
+
+    def bind_expert_id(self, expert_id: str) -> ExpertMessageRequest:
+        normalized = str(expert_id or '').strip()
+        if not normalized:
+            raise ValueError('expert_id is required')
+        bound = self.model_copy(deep=True)
+        bound._expert_id = normalized
+        return bound
+
+
+class ExpertCitation(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    file_id: str | None = None
+    filename: str | None = None
+    chunk_id: str | None = None
+    document_id: str | None = None
+    title: str | None = None
+    url: str | None = None
+    page_start: int | None = None
+    page_end: int | None = None
+    heading_path: list[str] = Field(default_factory=list)
+    score: float | None = None
+    marker: str | None = None
+    annotation: dict[str, Any] | None = None
+    message_annotation: OpenAIMessageFileCitationAnnotation | None = None
+    graph_relationships: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class ExpertRetrievalTraceRun(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    retrieval_run_id: str | None = None
+    query: str
+    vector_store_id: str
+    lens_id: str
+    requested_lens_id: str | None = None
+    lens_selection_source: Literal['explicit', 'inferred', 'default'] = 'default'
+    graph_status: str | None = None
+    result_ids: list[str] = Field(default_factory=list)
+    selected_context_result_ids: list[str] = Field(default_factory=list)
+    citation_count: int = Field(default=0, ge=0)
+
+
+class ExpertRetrievalTrace(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    status: Literal['not_run', 'completed', 'partial', 'failed']
+    runs: list[ExpertRetrievalTraceRun] = Field(default_factory=list)
+
+
+class ExpertModelMetadata(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    policy_id: str
+    requested_model_profile_id: str
+    model_profile_id: str
+    provider: str
+    model: str
+    latency_ms: int = Field(ge=0)
+    usage: ExpertChatUsage
+    finish_reason: str | None = None
+    fallback: ExpertChatFallback
+
+
+class ExpertMessageResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    expert_id: str
+    session_id: str
+    parent_session_id: str | None = None
+    answer: str = Field(min_length=1)
+    citations: list[ExpertCitation] = Field(default_factory=list)
+    retrieval_trace: ExpertRetrievalTrace
+    model_metadata: ExpertModelMetadata
+    caveats: list[str] = Field(default_factory=list)
+    follow_up_suggestions: list[str] = Field(default_factory=list)
+
+
+class ExpertSessionForkRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    label: str | None = Field(default=None, max_length=255)
+    external_user_id: str | None = Field(default=None, max_length=255)
+    conversation_id: str | None = Field(default=None, max_length=255)
+
+    @field_validator('label', 'external_user_id', 'conversation_id')
+    @classmethod
+    def _normalize_optional_fork_string(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        normalized = value.strip()
+        return normalized or None
+
+
+class ExpertSessionForkResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    expert_id: str
+    session_id: str
+    parent_session_id: str
+    external_user_id: str | None = None
+    conversation_id: str | None = None
+    label: str | None = None
 
 
 class VectorStoreGraphNode(BaseModel):

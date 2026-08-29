@@ -24,6 +24,10 @@ from svs_common.schemas import (
     OpenAIVectorStoreFileBatchCreateRequest, OpenAIVectorStoreFileUpdateRequest, PrometheusMetricsResponse,
     ReadinessResponse, RetrievalProfilesResponse, TenantResponse, UsageEventListResponse,
     VectorizationModesResponse,
+    ExpertMessageRequest, ExpertMessageResponse, ExpertProfile, ExpertProfileListResponse,
+    ExpertSessionForkRequest, ExpertSessionForkResponse,
+    ExpertFeedbackRequest, ExpertFeedbackResponse, ExpertMemoryDeletedResponse, ExpertMemoryEvent,
+    ExpertMemoryListResponse, ExpertMemoryPromotionRequest, ExpertTurnRecord,
     ChunkRecord, Principal, VectorStoreCreateRequest, SearchRequest, SearchResponse, ContextPackRequest, ContextPackResponse,
     RetrievalAnswerRequest, RetrievalAnswerResponse, DocumentIngestRequest,
     VectorStoreDeletedResponse, VectorStoreListResponse, VectorStoreResponse,
@@ -68,6 +72,32 @@ from svs_common.openai_compat import (
     vector_store_search_page_window,
 )
 from svs_common.openai_metadata import validate_openai_file_attributes
+from svs_common.expert_profiles import (
+    ExpertProfileNotFoundError,
+    list_expert_profiles,
+    resolve_expert_profile,
+)
+from svs_common.expert_engine import (
+    ExpertCitationIntegrityError,
+    ExpertRetrievalPlanningError,
+    configure_expert_search_executor,
+    run_expert_turn,
+)
+from svs_common.expert_llm import ExpertChatGatewayError
+from svs_common.expert_sessions import (
+    DEFAULT_EXPERT_MEMORY_POLICY,
+    ExpertSessionNotFound,
+    delete_expert_memory_event,
+    extract_candidate_memory_events,
+    fork_expert_session,
+    get_expert_feedback_record,
+    get_expert_session,
+    list_expert_memory_events,
+    promote_expert_memory_event,
+    record_expert_feedback,
+    record_expert_memory_event,
+)
+from svs_common.security import ExpertInteractionSensitiveDataError
 from svs_common.query_planner import KANSAS_CIVICS_LEGAL_PROFILE_ID, merge_query_filters, plan_query
 from svs_common.search_lenses import (
     DEFAULT_SEARCH_LENS_ID,
@@ -1335,6 +1365,385 @@ def list_models():
 @app.get('/api/v1/retrieval/profiles', response_model=RetrievalProfilesResponse)
 def list_profiles():
     return {'profiles': retrieval_profiles()}
+
+
+@app.get('/v1/experts', response_model=ExpertProfileListResponse)
+def list_experts(
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
+    ensure_scope(principal, 'retrieval:read')
+    enforce_rate_limit(db, principal, 'experts.list')
+    return list_expert_profiles(db, principal)
+
+
+@app.get('/v1/experts/{expert_id}', response_model=ExpertProfile)
+def get_expert_profile(
+    expert_id: str,
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
+    ensure_scope(principal, 'retrieval:read')
+    enforce_rate_limit(db, principal, 'experts.retrieve')
+    try:
+        return resolve_expert_profile(db, principal, expert_id)
+    except ExpertProfileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail='Expert profile not found') from exc
+
+
+def _expert_idempotency_fingerprint(
+    route: str,
+    principal: Principal,
+    expert_id: str,
+    payload: dict[str, Any],
+) -> str:
+    return stable_hash({
+        'route': route,
+        'expert_id': expert_id,
+        'api_key_id': principal.api_key_id,
+        'user_id': principal.user_id,
+        'request': payload,
+    })
+
+
+def _require_scoped_expert_session(
+    db: Session,
+    principal: Principal,
+    *,
+    expert_id: str,
+    session_id: str,
+    external_user_id: str | None,
+    conversation_id: str | None,
+):
+    session = get_expert_session(db, principal, session_id)
+    if (
+        session is None
+        or session.expert_id != expert_id
+        or (session.external_user_id or None) != (external_user_id or None)
+        or (session.conversation_id or None) != (conversation_id or None)
+    ):
+        raise ExpertSessionNotFound('expert session not found')
+    return session
+
+
+@app.post('/v1/experts/{expert_id}/messages', response_model=ExpertMessageResponse)
+async def post_expert_message(
+    expert_id: str,
+    req: ExpertMessageRequest,
+    idempotency_key: str | None = Header(default=None, alias='Idempotency-Key'),
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
+    ensure_scope(principal, 'retrieval:read')
+    enforce_rate_limit(db, principal, 'experts.messages.create')
+    bound_req = req.bind_expert_id(expert_id)
+    fingerprint = _expert_idempotency_fingerprint(
+        'experts.messages.create',
+        principal,
+        expert_id,
+        req.model_dump(mode='json'),
+    )
+    cached = check_idempotency(db, principal, idempotency_key, fingerprint)
+    if cached is not None:
+        return ExpertMessageResponse.model_validate(cached)
+    try:
+        response = await run_expert_turn(db, principal, bound_req)
+    except ExpertProfileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail='Expert profile not found') from exc
+    except ExpertSessionNotFound as exc:
+        raise HTTPException(status_code=404, detail='Expert session not found') from exc
+    except ExpertRetrievalPlanningError as exc:
+        db.commit()
+        raise HTTPException(status_code=422, detail='Expert retrieval plan is unavailable') from exc
+    except ExpertCitationIntegrityError as exc:
+        db.commit()
+        raise HTTPException(status_code=502, detail='Expert answer failed citation integrity validation') from exc
+    except ExpertChatGatewayError as exc:
+        db.commit()
+        raise HTTPException(status_code=503, detail='Expert model service unavailable') from exc
+    payload = response.model_dump(mode='json')
+    store_idempotency(db, principal, idempotency_key, fingerprint, payload)
+    db.commit()
+    return response
+
+
+@app.post(
+    '/v1/experts/{expert_id}/sessions/{session_id}/fork',
+    response_model=ExpertSessionForkResponse,
+)
+def fork_expert_session_route(
+    expert_id: str,
+    session_id: str,
+    req: ExpertSessionForkRequest,
+    idempotency_key: str | None = Header(default=None, alias='Idempotency-Key'),
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
+    ensure_scope(principal, 'retrieval:read')
+    enforce_rate_limit(db, principal, 'experts.sessions.fork')
+    fingerprint = _expert_idempotency_fingerprint(
+        'experts.sessions.fork',
+        principal,
+        expert_id,
+        {'session_id': session_id, **req.model_dump(mode='json')},
+    )
+    cached = check_idempotency(db, principal, idempotency_key, fingerprint)
+    if cached is not None:
+        return ExpertSessionForkResponse.model_validate(cached)
+    try:
+        resolve_expert_profile(db, principal, expert_id)
+        parent = get_expert_session(db, principal, session_id)
+        if (
+            parent is None
+            or parent.expert_id != expert_id
+            or (parent.external_user_id or None) != req.external_user_id
+            or (parent.conversation_id or None) != req.conversation_id
+        ):
+            raise ExpertSessionNotFound('expert session not found')
+        child = fork_expert_session(db, principal, session_id, label=req.label)
+    except ExpertProfileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail='Expert profile not found') from exc
+    except ExpertSessionNotFound as exc:
+        raise HTTPException(status_code=404, detail='Expert session not found') from exc
+    response = ExpertSessionForkResponse(
+        expert_id=child.expert_id,
+        session_id=child.id,
+        parent_session_id=session_id,
+        external_user_id=child.external_user_id,
+        conversation_id=child.conversation_id,
+        label=child.label,
+    )
+    payload = response.model_dump(mode='json')
+    store_idempotency(db, principal, idempotency_key, fingerprint, payload)
+    db.commit()
+    return response
+
+
+@app.post('/v1/experts/{expert_id}/feedback', response_model=ExpertFeedbackResponse)
+def post_expert_feedback(
+    expert_id: str,
+    req: ExpertFeedbackRequest,
+    idempotency_key: str | None = Header(default=None, alias='Idempotency-Key'),
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
+    ensure_scope(principal, 'retrieval:read')
+    enforce_rate_limit(db, principal, 'experts.feedback.create')
+    fingerprint = _expert_idempotency_fingerprint(
+        'experts.feedback.create',
+        principal,
+        expert_id,
+        req.model_dump(mode='json'),
+    )
+    cached = check_idempotency(db, principal, idempotency_key, fingerprint)
+    if cached is not None:
+        return ExpertFeedbackResponse.model_validate(cached)
+    try:
+        resolve_expert_profile(db, principal, expert_id)
+        _require_scoped_expert_session(
+            db,
+            principal,
+            expert_id=expert_id,
+            session_id=req.session_id,
+            external_user_id=req.external_user_id,
+            conversation_id=req.conversation_id,
+        )
+        candidates = extract_candidate_memory_events(
+            ExpertTurnRecord(
+                session_id=req.session_id,
+                expert_id=expert_id,
+                source_message_id=req.message_id,
+                memory_candidates=req.memory_candidates,
+            ),
+            DEFAULT_EXPERT_MEMORY_POLICY,
+        )
+        feedback_id = record_expert_feedback(
+            db,
+            principal,
+            req.session_id,
+            message_id=req.message_id,
+            feedback_type=req.feedback_type,
+            rating=req.rating,
+            comment=req.comment,
+            payload={'memory_candidate_count': len(req.memory_candidates)},
+        )
+        candidates = [
+            candidate.model_copy(update={'source_feedback_id': feedback_id})
+            for candidate in candidates
+        ]
+        for candidate in candidates:
+            record_expert_memory_event(
+                db,
+                principal,
+                req.session_id,
+                event_id=candidate.id,
+                event_type=candidate.event_type,
+                payload=candidate.payload,
+                confidence=candidate.confidence,
+                source_message_id=candidate.source_message_id,
+                source_feedback_id=candidate.source_feedback_id,
+            )
+        feedback = get_expert_feedback_record(db, principal, req.session_id, feedback_id)
+        if feedback is None:
+            raise ExpertSessionNotFound('expert feedback not found')
+    except ExpertProfileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail='Expert profile not found') from exc
+    except ExpertSessionNotFound as exc:
+        raise HTTPException(status_code=404, detail='Expert session or message not found') from exc
+    except (ExpertInteractionSensitiveDataError, ValueError) as exc:
+        raise HTTPException(status_code=422, detail='Expert feedback failed governance validation') from exc
+    response = ExpertFeedbackResponse(
+        expert_id=expert_id,
+        session_id=req.session_id,
+        feedback=feedback,
+        memory_candidates=candidates,
+    )
+    payload = response.model_dump(mode='json')
+    store_idempotency(db, principal, idempotency_key, fingerprint, payload)
+    db.commit()
+    return response
+
+
+@app.get(
+    '/v1/experts/{expert_id}/sessions/{session_id}/memory',
+    response_model=ExpertMemoryListResponse,
+)
+def get_expert_memory(
+    expert_id: str,
+    session_id: str,
+    external_user_id: str | None = Query(default=None, max_length=255),
+    conversation_id: str | None = Query(default=None, max_length=255),
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
+    ensure_scope(principal, 'retrieval:read')
+    enforce_rate_limit(db, principal, 'experts.memory.list')
+    try:
+        resolve_expert_profile(db, principal, expert_id)
+        _require_scoped_expert_session(
+            db,
+            principal,
+            expert_id=expert_id,
+            session_id=session_id,
+            external_user_id=external_user_id,
+            conversation_id=conversation_id,
+        )
+        events = list_expert_memory_events(db, principal, session_id)
+    except ExpertProfileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail='Expert profile not found') from exc
+    except ExpertSessionNotFound as exc:
+        raise HTTPException(status_code=404, detail='Expert session not found') from exc
+    return ExpertMemoryListResponse(expert_id=expert_id, session_id=session_id, data=events)
+
+
+@app.post(
+    '/v1/experts/{expert_id}/sessions/{session_id}/memory/{memory_event_id}/promote',
+    response_model=ExpertMemoryEvent,
+)
+def promote_expert_memory(
+    expert_id: str,
+    session_id: str,
+    memory_event_id: str,
+    req: ExpertMemoryPromotionRequest,
+    idempotency_key: str | None = Header(default=None, alias='Idempotency-Key'),
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
+    ensure_scope(principal, 'retrieval:read')
+    enforce_rate_limit(db, principal, 'experts.memory.promote')
+    fingerprint = _expert_idempotency_fingerprint(
+        'experts.memory.promote',
+        principal,
+        expert_id,
+        {'session_id': session_id, 'memory_event_id': memory_event_id, **req.model_dump(mode='json')},
+    )
+    cached = check_idempotency(db, principal, idempotency_key, fingerprint)
+    if cached is not None:
+        return ExpertMemoryEvent.model_validate(cached)
+    try:
+        resolve_expert_profile(db, principal, expert_id)
+        _require_scoped_expert_session(
+            db,
+            principal,
+            expert_id=expert_id,
+            session_id=session_id,
+            external_user_id=req.external_user_id,
+            conversation_id=req.conversation_id,
+        )
+        event = promote_expert_memory_event(
+            db,
+            principal,
+            session_id,
+            memory_event_id,
+            policy=DEFAULT_EXPERT_MEMORY_POLICY,
+            explicit_opt_in=req.confirm,
+        )
+    except ExpertProfileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail='Expert profile not found') from exc
+    except ExpertSessionNotFound as exc:
+        raise HTTPException(status_code=404, detail='Expert session or memory event not found') from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail='Expert memory failed promotion policy') from exc
+    payload = event.model_dump(mode='json')
+    store_idempotency(db, principal, idempotency_key, fingerprint, payload)
+    db.commit()
+    return event
+
+
+@app.delete(
+    '/v1/experts/{expert_id}/sessions/{session_id}/memory/{memory_event_id}',
+    response_model=ExpertMemoryDeletedResponse,
+)
+def delete_expert_memory(
+    expert_id: str,
+    session_id: str,
+    memory_event_id: str,
+    external_user_id: str | None = Query(default=None, max_length=255),
+    conversation_id: str | None = Query(default=None, max_length=255),
+    idempotency_key: str | None = Header(default=None, alias='Idempotency-Key'),
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
+    ensure_scope(principal, 'retrieval:read')
+    enforce_rate_limit(db, principal, 'experts.memory.delete')
+    fingerprint = _expert_idempotency_fingerprint(
+        'experts.memory.delete',
+        principal,
+        expert_id,
+        {
+            'session_id': session_id,
+            'memory_event_id': memory_event_id,
+            'external_user_id': external_user_id,
+            'conversation_id': conversation_id,
+        },
+    )
+    cached = check_idempotency(db, principal, idempotency_key, fingerprint)
+    if cached is not None:
+        return ExpertMemoryDeletedResponse.model_validate(cached)
+    try:
+        resolve_expert_profile(db, principal, expert_id)
+        _require_scoped_expert_session(
+            db,
+            principal,
+            expert_id=expert_id,
+            session_id=session_id,
+            external_user_id=external_user_id,
+            conversation_id=conversation_id,
+        )
+        delete_expert_memory_event(db, principal, session_id, memory_event_id)
+    except ExpertProfileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail='Expert profile not found') from exc
+    except ExpertSessionNotFound as exc:
+        raise HTTPException(status_code=404, detail='Expert session or memory event not found') from exc
+    response = ExpertMemoryDeletedResponse(
+        id=memory_event_id,
+        expert_id=expert_id,
+        session_id=session_id,
+    )
+    payload = response.model_dump(mode='json')
+    store_idempotency(db, principal, idempotency_key, fingerprint, payload)
+    db.commit()
+    return response
 
 
 @app.post('/api/v1/ingestion/preview', response_model=IngestionPlanResponse)
@@ -3360,6 +3769,7 @@ def _apply_topeka_municipal_graphrag_expansion(
     inputs: dict[str, Any] | None = None,
     relation_types: tuple[str, ...] = (),
     graph_coverage: dict[str, Any] | None = None,
+    max_expansions: int | None = None,
 ) -> tuple[list[ChunkRecord], dict[str, dict[str, Any]], dict[str, dict[str, Any]], dict[str, Any] | None]:
     if not enabled:
         return chunks, {}, {}, None
@@ -3374,6 +3784,8 @@ def _apply_topeka_municipal_graphrag_expansion(
     if not force and not _query_has_topeka_graphrag_intent(query):
         return chunks, {}, {}, {**summary_base, "applied": False, "reason": "no_graph_intent"}
     limit = _topeka_graph_expansion_limit()
+    if max_expansions is not None:
+        limit = min(limit, max_expansions)
     if limit <= 0:
         return chunks, {}, {}, {**summary_base, "applied": False, "reason": "graph_expansion_limit_zero"}
     seed_rows = _topeka_graph_seed_rows(db, principal, vector_store_id, chunks, inputs, limit=24)
@@ -3470,6 +3882,7 @@ def _apply_kscourts_graphrag_expansion(
     lens: dict[str, Any] | None = None,
     relation_types: tuple[str, ...] = (),
     graph_coverage: dict[str, Any] | None = None,
+    max_expansions: int | None = None,
 ) -> tuple[list[ChunkRecord], dict[str, dict[str, Any]], dict[str, dict[str, Any]], dict[str, Any] | None]:
     if not enabled:
         return chunks, {}, {}, None
@@ -3489,7 +3902,11 @@ def _apply_kscourts_graphrag_expansion(
         if len(seed_document_ids) >= 10:
             break
     limit = _graph_expansion_limit()
-    if not seed_document_ids or limit <= 0:
+    if max_expansions is not None:
+        limit = min(limit, max_expansions)
+    if limit <= 0:
+        return chunks, {}, {}, {**summary_base, "applied": False, "reason": "graph_expansion_limit_zero"}
+    if not seed_document_ids:
         return chunks, {}, {}, {**summary_base, "applied": False, "reason": "no_seed_documents"}
     relation_rows = _kscourts_graphrag_relation_rows(db, principal, vector_store_id, seed_document_ids, limit=limit * 4)
     if relation_types:
@@ -3646,6 +4063,7 @@ async def _openai_vector_store_search_page(
             inputs=req.inputs,
             relation_types=graph_relation_types,
             graph_coverage=graph_lens.get("coverage"),
+            max_expansions=req.graph_expansion_limit,
         )
     elif corpus_kind == KSCOURTS_CORPUS_KIND:
         chunks, graph_metadata_by_document_id, graph_metadata_by_chunk_id, graph_summary = _apply_kscourts_graphrag_expansion(
@@ -3659,6 +4077,7 @@ async def _openai_vector_store_search_page(
             lens=graph_lens,
             relation_types=graph_relation_types,
             graph_coverage=graph_lens.get("coverage") if graph_lens else graph_coverage,
+            max_expansions=req.graph_expansion_limit,
         )
     chunks, next_page = vector_store_search_page_window(req, chunks)
     file_lookup = _vector_store_file_lookup(db, principal, vector_store_id, [ch.document_id for ch in chunks])
@@ -3679,6 +4098,9 @@ async def _openai_vector_store_search_page(
             graph_summary,
         )
     return page
+
+
+configure_expert_search_executor(_openai_vector_store_search_page)
 
 
 @app.post(

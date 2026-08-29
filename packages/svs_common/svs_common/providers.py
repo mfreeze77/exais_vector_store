@@ -1,18 +1,39 @@
 from __future__ import annotations
-import hashlib, math
+import hashlib, json, math
 from dataclasses import dataclass
 from typing import Any
 from typing import Protocol
 import httpx
 from .config import get_settings
 from .provider_probe import health_allows_routing, normalize_health_status
-from .schemas import EmbeddingData, EmbeddingResponse, RerankResponse, RerankResult
+from .schemas import EmbeddingData, EmbeddingResponse, ExpertChatMessage, RerankResponse, RerankResult
 
 class EmbeddingProvider(Protocol):
     async def embed(self, texts: list[str], model: str, dimensions: int, input_type: str | None = None) -> EmbeddingResponse: ...
 
 class RerankProvider(Protocol):
     async def rerank(self, query: str, documents: list[str], model: str, top_n: int | None = None) -> RerankResponse: ...
+
+
+@dataclass(frozen=True)
+class ChatProviderResult:
+    content: str
+    model: str
+    usage: dict[str, int]
+    finish_reason: str | None = None
+
+
+class ChatProvider(Protocol):
+    provider: str
+
+    async def complete(
+        self,
+        messages: list[ExpertChatMessage],
+        model: str,
+        *,
+        max_output_tokens: int,
+        temperature: float,
+    ) -> ChatProviderResult: ...
 
 class ProviderConfigurationError(RuntimeError):
     """Raised when a selected provider is not configured for runtime use."""
@@ -384,3 +405,183 @@ def provider_for_rerank(provider_name: str, settings: Any | None = None) -> Rera
     if provider in {"self_hosted", "openai_compatible_private"}:
         return GenericEndpointRerankProvider(provider, _setting(s, "self_hosted_model_endpoint_url") or '', _setting(s, "self_hosted_model_api_key"))
     raise ProviderConfigurationError(f"unknown rerank provider: {provider_name}")
+
+
+def chat_provider_config_status(provider_name: str, settings: Any | None = None) -> ProviderConfigStatus:
+    """Report chat configuration without changing embedding/rerank status rules."""
+
+    provider = (provider_name or "").strip().lower()
+    s = settings or get_settings()
+    if provider == "fixture":
+        if bool(getattr(s, "is_local_env", False)):
+            return ProviderConfigStatus(provider=provider, configured=True)
+        return ProviderConfigStatus(
+            provider=provider,
+            configured=False,
+            reason="fixture chat provider is restricted to local/dev/test/ci",
+        )
+    if provider == "openai":
+        return _status(
+            provider,
+            ("OPENAI_API_KEY",),
+            bool(_setting(s, "openai_api_key")),
+            reason="openai chat provider requires OPENAI_API_KEY",
+        )
+    if provider in {"self_hosted", "openai_compatible_private"}:
+        return _status(
+            provider,
+            ("SELF_HOSTED_MODEL_ENDPOINT_URL",),
+            bool(_setting(s, "self_hosted_model_endpoint_url")),
+            reason=f"{provider} chat provider requires SELF_HOSTED_MODEL_ENDPOINT_URL",
+            auth_secret_ref=(
+                "envref://SELF_HOSTED_MODEL_API_KEY"
+                if _setting(s, "self_hosted_model_api_key")
+                else None
+            ),
+        )
+    return ProviderConfigStatus(
+        provider=provider or "unknown",
+        configured=False,
+        reason=f"unknown chat provider: {provider_name}",
+    )
+
+
+def _chat_usage(body: Any) -> dict[str, int]:
+    usage = body if isinstance(body, dict) else {}
+    input_tokens = int(usage.get("input_tokens", usage.get("prompt_tokens", 0)) or 0)
+    output_tokens = int(usage.get("output_tokens", usage.get("completion_tokens", 0)) or 0)
+    total_tokens = int(usage.get("total_tokens", input_tokens + output_tokens) or 0)
+    return {
+        "input_tokens": max(0, input_tokens),
+        "output_tokens": max(0, output_tokens),
+        "total_tokens": max(0, total_tokens),
+    }
+
+
+class FixtureChatProvider:
+    provider = "fixture"
+
+    async def complete(
+        self,
+        messages: list[ExpertChatMessage],
+        model: str,
+        *,
+        max_output_tokens: int,
+        temperature: float,
+    ) -> ChatProviderResult:
+        canonical = json.dumps(
+            [message.model_dump(mode="json") for message in messages],
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+        last_user = next((message.content for message in reversed(messages) if message.role == "user"), "")
+        content = f"[fixture:{digest}] {last_user}".strip()
+        input_tokens = sum(len(message.content.split()) for message in messages)
+        output_tokens = len(content.split())
+        return ChatProviderResult(
+            content=content,
+            model=model,
+            usage={
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "total_tokens": input_tokens + output_tokens,
+            },
+            finish_reason="stop",
+        )
+
+
+class OpenAICompatibleChatProvider:
+    def __init__(
+        self,
+        provider: str,
+        endpoint_url: str,
+        api_key: str | None = None,
+        *,
+        timeout_seconds: float = 120.0,
+    ):
+        if not endpoint_url:
+            raise ProviderConfigurationError(f"{provider} chat provider requires an endpoint URL")
+        self.provider = provider.strip().lower()
+        self.endpoint_url = endpoint_url.rstrip("/")
+        self.api_key = api_key
+        self.timeout_seconds = timeout_seconds
+
+    async def complete(
+        self,
+        messages: list[ExpertChatMessage],
+        model: str,
+        *,
+        max_output_tokens: int,
+        temperature: float,
+    ) -> ChatProviderResult:
+        payload = {
+            "model": model,
+            "messages": [message.model_dump(mode="json") for message in messages],
+            "max_tokens": max_output_tokens,
+            "temperature": temperature,
+        }
+        async with httpx.AsyncClient(timeout=self.timeout_seconds) as client:
+            response = await client.post(
+                _endpoint_url(self.endpoint_url, "chat/completions"),
+                headers=_headers(self.api_key),
+                json=payload,
+            )
+            response.raise_for_status()
+        try:
+            body = response.json()
+        except (TypeError, ValueError) as exc:
+            raise ProviderConfigurationError(
+                f"{self.provider} chat provider returned an unsupported response"
+            ) from exc
+        try:
+            if not isinstance(body, dict):
+                raise TypeError("chat response must be an object")
+            choice = body["choices"][0]
+            content = choice["message"]["content"]
+        except (KeyError, IndexError, TypeError, AttributeError) as exc:
+            raise ProviderConfigurationError(
+                f"{self.provider} chat provider returned an unsupported response"
+            ) from exc
+        if not isinstance(content, str) or not content.strip():
+            raise ProviderConfigurationError(f"{self.provider} chat provider returned empty content")
+        try:
+            usage = _chat_usage(body.get("usage"))
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ProviderConfigurationError(
+                f"{self.provider} chat provider returned unsupported usage metadata"
+            ) from exc
+        return ChatProviderResult(
+            content=content,
+            model=str(body.get("model") or model),
+            usage=usage,
+            finish_reason=(str(choice.get("finish_reason")) if choice.get("finish_reason") is not None else None),
+        )
+
+
+def chat_provider_for(provider_name: str, settings: Any | None = None) -> ChatProvider:
+    s = settings or get_settings()
+    provider = (provider_name or "").strip().lower()
+    status = chat_provider_config_status(provider, s)
+    if provider == "fixture":
+        if not status.configured:
+            raise ProviderConfigurationError(status.reason or "fixture chat provider is not configured")
+        return FixtureChatProvider()
+    if not status.configured:
+        raise ProviderConfigurationError(status.reason or f"{provider} chat provider is not configured")
+    timeout_seconds = float(getattr(s, "expert_chat_timeout_sec", 120.0) or 120.0)
+    if provider == "openai":
+        return OpenAICompatibleChatProvider(
+            provider,
+            "https://api.openai.com/v1",
+            _setting(s, "openai_api_key"),
+            timeout_seconds=timeout_seconds,
+        )
+    if provider in {"self_hosted", "openai_compatible_private"}:
+        return OpenAICompatibleChatProvider(
+            provider,
+            _setting(s, "self_hosted_model_endpoint_url") or "",
+            _setting(s, "self_hosted_model_api_key"),
+            timeout_seconds=timeout_seconds,
+        )
+    raise ProviderConfigurationError(f"unknown chat provider: {provider_name}")

@@ -13,6 +13,175 @@ the MCP server should be a thin adapter around the HTTP endpoints below; it
 should not implement retrieval, graph logic, citation formatting, or ACL logic
 itself.
 
+Named expert discovery is available through:
+
+```http
+GET /v1/experts
+GET /v1/experts/{expert_id}
+```
+
+Both routes require `retrieval:read`. They return only profiles whose complete
+vector-store binding is active and visible to the bearer principal. Profile
+graph capabilities come from the same search-lens registry used by direct
+vector-store search. The natural-language expert message endpoint is the
+recommended primitive when a named profile fits the task:
+
+```http
+POST /v1/experts/{expert_id}/messages
+POST /v1/experts/{expert_id}/feedback
+```
+
+The message route owns bounded retrieval, graph-lens selection, corpus-only
+citations, sessions, and model routing. Feedback must repeat the exact session,
+external caller user, and conversation scope. A caller may propose typed
+retrieval-strategy, answer-style, or preference memory, but proposal does not
+promote it. Promotion is a separate explicit action, and deletion remains
+available through the scoped session memory routes documented in `docs/API.md`.
+Promoted memory is never evidence or a legal source. Raw search tools below
+remain available for advanced callers that need direct retrieval control.
+
+## Recommended MCP-facing expert tools
+
+The recommended MCP product surface is the following three-tool HTTP adapter.
+These are stable caller-facing tool names, not a requirement to move ExAIS
+server behavior into an MCP process:
+
+| MCP tool | ExAIS HTTP request | Returned contract |
+| --- | --- | --- |
+| `list_exais_experts` | `GET /v1/experts` | `ExpertProfileListResponse` |
+| `ask_exais_expert` | `POST /v1/experts/{expert_id}/messages` | `ExpertMessageResponse` |
+| `submit_expert_feedback` | `POST /v1/experts/{expert_id}/feedback` | `ExpertFeedbackResponse` |
+
+All three require an ExAIS production bearer principal with `retrieval:read`.
+The MCP host injects `EXAIS_API_BASE` and the bearer key from managed runtime
+configuration. The base URL, bearer key, provider credentials, and backend
+service URLs are never tool arguments, model-visible fields, or adapter log
+values.
+
+### `list_exais_experts`
+
+Input schema:
+
+```json
+{
+  "type": "object",
+  "properties": {},
+  "additionalProperties": false
+}
+```
+
+The adapter sends `GET /v1/experts` and returns the response body unchanged.
+ExAIS, not the adapter, filters profiles by tenant, business instance, bearer
+principal, vector-store visibility, and active bindings.
+
+### `ask_exais_expert`
+
+Input schema:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "expert_id": {"type": "string", "minLength": 1},
+    "message": {"type": "string", "minLength": 1, "maxLength": 32000},
+    "session_id": {"type": "string", "minLength": 1},
+    "external_user_id": {"type": "string", "maxLength": 255},
+    "conversation_id": {"type": "string", "maxLength": 255},
+    "session_label": {"type": "string", "maxLength": 255},
+    "lens": {"type": "string", "maxLength": 128},
+    "lens_inputs": {"type": "object"}
+  },
+  "required": ["expert_id", "message"],
+  "additionalProperties": false
+}
+```
+
+The adapter removes `expert_id` from the JSON body, places it in the path, and
+forwards the remaining fields to the message endpoint. Omit `session_id` to
+start a session; pass the returned `session_id` on later turns to resume it.
+Keep `external_user_id` and `conversation_id` stable for the caller-owned
+conversation scope. The response is returned unchanged so `answer`, typed
+citations, retrieval trace, model metadata, caveats, and follow-up suggestions
+remain available to the caller.
+
+### `submit_expert_feedback`
+
+Input schema:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "expert_id": {"type": "string", "minLength": 1},
+    "session_id": {"type": "string", "minLength": 1},
+    "message_id": {"type": "string", "minLength": 1},
+    "external_user_id": {"type": "string", "maxLength": 255},
+    "conversation_id": {"type": "string", "maxLength": 255},
+    "feedback_type": {
+      "type": "string",
+      "enum": ["helpful", "unhelpful", "correction", "preference", "rating", "other"]
+    },
+    "rating": {"type": "integer", "minimum": 1, "maximum": 5},
+    "comment": {"type": "string", "maxLength": 8000},
+    "memory_candidates": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "properties": {
+          "memory_type": {
+            "type": "string",
+            "enum": ["retrieval_strategy", "answer_style", "preference"]
+          },
+          "instruction": {"type": "string", "minLength": 1, "maxLength": 2000},
+          "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+        },
+        "required": ["memory_type", "instruction", "confidence"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["expert_id", "session_id", "feedback_type"],
+  "allOf": [
+    {
+      "anyOf": [
+        {"required": ["rating"]},
+        {"required": ["comment"]},
+        {
+          "properties": {"memory_candidates": {"minItems": 1}},
+          "required": ["memory_candidates"]
+        }
+      ]
+    },
+    {
+      "if": {"properties": {"feedback_type": {"const": "rating"}}},
+      "then": {"required": ["rating"]}
+    }
+  ],
+  "additionalProperties": false
+}
+```
+
+The adapter places `expert_id` in the path and forwards the remaining fields.
+It must repeat the same external caller user and conversation values used by
+the session. ExAIS verifies the expert, session, message, API key, and caller
+scope and applies feedback/memory governance before any persistence.
+
+### Thin-adapter boundary
+
+The adapter may perform only transport work: typed input validation, path/body
+mapping, authorization-header injection, timeout handling, and faithful HTTP
+status/response forwarding. It must not contain provider SDK calls, model or
+fallback selection, retrieval planning, vector/graph search, lens
+authorization, ACL decisions, citation construction or repair, output guards,
+feedback governance, or memory promotion. In particular, a personal Codex,
+Claude Code, OpenCode, browser, desktop, or subscription session is not a
+production runtime for these tools.
+
+Use expert sessions first for natural-language questions. Use the raw vector
+store search and graph-lens contracts below only as an advanced primitive when
+the caller intentionally owns retrieval controls and raw result handling.
+
 ## Processing boundary
 
 Do not collapse the downstream responsibilities into the caller agent or VPS

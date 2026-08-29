@@ -83,10 +83,10 @@ and tool limits.
 
 Acceptance:
 
-- [ ] Expert profiles can be listed and resolved under the request principal.
-- [ ] Invalid or cross-scope vector-store bindings fail closed before retrieval
+- [x] Expert profiles can be listed and resolved under the request principal.
+- [x] Invalid or cross-scope vector-store bindings fail closed before retrieval
   or LLM calls.
-- [ ] Store-supported graph lenses are discoverable through the profile without
+- [x] Store-supported graph lenses are discoverable through the profile without
   duplicating lens logic.
 
 Primary files:
@@ -104,12 +104,12 @@ retrieval runs, feedback, memory events, and forks.
 
 Acceptance:
 
-- [ ] Sessions are keyed by principal, expert, API key, caller external user,
+- [x] Sessions are keyed by principal, expert, API key, caller external user,
   and caller conversation ID.
-- [ ] Resume preserves prior user/assistant/tool/retrieval context.
-- [ ] Fork creates a new session that records parentage without mutating the
+- [x] Resume preserves prior user/assistant/tool/retrieval context.
+- [x] Fork creates a new session that records parentage without mutating the
   parent.
-- [ ] Cross-tenant, cross-business-instance, cross-API-key, and cross-user
+- [x] Cross-tenant, cross-business-instance, cross-API-key, and cross-user
   session reads fail closed.
 
 Primary files:
@@ -128,12 +128,12 @@ coupling expert behavior to one vendor SDK.
 
 Acceptance:
 
-- [ ] Expert code calls one internal client contract.
-- [ ] Provider/model selection is profile or policy driven.
-- [ ] The route records provider, model, latency, token/usage metadata, and
+- [x] Expert code calls one internal client contract.
+- [x] Provider/model selection is profile or policy driven.
+- [x] The route records provider, model, latency, token/usage metadata, and
   fallback information.
-- [ ] Embedding and rerank provider behavior is unchanged.
-- [ ] Fixture provider proves deterministic tests without live credentials.
+- [x] Embedding and rerank provider behavior is unchanged.
+- [x] Fixture provider proves deterministic tests without live credentials.
 
 Primary files:
 
@@ -150,13 +150,13 @@ shape.
 
 Acceptance:
 
-- [ ] `POST /v1/experts/{expert_id}/messages` requires bearer auth and
+- [x] `POST /v1/experts/{expert_id}/messages` requires bearer auth and
   `retrieval:read`.
-- [ ] The route returns `expert_id`, `session_id`, optional `parent_session_id`,
+- [x] The route returns `expert_id`, `session_id`, optional `parent_session_id`,
   answer text, citations, retrieval trace, model metadata, caveats, and
   follow-up suggestions.
-- [ ] OpenAPI exposes named request and response components.
-- [ ] Route handlers do not expose storage credentials or backend service URLs.
+- [x] OpenAPI exposes named request and response components.
+- [x] Route handlers do not expose storage credentials or backend service URLs.
 
 Primary files:
 
@@ -174,13 +174,13 @@ synthesis.
 
 Acceptance:
 
-- [ ] The expert engine can call existing vector-store search paths.
-- [ ] Explicit store graph lenses can be selected by the expert profile and
+- [x] The expert engine can call existing vector-store search paths.
+- [x] Explicit store graph lenses can be selected by the expert profile and
   natural-language request.
-- [ ] Every retrieval run is persisted with query, filters, lens, graph status,
+- [x] Every retrieval run is persisted with query, filters, lens, graph status,
   result IDs, and citation metadata.
-- [ ] Citation integrity and PII/secret output guards apply to expert answers.
-- [ ] Existing raw search behavior is unchanged when no expert route is used.
+- [x] Citation integrity and PII/secret output guards apply to expert answers.
+- [x] Existing raw search behavior is unchanged when no expert route is used.
 
 Primary files:
 
@@ -199,13 +199,13 @@ future expert behavior but cannot silently become legal authority.
 
 Acceptance:
 
-- [ ] Feedback is scoped to tenant, business instance, API key, expert, caller
+- [x] Feedback is scoped to tenant, business instance, API key, expert, caller
   user, and session.
-- [ ] Promoted memory is opt-in, typed, confidence-scored, deletable, and
+- [x] Promoted memory is opt-in, typed, confidence-scored, deletable, and
   audit-visible.
-- [ ] Memory may guide retrieval strategy or answer style, but expert answers
+- [x] Memory may guide retrieval strategy or answer style, but expert answers
   may cite only retrieved corpus/source-package material.
-- [ ] Feedback and memory routes redact or reject obvious PII/secrets according
+- [x] Feedback and memory routes redact or reject obvious PII/secrets according
   to existing security policy.
 
 Primary files:
@@ -224,14 +224,14 @@ search for advanced callers.
 
 Acceptance:
 
-- [ ] `docs/CALLER_AGENT_INTEGRATION.md` documents
+- [x] `docs/CALLER_AGENT_INTEGRATION.md` documents
   `list_exais_experts`, `ask_exais_expert`, and
   `submit_expert_feedback`.
-- [ ] `docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md` says each graph-capable
+- [x] `docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md` says each graph-capable
   vector store should define an optional expert profile and eval set.
-- [ ] Evals compare raw search versus expert-session answers on tough Kansas
+- [x] Evals compare raw search versus expert-session answers on tough Kansas
   courts and Topeka municipal-code questions.
-- [ ] Eval output preserves citations, source URLs, graph relationship metadata,
+- [x] Eval output preserves citations, source URLs, graph relationship metadata,
   and caveats.
 
 Primary files:
@@ -334,3 +334,63 @@ Subagent orchestration note: the generic subagent pool was at thread limit when
 this wave was created, so the main orchestrator generated the artifacts locally
 using the `ticket-tranche` contract and verified them with the deterministic
 gate script.
+
+## Implementation Proof
+
+Completed on 2026-08-28 from `main` at base commit `50cd72c`.
+
+Independent ticket gates:
+
+- T-001: `PASS`. Profile listing/resolution, principal-scoped store binding,
+  graph-lens discovery, OpenAPI, and documentation checks passed.
+- T-002: `PASS`. Session/resume/fork isolation and FORCE RLS passed; a fresh
+  disposable PostgreSQL 17 database migrated to
+  `003_expert_conversation_sessions`, and the runtime-role integration test
+  passed `2 passed` with no published host port.
+- T-003: `PASS WITH NOTES` after malformed-success/fallback remediation.
+  Provider selection, fixture completion, fallback, usage metadata, and
+  embedding/rerank regressions passed. No external provider call was made.
+- T-004: `PASS WITH NOTES`. Bearer/scope, typed message/fork routes,
+  idempotency, failure normalization, and named OpenAPI contracts passed. The
+  then-deferred retrieval implementation was completed and accepted in T-005.
+- T-005: `PASS WITH NOTES` after adversarial remediation. Executor invocations,
+  context tokens, result persistence, response validation, binding-local lens
+  policy, graph status, citations, and raw-search regressions passed. No live
+  corpus, live graph, or external provider call was made in the ticket gate.
+- T-006: `PASS WITH NOTES` after adversarial remediation. Full caller scope,
+  opt-in typed memory, confidence/policy gates, scrubbed deletion, audit
+  metadata, PII/secret rejection before persistence, and memory/citation
+  separation passed. Live PostgreSQL proof was run at final-wave scope.
+- T-007: `PASS` after eval-provenance remediation. The deterministic comparison
+  passed four cases (two Kansas courts and two Topeka municipal-code cases),
+  with registry-authoritative expert/store bindings, combined citation
+  identity/URL and same-citation graph provenance, caveats, and both
+  live-verification flags set to `false`.
+
+Final verification:
+
+- Combined expert/API/security/raw-search target: `350 passed` with two existing
+  FastAPI lifespan deprecation warnings.
+- `python evals/expert-sessions/run_eval.py`: `pass`, four cases,
+  `live_corpus_verified=false`, `live_provider_verified=false`.
+- `python scripts/release/local-proof.py --cell ks-state-civics`: cell readiness
+  `{"ready":true,"db":true,"qdrant":true}`; Docker compile passed; Python
+  suite `824 passed, 7 skipped`; admin UI production build passed. The seven
+  skips are explicit opt-in integration tests, not hidden failures.
+- Fresh disposable PostgreSQL 17.11 proof: Alembic head
+  `003_expert_conversation_sessions`; expert session/RLS integration
+  `2 passed`; disposable container and network removed afterward.
+- Bearer-style caller proof: an in-process HTTP
+  `POST /v1/experts/kansas-court-decisions/messages` returned `200` and retained
+  its session ID, citation URL, and `cited_by` graph relationship. Downstream
+  retrieval/model behavior was fixture-backed for this caller-contract proof.
+- Existing raw-search coverage, named OpenAPI components, citation integrity,
+  output guards, and graph metadata preservation passed in the combined and
+  full suites.
+
+Claim boundary: these results prove repository behavior, Docker release proof,
+and disposable PostgreSQL RLS behavior. The KS cell readiness check did not
+deploy this uncommitted implementation into the long-running cell, and no live
+KS corpus expert answer, live model-gateway call, or external provider call was
+performed. External-provider behavior remains an explicit post-deployment
+integration proof item.

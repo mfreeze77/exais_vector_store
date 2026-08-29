@@ -219,6 +219,30 @@ to the next stage.
 - Edge provenance records extraction method and evidence when available.
 - Graph artifact eval passes before graph API load.
 
+### Expert profile and eval gate
+
+Each graph-capable vector store should define an optional expert profile and an
+eval set. Raw search remains valid without an expert profile, but the profile is
+the recommended natural-language caller surface when a jurisdiction wants a
+named server-side expert.
+
+- Define the profile through the shared expert-profile registry; do not put a
+  second registry in a caller adapter or jurisdiction package.
+- Bind only the intended vector stores and the graph lenses that are actually
+  available for each binding.
+- State corpus limits, graph coverage caveats, citation policy, model policy,
+  and bounded tool limits explicitly.
+- Keep retrieval, graph selection, citation integrity, tenant authorization,
+  provider routing, output guards, sessions, feedback, and memory on the ExAIS
+  server. Caller MCP tools remain thin HTTP adapters.
+- Add difficult direct-retrieval and relationship questions for the
+  jurisdiction. At least one deterministic eval should compare the raw search
+  evidence with the expert-session answer and prove that citation markers,
+  source URLs, graph relationship metadata, and caveats survive synthesis.
+- Label fixture/deterministic results separately from authenticated live corpus
+  and provider runs. Fixture proof cannot establish current corpus coverage,
+  graph availability, provider behavior, or latency.
+
 ### Ingestion gate
 
 - Ingestion uses the ExAIS API path only.
@@ -311,6 +335,12 @@ Use this checklist before starting another jurisdiction.
 - [ ] Verify default semantic search.
 - [ ] Verify every explicit graph lens.
 - [ ] Verify result citation URLs and graph relationship URLs.
+- [ ] For a graph-capable store, define the optional expert profile in the
+      shared registry and expose only binding-authorized available lenses.
+- [ ] Add a repository-backed expert eval set comparing raw search with
+      expert-session answers on direct and relationship questions.
+- [ ] Verify expert eval citation markers, source URLs, graph relationship
+      metadata, caveats, and deterministic-versus-live claim boundaries.
 - [ ] Record all counts, digests, commands, and proof paths in `source.lock.json`
       and `store.yaml`.
 - [ ] Only then wire caller tools or public routes.
