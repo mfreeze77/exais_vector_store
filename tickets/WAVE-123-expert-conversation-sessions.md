@@ -463,3 +463,64 @@ Post-remediation final verification:
   host-forwarding limitation, the explicit opt-in skips covered by live-cell
   migration/RLS evidence, and the then-uncommitted working tree; no code fix was
   required.
+
+### Referential follow-up and permanent caller-key polish
+
+Completed on 2026-08-28 after persisted live answers showed that the first
+Kansas and Topeka turns were useful and cited, but the referential continuation
+`Summarize that answer...` planned retrieval from that underspecified sentence
+alone and retrieved unrelated cases.
+
+- Created active non-expiring caller key `key_ecd166f5c61e4f70bbfcef47` with
+  only `retrieval:read` and `vector_stores:read`, security ceiling 3. PostgreSQL
+  retains only its hash; the raw one-time value is stored outside the repository
+  at `C:\Users\mfrie\.exais\keys\ks-state-civics-expert.json` with an ACL
+  limited to the operator account. Authenticated expert discovery returned
+  `200` with the registered Kansas and Topeka profiles.
+- Referential retrieval now adds no more than four prior scoped messages and
+  512 estimated tokens. Prior user messages may provide context; assistant text
+  is eligible only when server-owned metadata proves positive citations,
+  nonblank retrieval-run IDs, and completed or partial retrieval. Historical
+  markers are stripped and the context is labeled as a search hint, not
+  evidence. Current-turn retrieval remains the sole citation authority.
+- Independent implementation QC initially returned `FAIL` because an early
+  trigger also expanded self-contained named questions. The trigger was
+  narrowed to explicit backward-reference phrases and re-QC returned `PASS`.
+  Post-deployment QC then found that the phrase `the same` was still too broad;
+  it returned `FAIL`, the phrase was removed, and implementation re-QC returned
+  `PASS WITH NOTES`. Nine adversarial self-contained prompts now remain
+  byte-for-byte unchanged through the search executor, persisted retrieval
+  payload, and returned trace. Final independent post-deployment QC returned
+  `PASS` after the corrected images and live positive and negative probes.
+- Worker and independent-QC verification passed 18 focused referential tests,
+  53 expert-message tests, and 845 non-integration tests, plus compile and diff
+  checks.
+- Published final immutable digests for API
+  `sha256:8efad3e9f7ccb3b0251b296249e304cff910b7f0de0c013b7fa024bb64e10d3f`,
+  worker
+  `sha256:711d630f966b9a9835c9e080e6a9cd3a526db76fcc84b70b22c2db5c9dc6b977`,
+  model gateway
+  `sha256:941dd88d68808ced6931950757c5644142a9ab4ca0d2181a04f287c5b571ac19`,
+  and unchanged admin UI
+  `sha256:81bf557407e36eacf5bf23ee67bc03cb1957d6a91c3552b3755e848120b48dbb`.
+  These four cell services are active and healthy. Instance-agent digest
+  `sha256:ac20a90db03e87f7a35b364c1d15dbaaa9c7419992dd860b68d53c2e702d867d`
+  was published and pinned for optional profile use; no instance-agent
+  container was started.
+  The prior pin and manifest snapshot is under
+  `.release/cells/ks-state-civics/referential-followup-rollback-20260828-223331`.
+- A fresh live two-turn call through the deployed API and the permanent key
+  returned `200` twice using `openai/gpt-5.5-2026-04-23`, reused session
+  `exps_527f9dcc19ed4f07a0944f27`, and cited the same exact Kansas opinion URL on
+  both turns. The continuation returned the requested two-sentence Harris
+  summary with current-run citations instead of the prior false-insufficiency
+  response. A separate live same-session adversarial turn returned `200` and
+  preserved `Does State v. Harris use the same statutory interpretation as
+  State v. Smith?` byte-for-byte in its retrieval trace.
+- Final Docker-first proof after deployment passed readiness
+  `{"ready":true,"db":true,"qdrant":true}`, compileall, `845 passed, 7
+  skipped`, and the admin UI production build with zero npm vulnerabilities.
+  The skips remain the explicit opt-in PostgreSQL integration tests already
+  covered by live migration/RLS evidence. Cell-network access proof returned
+  `200` for both API and admin UI; Windows host-loopback forwarding remained
+  unavailable and is recorded as an environment limitation.

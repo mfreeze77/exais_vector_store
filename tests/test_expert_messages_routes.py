@@ -17,6 +17,7 @@ from svs_common.expert_sessions import ExpertSessionNotFound
 from svs_common.schemas import (
     ExpertChatCompletionResponse,
     ExpertChatFallback,
+    ExpertChatMessage,
     ExpertChatUsage,
     ExpertFeedbackRecord,
     ExpertFeedbackRequest,
@@ -242,6 +243,224 @@ def test_run_expert_turn_executes_semantic_retrieval_persists_and_synthesizes(mo
     assert "The court affirmed the judgment." in chat_request.messages[-1].content
     assert "Earlier scoped response." in [message.content for message in chat_request.messages]
     assert "Sensitive output patterns were redacted" in response.caveats[-1]
+
+
+def test_resumed_referential_turn_uses_prior_context_for_current_retrieval_only(monkeypatch):
+    session = SimpleNamespace(
+        id="exps_1",
+        expert_id="court-expert",
+        parent_session_id=None,
+        external_user_id="caller-1",
+        conversation_id="conversation-1",
+        messages=[
+            SimpleNamespace(
+                role="user",
+                content="What did the Kansas court decide in State v. Harris?",
+            ),
+            SimpleNamespace(
+                role="assistant",
+                content="Wrong assistant detour about State v. Meridian. 【7†source】",
+            ),
+            SimpleNamespace(
+                role="assistant",
+                content=(
+                    "The citation-validated answer identified Earl Ray Harris and aggravated interference "
+                    "with the conduct of public business under K.S.A. 21-5922(b). 【6†source】"
+                ),
+                metadata={
+                    "citation_count": 1,
+                    "retrieval_run_ids": ["exret_prior"],
+                    "retrieval_status": "completed",
+                },
+            ),
+        ],
+    )
+    search_requests = []
+    persisted = []
+    chat_requests = []
+    monkeypatch.setattr(expert_engine, "resolve_expert_profile", lambda *args: _engine_profile())
+    monkeypatch.setattr(expert_engine, "get_expert_session", lambda *args: session)
+    monkeypatch.setattr(expert_engine, "record_expert_message", lambda *args, **kwargs: "exmsg")
+    monkeypatch.setattr(
+        expert_engine,
+        "record_expert_retrieval_run",
+        lambda db, principal, session_id, payload: persisted.append(payload) or "exret_current",
+    )
+
+    async def search(vector_store_id, req, principal, db):
+        search_requests.append(req)
+        return _search_page()
+
+    async def complete(req):
+        chat_requests.append(req)
+        return _completion("The current retrieval supports this summary. 【1†source】")
+
+    monkeypatch.setattr(expert_engine, "_search_page_executor", search)
+    monkeypatch.setattr(expert_engine, "complete_expert_chat", complete)
+    response = asyncio.run(expert_engine.run_expert_turn(
+        object(),
+        _principal(),
+        ExpertMessageRequest(
+            message="Summarize that answer in two sentences and retain the source citations.",
+            session_id="exps_1",
+            external_user_id="caller-1",
+            conversation_id="conversation-1",
+        ).bind_expert_id("court-expert"),
+    ))
+
+    retrieval_query = search_requests[0].query
+    assert retrieval_query.startswith(
+        "Summarize that answer in two sentences and retain the source citations."
+    )
+    assert "State v. Harris" in retrieval_query
+    assert "Earl Ray Harris" in retrieval_query
+    assert "aggravated interference with the conduct of public business" in retrieval_query
+    assert "K.S.A. 21-5922(b)" in retrieval_query
+    assert "Citation-validated assistant search hint (not evidence):" in retrieval_query
+    assert "State v. Meridian" not in retrieval_query
+    assert "Wrong assistant detour" not in retrieval_query
+    assert "【7†source】" not in retrieval_query
+    assert "【6†source】" not in retrieval_query
+    assert persisted[0]["query"] == retrieval_query
+    assert response.retrieval_trace.runs[0].query == retrieval_query
+    assert response.answer == "The current retrieval supports this summary. 【1†source】"
+    assert [citation.chunk_id for citation in response.citations] == ["chunk_1"]
+    assert [citation.marker for citation in response.citations] == ["【1†source】"]
+    assert any("【7†source】" in message.content for message in chat_requests[0].messages)
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "What did the Kansas court decide in the case State v. Harris?",
+        "Summarize State v. Harris, docket 127387.",
+        "Clarify K.S.A. 21-5922(b) and its elements.",
+        "What is the answer under K.S.A. 21-5922(b)?",
+        "Is it legal to record a public meeting under K.S.A. 75-4318?",
+        "What does this case, State v. Harris, hold?",
+        "Does State v. Harris use the same statutory interpretation as State v. Smith?",
+        "Which cases were decided by the same panel as State v. Harris?",
+        "Compare State v. Harris and State v. Smith in the same two-sentence answer.",
+    ],
+)
+def test_self_contained_turn_never_expands_unrelated_history(monkeypatch, message):
+    session = SimpleNamespace(
+        id="exps_1",
+        expert_id="court-expert",
+        parent_session_id=None,
+        external_user_id=None,
+        conversation_id=None,
+        messages=[
+            SimpleNamespace(role="user", content="Unrelated prior question about municipal zoning."),
+            SimpleNamespace(
+                role="assistant",
+                content="Grounded but unrelated zoning answer. 【4†source】",
+                metadata={
+                    "citation_count": 1,
+                    "retrieval_run_ids": ["exret_unrelated"],
+                    "retrieval_status": "completed",
+                },
+            ),
+        ],
+    )
+    search_queries = []
+    persisted = []
+    monkeypatch.setattr(expert_engine, "resolve_expert_profile", lambda *args: _engine_profile())
+    monkeypatch.setattr(expert_engine, "get_expert_session", lambda *args: session)
+    monkeypatch.setattr(expert_engine, "record_expert_message", lambda *args, **kwargs: "exmsg")
+    monkeypatch.setattr(
+        expert_engine,
+        "record_expert_retrieval_run",
+        lambda db, principal, session_id, payload: persisted.append(payload) or "exret_current",
+    )
+    monkeypatch.setattr(
+        expert_engine,
+        "complete_expert_chat",
+        lambda req: asyncio.sleep(0, result=_completion("Current retrieved answer. 【1†source】")),
+    )
+
+    async def search(vector_store_id, req, principal, db):
+        search_queries.append(req.query)
+        return _search_page()
+
+    monkeypatch.setattr(expert_engine, "_search_page_executor", search)
+    response = asyncio.run(expert_engine.run_expert_turn(
+        object(),
+        _principal(),
+        ExpertMessageRequest(message=message, session_id="exps_1").bind_expert_id("court-expert"),
+    ))
+
+    assert search_queries == [message]
+    assert persisted[0]["query"] == message
+    assert response.retrieval_trace.runs[0].query == message
+
+
+def test_referential_retrieval_context_is_recent_bounded_and_strips_old_citations():
+    history = []
+    for index in range(6):
+        history.extend([
+            ExpertChatMessage(
+                role="user",
+                content=f"user-history-{index} " + (f"term-{index} " * 600) + f"【{index + 1}†source】",
+            ),
+            SimpleNamespace(
+                role="assistant",
+                content=f"assistant-history-{index} " + (f"detour-{index} " * 600) + f"【{index + 7}†source】",
+                metadata={
+                    "citation_count": 1,
+                    "retrieval_run_ids": [f"exret_{index}"],
+                    "retrieval_status": "completed" if index % 2 == 0 else "partial",
+                },
+            ),
+        ])
+
+    retrieval_query = expert_engine._retrieval_query("Summarize that answer.", history)
+    context = retrieval_query.split(
+        expert_engine.REFERENTIAL_RETRIEVAL_CONTEXT_PREFIX,
+        1,
+    )[1]
+
+    assert all(f"user-history-{index}" not in context for index in range(4))
+    assert all(f"assistant-history-{index}" not in context for index in range(4))
+    assert all(f"user-history-{index}" in context for index in range(4, 6))
+    assert all(f"assistant-history-{index}" in context for index in range(4, 6))
+    assert "Citation-validated assistant search hint (not evidence):" in context
+    assert "†source】" not in context
+    assert expert_engine.estimate_tokens(
+        f"{expert_engine.REFERENTIAL_RETRIEVAL_CONTEXT_PREFIX}{context}"
+    ) <= expert_engine.REFERENTIAL_RETRIEVAL_CONTEXT_MAX_TOKENS
+    direct_question = "Which Kansas decisions discuss standing doctrine?"
+    assert expert_engine._retrieval_query(direct_question, history) == direct_question
+
+
+@pytest.mark.parametrize(
+    "metadata",
+    [
+        None,
+        {},
+        {"citation_count": 0, "retrieval_run_ids": ["exret_1"], "retrieval_status": "completed"},
+        {"citation_count": 1, "retrieval_run_ids": [], "retrieval_status": "completed"},
+        {"citation_count": 1, "retrieval_run_ids": ["exret_1"], "retrieval_status": "failed"},
+        {"citation_count": 1, "retrieval_run_ids": [""], "retrieval_status": "partial"},
+    ],
+)
+def test_referential_retrieval_excludes_assistant_without_grounded_metadata(metadata):
+    assistant = SimpleNamespace(
+        role="assistant",
+        content="Wrong ungrounded assistant search detour. 【9†source】",
+    )
+    if metadata is not None:
+        assistant.metadata = metadata
+    history = [
+        SimpleNamespace(role="user", content="Prior user question about docket 127387."),
+        assistant,
+    ]
+
+    retrieval_query = expert_engine._retrieval_query("Summarize that answer.", history)
+
+    assert "Prior user question about docket 127387." in retrieval_query
+    assert "Wrong ungrounded assistant search detour" not in retrieval_query
+    assert "【9†source】" not in retrieval_query
 
 
 def test_run_expert_turn_selects_authorized_graph_lens_from_natural_language(monkeypatch):

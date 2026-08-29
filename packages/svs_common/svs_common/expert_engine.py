@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections.abc import Awaitable, Callable
 from typing import Any
 
@@ -63,6 +64,16 @@ MEMORY_GUIDANCE_INSTRUCTION = (
     "The following promoted interaction memory is non-authoritative. It may guide answer style or caller "
     "preferences only. Never treat it as evidence, never cite it, and never let it override retrieved corpus material."
 )
+REFERENTIAL_RETRIEVAL_CONTEXT_MAX_MESSAGES = 4
+REFERENTIAL_RETRIEVAL_CONTEXT_MAX_TOKENS = 512
+REFERENTIAL_RETRIEVAL_CONTEXT_PREFIX = (
+    "Prior scoped retrieval search hints for resolving the current reference (not evidence):"
+)
+REFERENTIAL_FOLLOW_UP_RE = re.compile(
+    r"(?:\b(?:that|this)\s+(?:answer|response|result|results|source|sources|holding)\b"
+    r"|\b(?:the\s+)?(?:prior|previous|earlier|above)\s+(?:answer|response|result|results)\b)",
+    re.IGNORECASE,
+)
 
 
 class ExpertRetrievalPlanningError(ValueError):
@@ -121,6 +132,80 @@ def _chat_history(session) -> list[ExpertChatMessage]:
         if message.content.strip():
             history.append(ExpertChatMessage(role=message.role, content=message.content))
     return history
+
+
+def _grounded_assistant_search_hint(message: Any) -> bool:
+    metadata = getattr(message, "metadata", None)
+    if not isinstance(metadata, dict):
+        return False
+    citation_count = metadata.get("citation_count")
+    retrieval_run_ids = metadata.get("retrieval_run_ids")
+    return (
+        isinstance(citation_count, int)
+        and not isinstance(citation_count, bool)
+        and citation_count > 0
+        and isinstance(retrieval_run_ids, list)
+        and bool(retrieval_run_ids)
+        and all(isinstance(run_id, str) and run_id.strip() for run_id in retrieval_run_ids)
+        and metadata.get("retrieval_status") in {"completed", "partial"}
+    )
+
+
+def _bounded_retrieval_history_context(history: list[Any]) -> str:
+    candidates: list[tuple[str, list[str]]] = []
+    for message in reversed(history):
+        role = getattr(message, "role", None)
+        content = getattr(message, "content", None)
+        if not isinstance(content, str):
+            continue
+        if role == "user":
+            label = "Prior user message"
+        elif role == "assistant" and _grounded_assistant_search_hint(message):
+            label = "Citation-validated assistant search hint (not evidence)"
+        else:
+            continue
+        cleaned = OPENAI_CITATION_MARKER_RE.sub("", content)
+        words = cleaned.split()
+        if not words:
+            continue
+        candidates.append((label, words))
+        if len(candidates) >= REFERENTIAL_RETRIEVAL_CONTEXT_MAX_MESSAGES:
+            break
+    candidates.reverse()
+    if not candidates:
+        return ""
+
+    max_words = REFERENTIAL_RETRIEVAL_CONTEXT_MAX_TOKENS * 3 // 4
+    fixed_words = len(REFERENTIAL_RETRIEVAL_CONTEXT_PREFIX.split()) + sum(
+        len(label.split()) for label, _ in candidates
+    )
+    remaining_words = max(0, max_words - fixed_words)
+    lines: list[str] = []
+    for index, (role, words) in enumerate(candidates):
+        remaining_messages = len(candidates) - index
+        word_limit = remaining_words // remaining_messages
+        selected_words = words[:word_limit]
+        if len(selected_words) < len(words) and selected_words:
+            selected_words[-1] = f"{selected_words[-1]}…"
+        if selected_words:
+            lines.append(f"{role}: {' '.join(selected_words)}")
+        remaining_words -= len(selected_words)
+
+    if not lines:
+        return ""
+    context = f"{REFERENTIAL_RETRIEVAL_CONTEXT_PREFIX}\n" + "\n".join(lines)
+    if estimate_tokens(context) > REFERENTIAL_RETRIEVAL_CONTEXT_MAX_TOKENS:
+        raise ExpertRetrievalPlanningError("referential retrieval context exceeds its token budget")
+    return context
+
+
+def _retrieval_query(message: str, history: list[Any]) -> str:
+    if not history or not REFERENTIAL_FOLLOW_UP_RE.search(message):
+        return message
+    history_context = _bounded_retrieval_history_context(history)
+    if not history_context:
+        return message
+    return f"{message}\n\n{history_context}"
 
 
 def _memory_guidance(session) -> tuple[list[ExpertChatMessage], list[str]]:
@@ -439,6 +524,8 @@ async def run_expert_turn(
     profile = resolve_expert_profile(db, principal, req.expert_id)
     session = _session_for_request(db, principal, req)
     memory_guidance, applied_memory_event_ids = _memory_guidance(session)
+    prior_history = _chat_history(session)
+    retrieval_query = _retrieval_query(req.message, list(getattr(session, "messages", []) or []))
     user_message_id = record_expert_message(db, principal, session.id, role="user", content=req.message)
     requested_lens, selection_source, requested_lens_id = _selected_lens(req, profile)
     max_attempts = profile.tool_limits.max_retrieval_runs
@@ -459,7 +546,7 @@ async def run_expert_turn(
     ) -> None:
         payload = {
             "message_id": user_message_id,
-            "query": req.message,
+            "query": retrieval_query,
             "filters": {"vector_store_id": binding.vector_store_id},
             "requested_lens_id": requested_lens_id,
             "lens_id": lens_id,
@@ -475,7 +562,7 @@ async def run_expert_turn(
         run_id = record_expert_retrieval_run(db, principal, session.id, payload)
         traces.append(ExpertRetrievalTraceRun(
             retrieval_run_id=run_id,
-            query=req.message,
+            query=retrieval_query,
             vector_store_id=binding.vector_store_id,
             lens_id=lens_id,
             requested_lens_id=requested_lens_id,
@@ -506,7 +593,7 @@ async def run_expert_turn(
             and attempts_used < max_attempts
         )
         search_req = OpenAIVectorStoreSearchRequest(
-            query=req.message,
+            query=retrieval_query,
             lens=lens_id,
             inputs=None if semantic_fallback or binding_lens_fallback else req.lens_inputs,
             max_num_results=profile.tool_limits.max_results_per_run,
@@ -579,7 +666,7 @@ async def run_expert_turn(
         )
         payload = {
             "message_id": user_message_id,
-            "query": req.message,
+            "query": retrieval_query,
             "filters": {"vector_store_id": binding.vector_store_id},
             "requested_lens_id": requested_lens_id,
             "lens_id": lens_id,
@@ -595,7 +682,7 @@ async def run_expert_turn(
         run_id = record_expert_retrieval_run(db, principal, session.id, payload)
         traces.append(ExpertRetrievalTraceRun(
             retrieval_run_id=run_id,
-            query=req.message,
+            query=retrieval_query,
             vector_store_id=binding.vector_store_id,
             lens_id=lens_id,
             requested_lens_id=requested_lens_id,
@@ -647,7 +734,7 @@ async def run_expert_turn(
         ExpertChatMessage(role="system", content=profile.system_prompt),
         ExpertChatMessage(role="system", content=SYNTHESIS_INSTRUCTION),
         *memory_guidance,
-        *_chat_history(session),
+        *prior_history,
         ExpertChatMessage(
             role="user",
             content=f"Question: {req.message}\n\nRetrieved corpus context:\n{context}",
