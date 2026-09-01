@@ -131,6 +131,7 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-121 KS Civics VPS Go-Live Handoff](./WAVE-121-KS-civics-vps-go-live-handoff.md)
 - [WAVE-122 Topeka Municipal Code GraphRAG API Handler](./WAVE-122-topeka-municipal-code-graphrag-api-handler.md)
 - [WAVE-123 Expert Conversation Sessions](./WAVE-123-expert-conversation-sessions.md)
+- [WAVE-125 Caller Jurisdiction Metadata And Per-User API Keys](./WAVE-125-caller-jurisdiction-metadata-and-per-user-api-keys.md)
 
 ## Execution Model
 
