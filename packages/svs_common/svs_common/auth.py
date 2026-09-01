@@ -98,6 +98,50 @@ def openai_admin_api_key_create_response(
     return payload
 
 
+# WAVE-125 QC: scope namespaces a user-bound (caller-provisioned) key may never carry.
+PRIVILEGED_SCOPE_NAMESPACES = ("api_keys", "users", "admin", "usage")
+
+
+def validate_delegated_scopes(principal: Principal, scopes: list[str], *, user_bound: bool) -> list[str]:
+    """A principal can only mint scopes it already holds (``*``/``system`` included).
+
+    User-bound keys additionally may not carry privileged namespaces, any
+    ``role:`` scope, or the wildcards, regardless of what the creator holds.
+    """
+    requested = [str(scope).strip() for scope in scopes if str(scope).strip()]
+    if user_bound:
+        forbidden = [
+            scope for scope in requested
+            if scope in ("*", "system")
+            or scope.startswith("role:")
+            or scope.split(":", 1)[0] in PRIVILEGED_SCOPE_NAMESPACES
+        ]
+        if forbidden:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={"error": "scope_not_delegable_to_user_bound_key", "required": forbidden, "any_of": False},
+            )
+    denied = [scope for scope in requested if not principal_has_scope(principal, scope)]
+    if denied:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"error": "insufficient_scope", "required": denied, "any_of": False},
+        )
+    return requested
+
+
+def validate_delegated_security_level(principal: Principal, max_security_level: int | None) -> int:
+    """A minted key level defaults to, and may never exceed, the creator level."""
+    if max_security_level is None:
+        return int(principal.max_security_level)
+    if isinstance(max_security_level, bool) or int(max_security_level) > int(principal.max_security_level):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="max_security_level may not exceed the creating principal",
+        )
+    return int(max_security_level)
+
+
 def _validate_api_key_expires_at(expires_at: int | None) -> int | None:
     if expires_at is None:
         return None
@@ -108,12 +152,18 @@ def _validate_api_key_expires_at(expires_at: int | None) -> int | None:
 def create_api_key(db: Session, principal: Principal, label: str, scopes: list[str] | None = None, max_security_level: int | None = None, expires_at: int | None = None, *, user_id: str | None = None) -> dict:
     """Mint a key. ``user_id`` binds the key to a caller-provisioned user (WAVE-125);
     otherwise the key inherits the creating principal's user binding. Callers are
-    responsible for validating that ``user_id`` is in scope before calling."""
+    responsible for validating that ``user_id`` is in scope before calling.
+
+    Every creation path enforces the delegation rules: requested scopes must be
+    a subset of the creator's, the level may not exceed the creator's, and a
+    user-bound key may not carry privileged, role, or wildcard scopes.
+    """
     effective_expires_at = _validate_api_key_expires_at(expires_at)
+    requested_scopes = list(scopes) if scopes is not None else list(DEFAULT_API_KEY_SCOPES)
+    effective_scopes = validate_delegated_scopes(principal, requested_scopes, user_bound=user_id is not None)
+    effective_max_level = validate_delegated_security_level(principal, max_security_level)
     raw = generate_api_key()
     key_id = new_id("key")
-    effective_scopes = list(scopes) if scopes is not None else list(DEFAULT_API_KEY_SCOPES)
-    effective_max_level = max_security_level if max_security_level is not None else principal.max_security_level
     effective_user_id = user_id if user_id is not None else principal.user_id
     db.execute(text("""
         INSERT INTO api_keys(id, tenant_id, business_instance_id, user_id, key_hash, label, scopes, max_security_level, expires_at, status)
@@ -249,10 +299,13 @@ def resolve_api_key_principal(db: Session, authorization: str | None) -> Princip
             WHERE id=:user_id AND tenant_id=:tenant_id
             LIMIT 1
         """), {"user_id": row["user_id"], "tenant_id": row["tenant_id"]}).mappings().first()
-        if user_row:
-            if user_row["status"] == "deactivated":
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="API key user is deactivated")
-            external_id = user_row["external_id"] or None
+        # QC: a bound user that cannot be resolved (missing, cross-instance, or
+        # not active) must never degrade into an unbound cell key.
+        if not user_row:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="API key user is not available")
+        if user_row["status"] != "active":
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="API key user is deactivated")
+        external_id = user_row["external_id"] or None
         group_rows = db.execute(text("""
             SELECT g.slug
             FROM group_memberships gm JOIN groups g ON g.id=gm.group_id

@@ -88,10 +88,22 @@ def upgrade() -> None:
     _grant_runtime_role(connection)
 
 
+def _ensure_no_null_emails(connection) -> None:
+    """Downgrade restores ``users.email NOT NULL``; refuse loudly if data would violate it."""
+    null_emails = int(connection.execute(text("SELECT count(*) FROM users WHERE email IS NULL")).scalar_one() or 0)
+    if null_emails:
+        raise RuntimeError(
+            f"cannot downgrade 004_wave125_caller_identity: {null_emails} users row(s) have NULL email; "
+            "set an email (or delete those caller-provisioned users) before restoring NOT NULL"
+        )
+
+
 def downgrade() -> None:
     connection = op.get_bind()
+    _ensure_no_null_emails(connection)
     connection.exec_driver_sql(
         """
+        ALTER TABLE users ALTER COLUMN email SET NOT NULL;
         DROP INDEX IF EXISTS idx_api_keys_scope_user;
         ALTER TABLE rate_limit_counters DROP COLUMN IF EXISTS user_id;
         ALTER TABLE rate_limit_counters DROP COLUMN IF EXISTS api_key_id;

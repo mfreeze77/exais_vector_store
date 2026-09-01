@@ -81,7 +81,9 @@ def test_ensure_scope_blocks_missing():
 def test_create_api_key_reports_default_effective_scopes(monkeypatch):
     monkeypatch.setattr(auth_mod, "generate_api_key", lambda: "svs_live_test_secret")
     db = _Db()
-    principal = Principal(tenant_id="tenant", business_instance_id="biz", user_id="user", max_security_level=3)
+    # WAVE-125 QC: a creator can only delegate scopes it holds, so the default
+    # scope set must be held by the principal.
+    principal = Principal(tenant_id="tenant", business_instance_id="biz", user_id="user", max_security_level=3, scopes=list(DEFAULT_API_KEY_SCOPES))
 
     result = create_api_key(db, principal, "default")
 
@@ -99,7 +101,7 @@ def test_create_api_key_accepts_future_expiration(monkeypatch):
     monkeypatch.setattr(auth_mod, "generate_api_key", lambda: "svs_live_expiring_secret")
     monkeypatch.setattr(auth_mod.time, "time", lambda: 1710000000)
     db = _Db()
-    principal = Principal(tenant_id="tenant", business_instance_id="biz", user_id="user", max_security_level=3)
+    principal = Principal(tenant_id="tenant", business_instance_id="biz", user_id="user", max_security_level=3, scopes=["retrieval:read"])
 
     result = create_api_key(db, principal, "expiring", ["retrieval:read"], 2, expires_at=1710003600)
 
@@ -154,7 +156,13 @@ def test_create_api_key_route_passes_expiration_and_commits(monkeypatch):
 
     monkeypatch.setattr(api_main, "create_api_key", fake_create_key)
     db = _Db()
-    principal = Principal(tenant_id="tenant", business_instance_id="biz", scopes=["api_keys:write"])
+    # WAVE-125 QC: the route enforces subset scopes and the level cap for every key.
+    principal = Principal(
+        tenant_id="tenant",
+        business_instance_id="biz",
+        scopes=["api_keys:write", "retrieval:read", "vector_stores:read"],
+        max_security_level=4,
+    )
 
     result = api_main.create_instance_api_key(
         label="route",

@@ -143,8 +143,10 @@ because a package already describes one jurisdiction corpus end to end.
   `retrieval:read` key bound to it, and the key's first expert message
   produces a session, a usage event, and an audit event all carrying that
   user's `user_id` and the key's `api_key_id`.
-- The same user-bound key receives 403 on every admin route and cannot list,
-  fork, or read memory for a session created under another user.
+- The same user-bound key receives 403 on every admin route (the one
+  documented exception is `GET /api/v1/admin/session`, the admin-UI identity
+  echo that returns only the caller's own principal) and cannot list, fork, or
+  read memory for a session created under another user.
 - Deactivating the user revokes the key (subsequent calls 401) and preserves
   the session and usage history.
 - `GET /api/v1/admin/usage/summary?group_by=user` returns one row per user
@@ -311,3 +313,49 @@ MSYS_NO_PATHCONV=1 docker run --rm -v "<worktree>:/work" -w /work \
 - Consider whether the subset-scope and level-cap rules should also apply to
   keys created without `user_id` (left unchanged to preserve existing
   behaviour and tests).
+
+### QC round 1 (REQUEST CHANGES on a612eb8)
+
+1. HIGH — delegation rules were user-bound-only. Now `validate_delegated_scopes`
+   and `validate_delegated_security_level` (`auth.py`) run for **every** key
+   creation, both in the `POST /api/v1/admin/api-keys` route and inside
+   `create_api_key` itself (so the OpenAI alias and any direct caller are
+   covered): a principal can only mint scopes it holds (`*`/`system` included,
+   via `principal_has_scope`) and a level at or below its own (default = its
+   own). User-bound keys are additionally denied `api_keys:*`, `users:*`,
+   `admin:*`, `usage:*`, any `role:` scope, `*`, and `system`
+   (`403 scope_not_delegable_to_user_bound_key`). `GET /api/v1/admin/usage`
+   and `/usage/summary` force `user_id = principal.user_id` for a caller bound
+   to a caller-provisioned user (discriminator: `principal.external_id`, so
+   bootstrap/cell admin keys that also carry a `user_id` are unaffected); an
+   explicit different `user_id` is `403 user_bound_usage_scope`. Documented in
+   `docs/API.md`. Existing tests that relied on unvalidated creation were
+   updated to give the creator the scopes/level it delegates
+   (`test_auth_scopes.py` x3) rather than weakening the rule. The earlier
+   follow-up about applying the rules to unbound keys is closed.
+2. MEDIUM — `resolve_api_key_principal` now raises `401 API key user is not
+   available` when `api_keys.user_id` is set but the user row is not found in
+   the key's tenant, and `401` for any non-`active` status; a bound key never
+   degrades into a cell key. `test_admin_auth_sessions._SessionDb` now answers
+   the user lookup for its bound-user fixture.
+3. LOW — `users.get_user_by_external_id` is instance-fenced
+   (`business_instance_id=:biz_id`); the tenant-wide lookup needed to answer
+   `409` on a cross-instance `external_id` collision is a private
+   `_tenant_user_by_external_id` used only by `create_or_get_user`.
+4. LOW — `docs/API.md`, `docs/CALLER_AGENT_INTEGRATION.md`, and this ticket's
+   acceptance criterion now name `GET /api/v1/admin/session` as the one
+   documented exception (admin-UI identity echo, caller's own principal only).
+5. LOW — downgrade is schema-exact: it restores `users.email NOT NULL` after
+   `_ensure_no_null_emails` counts NULL emails and raises `RuntimeError` with
+   the count instead of failing half-way or silently.
+
+New tests (`tests/test_wave125_caller_identity.py`):
+`test_every_key_creation_enforces_subset_scopes_and_level_cap`,
+`test_user_bound_keys_can_never_carry_privileged_role_or_wildcard_scopes`,
+`test_user_bound_caller_is_forced_to_its_own_usage`,
+`test_get_user_by_external_id_is_instance_fenced`,
+`test_downgrade_restores_email_not_null_and_refuses_null_emails`, plus the
+missing-user `401` case in `test_resolve_principal_carries_external_id...`.
+
+Validation (same Docker command as above): `COMPILEALL_OK`,
+`874 passed, 2 warnings in 23.98s`.

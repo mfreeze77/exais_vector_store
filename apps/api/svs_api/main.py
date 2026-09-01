@@ -137,7 +137,8 @@ from svs_common.auth import (
     ensure_scope,
     get_api_key,
     list_api_keys,
-    principal_has_scope,
+    validate_delegated_scopes,
+    validate_delegated_security_level,
     openai_admin_api_key_create_response,
     openai_admin_api_key_from_metadata,
     openai_project_api_key_from_metadata,
@@ -2086,6 +2087,27 @@ def admin_fleet_versions(
     )
 
 
+def _caller_user_bound(principal: Principal) -> bool:
+    """True for a key bound to a caller-provisioned user (one with an external_id).
+
+    Cell/bootstrap admin keys may also carry a user_id, but only WAVE-125
+    caller-provisioned users have an external_id, so that is the discriminator.
+    """
+    return bool(principal.external_id)
+
+
+def _force_user_bound_usage_scope(principal: Principal, user_id: str | None) -> str | None:
+    """QC: a user-bound key may only read its own usage, never another user's."""
+    if not _caller_user_bound(principal):
+        return user_id
+    if user_id is not None and user_id != principal.user_id:
+        raise HTTPException(
+            status_code=403,
+            detail={'error': 'user_bound_usage_scope', 'message': 'a user-bound key can only read its own usage'},
+        )
+    return principal.user_id
+
+
 @app.get('/api/v1/admin/usage', response_model=UsageEventListResponse, response_model_exclude_unset=True)
 def usage(
     limit: int = 100,
@@ -2095,6 +2117,7 @@ def usage(
     db: Session = Depends(db_for_principal),
 ):
     ensure_scope(principal, ['admin:read', 'usage:read'], any_of=True)
+    user_id = _force_user_bound_usage_scope(principal, user_id)
     params: dict[str, Any] = {'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id, 'limit': min(max(limit, 1), 500)}
     filters = ''
     if user_id is not None:
@@ -2132,6 +2155,8 @@ def usage_summary(
     ensure_scope(principal, ['admin:read', 'usage:read'], any_of=True)
     enforce_rate_limit(db, principal, 'admin.usage.summary')
     from_ts, to_ts = _usage_window_bounds(from_ts, to_ts)
+    forced_user_id = _force_user_bound_usage_scope(principal, None)
+    forced_clause = ' AND ue.user_id=:forced_user_id' if forced_user_id is not None else ''
     group_column = 'ue.user_id' if group_by == 'user' else 'ue.api_key_id'
     external_id_select = 'max(u.external_id) AS external_id,' if group_by == 'user' else 'NULL::text AS external_id,'
     external_id_join = 'LEFT JOIN users u ON u.id=ue.user_id AND u.tenant_id=ue.tenant_id' if group_by == 'user' else ''
@@ -2143,7 +2168,7 @@ def usage_summary(
                sum(ue.cost_estimate_usd) AS cost_estimate_usd
         FROM usage_events ue
         {external_id_join}
-        WHERE ue.tenant_id=:tenant_id AND ue.business_instance_id=:biz_id
+        WHERE ue.tenant_id=:tenant_id AND ue.business_instance_id=:biz_id{forced_clause}
           AND (CAST(:from_ts AS bigint) IS NULL OR ue.created_at >= to_timestamp(CAST(:from_ts AS double precision)))
           AND (CAST(:to_ts AS bigint) IS NULL OR ue.created_at < to_timestamp(CAST(:to_ts AS double precision)))
         GROUP BY {group_column}
@@ -2155,6 +2180,7 @@ def usage_summary(
         'from_ts': from_ts,
         'to_ts': to_ts,
         'limit': limit,
+        'forced_user_id': forced_user_id,
     }).mappings().all()
     data = [
         UsageSummaryRow(
@@ -2251,28 +2277,14 @@ def deactivate_admin_user(
     return {'id': user_id, 'object': 'user.deactivated', 'deactivated': True, 'revoked_api_key_ids': revoked_ids, 'data': user}
 
 
-def _validate_user_bound_key_request(
-    db: Session,
-    principal: Principal,
-    *,
-    user_id: str,
-    scopes: list[str],
-    max_security_level: int | None,
-) -> int | None:
-    """WAVE-125 rules for a key bound to a caller-provisioned user."""
+def _require_bindable_user(db: Session, principal: Principal, user_id: str) -> dict[str, Any]:
+    """WAVE-125: the target user must exist in the caller instance and be active."""
     user = get_user(db, principal, user_id)
     if user is None:
         raise HTTPException(status_code=404, detail='User not found')
     if user['status'] != 'active':
         raise HTTPException(status_code=409, detail='User is deactivated')
-    if any(scope in ('*', 'system') for scope in scopes):
-        raise HTTPException(status_code=403, detail={'error': 'insufficient_scope', 'required': scopes, 'any_of': False})
-    denied = [scope for scope in scopes if not principal_has_scope(principal, scope)]
-    if denied:
-        raise HTTPException(status_code=403, detail={'error': 'insufficient_scope', 'required': denied, 'any_of': False})
-    if max_security_level is not None and max_security_level > principal.max_security_level:
-        raise HTTPException(status_code=422, detail='max_security_level may not exceed the creating principal')
-    return max_security_level if max_security_level is not None else principal.max_security_level
+    return user
 
 
 @app.post('/api/v1/admin/api-keys', response_model=InstanceApiKeyResponse, response_model_exclude_unset=True)
@@ -2289,14 +2301,20 @@ def create_instance_api_key(
     enforce_rate_limit(db, principal, 'admin.api_keys.create')
     if scopes is None:
         scopes = DEFAULT_USER_BOUND_API_KEY_SCOPES if user_id else DEFAULT_INSTANCE_API_KEY_SCOPES
-    scope_list = [s.strip() for s in scopes.split(',') if s.strip()]
+    # QC: delegation rules apply to every key creation, bound or not. A principal
+    # can never mint scopes or a level it does not hold; user-bound keys also
+    # cannot carry privileged, role, or wildcard scopes.
+    scope_list = validate_delegated_scopes(
+        principal,
+        [s.strip() for s in scopes.split(',') if s.strip()],
+        user_bound=bool(user_id),
+    )
+    effective_level = validate_delegated_security_level(principal, max_security_level)
     if user_id:
-        effective_level = _validate_user_bound_key_request(
-            db, principal, user_id=user_id, scopes=scope_list, max_security_level=max_security_level,
-        )
+        _require_bindable_user(db, principal, user_id)
         result = create_api_key(db, principal, label, scope_list, effective_level, expires_at, user_id=user_id)
     else:
-        result = create_api_key(db, principal, label, scope_list, max_security_level, expires_at)
+        result = create_api_key(db, principal, label, scope_list, effective_level, expires_at)
     db.commit()
     return result
 

@@ -379,8 +379,11 @@ The expected pairing is `users.external_id == external_user_id`: keep sending
 `external_user_id` as the caller-side correlation id, and ExAIS rejects
 (`403 external_user_id_mismatch`) a message, fork, feedback, or memory call
 whose `external_user_id` disagrees with the key's bound user. A user-bound
-`retrieval:read` key gets `403` on every admin route and cannot read another
-user's sessions or memory, so it is safe to hand to a per-user agent process.
+`retrieval:read` key gets `403` on every admin route (the only exception is
+`GET /api/v1/admin/session`, which echoes the caller's own identity), can
+never be minted with `api_keys:*`, `users:*`, `admin:*`, `usage:*`, `role:*`,
+`*`, or `system`, and cannot read another user's sessions, memory, or usage,
+so it is safe to hand to a per-user agent process.
 
 Per-user reporting: `GET /api/v1/admin/usage?user_id=...&api_key_id=...` and
 `GET /api/v1/admin/usage/summary?group_by=user&from=<unix>&to=<unix>` (one row

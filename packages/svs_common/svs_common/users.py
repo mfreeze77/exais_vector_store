@@ -55,12 +55,29 @@ def get_user(db: Session, principal: Principal, user_id: str) -> dict[str, Any] 
 
 
 def get_user_by_external_id(db: Session, principal: Principal, external_id: str) -> dict[str, Any] | None:
+    """Instance-fenced lookup: only users of the principal business instance are visible."""
+    row = db.execute(text(f"""
+        SELECT {USER_COLUMNS}
+        FROM users
+        WHERE tenant_id=:tenant_id AND business_instance_id=:biz_id AND external_id=:external_id
+        LIMIT 1
+    """), {**_scope(principal), "external_id": external_id}).mappings().first()
+    return user_from_row(row) if row else None
+
+
+def _tenant_user_by_external_id(db: Session, principal: Principal, external_id: str) -> dict[str, Any] | None:
+    """Tenant-wide lookup used only to detect a cross-instance external_id collision.
+
+    The unique index is per tenant, so provisioning must see the other instance
+    row to answer 409 instead of racing the index. Nothing from this row is
+    returned to callers.
+    """
     row = db.execute(text(f"""
         SELECT {USER_COLUMNS}
         FROM users
         WHERE tenant_id=:tenant_id AND external_id=:external_id
         LIMIT 1
-    """), {**_scope(principal), "external_id": external_id}).mappings().first()
+    """), {"tenant_id": principal.tenant_id, "external_id": external_id}).mappings().first()
     return user_from_row(row) if row else None
 
 
@@ -78,7 +95,7 @@ def create_or_get_user(
     is a 409: external ids are unique per tenant and a cell must not silently
     adopt another instance's identity.
     """
-    existing = get_user_by_external_id(db, principal, external_id)
+    existing = _tenant_user_by_external_id(db, principal, external_id)
     if existing is not None:
         if existing["business_instance_id"] != principal.business_instance_id:
             raise HTTPException(
@@ -109,7 +126,7 @@ def create_or_get_user(
         return user_from_row(row), True
     # Lost a race on the unique index: return the row the other writer created.
     raced = get_user_by_external_id(db, principal, external_id)
-    if raced is None or raced["business_instance_id"] != principal.business_instance_id:
+    if raced is None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="user could not be provisioned")
     return raced, False
 

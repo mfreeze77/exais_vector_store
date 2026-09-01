@@ -423,15 +423,32 @@ Without `user_id` the route behaves as before (creator-inherited user, default
 `GET /api/v1/admin/api-keys?user_id=...` filters by bound user and every key
 row now reports `user_id`. `DELETE /api/v1/admin/api-keys/{id}` revokes. A
 user-bound key holding only `retrieval:read` receives `403` on every admin and
-organization route, cannot widen its own scopes, and cannot see expert sessions
-or memory created under a different user.
+organization route except `GET /api/v1/admin/session`, the admin-UI identity
+echo that answers any `ADMIN_UI_SESSION_SCOPES` holder with the caller's own
+principal and nothing else; it cannot widen its own scopes and cannot see
+expert sessions or memory created under a different user.
+
+Delegation rules apply to **every** key creation, with or without `user_id`:
+requested scopes must already be held by the creating principal (`*` and
+`system` can only be minted by a principal that holds them) and
+`max_security_level` defaults to and may not exceed the creator's. A key bound
+to a user may additionally never carry `api_keys:*`, `users:*`, `admin:*`,
+`usage:*`, any `role:` scope, `*`, or `system`, regardless of what the creator
+holds (`403 scope_not_delegable_to_user_bound_key`). Principal resolution
+fails `401` when a key's bound user cannot be found in the key's tenant or is
+not `active`; a bound key never degrades into an unbound cell key.
 
 ### Usage attribution (WAVE-125)
 
 Usage events carry `user_id` and `api_key_id` from the request principal (as
 audit events already did); rate-limit buckets record them as well.
 `GET /api/v1/admin/usage` returns `id`, `user_id`, and `api_key_id` per row and
-accepts `user_id` / `api_key_id` filters. `GET /api/v1/admin/usage/summary`
+accepts `user_id` / `api_key_id` filters. When the caller is a user-bound key
+(bound to a caller-provisioned user with an `external_id`) that somehow holds
+`usage:read` or `admin:read`, both usage routes are forced to that user's own
+`user_id`: the filter is applied server-side, the summary is restricted to the
+caller's rows, and an explicit different `user_id` is `403
+user_bound_usage_scope`. `GET /api/v1/admin/usage/summary`
 groups by `user` (default) or `api_key` over an optional `[from, to)` Unix-
 timestamp window and returns `{"object": "usage.summary", "group_by", "from",
 "to", "data": [{"group_id", "external_id", "event_count", "quantity",

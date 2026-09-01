@@ -38,6 +38,7 @@ from svs_common.expert_sessions import (
     get_expert_session,
     record_expert_turn_accounting,
 )
+from svs_common.users import get_user_by_external_id
 from svs_common.request_controls import enforce_rate_limit
 from svs_common.schemas import (
     EXPERT_CORPUS_KINDS,
@@ -143,7 +144,7 @@ def _principal(**overrides) -> Principal:
         business_instance_id="biz",
         user_id="usr_admin",
         api_key_id="key_admin",
-        scopes=["api_keys:write", "usage:read", "retrieval:read"],
+        scopes=["api_keys:write", "usage:read", "retrieval:read", "documents:write", "vector_stores:write", "vector_stores:read"],
         max_security_level=3,
     )
     values.update(overrides)
@@ -330,8 +331,9 @@ def test_create_user_is_idempotent_on_external_id_and_instance_scoped():
     assert AdminUserResponse.model_validate(created).id == "usr_bound"
     assert created["external_id"] == "ext-1"
     lookup_sql, lookup_params = db.calls[0]
-    assert "external_id=:external_id" in lookup_sql
-    assert lookup_params == {"tenant_id": "tenant", "biz_id": "biz", "external_id": "ext-1"}
+    # The conflict pre-check is tenant-wide on purpose (the unique index is per tenant).
+    assert "external_id=:external_id" in lookup_sql and "business_instance_id=:biz_id" not in lookup_sql
+    assert lookup_params == {"tenant_id": "tenant", "external_id": "ext-1"}
     insert_sql, insert_params = db.calls[1]
     assert "INSERT INTO users" in insert_sql
     assert "ON CONFLICT DO NOTHING" in insert_sql
@@ -347,6 +349,15 @@ def test_create_user_is_idempotent_on_external_id_and_instance_scoped():
     with pytest.raises(HTTPException) as exc:
         create_or_get_user(other_instance, principal, external_id="ext-1")
     assert exc.value.status_code == 409
+
+
+def test_get_user_by_external_id_is_instance_fenced():
+    db = _Db(results=[_user_row()])
+    user = get_user_by_external_id(db, _principal(), "ext-1")
+    assert user["id"] == "usr_bound"
+    sql, params = db.calls[0]
+    assert "tenant_id=:tenant_id" in sql and "business_instance_id=:biz_id" in sql
+    assert params == {"tenant_id": "tenant", "biz_id": "biz", "external_id": "ext-1"}
 
 
 def test_create_user_rejects_blank_external_id_and_duplicate_email():
@@ -463,6 +474,60 @@ def test_create_user_bound_key_enforces_subset_scopes_level_cap_and_user_state(m
     with pytest.raises(HTTPException) as exc:
         api_main.create_instance_api_key(user_id="usr_bound", principal=principal, db=_Db(results=[_user_row(status="deactivated")]))
     assert exc.value.status_code == 409
+
+
+def test_every_key_creation_enforces_subset_scopes_and_level_cap(monkeypatch):
+    monkeypatch.setattr(api_main, "create_api_key", lambda *a, **k: pytest.fail("must not mint"))
+    creator = _principal(scopes=["api_keys:write", "retrieval:read"], max_security_level=2)
+
+    # An unbound request for scopes the creator does not hold is refused ...
+    with pytest.raises(HTTPException) as exc:
+        api_main.create_instance_api_key(scopes="*", principal=creator, db=_Db())
+    assert exc.value.status_code == 403 and exc.value.detail["required"] == ["*"]
+    with pytest.raises(HTTPException) as exc:
+        api_main.create_instance_api_key(scopes="retrieval:read,documents:write,admin:read", principal=creator, db=_Db())
+    assert exc.value.status_code == 403 and exc.value.detail["required"] == ["documents:write", "admin:read"]
+    # ... and so is the legacy default scope set when the creator lacks part of it.
+    with pytest.raises(HTTPException) as exc:
+        api_main.create_instance_api_key(principal=creator, db=_Db())
+    assert exc.value.status_code == 403
+    # ... and a level above the creator's, with or without user_id.
+    with pytest.raises(HTTPException) as exc:
+        api_main.create_instance_api_key(scopes="retrieval:read", max_security_level=5, principal=creator, db=_Db())
+    assert exc.value.status_code == 422
+
+    # The auth layer enforces the same rules for any direct caller.
+    with pytest.raises(HTTPException) as exc:
+        create_api_key(_Db(), creator, "direct", ["vector_stores:write"])
+    assert exc.value.status_code == 403
+    with pytest.raises(HTTPException) as exc:
+        create_api_key(_Db(), creator, "direct", ["retrieval:read"], 3)
+    assert exc.value.status_code == 422
+
+    # Wildcards stay mintable only by a principal that actually holds them.
+    seen = {}
+    monkeypatch.setattr(api_main, "create_api_key", lambda db, p, label, scopes, level, exp, **kw: seen.update(scopes=scopes, level=level) or {"id": "k", "api_key": "s", "label": label, "scopes": scopes, "max_security_level": level})
+    api_main.create_instance_api_key(scopes="*", max_security_level=5, principal=_principal(scopes=["*"], max_security_level=5), db=_Db())
+    assert seen == {"scopes": ["*"], "level": 5}
+
+
+def test_user_bound_keys_can_never_carry_privileged_role_or_wildcard_scopes(monkeypatch):
+    monkeypatch.setattr(api_main, "create_api_key", lambda *a, **k: pytest.fail("must not mint"))
+    owner = _principal(scopes=["*"], max_security_level=5)
+    for scopes in ("api_keys:write", "users:read", "admin:read", "usage:read", "role:owner", "*", "system", "retrieval:read,api_keys:read"):
+        with pytest.raises(HTTPException) as exc:
+            api_main.create_instance_api_key(user_id="usr_bound", scopes=scopes, principal=owner, db=_Db(results=[_user_row()]))
+        assert exc.value.status_code == 403, scopes
+        assert exc.value.detail["error"] == "scope_not_delegable_to_user_bound_key", scopes
+    # The auth layer refuses the same delegation directly.
+    with pytest.raises(HTTPException) as exc:
+        create_api_key(_Db(), owner, "bound", ["usage:read"], user_id="usr_bound")
+    assert exc.value.detail["error"] == "scope_not_delegable_to_user_bound_key"
+    # A user-bound key holding api_keys:write (legacy data) still cannot widen itself.
+    bound_admin = _principal(user_id="usr_bound", api_key_id="key_u", external_id="ext-1", scopes=["api_keys:write", "retrieval:read"], max_security_level=1)
+    with pytest.raises(HTTPException) as exc:
+        api_main.create_instance_api_key(scopes="*", max_security_level=5, principal=bound_admin, db=_Db())
+    assert exc.value.status_code == 403
 
 
 def test_create_api_key_persists_bound_user_and_returns_raw_key_once(monkeypatch):
@@ -726,6 +791,29 @@ def test_usage_route_filters_and_summary_group_rows():
     assert exc.value.status_code == 403
 
 
+def test_user_bound_caller_is_forced_to_its_own_usage():
+    bound = _principal(user_id="usr_bound", api_key_id="key_u", external_id="ext-1", scopes=["usage:read"])
+    db = _Db(results=[[]])
+    api_main.usage(limit=10, user_id=None, api_key_id=None, principal=bound, db=db)
+    sql, params = db.calls[0]
+    assert "AND user_id=:user_id" in sql and params["user_id"] == "usr_bound"
+    with pytest.raises(HTTPException) as exc:
+        api_main.usage(limit=10, user_id="usr_other", api_key_id=None, principal=bound, db=_Db())
+    assert exc.value.status_code == 403 and exc.value.detail["error"] == "user_bound_usage_scope"
+
+    summary_db = _Db(results=[[]])
+    api_main.usage_summary(group_by="api_key", from_ts=None, to_ts=None, limit=10, principal=bound, db=summary_db)
+    sql, params = summary_db.calls[0]
+    assert "AND ue.user_id=:forced_user_id" in sql and params["forced_user_id"] == "usr_bound"
+
+    # Cell keys (no external_id, even with a user_id) keep the unrestricted view.
+    cell = _principal(scopes=["usage:read"])
+    open_db = _Db(results=[[]])
+    api_main.usage_summary(group_by="user", from_ts=None, to_ts=None, limit=10, principal=cell, db=open_db)
+    assert "forced_user_id" not in open_db.calls[0][0]
+    assert open_db.calls[0][1]["forced_user_id"] is None
+
+
 def test_resolve_principal_carries_external_id_and_fails_closed_for_deactivated_user():
     key_row = {
         "id": "key_u", "tenant_id": "tenant", "business_instance_id": "biz", "user_id": "usr_bound",
@@ -744,6 +832,15 @@ def test_resolve_principal_carries_external_id_and_fails_closed_for_deactivated_
         resolve_api_key_principal(deactivated, "Bearer svs_live_bound")
     assert exc.value.status_code == 401
     assert not any("UPDATE api_keys SET last_used_at" in sql for sql, _ in deactivated.calls)
+
+    # QC: a bound user that cannot be found (RLS edge, cross-instance) never
+    # degrades the key into an unbound cell key.
+    missing_user = _Db(results=[{}, key_row, *set_configs, None])
+    with pytest.raises(HTTPException) as exc:
+        resolve_api_key_principal(missing_user, "Bearer svs_live_bound")
+    assert exc.value.status_code == 401
+    assert "not available" in exc.value.detail
+    assert not any("UPDATE api_keys SET last_used_at" in sql for sql, _ in missing_user.calls)
 
     # A revoked key (post-deactivation) never resolves: the lookup filters on status='active'.
     with pytest.raises(HTTPException) as exc:
@@ -791,8 +888,48 @@ def test_alembic_revision_adds_caller_identity_columns():
     ):
         assert fragment in body, fragment
     assert "def downgrade" in body
+    assert "ALTER TABLE users ALTER COLUMN email SET NOT NULL" in body
     # Legacy db/migrations stay frozen; the drift checker owns that manifest.
     assert not (ROOT / "db" / "migrations" / "009_wave125_caller_identity.sql").exists()
+
+
+def _load_migration_004():
+    path = ROOT / "migrations" / "versions" / "004_wave125_caller_identity.py"
+    spec = importlib.util.spec_from_file_location("wave125_migration_004", path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec and spec.loader
+    sys.modules["wave125_migration_004"] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_downgrade_restores_email_not_null_and_refuses_null_emails(monkeypatch):
+    module = _load_migration_004()
+
+    class _Conn:
+        def __init__(self, null_emails):
+            self.null_emails = null_emails
+            self.executed = []
+
+        def execute(self, stmt, params=None):
+            self.executed.append(str(stmt))
+            return SimpleNamespace(scalar_one=lambda: self.null_emails)
+
+        def exec_driver_sql(self, sql):
+            self.executed.append(sql)
+
+    dirty = _Conn(2)
+    monkeypatch.setattr(module, "op", SimpleNamespace(get_bind=lambda: dirty))
+    with pytest.raises(RuntimeError) as exc:
+        module.downgrade()
+    assert "2 users row(s) have NULL email" in str(exc.value)
+    assert not any("SET NOT NULL" in sql for sql in dirty.executed)
+
+    clean = _Conn(0)
+    monkeypatch.setattr(module, "op", SimpleNamespace(get_bind=lambda: clean))
+    module.downgrade()
+    assert any("ALTER TABLE users ALTER COLUMN email SET NOT NULL" in sql for sql in clean.executed)
+    assert any("DROP COLUMN IF EXISTS external_id" in sql for sql in clean.executed)
 
 
 def _load_cell_access_proof():
