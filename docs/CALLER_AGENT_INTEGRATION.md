@@ -74,6 +74,18 @@ The adapter sends `GET /v1/experts` and returns the response body unchanged.
 ExAIS, not the adapter, filters profiles by tenant, business instance, bearer
 principal, vector-store visibility, and active bindings.
 
+Each profile declares `jurisdiction_key` (for example `ks:city:topeka`) and
+`corpus` (`statutes`, `court_decisions`, `municipal_code`,
+`administrative_regulations`, `legislative_materials`, `meeting_records`,
+`other`). A caller that keeps its own jurisdiction-to-expert registry must
+verify each local assignment against these fields at startup or on a schedule:
+fetch `GET /v1/experts?jurisdiction_key=<key>` for every jurisdiction it
+serves, and refuse to expose an expert whose declared `jurisdiction_key` does
+not match the local assignment (or whose `corpus` disagrees with the local
+slug). Treat a mismatch as a configuration error, not a routing hint. The
+filters never widen visibility, so an empty filtered list means the caller's
+key cannot see that expert, not that the jurisdiction is unknown.
+
 ### `ask_exais_expert`
 
 Input schema:
@@ -342,6 +354,44 @@ DELETE /v1/organization/admin_api_keys/{key_id}
 `POST /v1/organization/admin_api_keys` returns the plaintext key once as
 `value`, but it inherits the current caller's scopes and max security level. Use
 the native create route when you need a purpose-built read-only agent key.
+
+### Per-user keys and attribution (WAVE-125)
+
+Callers have two accounting patterns; both are supported and neither is
+required:
+
+1. **One cell key.** Pass a stable `external_user_id` and `conversation_id`
+   on every expert message. Sessions are scoped by the cell key plus those
+   correlation ids; usage rows are attributed to the cell key.
+2. **One key per human.** Provision each person once with
+   `POST /api/v1/admin/users {"external_id": "<caller user id>"}` (idempotent),
+   mint a key bound to that ExAIS user with
+   `POST /api/v1/admin/api-keys?user_id=<usr_...>&label=...` (defaults to
+   `retrieval:read`, scopes must be a subset of the admin key's, security
+   level capped at the admin key's), and store the raw key per user. Expert
+   sessions, messages, retrieval runs, usage events, audit events, and
+   rate-limit buckets then carry that user's `user_id` and the key's
+   `api_key_id` natively. Deactivate a departed user with
+   `POST /api/v1/admin/users/{user_id}/deactivate`; it revokes the user's keys
+   and blocks new sessions while keeping history for reporting.
+
+The expected pairing is `users.external_id == external_user_id`: keep sending
+`external_user_id` as the caller-side correlation id, and ExAIS rejects
+(`403 external_user_id_mismatch`) a message, fork, feedback, or memory call
+whose `external_user_id` disagrees with the key's bound user. A user-bound
+`retrieval:read` key gets `403` on every admin route (the only exception is
+`GET /api/v1/admin/session`, which echoes the caller's own identity), can
+only be minted with scopes from `retrieval:read`, `documents:read`,
+`documents:write`, `vector_stores:read`, `vector_stores:write` (never
+`api_keys:*`, `users:*`, `admin:*`, `usage:*`, `audit:*`, `fleet:*`, `role:*`,
+`*`, or `system`), and cannot read another user's sessions, memory, or usage,
+so it is safe to hand to a per-user agent process.
+
+Per-user reporting: `GET /api/v1/admin/usage?user_id=...&api_key_id=...` and
+`GET /api/v1/admin/usage/summary?group_by=user&from=<unix>&to=<unix>` (one row
+per user with `external_id`, `event_count`, `quantity`, `cost_estimate_usd`).
+`python scripts/release/cell-access-proof.py --attribution-proof` exercises the
+whole path against a local cell using a cell admin key from `$EXAIS_ADMIN_KEY`.
 
 ## First admin bootstrap
 

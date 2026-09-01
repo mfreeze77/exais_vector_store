@@ -101,8 +101,12 @@ post /api/v1/maintenance/reindex
 get /api/v1/admin/session
 get /api/v1/admin/fleet/versions
 get /api/v1/admin/usage
+get /api/v1/admin/usage/summary
 get /api/v1/admin/audit-events
 post /api/v1/admin/tenants
+post /api/v1/admin/users
+get /api/v1/admin/users
+post /api/v1/admin/users/{user_id}/deactivate
 post /api/v1/admin/api-keys
 get /api/v1/admin/api-keys
 delete /api/v1/admin/api-keys/{api_key_id}
@@ -185,8 +189,8 @@ def test_every_documented_operation_uses_named_request_and_success_components():
         for method in path_item
         if method in HTTP_METHODS
     }
-    assert len(spec['paths']) == 61
-    assert len(components) == 151
+    assert len(spec['paths']) == 64
+    assert len(components) == 157
     assert operations == EXPECTED_OPERATIONS
 
     request_media: set[tuple[str, str, str]] = set()

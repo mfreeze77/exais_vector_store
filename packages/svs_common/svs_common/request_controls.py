@@ -88,12 +88,13 @@ def _enforce_rate_limit_for_subject(
 ) -> None:
     minute = datetime.now(timezone.utc).replace(second=0, microsecond=0)
     row = db.execute(text('''
-        INSERT INTO rate_limit_counters(id, tenant_id, business_instance_id, subject_id, bucket, window_start, count)
-        VALUES (:id, :tenant_id, :biz_id, :subject_id, :bucket, :window_start, 1)
+        INSERT INTO rate_limit_counters(id, tenant_id, business_instance_id, subject_id, bucket, window_start, count, api_key_id, user_id)
+        VALUES (:id, :tenant_id, :biz_id, :subject_id, :bucket, :window_start, 1, :api_key_id, :user_id)
         ON CONFLICT (tenant_id, business_instance_id, subject_id, bucket, window_start)
         DO UPDATE SET count=rate_limit_counters.count + 1, updated_at=now()
         RETURNING count
     '''), {'id': new_id('rl'), 'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id,
-          'subject_id': subject, 'bucket': bucket, 'window_start': minute}).mappings().first()
+          'subject_id': subject, 'bucket': bucket, 'window_start': minute,
+          'api_key_id': principal.api_key_id, 'user_id': principal.user_id}).mappings().first()
     if row and int(row['count']) > limit:
         raise HTTPException(status_code=429, detail=detail)

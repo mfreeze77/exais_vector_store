@@ -373,9 +373,10 @@ class IngestionService:
             """), {"new_docv_id": docv_id, "old_docv_ids": superseded_version_ids, "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id})
             enqueue_purge_stale_vectors(db, principal, document_version_ids=superseded_version_ids, reason='document_version_superseded')
         db.execute(jsonb_text("""
-            INSERT INTO usage_events(id, tenant_id, business_instance_id, user_id, event_type, quantity, unit, provider, model, metadata)
-            VALUES (:id, :tenant_id, :biz_id, :user_id, 'ingestion.chunks_indexed', :quantity, 'chunk', :provider, :model, CAST(:metadata AS jsonb))
+            INSERT INTO usage_events(id, tenant_id, business_instance_id, user_id, api_key_id, event_type, quantity, unit, provider, model, metadata)
+            VALUES (:id, :tenant_id, :biz_id, :user_id, :api_key_id, 'ingestion.chunks_indexed', :quantity, 'chunk', :provider, :model, CAST(:metadata AS jsonb))
         """, 'metadata'), {"id": new_id("use"), "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "user_id": principal.user_id,
+              "api_key_id": principal.api_key_id,
               "quantity": len(chunk_ids), "provider": embeddings.provider, "model": embeddings.model,
               "metadata": jsonb_param({"document_id": doc_id, "document_version_id": docv_id, "vector_store_id": req.vector_store_id, "mode": mode_id})})
 

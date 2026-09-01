@@ -5,7 +5,7 @@ The API has two layers:
 1. **Native SVS API** for ingestion, mode routing, retrieval, admin, model registry, and instance operations.
 2. **OpenAI-compatible vector-store API** for clients that expect `/v1/vector_stores`-style behavior.
 
-Generated `/openapi.json` currently contains 57 paths, 74 operations, and 143
+Generated `/openapi.json` currently contains 64 paths, 82 operations, and 157
 schema components. All documented native and OpenAI-compatible operations have
 named 2xx response components, and every JSON request body resolves directly to
 a named component. Native responses are runtime-bound through FastAPI response
@@ -15,7 +15,7 @@ retain named `multipart/form-data` components. Metrics and extracted OpenAI file
 content use HTTP-proven `text/plain` responses with named string schemas.
 
 `tests/test_openapi_contract.py` freezes all valid OpenAPI HTTP methods across
-the exact 74-operation inventory, verifies
+the exact 82-operation inventory, verifies
 that every request and successful response body is a direct component reference,
 and validates representative runtime payloads against the promoted contracts.
 This is contract closure, not new OpenAI parity behavior.
@@ -137,6 +137,18 @@ tool limits, citation and caveat policies, authorized vector stores, and graph
 lens capabilities composed from the existing search-lens registry. Profile
 metadata contains no provider credentials or backend service URLs.
 
+Each profile also declares routing metadata (WAVE-125): `jurisdiction_key`, a
+caller-defined key such as `ks:city:topeka`, and `corpus`, one of `statutes`,
+`court_decisions`, `municipal_code`, `administrative_regulations`,
+`legislative_materials`, `meeting_records`, or `other`. Both are nullable for
+experts that have not declared them. `GET /v1/experts` accepts
+`?jurisdiction_key=...` and `?corpus=...` filters; an unknown `corpus` value is
+`422`. Filters are applied only after the tenant, instance, principal, and
+binding checks, so they narrow the visible set and never widen it. The registry
+populates these fields from the expert definition (compiled WAVE-124 packages
+supply them from `package.yaml`; hand-registered experts set them in
+`expert_profiles.py`).
+
 ### Expert messages, sessions, feedback, and governed memory
 
 ```http
@@ -154,6 +166,18 @@ request supplies `message` plus optional `session_id`, `external_user_id`,
 `conversation_id`, and `session_label`. When resuming by `session_id`, the
 external-user and conversation values must exactly match the stored session;
 omitting a stored value also fails closed. The path `expert_id` is authoritative.
+
+Sessions, messages, tool calls, retrieval runs, feedback, and memory rows are
+scoped by the principal's `api_key_id` and `user_id` in addition to the
+caller-side `external_user_id` and `conversation_id`. A key bound to one user
+(see [Admin](#admin)) therefore cannot list, fork, or read memory for a session
+created under another user. When the bound user has an `external_id` and the
+request carries `external_user_id`, the two must agree or the request is `403
+external_user_id_mismatch`; cell keys without a bound external id keep
+`external_user_id` as a free-form correlation id. Every completed message also
+writes one `expert.message` usage event (token quantity, provider, model) and
+one `expert`/`message` audit event carrying the principal's `user_id` and
+`api_key_id`.
 
 The typed message response contains `expert_id`, `session_id`, optional
 `parent_session_id`, `answer`, `citations`, `retrieval_trace`,
@@ -346,11 +370,97 @@ malformed answer citation payloads before return.
 ## Admin
 
 ```http
+GET  /api/v1/admin/session
+GET  /api/v1/admin/fleet/versions
+GET  /api/v1/admin/usage?limit=&user_id=&api_key_id=
+GET  /api/v1/admin/usage/summary?group_by=user|api_key&from=&to=&limit=
+GET  /api/v1/admin/audit-events
 POST /api/v1/admin/tenants
-POST /api/v1/admin/api-keys
+POST /api/v1/admin/users
+GET  /api/v1/admin/users?external_id=&status=&limit=&after=
+POST /api/v1/admin/users/{user_id}/deactivate
+POST /api/v1/admin/api-keys?label=&scopes=&max_security_level=&expires_at=&user_id=
+GET  /api/v1/admin/api-keys?limit=&after=&user_id=
+DELETE /api/v1/admin/api-keys/{api_key_id}
 ```
 
 API key creation returns plaintext only once. Store it immediately.
+
+### Caller-provisioned users (WAVE-125)
+
+`POST /api/v1/admin/users` takes a JSON body `{"external_id": "...",
+"email": null, "display_name": null}` and returns the ExAIS `user`
+(`id`, `external_id`, `email`, `display_name`, `status`,
+`business_instance_id`, `created_at`, `deactivated_at`). It is idempotent on
+`(tenant_id, external_id)`: repeating the call returns the existing user. An
+`external_id` already provisioned in another business instance, or an `email`
+owned by another user, is `409`. `GET /api/v1/admin/users` lists users of the
+principal's business instance newest-first with `after` cursor paging and
+optional `external_id` / `status` (`active`|`deactivated`) filters.
+`POST /api/v1/admin/users/{user_id}/deactivate` marks the user deactivated,
+revokes every active key bound to it (returned as `revoked_api_key_ids`), emits
+an `admin`/`user.deactivate` audit event, and preserves session, usage, and
+audit history. Every user created through this route is instance-scoped and
+carries an `external_id`; the schema enforces `CHECK (business_instance_id IS
+NULL OR external_id IS NOT NULL)`, so a user-bound key is structurally one
+whose user has an `external_id`. Subsequent calls with a revoked key are `401`; a key that
+somehow remains active for a deactivated user also fails `401` at principal
+resolution. These routes require `users:write` or `api_keys:write` (listing
+also accepts `users:read` / `api_keys:read`) and use the admin rate limit.
+
+### User-bound API keys (WAVE-125)
+
+`POST /api/v1/admin/api-keys` accepts an optional `user_id`. When present:
+
+- the user must exist in the principal's tenant and business instance and be
+  `active` (`404` / `409` otherwise);
+- `scopes` defaults to `retrieval:read`; every requested scope must be on the
+  user-bound allow-list (`403 scope_not_delegable_to_user_bound_key`) and
+  already held by the creating principal (`403 insufficient_scope` lists the
+  denied scopes);
+- `max_security_level` defaults to the creator's level and may not exceed it
+  (`422`);
+- the response includes `user_id` and, exactly once, the raw `api_key`.
+
+Without `user_id` the route behaves as before (creator-inherited user, default
+`retrieval:read,documents:write,vector_stores:write,vector_stores:read`).
+`GET /api/v1/admin/api-keys?user_id=...` filters by bound user and every key
+row now reports `user_id`. `DELETE /api/v1/admin/api-keys/{id}` revokes. A
+user-bound key holding only `retrieval:read` receives `403` on every admin and
+organization route except `GET /api/v1/admin/session`, the admin-UI identity
+echo that answers any `ADMIN_UI_SESSION_SCOPES` holder with the caller's own
+principal and nothing else; it cannot widen its own scopes and cannot see
+expert sessions or memory created under a different user.
+
+Delegation rules apply to **every** key creation, with or without `user_id`:
+requested scopes must already be held by the creating principal (`*` and
+`system` can only be minted by a principal that holds them) and
+`max_security_level` defaults to and may not exceed the creator's. A key bound
+to a user may additionally carry only exact scopes from the allow-list
+`retrieval:read`, `documents:read`, `documents:write`, `vector_stores:read`,
+`vector_stores:write`, regardless of what the creator holds; anything else
+(`api_keys:*`, `users:*`, `admin:*`, `usage:*`, `audit:*`, `fleet:*`, `role:*`,
+namespace wildcards, `*`, `system`, and any future namespace) is
+`403 scope_not_delegable_to_user_bound_key` by construction. Principal resolution
+fails `401` when a key's bound user cannot be found in the key's tenant or is
+not `active`; a bound key never degrades into an unbound cell key.
+
+### Usage attribution (WAVE-125)
+
+Usage events carry `user_id` and `api_key_id` from the request principal (as
+audit events already did); rate-limit buckets record them as well.
+`GET /api/v1/admin/usage` returns `id`, `user_id`, and `api_key_id` per row and
+accepts `user_id` / `api_key_id` filters. When the caller is a user-bound key
+(bound to a caller-provisioned user with an `external_id`) that somehow holds
+`usage:read` or `admin:read`, both usage routes are forced to that user's own
+`user_id`: the filter is applied server-side, the summary is restricted to the
+caller's rows, and an explicit different `user_id` is `403
+user_bound_usage_scope`. `GET /api/v1/admin/usage/summary`
+groups by `user` (default) or `api_key` over an optional `[from, to)` Unix-
+timestamp window and returns `{"object": "usage.summary", "group_by", "from",
+"to", "data": [{"group_id", "external_id", "event_count", "quantity",
+"cost_estimate_usd"}]}`; `external_id` is populated for `group_by=user`.
+Both require `admin:read` or `usage:read`.
 
 ## OpenAI-compatible vector store routes
 

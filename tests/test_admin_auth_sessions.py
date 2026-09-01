@@ -33,6 +33,9 @@ class _SessionDb:
             return _Rows(row=self.api_key_row)
         if "FROM group_memberships" in sql:
             return _Rows(rows=[{"slug": slug} for slug in self.group_slugs])
+        if "FROM users" in sql and "WHERE id=:user_id" in sql and self.api_key_row and self.api_key_row.get("user_id"):
+            # WAVE-125: a bound user must resolve as active or the key fails closed.
+            return _Rows(row={"external_id": None, "status": "active"})
         return _Rows()
 
 

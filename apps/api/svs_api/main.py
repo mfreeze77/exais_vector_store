@@ -18,6 +18,8 @@ from svs_common.sql import jsonb_text
 from svs_common.security import build_retrieval_scope, chunk_allowed_by_scope, principal_from_dev_headers
 from svs_common.schemas import (
     AdminSessionResponse, AuditEventListResponse, BakeoffRunListResponse, HealthResponse,
+    AdminUserCreateRequest, AdminUserDeactivateResponse, AdminUserListResponse, AdminUserResponse,
+    ExpertCorpus, UsageSummaryGroupBy, UsageSummaryResponse, UsageSummaryRow,
     IngestionJobDetail, IngestionJobListResponse, IngestionJobResponse, InstanceApiKeyDeletedResponse,
     InstanceApiKeyListResponse, InstanceApiKeyResponse, ModelEndpointListResponse, ModelEndpointPatchRequest,
     ModelRegistryResponse, OpenAIFileContentResponse, OpenAIVectorStoreFileAttachRequest,
@@ -96,6 +98,13 @@ from svs_common.expert_sessions import (
     promote_expert_memory_event,
     record_expert_feedback,
     record_expert_memory_event,
+    record_expert_turn_accounting,
+)
+from svs_common.users import (
+    create_or_get_user,
+    deactivate_user,
+    get_user,
+    list_users,
 )
 from svs_common.security import ExpertInteractionSensitiveDataError
 from svs_common.query_planner import KANSAS_CIVICS_LEGAL_PROFILE_ID, merge_query_filters, plan_query
@@ -128,6 +137,8 @@ from svs_common.auth import (
     ensure_scope,
     get_api_key,
     list_api_keys,
+    validate_delegated_scopes,
+    validate_delegated_security_level,
     openai_admin_api_key_create_response,
     openai_admin_api_key_from_metadata,
     openai_project_api_key_from_metadata,
@@ -1369,12 +1380,15 @@ def list_profiles():
 
 @app.get('/v1/experts', response_model=ExpertProfileListResponse)
 def list_experts(
+    jurisdiction_key: str | None = None,
+    corpus: ExpertCorpus | None = None,
     principal: Principal = Depends(get_request_principal),
     db: Session = Depends(db_for_principal),
 ):
     ensure_scope(principal, 'retrieval:read')
     enforce_rate_limit(db, principal, 'experts.list')
-    return list_expert_profiles(db, principal)
+    # WAVE-125: filters narrow the already-visible set; they never widen it.
+    return list_expert_profiles(db, principal, jurisdiction_key=jurisdiction_key, corpus=corpus)
 
 
 @app.get('/v1/experts/{expert_id}', response_model=ExpertProfile)
@@ -1406,6 +1420,25 @@ def _expert_idempotency_fingerprint(
     })
 
 
+def _ensure_external_user_binding(principal: Principal, external_user_id: str | None) -> None:
+    """WAVE-125: a user-bound key may only speak for its own external_id.
+
+    When the principal's bound user has an ``external_id`` and the caller also
+    supplies ``external_user_id``, the two must agree. Keys without a bound
+    external_id (cell keys) keep the caller-side correlation id as-is.
+    """
+    bound = (principal.external_id or '').strip()
+    supplied = (external_user_id or '').strip()
+    if bound and supplied and bound != supplied:
+        raise HTTPException(
+            status_code=403,
+            detail={
+                'error': 'external_user_id_mismatch',
+                'message': 'external_user_id does not match the user bound to this API key',
+            },
+        )
+
+
 def _require_scoped_expert_session(
     db: Session,
     principal: Principal,
@@ -1415,6 +1448,7 @@ def _require_scoped_expert_session(
     external_user_id: str | None,
     conversation_id: str | None,
 ):
+    _ensure_external_user_binding(principal, external_user_id)
     session = get_expert_session(db, principal, session_id)
     if (
         session is None
@@ -1436,6 +1470,7 @@ async def post_expert_message(
 ):
     ensure_scope(principal, 'retrieval:read')
     enforce_rate_limit(db, principal, 'experts.messages.create')
+    _ensure_external_user_binding(principal, req.external_user_id)
     bound_req = req.bind_expert_id(expert_id)
     fingerprint = _expert_idempotency_fingerprint(
         'experts.messages.create',
@@ -1461,6 +1496,13 @@ async def post_expert_message(
     except ExpertChatGatewayError as exc:
         db.commit()
         raise HTTPException(status_code=503, detail='Expert model service unavailable') from exc
+    record_expert_turn_accounting(
+        db,
+        principal,
+        response,
+        external_user_id=req.external_user_id,
+        conversation_id=req.conversation_id,
+    )
     payload = response.model_dump(mode='json')
     store_idempotency(db, principal, idempotency_key, fingerprint, payload)
     db.commit()
@@ -1481,6 +1523,7 @@ def fork_expert_session_route(
 ):
     ensure_scope(principal, 'retrieval:read')
     enforce_rate_limit(db, principal, 'experts.sessions.fork')
+    _ensure_external_user_binding(principal, req.external_user_id)
     fingerprint = _expert_idempotency_fingerprint(
         'experts.sessions.fork',
         principal,
@@ -2044,15 +2087,115 @@ def admin_fleet_versions(
     )
 
 
+def _caller_user_bound(principal: Principal) -> bool:
+    """True for a key bound to a caller-provisioned user (one with an external_id).
+
+    Cell/bootstrap admin keys may also carry a user_id, but only WAVE-125
+    caller-provisioned users have an external_id, so that is the discriminator.
+    Migration 004 makes it structural: CHECK (business_instance_id IS NULL OR
+    external_id IS NOT NULL) on users.
+    """
+    return bool(principal.external_id)
+
+
+def _force_user_bound_usage_scope(principal: Principal, user_id: str | None) -> str | None:
+    """QC: a user-bound key may only read its own usage, never another user's."""
+    if not _caller_user_bound(principal):
+        return user_id
+    if user_id is not None and user_id != principal.user_id:
+        raise HTTPException(
+            status_code=403,
+            detail={'error': 'user_bound_usage_scope', 'message': 'a user-bound key can only read its own usage'},
+        )
+    return principal.user_id
+
+
 @app.get('/api/v1/admin/usage', response_model=UsageEventListResponse, response_model_exclude_unset=True)
-def usage(limit: int = 100, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
+def usage(
+    limit: int = 100,
+    user_id: str | None = None,
+    api_key_id: str | None = None,
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
     ensure_scope(principal, ['admin:read', 'usage:read'], any_of=True)
+    user_id = _force_user_bound_usage_scope(principal, user_id)
+    params: dict[str, Any] = {'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id, 'limit': min(max(limit, 1), 500)}
+    filters = ''
+    if user_id is not None:
+        filters += ' AND user_id=:user_id'
+        params['user_id'] = user_id
+    if api_key_id is not None:
+        filters += ' AND api_key_id=:api_key_id'
+        params['api_key_id'] = api_key_id
     rows = db.execute(text('''
-        SELECT event_type, quantity, unit, provider, model, cost_estimate_usd, metadata, extract(epoch from created_at)::bigint created_at
+        SELECT id, event_type, quantity, unit, provider, model, cost_estimate_usd, user_id, api_key_id, metadata,
+               extract(epoch from created_at)::bigint created_at
         FROM usage_events WHERE tenant_id=:tenant_id AND business_instance_id=:biz_id
+        ''' + filters + '''
         ORDER BY created_at DESC LIMIT :limit
-    '''), {'tenant_id': principal.tenant_id, 'biz_id': principal.business_instance_id, 'limit': min(max(limit, 1), 500)}).mappings().all()
+    '''), params).mappings().all()
     return _list_response([dict(r) for r in rows])
+
+
+def _usage_window_bounds(from_ts: int | None, to_ts: int | None) -> tuple[int | None, int | None]:
+    if from_ts is not None and to_ts is not None and to_ts <= from_ts:
+        raise HTTPException(status_code=422, detail='to must be greater than from')
+    return from_ts, to_ts
+
+
+@app.get('/api/v1/admin/usage/summary', response_model=UsageSummaryResponse, response_model_by_alias=True)
+def usage_summary(
+    group_by: UsageSummaryGroupBy = Query(default='user'),
+    from_ts: int | None = Query(default=None, alias='from', ge=0),
+    to_ts: int | None = Query(default=None, alias='to', ge=0),
+    limit: int = Query(default=200, ge=1, le=1000),
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
+    """WAVE-125: quantity and estimated cost per user or per API key for a window."""
+    ensure_scope(principal, ['admin:read', 'usage:read'], any_of=True)
+    enforce_rate_limit(db, principal, 'admin.usage.summary')
+    from_ts, to_ts = _usage_window_bounds(from_ts, to_ts)
+    forced_user_id = _force_user_bound_usage_scope(principal, None)
+    forced_clause = ' AND ue.user_id=:forced_user_id' if forced_user_id is not None else ''
+    group_column = 'ue.user_id' if group_by == 'user' else 'ue.api_key_id'
+    external_id_select = 'max(u.external_id) AS external_id,' if group_by == 'user' else 'NULL::text AS external_id,'
+    external_id_join = 'LEFT JOIN users u ON u.id=ue.user_id AND u.tenant_id=ue.tenant_id' if group_by == 'user' else ''
+    rows = db.execute(text(f'''
+        SELECT {group_column} AS group_id,
+               {external_id_select}
+               count(*)::bigint AS event_count,
+               coalesce(sum(ue.quantity), 0) AS quantity,
+               sum(ue.cost_estimate_usd) AS cost_estimate_usd
+        FROM usage_events ue
+        {external_id_join}
+        WHERE ue.tenant_id=:tenant_id AND ue.business_instance_id=:biz_id{forced_clause}
+          AND (CAST(:from_ts AS bigint) IS NULL OR ue.created_at >= to_timestamp(CAST(:from_ts AS double precision)))
+          AND (CAST(:to_ts AS bigint) IS NULL OR ue.created_at < to_timestamp(CAST(:to_ts AS double precision)))
+        GROUP BY {group_column}
+        ORDER BY quantity DESC, group_id ASC NULLS LAST
+        LIMIT :limit
+    '''), {
+        'tenant_id': principal.tenant_id,
+        'biz_id': principal.business_instance_id,
+        'from_ts': from_ts,
+        'to_ts': to_ts,
+        'limit': limit,
+        'forced_user_id': forced_user_id,
+    }).mappings().all()
+    data = [
+        UsageSummaryRow(
+            group_by=group_by,
+            group_id=row['group_id'],
+            external_id=row.get('external_id'),
+            event_count=int(row['event_count'] or 0),
+            quantity=float(row['quantity'] or 0),
+            cost_estimate_usd=float(row['cost_estimate_usd']) if row.get('cost_estimate_usd') is not None else None,
+        )
+        for row in rows
+    ]
+    return UsageSummaryResponse(group_by=group_by, from_ts=from_ts, to_ts=to_ts, data=data)
 
 
 @app.get('/api/v1/admin/audit-events', response_model=AuditEventListResponse, response_model_exclude_unset=True)
@@ -2076,20 +2219,120 @@ def create_tenant(name: str, slug: str, principal: Principal = Depends(get_reque
     return {'id': tenant_id, 'name': name, 'slug': slug}
 
 
+USERS_WRITE_SCOPES = ['users:write', 'api_keys:write']
+USERS_READ_SCOPES = ['users:read', 'users:write', 'api_keys:read', 'api_keys:write']
+DEFAULT_INSTANCE_API_KEY_SCOPES = 'retrieval:read,documents:write,vector_stores:write,vector_stores:read'
+DEFAULT_USER_BOUND_API_KEY_SCOPES = 'retrieval:read'
+
+
+@app.post('/api/v1/admin/users', response_model=AdminUserResponse)
+def create_admin_user(
+    req: AdminUserCreateRequest,
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
+    """WAVE-125: provision (idempotently, by external_id) a caller-side user."""
+    ensure_scope(principal, USERS_WRITE_SCOPES, any_of=True)
+    enforce_rate_limit(db, principal, 'admin.users.create')
+    user, _created = create_or_get_user(
+        db,
+        principal,
+        external_id=req.external_id,
+        email=req.email,
+        display_name=req.display_name,
+    )
+    db.commit()
+    return user
+
+
+@app.get('/api/v1/admin/users', response_model=AdminUserListResponse)
+def list_admin_users(
+    limit: int = 20,
+    after: str | None = None,
+    external_id: str | None = None,
+    status: str | None = None,
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
+    ensure_scope(principal, USERS_READ_SCOPES, any_of=True)
+    enforce_rate_limit(db, principal, 'admin.users.list')
+    if status is not None and status not in ('active', 'deactivated'):
+        raise HTTPException(status_code=422, detail='status must be active or deactivated')
+    data, has_more = list_users(db, principal, limit=limit, after=after, external_id=external_id, status_filter=status)
+    return _list_response(data, has_more)
+
+
+@app.post('/api/v1/admin/users/{user_id}/deactivate', response_model=AdminUserDeactivateResponse)
+def deactivate_admin_user(
+    user_id: str,
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
+    """Deactivate a user, revoke its active keys, block new sessions; keep history."""
+    ensure_scope(principal, USERS_WRITE_SCOPES, any_of=True)
+    enforce_rate_limit(db, principal, 'admin.users.deactivate')
+    result = deactivate_user(db, principal, user_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail='User not found')
+    user, revoked_ids = result
+    db.commit()
+    return {'id': user_id, 'object': 'user.deactivated', 'deactivated': True, 'revoked_api_key_ids': revoked_ids, 'data': user}
+
+
+def _require_bindable_user(db: Session, principal: Principal, user_id: str) -> dict[str, Any]:
+    """WAVE-125: the target user must exist in the caller instance and be active."""
+    user = get_user(db, principal, user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail='User not found')
+    if user['status'] != 'active':
+        raise HTTPException(status_code=409, detail='User is deactivated')
+    return user
+
+
 @app.post('/api/v1/admin/api-keys', response_model=InstanceApiKeyResponse, response_model_exclude_unset=True)
-def create_instance_api_key(label: str = 'default', scopes: str = 'retrieval:read,documents:write,vector_stores:write,vector_stores:read', max_security_level: int | None = None, expires_at: int | None = None, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
+def create_instance_api_key(
+    label: str = 'default',
+    scopes: str | None = None,
+    max_security_level: int | None = None,
+    expires_at: int | None = None,
+    user_id: str | None = None,
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
     ensure_scope(principal, 'api_keys:write')
     enforce_rate_limit(db, principal, 'admin.api_keys.create')
-    result = create_api_key(db, principal, label, [s.strip() for s in scopes.split(',') if s.strip()], max_security_level, expires_at)
+    if scopes is None:
+        scopes = DEFAULT_USER_BOUND_API_KEY_SCOPES if user_id else DEFAULT_INSTANCE_API_KEY_SCOPES
+    # QC: delegation rules apply to every key creation, bound or not. A principal
+    # can never mint scopes or a level it does not hold; user-bound keys are
+    # further restricted to the USER_BOUND_ALLOWED_SCOPES allow-list.
+    scope_list = validate_delegated_scopes(
+        principal,
+        [s.strip() for s in scopes.split(',') if s.strip()],
+        user_bound=bool(user_id),
+    )
+    effective_level = validate_delegated_security_level(principal, max_security_level)
+    if user_id:
+        _require_bindable_user(db, principal, user_id)
+        result = create_api_key(db, principal, label, scope_list, effective_level, expires_at, user_id=user_id)
+    else:
+        result = create_api_key(db, principal, label, scope_list, effective_level, expires_at)
     db.commit()
     return result
 
 
 @app.get('/api/v1/admin/api-keys', response_model=InstanceApiKeyListResponse, response_model_exclude_unset=True)
-def list_instance_api_keys(limit: int = 20, after: str | None = None, principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
+def list_instance_api_keys(
+    limit: int = 20,
+    after: str | None = None,
+    user_id: str | None = None,
+    principal: Principal = Depends(get_request_principal),
+    db: Session = Depends(db_for_principal),
+):
     ensure_scope(principal, ['api_keys:read', 'api_keys:write'], any_of=True)
     enforce_rate_limit(db, principal, 'admin.api_keys.list')
-    data, has_more = list_api_keys(db, principal, limit, after=after)
+    filters = {'user_id': user_id} if user_id else {}
+    data, has_more = list_api_keys(db, principal, limit, after=after, **filters)
     return _list_response(data, has_more)
 
 

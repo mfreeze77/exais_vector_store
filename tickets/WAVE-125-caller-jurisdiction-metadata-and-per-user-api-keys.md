@@ -1,6 +1,6 @@
 # WAVE-125 Caller Jurisdiction Metadata And Per-User API Keys
 
-Status: Proposed  
+Status: In review  
 Priority: P1  
 Base: `main @ 3c2aa02` (Plan jurisdiction knowledge package lifecycle)  
 Consumer: StateCivics `state-civics-ai` tickets KS-569 (jurisdiction-aware tool
@@ -143,8 +143,10 @@ because a package already describes one jurisdiction corpus end to end.
   `retrieval:read` key bound to it, and the key's first expert message
   produces a session, a usage event, and an audit event all carrying that
   user's `user_id` and the key's `api_key_id`.
-- The same user-bound key receives 403 on every admin route and cannot list,
-  fork, or read memory for a session created under another user.
+- The same user-bound key receives 403 on every admin route (the one
+  documented exception is `GET /api/v1/admin/session`, the admin-UI identity
+  echo that returns only the caller's own principal) and cannot list, fork, or
+  read memory for a session created under another user.
 - Deactivating the user revokes the key (subsequent calls 401) and preserves
   the session and usage history.
 - `GET /api/v1/admin/usage/summary?group_by=user` returns one row per user
@@ -181,3 +183,203 @@ because a package already describes one jurisdiction corpus end to end.
   profile's `jurisdiction_key` matches.
 - Per-user keys are optional for callers. A caller may keep one cell key and
   rely on `external_user_id`; Scope D must not make that path worse.
+
+## Implementation Log
+
+Branch: `feat/wave-125-caller-identity` (forked from `main @ bb43e63`).
+
+### Deviations from the spec text (deliberate, called out for review)
+
+- **Migration lives in Alembic, not `db/migrations/009_*.sql`.**
+  `scripts/check-migration-drift.py` (enforced by `tests/test_migration_discipline.py`)
+  freezes `db/migrations/` as the baseline manifest hashed into
+  `migrations/versions/001_initial_schema.py`; any new file there fails the
+  gate, and the baseline revision would replay it. The schema change is
+  therefore `migrations/versions/004_wave125_caller_identity.py`
+  (`down_revision = "003_expert_conversation_sessions"`) with the same
+  `_formatted`/`_grant_runtime_role` pattern as revision 003, mirroring
+  `999_grant_runtime_role.sh`.
+- **Expert metadata is stored in the code registry, not a new table.**
+  WAVE-124 states the expert profile registry is the only runtime registry and
+  packages compile into it, so `jurisdiction_key` and `corpus` are fields on
+  `ExpertProfileDefinition` (set for the two hand-registered experts) and the
+  WAVE-124 compiler is expected to populate them from `package.yaml`. No
+  expert-metadata table was added.
+- **`contracts/openapi.json` was not regenerated.** No generator exists
+  (searched `scripts/`, `Makefile`, `docs/`); the file is a hand-maintained
+  snapshot already stale against `main` (34 paths vs 64 live). Per the
+  orchestrator's instruction it was not hand-edited. The live contract is
+  frozen by `tests/test_openapi_contract.py` (`EXPECTED_OPERATIONS` updated
+  to 82 operations, 64 paths, 157 components) and `docs/API.md` counts were
+  updated to match. Regenerating the snapshot via `app.openapi()` is a
+  one-line follow-up once the orchestrator decides that file's lifecycle.
+- **`GET /api/v1/admin/session` still answers a `retrieval:read` key.**
+  That route is the admin-UI identity echo and deliberately accepts every
+  `ADMIN_UI_SESSION_SCOPES` entry (existing tests assert this); it returns
+  only the caller's own principal and mutates nothing. Every other
+  `/api/v1/admin/*` and `/v1/organization/*` operation returns `403
+  insufficient_scope` to a user-bound `retrieval:read` key, which the new
+  test enumerates from `app.routes`.
+- **`users.business_instance_id` was added** (nullable) so that "the user must
+  belong to the principal's tenant and business instance" is enforceable;
+  legacy tenant-level users (NULL instance, e.g. the bootstrap admin) cannot
+  be bound through the new route. `users.email` became nullable because
+  external-id-only users have no email.
+
+### Files changed
+
+- `migrations/versions/004_wave125_caller_identity.py` (new): `users.external_id`,
+  `users.business_instance_id`, `users.deactivated_at`, `users.updated_at`,
+  `email` nullable, partial unique index `(tenant_id, external_id)`,
+  `usage_events.api_key_id`, `rate_limit_counters.{api_key_id,user_id}`,
+  indexes, runtime-role re-grant, downgrade. RLS review in the module docstring.
+- `packages/svs_common/svs_common/schemas.py`: `Principal.external_id`;
+  `ExpertCorpus` / `EXPERT_CORPUS_KINDS`; `ExpertProfile.jurisdiction_key`,
+  `.corpus`; `UsageEventResponse.{id,user_id,api_key_id}`; `UsageSummaryRow`,
+  `UsageSummaryResponse`; `AdminUserCreateRequest`, `AdminUserResponse`,
+  `AdminUserListResponse`, `AdminUserDeactivateResponse`;
+  `InstanceApiKeyResponse.user_id`.
+- `packages/svs_common/svs_common/auth.py`: `create_api_key(..., user_id=)`,
+  `list_api_keys(..., user_id=)`, key metadata exposes `user_id`,
+  `resolve_api_key_principal` loads the bound user's `external_id` and fails
+  `401` for a deactivated user.
+- `packages/svs_common/svs_common/users.py` (new): `create_or_get_user`
+  (idempotent, 409 on cross-instance external_id or duplicate email),
+  `get_user`, `get_user_by_external_id`, `list_users`, `deactivate_user`
+  (revokes active keys, writes `admin`/`user.deactivate` audit, no deletes).
+- `packages/svs_common/svs_common/expert_profiles.py`: definition fields,
+  registry values (`ks:state:kansas`/`court_decisions`,
+  `ks:city:topeka`/`municipal_code`), `list_expert_profiles(jurisdiction_key=,
+  corpus=)` filtering after visibility resolution.
+- `packages/svs_common/svs_common/expert_sessions.py`:
+  `record_expert_turn_accounting` (one `expert.message` usage event + one
+  `expert`/`message` audit event with `user_id`/`api_key_id`).
+- `packages/svs_common/svs_common/request_controls.py`,
+  `retrieval.py`, `ingestion.py`: rate-limit counters and existing usage
+  writers now record `api_key_id` (and `user_id` for counters).
+- `apps/api/svs_api/main.py`: `GET /v1/experts` filters; `_ensure_external_user_binding`
+  applied to messages, fork, feedback, memory routes; accounting call after a
+  successful turn; `GET /api/v1/admin/usage` filters; new
+  `GET /api/v1/admin/usage/summary`; new `POST/GET /api/v1/admin/users`,
+  `POST /api/v1/admin/users/{user_id}/deactivate`; `POST /api/v1/admin/api-keys`
+  `user_id` with subset-scope / level-cap / user-state rules and
+  `retrieval:read` default; `GET /api/v1/admin/api-keys?user_id=`.
+- `scripts/release/cell-access-proof.py`: `--attribution-proof`
+  (`--admin-key-env`, `--expert-id`, `--external-user-id`, `--keep-user-key`)
+  mints a user-bound key, sends one expert message, lists the attributed usage
+  rows and per-user summary, revokes the key, prints `ATTRIBUTION_*` lines
+  with no key material.
+- `docs/API.md`, `docs/CALLER_AGENT_INTEGRATION.md`: discovery filters,
+  caller verification guidance, admin users, user-bound keys, attribution and
+  summary, per-user vs cell-key patterns, contract counts.
+- Tests: `tests/test_wave125_caller_identity.py` (new, 22 tests);
+  `tests/test_openapi_contract.py` inventory/counts;
+  `tests/test_auth_scopes.py` and `tests/test_expert_messages_routes.py` fakes
+  accept the new keyword / accounting writes.
+
+### Commands run (all inside Docker; nothing installed on the host)
+
+```text
+docker build -q -f apps/api/Dockerfile -t exais-wave125-api-test .
+MSYS_NO_PATHCONV=1 docker run --rm -v "<worktree>:/work" -w /work \
+  -e PYTHONPATH=/work/packages/svs_common:/work/apps/api:/work/apps/worker:/work/apps/model_gateway:/work/apps/instance_agent \
+  -e PYTHONDONTWRITEBYTECODE=1 exais-wave125-api-test \
+  sh -c "python -m compileall -f -q packages apps tests scripts && echo COMPILEALL_OK \
+         && python -m pytest -q -rs -p no:cacheprovider --ignore=tests/integration"
+```
+
+### Verification results
+
+- `COMPILEALL_OK`
+- `869 passed, 2 warnings in 21.87s` (full non-integration suite; the two
+  warnings are the pre-existing FastAPI `on_event` deprecations).
+- Postgres-backed tests: none exist outside `tests/integration`; the
+  non-integration suite uses the repository's fake-DB style and needed no
+  database. `tests/integration` (live RLS gate, needs a migrated Postgres)
+  was **not** run in this session, so the new Alembic revision and the RLS
+  interaction of the new columns are verified by review only.
+- `scripts/release/cell-access-proof.py --attribution-proof` was **not** run
+  against a live cell (the orchestrator forbade starting the cell); its HTTP
+  sequence is covered by a monkeypatched unit test.
+
+### Follow-ups
+
+- Run `tests/integration` and `cell-access-proof.py --attribution-proof`
+  against a migrated local cell before release.
+- Decide the lifecycle of `contracts/openapi.json` (generate from
+  `app.openapi()` or retire it).
+- WAVE-124 compiler: map `package.yaml` jurisdiction/corpus into
+  `ExpertProfileDefinition.jurisdiction_key` / `.corpus`.
+- Consider whether the subset-scope and level-cap rules should also apply to
+  keys created without `user_id` (left unchanged to preserve existing
+  behaviour and tests).
+
+### QC round 1 (REQUEST CHANGES on a612eb8)
+
+1. HIGH — delegation rules were user-bound-only. Now `validate_delegated_scopes`
+   and `validate_delegated_security_level` (`auth.py`) run for **every** key
+   creation, both in the `POST /api/v1/admin/api-keys` route and inside
+   `create_api_key` itself (so the OpenAI alias and any direct caller are
+   covered): a principal can only mint scopes it holds (`*`/`system` included,
+   via `principal_has_scope`) and a level at or below its own (default = its
+   own). User-bound keys are additionally denied `api_keys:*`, `users:*`,
+   `admin:*`, `usage:*`, any `role:` scope, `*`, and `system`
+   (`403 scope_not_delegable_to_user_bound_key`). `GET /api/v1/admin/usage`
+   and `/usage/summary` force `user_id = principal.user_id` for a caller bound
+   to a caller-provisioned user (discriminator: `principal.external_id`, so
+   bootstrap/cell admin keys that also carry a `user_id` are unaffected); an
+   explicit different `user_id` is `403 user_bound_usage_scope`. Documented in
+   `docs/API.md`. Existing tests that relied on unvalidated creation were
+   updated to give the creator the scopes/level it delegates
+   (`test_auth_scopes.py` x3) rather than weakening the rule. The earlier
+   follow-up about applying the rules to unbound keys is closed.
+2. MEDIUM — `resolve_api_key_principal` now raises `401 API key user is not
+   available` when `api_keys.user_id` is set but the user row is not found in
+   the key's tenant, and `401` for any non-`active` status; a bound key never
+   degrades into a cell key. `test_admin_auth_sessions._SessionDb` now answers
+   the user lookup for its bound-user fixture.
+3. LOW — `users.get_user_by_external_id` is instance-fenced
+   (`business_instance_id=:biz_id`); the tenant-wide lookup needed to answer
+   `409` on a cross-instance `external_id` collision is a private
+   `_tenant_user_by_external_id` used only by `create_or_get_user`.
+4. LOW — `docs/API.md`, `docs/CALLER_AGENT_INTEGRATION.md`, and this ticket's
+   acceptance criterion now name `GET /api/v1/admin/session` as the one
+   documented exception (admin-UI identity echo, caller's own principal only).
+5. LOW — downgrade is schema-exact: it restores `users.email NOT NULL` after
+   `_ensure_no_null_emails` counts NULL emails and raises `RuntimeError` with
+   the count instead of failing half-way or silently.
+
+New tests (`tests/test_wave125_caller_identity.py`):
+`test_every_key_creation_enforces_subset_scopes_and_level_cap`,
+`test_user_bound_keys_can_never_carry_privileged_role_or_wildcard_scopes`,
+`test_user_bound_caller_is_forced_to_its_own_usage`,
+`test_get_user_by_external_id_is_instance_fenced`,
+`test_downgrade_restores_email_not_null_and_refuses_null_emails`, plus the
+missing-user `401` case in `test_resolve_principal_carries_external_id...`.
+
+Validation (same Docker command as above): `COMPILEALL_OK`,
+`874 passed, 2 warnings in 23.98s`.
+
+### QC round 2 (approved at 9871eb1; two non-blocking hardening items folded in)
+
+1. Structural discriminator: migration 004 (unreleased, edited in place) adds
+   `CONSTRAINT users_instance_user_has_external_id CHECK
+   (business_instance_id IS NULL OR external_id IS NOT NULL)` on `users`
+   (idempotent `DROP CONSTRAINT IF EXISTS` first) and the downgrade drops it
+   before removing the columns. Legacy tenant-level users (NULL/NULL) remain
+   valid. `test_upgrade_adds_structural_user_bound_discriminator` runs
+   `upgrade()` and `downgrade()` against a fake bind and asserts the ADD and
+   DROP statements.
+2. Allow-list replaces the deny-list: `auth.USER_BOUND_ALLOWED_SCOPES =
+   {retrieval:read, documents:read, documents:write, vector_stores:read,
+   vector_stores:write}` (the non-privileged subset of the existing default
+   caller scopes). A user-bound key may carry only exact scopes from that set,
+   so `audit:*`, `fleet:*`, namespace wildcards, `role:*`, `*`, `system`, and
+   any future namespace are refused by construction
+   (`403 scope_not_delegable_to_user_bound_key`).
+   `test_user_bound_keys_only_carry_allow_listed_scopes` covers thirteen
+   refused inputs and proves every allow-listed scope is mintable.
+   `docs/API.md` and `docs/CALLER_AGENT_INTEGRATION.md` updated.
+
+Validation (same Docker command): `COMPILEALL_OK`,
+`875 passed, 2 warnings in 24.36s`.

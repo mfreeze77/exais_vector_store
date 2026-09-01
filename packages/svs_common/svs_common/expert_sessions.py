@@ -641,6 +641,102 @@ def _record_governance_audit(
     return audit_id
 
 
+def record_expert_turn_accounting(
+    db: Session,
+    principal: Principal,
+    response: Any,
+    *,
+    external_user_id: str | None = None,
+    conversation_id: str | None = None,
+) -> tuple[str, str]:
+    """Write one usage event and one audit event for a completed expert turn.
+
+    WAVE-125: both rows carry ``user_id`` and ``api_key_id`` from the principal so
+    a user-bound key is attributed natively; ``external_user_id`` and
+    ``conversation_id`` stay in metadata as the caller-side correlation ids.
+    Returns ``(usage_event_id, audit_event_id)``.
+    """
+
+    scope = _principal_scope(principal)
+    model_metadata = getattr(response, "model_metadata", None)
+    usage = getattr(model_metadata, "usage", None)
+    input_tokens = int(getattr(usage, "input_tokens", 0) or 0)
+    output_tokens = int(getattr(usage, "output_tokens", 0) or 0)
+    total_tokens = int(getattr(usage, "total_tokens", 0) or (input_tokens + output_tokens))
+    retrieval_trace = getattr(response, "retrieval_trace", None)
+    retrieval_status = getattr(retrieval_trace, "status", None)
+    retrieval_runs = len(getattr(retrieval_trace, "runs", None) or [])
+    expert_id = str(getattr(response, "expert_id", "") or "")
+    session_id = str(getattr(response, "session_id", "") or "")
+    provider = getattr(model_metadata, "provider", None)
+    model = getattr(model_metadata, "model", None)
+    correlation = {
+        "expert_id": expert_id,
+        "session_id": session_id,
+        "external_user_id": _optional(external_user_id),
+        "conversation_id": _optional(conversation_id),
+    }
+    usage_id = new_id("use")
+    db.execute(
+        jsonb_text(
+            """
+            INSERT INTO usage_events(
+              id, tenant_id, business_instance_id, user_id, api_key_id,
+              event_type, quantity, unit, provider, model, metadata
+            ) VALUES (
+              :id, :tenant_id, :biz_id, :user_id, :api_key_id,
+              'expert.message', :quantity, 'token', :provider, :model, CAST(:metadata AS jsonb)
+            )
+            """,
+            "metadata",
+        ),
+        {
+            **scope,
+            "id": usage_id,
+            "quantity": total_tokens,
+            "provider": provider,
+            "model": model,
+            "metadata": jsonb_param({
+                **correlation,
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "retrieval_status": retrieval_status,
+                "retrieval_runs": retrieval_runs,
+                "citation_count": len(getattr(response, "citations", None) or []),
+                "model_profile_id": getattr(model_metadata, "model_profile_id", None),
+            }),
+        },
+    )
+    audit_id = new_id("aud")
+    db.execute(
+        jsonb_text(
+            """
+            INSERT INTO audit_events(
+              id, tenant_id, business_instance_id, user_id, api_key_id,
+              event_type, action, resource_type, resource_id, security_level, metadata
+            ) VALUES (
+              :id, :tenant_id, :biz_id, :user_id, :api_key_id,
+              'expert', 'message', 'expert_session', :resource_id, :security_level, CAST(:metadata AS jsonb)
+            )
+            """,
+            "metadata",
+        ),
+        {
+            **scope,
+            "id": audit_id,
+            "resource_id": session_id or None,
+            "security_level": principal.max_security_level,
+            "metadata": jsonb_param({
+                **correlation,
+                "usage_event_id": usage_id,
+                "retrieval_status": retrieval_status,
+                "model_profile_id": getattr(model_metadata, "model_profile_id", None),
+            }),
+        },
+    )
+    return usage_id, audit_id
+
+
 def record_expert_feedback(
     db: Session,
     principal: Principal,
