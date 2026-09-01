@@ -381,8 +381,10 @@ The expected pairing is `users.external_id == external_user_id`: keep sending
 whose `external_user_id` disagrees with the key's bound user. A user-bound
 `retrieval:read` key gets `403` on every admin route (the only exception is
 `GET /api/v1/admin/session`, which echoes the caller's own identity), can
-never be minted with `api_keys:*`, `users:*`, `admin:*`, `usage:*`, `role:*`,
-`*`, or `system`, and cannot read another user's sessions, memory, or usage,
+only be minted with scopes from `retrieval:read`, `documents:read`,
+`documents:write`, `vector_stores:read`, `vector_stores:write` (never
+`api_keys:*`, `users:*`, `admin:*`, `usage:*`, `audit:*`, `fleet:*`, `role:*`,
+`*`, or `system`), and cannot read another user's sessions, memory, or usage,
 so it is safe to hand to a per-user agent process.
 
 Per-user reporting: `GET /api/v1/admin/usage?user_id=...&api_key_id=...` and

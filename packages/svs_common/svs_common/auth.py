@@ -98,24 +98,27 @@ def openai_admin_api_key_create_response(
     return payload
 
 
-# WAVE-125 QC: scope namespaces a user-bound (caller-provisioned) key may never carry.
-PRIVILEGED_SCOPE_NAMESPACES = ("api_keys", "users", "admin", "usage")
+# WAVE-125 QC: the only scopes a user-bound (caller-provisioned) key may carry.
+# An allow-list, so admin/api_keys/users/usage/audit/fleet/role/wildcard scopes
+# and any future privileged namespace are excluded by construction.
+USER_BOUND_ALLOWED_SCOPES = frozenset({
+    "retrieval:read",
+    "documents:read",
+    "documents:write",
+    "vector_stores:read",
+    "vector_stores:write",
+})
 
 
 def validate_delegated_scopes(principal: Principal, scopes: list[str], *, user_bound: bool) -> list[str]:
     """A principal can only mint scopes it already holds (``*``/``system`` included).
 
-    User-bound keys additionally may not carry privileged namespaces, any
-    ``role:`` scope, or the wildcards, regardless of what the creator holds.
+    User-bound keys additionally may only carry exact scopes from
+    ``USER_BOUND_ALLOWED_SCOPES``, regardless of what the creator holds.
     """
     requested = [str(scope).strip() for scope in scopes if str(scope).strip()]
     if user_bound:
-        forbidden = [
-            scope for scope in requested
-            if scope in ("*", "system")
-            or scope.startswith("role:")
-            or scope.split(":", 1)[0] in PRIVILEGED_SCOPE_NAMESPACES
-        ]
+        forbidden = [scope for scope in requested if scope not in USER_BOUND_ALLOWED_SCOPES]
         if forbidden:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -156,7 +159,7 @@ def create_api_key(db: Session, principal: Principal, label: str, scopes: list[s
 
     Every creation path enforces the delegation rules: requested scopes must be
     a subset of the creator's, the level may not exceed the creator's, and a
-    user-bound key may not carry privileged, role, or wildcard scopes.
+    user-bound key may only carry scopes from ``USER_BOUND_ALLOWED_SCOPES``.
     """
     effective_expires_at = _validate_api_key_expires_at(expires_at)
     requested_scopes = list(scopes) if scopes is not None else list(DEFAULT_API_KEY_SCOPES)

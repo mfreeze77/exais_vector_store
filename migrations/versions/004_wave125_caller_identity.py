@@ -1,7 +1,11 @@
 """WAVE-125: caller-provisioned users, user-bound API keys, and per-key attribution.
 
 - users.external_id (caller-side id) with a unique index on (tenant_id, external_id)
-- users.business_instance_id so a cell admin key only sees users it provisioned
+- users.business_instance_id so a cell admin key only sees users it provisioned;
+  CHECK (business_instance_id IS NULL OR external_id IS NOT NULL) makes the
+  "caller-provisioned user" discriminator structural: every instance-scoped
+  user has an external_id, and legacy tenant-level users (bootstrap admin) stay
+  NULL/NULL
 - users.email becomes nullable (external_id-only users have no email)
 - users.deactivated_at / users.updated_at for the deactivate lifecycle
 - usage_events.api_key_id and rate_limit_counters.{api_key_id,user_id} so usage
@@ -65,6 +69,9 @@ def upgrade() -> None:
         ALTER TABLE users DROP CONSTRAINT IF EXISTS users_external_id_not_blank;
         ALTER TABLE users ADD CONSTRAINT users_external_id_not_blank
           CHECK (external_id IS NULL OR btrim(external_id) <> '');
+        ALTER TABLE users DROP CONSTRAINT IF EXISTS users_instance_user_has_external_id;
+        ALTER TABLE users ADD CONSTRAINT users_instance_user_has_external_id
+          CHECK (business_instance_id IS NULL OR external_id IS NOT NULL);
 
         CREATE UNIQUE INDEX IF NOT EXISTS uq_users_tenant_external_id
           ON users(tenant_id, external_id)
@@ -112,6 +119,7 @@ def downgrade() -> None:
         ALTER TABLE usage_events DROP COLUMN IF EXISTS api_key_id;
         DROP INDEX IF EXISTS idx_users_instance_created;
         DROP INDEX IF EXISTS uq_users_tenant_external_id;
+        ALTER TABLE users DROP CONSTRAINT IF EXISTS users_instance_user_has_external_id;
         ALTER TABLE users DROP CONSTRAINT IF EXISTS users_external_id_not_blank;
         ALTER TABLE users DROP COLUMN IF EXISTS updated_at;
         ALTER TABLE users DROP COLUMN IF EXISTS deactivated_at;

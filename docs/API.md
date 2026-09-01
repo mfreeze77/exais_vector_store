@@ -400,7 +400,10 @@ optional `external_id` / `status` (`active`|`deactivated`) filters.
 `POST /api/v1/admin/users/{user_id}/deactivate` marks the user deactivated,
 revokes every active key bound to it (returned as `revoked_api_key_ids`), emits
 an `admin`/`user.deactivate` audit event, and preserves session, usage, and
-audit history. Subsequent calls with a revoked key are `401`; a key that
+audit history. Every user created through this route is instance-scoped and
+carries an `external_id`; the schema enforces `CHECK (business_instance_id IS
+NULL OR external_id IS NOT NULL)`, so a user-bound key is structurally one
+whose user has an `external_id`. Subsequent calls with a revoked key are `401`; a key that
 somehow remains active for a deactivated user also fails `401` at principal
 resolution. These routes require `users:write` or `api_keys:write` (listing
 also accepts `users:read` / `api_keys:read`) and use the admin rate limit.
@@ -411,9 +414,10 @@ also accepts `users:read` / `api_keys:read`) and use the admin rate limit.
 
 - the user must exist in the principal's tenant and business instance and be
   `active` (`404` / `409` otherwise);
-- `scopes` defaults to `retrieval:read` and every requested scope must already
-  be held by the creating principal (`403 insufficient_scope` lists the
-  denied scopes; `*` and `system` are never delegated);
+- `scopes` defaults to `retrieval:read`; every requested scope must be on the
+  user-bound allow-list (`403 scope_not_delegable_to_user_bound_key`) and
+  already held by the creating principal (`403 insufficient_scope` lists the
+  denied scopes);
 - `max_security_level` defaults to the creator's level and may not exceed it
   (`422`);
 - the response includes `user_id` and, exactly once, the raw `api_key`.
@@ -432,9 +436,12 @@ Delegation rules apply to **every** key creation, with or without `user_id`:
 requested scopes must already be held by the creating principal (`*` and
 `system` can only be minted by a principal that holds them) and
 `max_security_level` defaults to and may not exceed the creator's. A key bound
-to a user may additionally never carry `api_keys:*`, `users:*`, `admin:*`,
-`usage:*`, any `role:` scope, `*`, or `system`, regardless of what the creator
-holds (`403 scope_not_delegable_to_user_bound_key`). Principal resolution
+to a user may additionally carry only exact scopes from the allow-list
+`retrieval:read`, `documents:read`, `documents:write`, `vector_stores:read`,
+`vector_stores:write`, regardless of what the creator holds; anything else
+(`api_keys:*`, `users:*`, `admin:*`, `usage:*`, `audit:*`, `fleet:*`, `role:*`,
+namespace wildcards, `*`, `system`, and any future namespace) is
+`403 scope_not_delegable_to_user_bound_key` by construction. Principal resolution
 fails `401` when a key's bound user cannot be found in the key's tenant or is
 not `active`; a bound key never degrades into an unbound cell key.
 

@@ -2092,6 +2092,8 @@ def _caller_user_bound(principal: Principal) -> bool:
 
     Cell/bootstrap admin keys may also carry a user_id, but only WAVE-125
     caller-provisioned users have an external_id, so that is the discriminator.
+    Migration 004 makes it structural: CHECK (business_instance_id IS NULL OR
+    external_id IS NOT NULL) on users.
     """
     return bool(principal.external_id)
 
@@ -2302,8 +2304,8 @@ def create_instance_api_key(
     if scopes is None:
         scopes = DEFAULT_USER_BOUND_API_KEY_SCOPES if user_id else DEFAULT_INSTANCE_API_KEY_SCOPES
     # QC: delegation rules apply to every key creation, bound or not. A principal
-    # can never mint scopes or a level it does not hold; user-bound keys also
-    # cannot carry privileged, role, or wildcard scopes.
+    # can never mint scopes or a level it does not hold; user-bound keys are
+    # further restricted to the USER_BOUND_ALLOWED_SCOPES allow-list.
     scope_list = validate_delegated_scopes(
         principal,
         [s.strip() for s in scopes.split(',') if s.strip()],

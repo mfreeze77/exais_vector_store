@@ -26,7 +26,7 @@ from svs_common import auth as auth_mod
 from svs_common import expert_profiles
 from svs_common import retrieval as retrieval_mod
 from svs_common import ingestion as ingestion_mod
-from svs_common.auth import create_api_key, list_api_keys, resolve_api_key_principal
+from svs_common.auth import USER_BOUND_ALLOWED_SCOPES, create_api_key, list_api_keys, resolve_api_key_principal
 from svs_common.expert_profiles import (
     ExpertProfileDefinition,
     ExpertVectorStoreBindingDefinition,
@@ -511,14 +511,29 @@ def test_every_key_creation_enforces_subset_scopes_and_level_cap(monkeypatch):
     assert seen == {"scopes": ["*"], "level": 5}
 
 
-def test_user_bound_keys_can_never_carry_privileged_role_or_wildcard_scopes(monkeypatch):
+def test_user_bound_keys_only_carry_allow_listed_scopes(monkeypatch):
+    assert USER_BOUND_ALLOWED_SCOPES == {
+        "retrieval:read", "documents:read", "documents:write", "vector_stores:read", "vector_stores:write",
+    }
     monkeypatch.setattr(api_main, "create_api_key", lambda *a, **k: pytest.fail("must not mint"))
     owner = _principal(scopes=["*"], max_security_level=5)
-    for scopes in ("api_keys:write", "users:read", "admin:read", "usage:read", "role:owner", "*", "system", "retrieval:read,api_keys:read"):
+    for scopes in (
+        "api_keys:write", "users:read", "admin:read", "usage:read", "audit:read", "fleet:read",
+        "role:owner", "*", "system", "documents:*", "vector_stores:*", "future:anything",
+        "retrieval:read,api_keys:read",
+    ):
         with pytest.raises(HTTPException) as exc:
             api_main.create_instance_api_key(user_id="usr_bound", scopes=scopes, principal=owner, db=_Db(results=[_user_row()]))
         assert exc.value.status_code == 403, scopes
         assert exc.value.detail["error"] == "scope_not_delegable_to_user_bound_key", scopes
+        assert exc.value.detail["required"] == [s for s in scopes.split(",") if s not in USER_BOUND_ALLOWED_SCOPES], scopes
+
+    # Every allow-listed scope is mintable by a creator that holds it.
+    seen = {}
+    monkeypatch.setattr(api_main, "create_api_key", lambda db, p, label, scopes, level, exp, **kw: seen.update(scopes=scopes) or {"id": "k", "api_key": "s", "label": label, "scopes": scopes, "max_security_level": level, "user_id": kw.get("user_id")})
+    api_main.create_instance_api_key(user_id="usr_bound", scopes=",".join(sorted(USER_BOUND_ALLOWED_SCOPES)), principal=owner, db=_Db(results=[_user_row()]))
+    assert set(seen["scopes"]) == USER_BOUND_ALLOWED_SCOPES
+    monkeypatch.setattr(api_main, "create_api_key", lambda *a, **k: pytest.fail("must not mint"))
     # The auth layer refuses the same delegation directly.
     with pytest.raises(HTTPException) as exc:
         create_api_key(_Db(), owner, "bound", ["usage:read"], user_id="usr_bound")
@@ -876,6 +891,8 @@ def test_alembic_revision_adds_caller_identity_columns():
     assert 'revision = "004_wave125_caller_identity"' in body
     assert 'down_revision = "003_expert_conversation_sessions"' in body
     for fragment in (
+        "CHECK (business_instance_id IS NULL OR external_id IS NOT NULL)",
+        "DROP CONSTRAINT IF EXISTS users_instance_user_has_external_id",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS external_id TEXT",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS business_instance_id TEXT",
         "ALTER TABLE users ALTER COLUMN email DROP NOT NULL",
@@ -901,6 +918,36 @@ def _load_migration_004():
     sys.modules["wave125_migration_004"] = module
     spec.loader.exec_module(module)
     return module
+
+
+def test_upgrade_adds_structural_user_bound_discriminator(monkeypatch):
+    module = _load_migration_004()
+
+    class _Conn:
+        def __init__(self):
+            self.executed = []
+
+        def execute(self, stmt, params=None):
+            # _formatted() asks Postgres to render GRANT statements; echo the template.
+            return SimpleNamespace(scalar_one=lambda: str(params.get("template", "")) if params else "")
+
+        def exec_driver_sql(self, sql):
+            self.executed.append(str(sql))
+
+    conn = _Conn()
+    monkeypatch.setattr(module, "op", SimpleNamespace(get_bind=lambda: conn))
+    module.upgrade()
+    schema_sql = "\n".join(conn.executed)
+    assert "ADD CONSTRAINT users_instance_user_has_external_id" in schema_sql
+    assert "CHECK (business_instance_id IS NULL OR external_id IS NOT NULL)" in schema_sql
+    assert "ADD COLUMN IF NOT EXISTS external_id TEXT" in schema_sql
+    assert "GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE %I TO %I" in schema_sql
+
+    dropped = _Conn()
+    monkeypatch.setattr(module, "op", SimpleNamespace(get_bind=lambda: dropped))
+    dropped.execute = lambda stmt, params=None: SimpleNamespace(scalar_one=lambda: 0)
+    module.downgrade()
+    assert any("DROP CONSTRAINT IF EXISTS users_instance_user_has_external_id" in sql for sql in dropped.executed)
 
 
 def test_downgrade_restores_email_not_null_and_refuses_null_emails(monkeypatch):

@@ -359,3 +359,27 @@ missing-user `401` case in `test_resolve_principal_carries_external_id...`.
 
 Validation (same Docker command as above): `COMPILEALL_OK`,
 `874 passed, 2 warnings in 23.98s`.
+
+### QC round 2 (approved at 9871eb1; two non-blocking hardening items folded in)
+
+1. Structural discriminator: migration 004 (unreleased, edited in place) adds
+   `CONSTRAINT users_instance_user_has_external_id CHECK
+   (business_instance_id IS NULL OR external_id IS NOT NULL)` on `users`
+   (idempotent `DROP CONSTRAINT IF EXISTS` first) and the downgrade drops it
+   before removing the columns. Legacy tenant-level users (NULL/NULL) remain
+   valid. `test_upgrade_adds_structural_user_bound_discriminator` runs
+   `upgrade()` and `downgrade()` against a fake bind and asserts the ADD and
+   DROP statements.
+2. Allow-list replaces the deny-list: `auth.USER_BOUND_ALLOWED_SCOPES =
+   {retrieval:read, documents:read, documents:write, vector_stores:read,
+   vector_stores:write}` (the non-privileged subset of the existing default
+   caller scopes). A user-bound key may carry only exact scopes from that set,
+   so `audit:*`, `fleet:*`, namespace wildcards, `role:*`, `*`, `system`, and
+   any future namespace are refused by construction
+   (`403 scope_not_delegable_to_user_bound_key`).
+   `test_user_bound_keys_only_carry_allow_listed_scopes` covers thirteen
+   refused inputs and proves every allow-listed scope is mintable.
+   `docs/API.md` and `docs/CALLER_AGENT_INTEGRATION.md` updated.
+
+Validation (same Docker command): `COMPILEALL_OK`,
+`875 passed, 2 warnings in 24.36s`.
