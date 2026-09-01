@@ -57,6 +57,11 @@ class ExpertProfileDefinition:
     model_policy: ExpertModelPolicy
     tool_limits: ExpertToolLimits
     allow_automatic_graph_lens_selection: bool = True
+    # WAVE-125: routing metadata. Compiled WAVE-124 packages populate these from
+    # package.yaml; hand-registered experts set them here. Neither field grants
+    # or widens visibility.
+    jurisdiction_key: str | None = None
+    corpus: str | None = None
 
 
 _RETRIEVED_CORPUS_CITATION_POLICY = ExpertCitationPolicy(
@@ -106,6 +111,8 @@ EXPERT_PROFILE_REGISTRY: tuple[ExpertProfileDefinition, ...] = (
         ),
         model_policy=_DEFAULT_MODEL_POLICY,
         tool_limits=_DEFAULT_TOOL_LIMITS,
+        jurisdiction_key="ks:state:kansas",
+        corpus="court_decisions",
     ),
     ExpertProfileDefinition(
         id="topeka-municipal-code",
@@ -135,8 +142,17 @@ EXPERT_PROFILE_REGISTRY: tuple[ExpertProfileDefinition, ...] = (
         ),
         model_policy=_DEFAULT_MODEL_POLICY,
         tool_limits=_DEFAULT_TOOL_LIMITS,
+        jurisdiction_key="ks:city:topeka",
+        corpus="municipal_code",
     ),
 )
+
+
+def _normalized_filter(value: str | None) -> str | None:
+    if value is None:
+        return None
+    normalized = str(value).strip()
+    return normalized or None
 
 
 def expert_profile_definition(expert_id: str) -> ExpertProfileDefinition | None:
@@ -221,6 +237,8 @@ def resolve_expert_profile(db: Session, principal: Principal, expert_id: str) ->
         label=definition.label,
         description=definition.description,
         system_prompt=definition.system_prompt,
+        jurisdiction_key=definition.jurisdiction_key,
+        corpus=definition.corpus,
         vector_stores=vector_stores,
         graph_lens_policy=ExpertGraphLensPolicy(
             allow_automatic_selection=definition.allow_automatic_graph_lens_selection,
@@ -237,15 +255,33 @@ def resolve_expert_profile(db: Session, principal: Principal, expert_id: str) ->
     )
 
 
-def list_expert_profiles(db: Session, principal: Principal) -> ExpertProfileListResponse:
-    """List only profiles whose complete binding set is visible to the principal."""
+def list_expert_profiles(
+    db: Session,
+    principal: Principal,
+    *,
+    jurisdiction_key: str | None = None,
+    corpus: str | None = None,
+) -> ExpertProfileListResponse:
+    """List only profiles whose complete binding set is visible to the principal.
 
+    ``jurisdiction_key`` and ``corpus`` (WAVE-125) are applied only after the
+    tenant, instance, principal, and binding checks in ``resolve_expert_profile``
+    have passed, so a filter can narrow the visible set but never widen it.
+    """
+
+    wanted_jurisdiction = _normalized_filter(jurisdiction_key)
+    wanted_corpus = _normalized_filter(corpus)
     profiles: list[ExpertProfile] = []
     for definition in EXPERT_PROFILE_REGISTRY:
         try:
-            profiles.append(resolve_expert_profile(db, principal, definition.id))
+            profile = resolve_expert_profile(db, principal, definition.id)
         except ExpertProfileNotFoundError:
             continue
+        if wanted_jurisdiction is not None and profile.jurisdiction_key != wanted_jurisdiction:
+            continue
+        if wanted_corpus is not None and profile.corpus != wanted_corpus:
+            continue
+        profiles.append(profile)
     return ExpertProfileListResponse(
         data=profiles,
         first_id=profiles[0].id if profiles else None,

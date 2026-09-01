@@ -1061,6 +1061,10 @@ def test_message_route_path_binds_expert_and_persists_idempotent_response(monkey
 
     class _Db:
         committed = False
+        calls: list = []
+
+        def execute(self, stmt, params=None):
+            self.calls.append((str(stmt), dict(params or {})))
 
         def commit(self):
             self.committed = True

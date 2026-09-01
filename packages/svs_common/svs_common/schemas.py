@@ -23,6 +23,9 @@ class Principal(BaseModel):
     groups: list[str] = Field(default_factory=list)
     max_security_level: int = 1
     scopes: list[str] = Field(default_factory=list)
+    # WAVE-125: caller-side identifier of the bound user, when the API key is
+    # bound to a caller-provisioned user with an external_id.
+    external_id: str | None = None
 
 
 class HealthResponse(BaseModel):
@@ -890,6 +893,18 @@ class ExpertToolLimits(BaseModel):
     max_context_tokens: int = Field(ge=1)
 
 
+ExpertCorpus = Literal[
+    'statutes',
+    'court_decisions',
+    'municipal_code',
+    'administrative_regulations',
+    'legislative_materials',
+    'meeting_records',
+    'other',
+]
+EXPERT_CORPUS_KINDS = frozenset(get_args(ExpertCorpus))
+
+
 class ExpertProfile(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -898,6 +913,12 @@ class ExpertProfile(BaseModel):
     label: str
     description: str
     system_prompt: str
+    # WAVE-125: caller-defined jurisdiction key (for example `ks:city:topeka`)
+    # and the corpus family the expert answers for. Both are declared by the
+    # expert registry / WAVE-124 package and are informational for routing;
+    # they never widen visibility.
+    jurisdiction_key: str | None = None
+    corpus: ExpertCorpus | None = None
     vector_stores: list[ExpertVectorStoreBinding] = Field(min_length=1)
     graph_lens_policy: ExpertGraphLensPolicy
     citation_policy: ExpertCitationPolicy
@@ -1997,12 +2018,15 @@ class AdminSessionResponse(BaseModel):
 class UsageEventResponse(BaseModel):
     model_config = ConfigDict(extra='allow')
 
+    id: str | None = None
     event_type: str
     quantity: int | float
     unit: str
     provider: str | None = None
     model: str | None = None
     cost_estimate_usd: float | None = None
+    user_id: str | None = None
+    api_key_id: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
     created_at: int | None = None
 
@@ -2013,6 +2037,89 @@ class UsageEventListResponse(BaseModel):
     first_id: str | None = None
     last_id: str | None = None
     has_more: bool = False
+
+
+UsageSummaryGroupBy = Literal['user', 'api_key']
+
+
+class UsageSummaryRow(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    object: Literal['usage.summary.row'] = 'usage.summary.row'
+    group_by: UsageSummaryGroupBy
+    group_id: str | None = None
+    external_id: str | None = None
+    event_count: int
+    quantity: float
+    cost_estimate_usd: float | None = None
+
+
+class UsageSummaryResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
+
+    object: Literal['usage.summary'] = 'usage.summary'
+    group_by: UsageSummaryGroupBy
+    from_ts: int | None = Field(default=None, alias='from')
+    to_ts: int | None = Field(default=None, alias='to')
+    data: list[UsageSummaryRow] = Field(default_factory=list)
+
+
+class AdminUserCreateRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    external_id: str = Field(min_length=1, max_length=255)
+    email: str | None = Field(default=None, max_length=320)
+    display_name: str | None = Field(default=None, max_length=255)
+
+    @field_validator('external_id')
+    @classmethod
+    def _non_blank_external_id(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError('external_id must be a non-empty string')
+        return normalized
+
+    @field_validator('email', 'display_name')
+    @classmethod
+    def _normalize_optional_user_string(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        normalized = value.strip()
+        return normalized or None
+
+
+class AdminUserResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object: Literal['user'] = 'user'
+    external_id: str | None = None
+    email: str | None = None
+    display_name: str | None = None
+    status: str
+    business_instance_id: str | None = None
+    created_at: int | None = None
+    deactivated_at: int | None = None
+
+
+class AdminUserListResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    object: Literal['list'] = 'list'
+    data: list[AdminUserResponse] = Field(default_factory=list)
+    first_id: str | None = None
+    last_id: str | None = None
+    has_more: bool = False
+
+
+class AdminUserDeactivateResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object: Literal['user.deactivated'] = 'user.deactivated'
+    deactivated: bool = True
+    revoked_api_key_ids: list[str] = Field(default_factory=list)
+    data: AdminUserResponse
 
 
 class AuditEventResponse(BaseModel):
@@ -2051,6 +2158,7 @@ class InstanceApiKeyResponse(BaseModel):
     scopes: list[str] = Field(default_factory=list)
     max_security_level: int
     api_key: str | None = None
+    user_id: str | None = None
     status: str | None = None
     created_at: int | None = None
     last_used_at: int | None = None

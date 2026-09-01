@@ -1333,9 +1333,10 @@ class RetrievalService:
               "resource_id": req.vector_store_id, "lvl": principal.max_security_level, "query_hash": query_hash(req.query),
               "metadata": jsonb_param(metadata)})
         db.execute(jsonb_text("""
-            INSERT INTO usage_events(id, tenant_id, business_instance_id, user_id, event_type, quantity, unit, metadata)
-            VALUES (:id, :tenant_id, :biz_id, :user_id, 'retrieval.query', 1, 'query', CAST(:metadata AS jsonb))
+            INSERT INTO usage_events(id, tenant_id, business_instance_id, user_id, api_key_id, event_type, quantity, unit, metadata)
+            VALUES (:id, :tenant_id, :biz_id, :user_id, :api_key_id, 'retrieval.query', 1, 'query', CAST(:metadata AS jsonb))
         """, 'metadata'), {"id": new_id("use"), "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "user_id": principal.user_id,
+              "api_key_id": principal.api_key_id,
               "metadata": jsonb_param({"vector_store_id": req.vector_store_id, "top_k": req.top_k, "result_count": len(result_ids)})})
         return aud
 

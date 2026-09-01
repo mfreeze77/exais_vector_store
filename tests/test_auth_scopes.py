@@ -134,7 +134,7 @@ def test_create_api_key_rejects_past_expiration(monkeypatch):
 def test_create_api_key_route_passes_expiration_and_commits(monkeypatch):
     seen = {}
 
-    def fake_create_key(db, principal, label, scopes, max_security_level, expires_at):
+    def fake_create_key(db, principal, label, scopes, max_security_level, expires_at, *, user_id=None):
         seen["args"] = {
             "db": db,
             "principal": principal,
