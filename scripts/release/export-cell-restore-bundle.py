@@ -579,6 +579,7 @@ def write_checksums(bundle_dir: Path) -> Path:
     checksum_path.write_text(
         "".join(f"{sha256_file(path)}  ./{path.relative_to(bundle_dir).as_posix()}\n" for path in files),
         encoding="utf-8",
+        newline="\n",
     )
     return checksum_path
 
@@ -688,7 +689,7 @@ def create_bundle_archive(bundle_dir: Path) -> tuple[Path, Path]:
     with tarfile.open(archive_path, "w:gz") as archive:
         archive.add(bundle_dir, arcname=bundle_dir.name)
     checksum_path = Path(str(archive_path) + ".sha256")
-    checksum_path.write_text(f"{sha256_file(archive_path)}  {archive_path.name}\n", encoding="utf-8")
+    checksum_path.write_text(f"{sha256_file(archive_path)}  {archive_path.name}\n", encoding="utf-8", newline="\n")
     return archive_path, checksum_path
 
 

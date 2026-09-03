@@ -18,11 +18,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
-from release_common import DEFAULT_CELL, api_base, compose_network_name, ensure_env, project_name, read_env, release_dir
+from release_common import DEFAULT_CELL, ROOT, api_base, compose_network_name, ensure_env, project_name, read_env, release_dir
 from scale_common import chunk_vector_store_where, job_vector_store_where, parse_int_row, psql, sql_literal
 
 
-DEFAULT_SOURCE_ROOT = Path(r"C:\Users\mfrie\Ai_Projects\ksa-diff-collector-main")
+# The collector repo is a sibling checkout of this one; override with KSCOURTS_SOURCE_ROOT.
+DEFAULT_SOURCE_ROOT = Path(os.environ.get("KSCOURTS_SOURCE_ROOT") or ROOT.parent / "ksa-diff-collector-main")
 DEFAULT_MANIFEST = Path(r"data\raw\kscourts-decisions\decisions_manifest.csv")
 DEFAULT_STATE_RELATIVE = Path("kscourts-ingest") / "progress.jsonl"
 DEFAULT_VECTOR_STORE_NAME = "Kansas Court Decisions"
