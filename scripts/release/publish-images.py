@@ -20,8 +20,12 @@ from provenance_common import (
     write_release_manifest,
 )
 
+# The containerd image store (Docker Desktop default since 4.x) pushes an OCI
+# image index, so the registry check must accept that media type too or
+# registry:2 answers 404 for a tag that was just pushed.
 ACCEPT_HEADER = (
-    "Accept: application/vnd.oci.image.manifest.v1+json, "
+    "Accept: application/vnd.oci.image.index.v1+json, "
+    "application/vnd.oci.image.manifest.v1+json, "
     "application/vnd.docker.distribution.manifest.v2+json, "
     "application/vnd.docker.distribution.manifest.list.v2+json"
 )
