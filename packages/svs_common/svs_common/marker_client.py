@@ -29,6 +29,7 @@ def _read_config() -> dict[str, str | None]:
     env = {
         "api_key": os.getenv("MARKER_RUNPOD_API_KEY") or None,
         "endpoint_id": os.getenv("MARKER_RUNPOD_ENDPOINT_ID") or None,
+        "legacy_marker_endpoint_id": os.getenv("RUNPOD_MARKER_ENDPOINT_ID") or None,
         "fallback_api_key": os.getenv("RUNPOD_API_KEY") or None,
         "fallback_endpoint_id": os.getenv("RUNPOD_ENDPOINT_ID") or None,
         "mode": (os.getenv("MARKER_MODE") or "").strip().lower() or None,
@@ -44,7 +45,9 @@ def _read_config() -> dict[str, str | None]:
     except Exception:
         return {
             "api_key": env["api_key"] or env["fallback_api_key"],
-            "endpoint_id": env["endpoint_id"] or env["fallback_endpoint_id"],
+            "endpoint_id": env["endpoint_id"]
+            or env["legacy_marker_endpoint_id"]
+            or env["fallback_endpoint_id"],
             "mode": env["mode"] or "remote",
             "timeout_sec": env["timeout_sec"],
             "poll_interval_sec": env["poll_interval_sec"],
@@ -53,7 +56,11 @@ def _read_config() -> dict[str, str | None]:
         }
     return {
         "api_key": env["api_key"] or settings.marker_runpod_api_key or env["fallback_api_key"] or settings.runpod_api_key,
-        "endpoint_id": env["endpoint_id"] or settings.marker_runpod_endpoint_id or env["fallback_endpoint_id"] or settings.runpod_endpoint_id,
+        "endpoint_id": env["endpoint_id"]
+        or settings.marker_runpod_endpoint_id
+        or env["legacy_marker_endpoint_id"]
+        or env["fallback_endpoint_id"]
+        or settings.runpod_endpoint_id,
         "mode": env["mode"] or settings.marker_mode,
         "timeout_sec": env["timeout_sec"] or str(settings.marker_timeout_sec),
         "poll_interval_sec": env["poll_interval_sec"] or str(settings.marker_poll_interval_sec),
@@ -210,7 +217,8 @@ class MarkerRunpodClient:
         if not self.api_key or not self.endpoint_id:
             raise MarkerRunpodError(
                 "Marker RunPod transport is not configured: set MARKER_RUNPOD_API_KEY and "
-                "MARKER_RUNPOD_ENDPOINT_ID, or fallback RUNPOD_API_KEY and RUNPOD_ENDPOINT_ID."
+                "MARKER_RUNPOD_ENDPOINT_ID, or use RUNPOD_API_KEY with the compatible "
+                "RUNPOD_MARKER_ENDPOINT_ID/RUNPOD_ENDPOINT_ID alias."
             )
 
     def _auth_headers(self) -> dict[str, str]:

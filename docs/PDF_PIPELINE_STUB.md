@@ -29,7 +29,10 @@ Raw PDF upload path:
 
 `MARKER_*` variables are preferred. For local proof compatibility, if
 `MARKER_RUNPOD_API_KEY` or `MARKER_RUNPOD_ENDPOINT_ID` is omitted, the client can
-fall back to `RUNPOD_API_KEY` and `RUNPOD_ENDPOINT_ID`.
+fall back to `RUNPOD_API_KEY` and `RUNPOD_ENDPOINT_ID`. Existing StateCivics
+environments may supply the Marker-specific `RUNPOD_MARKER_ENDPOINT_ID` alias;
+it takes precedence over the generic endpoint but not over
+`MARKER_RUNPOD_ENDPOINT_ID`.
 
 RunPod serverless protocol:
 

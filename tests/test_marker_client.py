@@ -135,6 +135,50 @@ def test_marker_client_uses_runpod_alias_when_marker_config_absent(monkeypatch: 
     assert client.endpoint_id == "alias-endpoint"
 
 
+def test_marker_client_accepts_statecivics_marker_endpoint_alias(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    from svs_common import config as svs_config
+
+    monkeypatch.delenv("MARKER_RUNPOD_API_KEY", raising=False)
+    monkeypatch.delenv("MARKER_RUNPOD_ENDPOINT_ID", raising=False)
+    monkeypatch.delenv("RUNPOD_ENDPOINT_ID", raising=False)
+    monkeypatch.setenv("RUNPOD_API_KEY", "statecivics-key")
+    monkeypatch.setenv("RUNPOD_MARKER_ENDPOINT_ID", "statecivics-marker-endpoint")
+    monkeypatch.setattr(
+        svs_config,
+        "get_settings",
+        lambda: SimpleNamespace(
+            marker_runpod_api_key=None,
+            marker_runpod_endpoint_id=None,
+            runpod_api_key=None,
+            runpod_endpoint_id=None,
+            marker_mode="remote",
+            marker_timeout_sec=30,
+            marker_poll_interval_sec=1,
+            marker_max_attempts=1,
+            marker_retry_backoff_sec=0,
+        ),
+    )
+
+    client = MarkerRunpodClient()
+
+    assert client.api_key == "statecivics-key"
+    assert client.endpoint_id == "statecivics-marker-endpoint"
+
+
+def test_marker_specific_endpoint_precedes_legacy_and_generic_aliases(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("MARKER_RUNPOD_ENDPOINT_ID", "preferred-marker-endpoint")
+    monkeypatch.setenv("RUNPOD_MARKER_ENDPOINT_ID", "legacy-marker-endpoint")
+    monkeypatch.setenv("RUNPOD_ENDPOINT_ID", "generic-endpoint")
+
+    client = MarkerRunpodClient(api_key="key")
+
+    assert client.endpoint_id == "preferred-marker-endpoint"
+
+
 def test_marker_client_uses_runpod_alias_when_settings_unavailable(monkeypatch: pytest.MonkeyPatch):
     from svs_common import config as svs_config
 
