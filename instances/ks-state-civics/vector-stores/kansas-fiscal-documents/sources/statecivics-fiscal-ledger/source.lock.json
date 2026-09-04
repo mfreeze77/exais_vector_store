@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lockedAt": "2026-09-04T08:11:51Z",
+  "lockedAt": "2026-09-04T16:28:38Z",
   "sourceType": "statecivics_custody_ledger_projection",
   "sourceManifest": {
     "format": "jsonl",
@@ -9,7 +9,7 @@
   },
   "producer": {
     "repository": "operator-source://statecivics-recovered-local",
-    "revision": "b3f5c09170c66453097bcd4fb44c6eb2b9031f39",
+    "revision": "4a8cab323f73f360b4bfec2e361c3737f434c4bb",
     "entrypoint": "scripts/operator/export_retrieval_manifest.py",
     "contract": "contracts/civic-impact/retrieval-export-record.schema.json",
     "contractSha256": "78a3de138cdb534831df034bc66f6a6a2bf7ec3f5d6d573efedf2b50d7a7f32b"
@@ -48,6 +48,27 @@
         "text"
       ],
       "boundary": "Proves the configured RunPod Marker endpoint can parse a real Kansas fiscal PDF. It does not prove ExAIS API persistence, vector indexing, or recall."
+    },
+    "lastQualityProof": {
+      "observedAt": "2026-09-04T16:28:38Z",
+      "status": "passed",
+      "scope": "single_marker_response_fiscal_table_fidelity",
+      "profile": "quality/fy2025-director-presentation.json",
+      "profileSha256": "c7d024d803c7e0feb685569a1eac786a622ade2445fb740a42e9d4b4968b53f0",
+      "sourceDocument": "FY2025_GBR_Director_Presentation-UPDATED_01.16.2024.pdf",
+      "sourceByteCount": 717996,
+      "sourceSha256": "8cc58bf8da72e204c2966fb7e8c1034aca334cbcf7b0f68a8ec4e701eea4c717",
+      "attemptCount": 1,
+      "markerJobCount": 1,
+      "markdownCharCount": 30615,
+      "markdownSha256": "9f43516abbac42fe4b383fd7352f1699a0b34f448081981981204f702274c33c",
+      "tableCount": 6,
+      "tableRowCount": 125,
+      "tableCellCount": 927,
+      "anchorChecksPassed": 3,
+      "tableChecksPassed": 3,
+      "expectedRowsMatched": 9,
+      "boundary": "One Marker job produced one response. All quality metrics and row checks were computed from that response; no second extraction was run."
     }
   }
 }

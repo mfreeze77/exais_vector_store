@@ -6,10 +6,13 @@ import logging
 import os
 import re
 import time
+from collections.abc import Awaitable, Callable
 from pathlib import Path
-from typing import Any, Awaitable, Callable
+from typing import Any
 
 import httpx
+
+from .marker_quality import summarize_markdown
 
 logger = logging.getLogger(__name__)
 
@@ -162,6 +165,9 @@ def marker_attribute_summary(
         }
         if safe_metadata:
             attrs["marker_metadata"] = safe_metadata
+    # Derived from the same Marker response that is about to be ingested. This
+    # records structural table coverage without another extraction or network call.
+    attrs.update(summarize_markdown(extract_markdown(output)))
     return attrs
 
 

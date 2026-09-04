@@ -16,7 +16,7 @@ registered custody object rather than harvest again or infer canonical joins
 from vector similarity.
 
 The producer contract is pinned to StateCivics commit
-`b3f5c09170c66453097bcd4fb44c6eb2b9031f39` and retrieval-export contract SHA
+`4a8cab323f73f360b4bfec2e361c3737f434c4bb` and retrieval-export contract SHA
 `78a3de138cdb534831df034bc66f6a6a2bf7ec3f5d6d573efedf2b50d7a7f32b`.
 
 ## Scope
@@ -25,6 +25,8 @@ The producer contract is pinned to StateCivics commit
 - Extend multipart upload metadata without bypassing its Marker PDF route.
 - Validate and consume deterministic StateCivics desired-state JSONL.
 - Verify custody URI, bytes, ledger hash, MIME routing, rights, and lifecycle.
+- Prove representative fiscal-table fidelity from one Marker response without
+  paying for or comparing against a second extraction.
 - Add a non-production source package and fiscal recall/provenance gate.
 
 ## Out Of Scope
@@ -58,6 +60,9 @@ The producer contract is pinned to StateCivics commit
   closed before an API write.
 - Recall proof requires relevant content, a public citation, and StateCivics
   logical-document plus source-revision provenance.
+- The Marker quality proof pins source bytes, requires expected document
+  anchors, and matches nine fiscal rows across three tables from the same
+  response used to compute its output digest and structural counts.
 
 ## Dependencies
 
@@ -76,6 +81,7 @@ pytest -q \
   tests/test_documents_ingest.py \
   tests/test_ingestion_metadata_refresh.py \
   tests/test_pdf_marker_upload.py \
+  tests/test_marker_quality.py \
   tests/test_instance_source_packages.py \
   tests/test_openapi_contract.py
 
@@ -90,10 +96,13 @@ The final production gate additionally requires a real API `--apply`, an
 unchanged repeat run showing zero mutations, persisted Marker provenance, and a
 passing live fiscal recall proof.
 
-Bounded endpoint proof completed 2026-09-04: the configured RunPod Marker
-endpoint converted the real 717,996-byte FY2025 Kansas Governor's Budget
-director presentation into 30,615 Markdown characters in one attempt. This is
-parser proof only and does not close the API/index/recall gates.
+Bounded quality proof completed 2026-09-04: one configured RunPod Marker job
+converted the real 717,996-byte FY2025 Kansas Governor's Budget director
+presentation into 30,615 Markdown characters containing 6 structured tables,
+125 rows, and 927 cells. Three document anchors and nine pinned fiscal rows
+across three tables all matched. This closes the representative parser/table
+fidelity gate only; it does not close the API persistence, indexing,
+idempotency, or recall gates.
 
 ## Notes
 

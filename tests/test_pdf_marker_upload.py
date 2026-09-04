@@ -4,7 +4,6 @@ import asyncio
 
 import pytest
 from fastapi import HTTPException
-
 from svs_api import main as api_main
 from svs_common.marker_client import MarkerRunpodError, pdf_source_id
 from svs_common.schemas import Principal
@@ -96,6 +95,13 @@ def test_marker_pdf_upload_request_builds_pdf_markdown_ingest(monkeypatch: pytes
     assert req.attributes["marker_job_id"] == "job-xyz"
     assert req.attributes["marker_pages"] == 7
     assert req.attributes["marker_metadata"] == {"marker_version": "test"}
+    assert req.attributes["marker_markdown_chars"] == len(
+        "<!-- page: 7 -->\n# Panel Schedule\nCircuit rows"
+    )
+    assert len(req.attributes["marker_markdown_sha256"]) == 64
+    assert req.attributes["marker_table_count"] == 0
+    assert req.attributes["marker_table_row_count"] == 0
+    assert req.attributes["marker_table_cell_count"] == 0
     assert "api_key" not in req.attributes["marker_metadata"]
     assert "secret_note" not in req.attributes["marker_metadata"]
 
