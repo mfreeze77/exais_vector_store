@@ -402,6 +402,7 @@ class DocumentIngestRequest(BaseModel):
     content: str
     mode: str = 'auto_detect_v1'
     source_uri: str | None = None
+    source_identity: str | None = Field(default=None, min_length=1, max_length=512)
     attributes: dict[str, Any] = Field(default_factory=dict)
     security_level: int = 1
     classification: str = 'tenant_private'
@@ -415,6 +416,16 @@ class DocumentIngestRequest(BaseModel):
         if v < 0 or v > 5:
             raise ValueError('security_level must be 0..5')
         return v
+
+    @field_validator('source_identity')
+    @classmethod
+    def validate_source_identity(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        value = value.strip()
+        if not value:
+            raise ValueError('source_identity must not be blank')
+        return value
 
 class IngestionJobResponse(BaseModel):
     id: str

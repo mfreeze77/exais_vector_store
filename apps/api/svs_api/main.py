@@ -1,5 +1,6 @@
 from __future__ import annotations
 from hashlib import sha256
+import json
 import os
 import re
 import time
@@ -320,6 +321,10 @@ async def marker_pdf_upload_request(
     knowledge_base_id: str | None,
     security_level: int,
     principal: Principal,
+    source_uri: str | None = None,
+    source_identity: str | None = None,
+    attributes: dict[str, Any] | None = None,
+    classification: str = 'tenant_private',
 ) -> DocumentIngestRequest:
     job_ids: list[str] = []
     try:
@@ -343,13 +348,14 @@ async def marker_pdf_upload_request(
     except ObjectStoreError as exc:
         raise HTTPException(status_code=503, detail='Source PDF object-store write failed') from exc
 
-    attrs = marker_attribute_summary(
+    attrs = dict(attributes or {})
+    attrs.update(marker_attribute_summary(
         original_filename=file.filename,
         pdf_bytes=content_bytes,
         output=output,
         job_id=job_ids[-1] if job_ids else None,
         source_object_key=source_key,
-    )
+    ))
     return DocumentIngestRequest(
         vector_store_id=vector_store_id,
         knowledge_base_id=knowledge_base_id,
@@ -358,11 +364,25 @@ async def marker_pdf_upload_request(
         mime_type='text/markdown',
         content=markdown,
         mode='pdf_markdown_external_v1',
-        source_uri=f'object://{source_key}',
+        source_uri=source_uri or f'object://{source_key}',
+        source_identity=source_identity,
         attributes=attrs,
         security_level=security_level,
+        classification=classification,
         source_trust='external_pdf_parser',
     )
+
+
+def _document_upload_attributes(attributes_json: str | None) -> dict[str, Any]:
+    if attributes_json is None or not attributes_json.strip():
+        return {}
+    try:
+        value = json.loads(attributes_json)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=422, detail='attributes_json must be valid JSON') from exc
+    if not isinstance(value, dict):
+        raise HTTPException(status_code=422, detail='attributes_json must contain a JSON object')
+    return value
 
 
 def _vector_store_unavailable_http_exception(exc: VectorStoreUnavailableError) -> HTTPException:
@@ -1818,12 +1838,29 @@ async def ingest_document(req: DocumentIngestRequest, idempotency_key: str | Non
 
 
 @app.post('/api/v1/documents/upload', response_model=IngestionJobResponse)
-async def upload_document(file: UploadFile = File(...), title: str | None = Form(default=None), mode: str = Form(default='auto_detect_v1'), vector_store_id: str | None = Form(default=None), knowledge_base_id: str | None = Form(default=None), security_level: int = Form(default=1), principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
+async def upload_document(file: UploadFile = File(...), title: str | None = Form(default=None), mode: str = Form(default='auto_detect_v1'), vector_store_id: str | None = Form(default=None), knowledge_base_id: str | None = Form(default=None), security_level: int = Form(default=1), classification: str = Form(default='tenant_private'), source_uri: str | None = Form(default=None), source_identity: str | None = Form(default=None), attributes_json: str | None = Form(default=None), idempotency_key: str | None = Header(default=None, alias='Idempotency-Key'), principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'documents:write')
     enforce_rate_limit(db, principal, 'documents.upload')
     content_bytes = await file.read()
     if len(content_bytes) > settings.svs_request_body_limit_bytes:
         raise HTTPException(status_code=413, detail='Uploaded document exceeds configured body limit')
+    attributes = _document_upload_attributes(attributes_json)
+    fingerprint = stable_hash({
+        'filename': file.filename,
+        'content_type': file.content_type,
+        'content_sha256': sha256(content_bytes).hexdigest(),
+        'title': title,
+        'mode': mode,
+        'vector_store_id': vector_store_id,
+        'knowledge_base_id': knowledge_base_id,
+        'security_level': security_level,
+        'classification': classification,
+        'source_uri': source_uri,
+        'source_identity': source_identity,
+        'attributes': attributes,
+    })
+    if cached := check_idempotency(db, principal, idempotency_key, fingerprint):
+        return cached
     if is_marker_pdf_upload(file.filename, file.content_type, mode):
         req = await marker_pdf_upload_request(
             file=file,
@@ -1834,11 +1871,20 @@ async def upload_document(file: UploadFile = File(...), title: str | None = Form
             knowledge_base_id=knowledge_base_id,
             security_level=security_level,
             principal=principal,
+            source_uri=source_uri,
+            source_identity=source_identity,
+            attributes=attributes,
+            classification=classification,
         )
     else:
         content = content_bytes.decode('utf-8', errors='replace')
-        req = DocumentIngestRequest(vector_store_id=vector_store_id, knowledge_base_id=knowledge_base_id, title=title or file.filename or 'uploaded document', filename=file.filename, mime_type=file.content_type, content=content, mode=mode, security_level=security_level)
-    return await ingest_or_enqueue(req, principal, db)
+        req = DocumentIngestRequest(vector_store_id=vector_store_id, knowledge_base_id=knowledge_base_id, title=title or file.filename or 'uploaded document', filename=file.filename, mime_type=file.content_type, content=content, mode=mode, source_uri=source_uri, source_identity=source_identity, attributes=attributes, security_level=security_level, classification=classification)
+    result = await ingest_or_enqueue(req, principal, db)
+    payload = result.model_dump()
+    set_rls_context(db, principal)
+    store_idempotency(db, principal, idempotency_key, fingerprint, payload)
+    db.commit()
+    return payload
 
 
 @app.get('/api/v1/jobs', response_model=IngestionJobListResponse, response_model_exclude_unset=True)

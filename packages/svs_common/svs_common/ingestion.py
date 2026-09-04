@@ -19,6 +19,24 @@ from .vector_store_repo import refresh_vector_store_activity, require_active_vec
 
 OPENAI_FILE_ID_ATTRIBUTE = "_openai_file_id"
 VECTOR_STORE_FILE_CHUNKING_STRATEGY_ATTRIBUTE = "_openai_chunking_strategy"
+SOURCE_IDENTITY_ATTRIBUTE = "source_identity"
+
+
+def _request_attributes(req: DocumentIngestRequest) -> dict:
+    attributes = dict(req.attributes)
+    if req.source_identity:
+        # The first-class field governs ingest identity. Mirror it into public
+        # retrieval metadata so an indexed passage can be traced back to its
+        # source manifest without requiring database access.
+        attributes[SOURCE_IDENTITY_ATTRIBUTE] = req.source_identity
+    return attributes
+
+
+def _document_version_metadata(req: DocumentIngestRequest, mode_id: str) -> dict:
+    metadata = {"mode": mode_id, "attributes": _request_attributes(req)}
+    if req.source_identity:
+        metadata[SOURCE_IDENTITY_ATTRIBUTE] = req.source_identity
+    return metadata
 
 
 def embedding_profile_config(embedding_profile_id: str, registry: dict | None = None) -> dict:
@@ -55,7 +73,7 @@ class IngestionService:
         if not req.vector_store_id:
             return None
         file_attrs = {
-            k: v for k, v in req.attributes.items()
+            k: v for k, v in _request_attributes(req).items()
             if not k.startswith("_") or k == VECTOR_STORE_FILE_CHUNKING_STRATEGY_ATTRIBUTE
         }
         usage_bytes = len(req.content.encode())
@@ -146,7 +164,22 @@ class IngestionService:
         # fully indexed in every retrieval backend. This prevents a failed
         # attempt that inserted rows but never committed vectors from being
         # treated as a successful prior ingest on retry.
-        return db.execute(text("""
+        identity_clause = ""
+        params = {
+            "tenant_id": principal.tenant_id,
+            "biz_id": principal.business_instance_id,
+            "kb_id": req.knowledge_base_id,
+            "vs_id": req.vector_store_id,
+            "hash": content_hash,
+        }
+        if req.source_identity:
+            # Equal bytes are not sufficient identity. Two official documents
+            # can legitimately publish the same content and remain separate
+            # evidence. When a connector supplies a stable identity, dedupe is
+            # scoped to that identity as well as the content hash.
+            identity_clause = "AND dv.metadata #>> '{source_identity}' = :source_identity"
+            params["source_identity"] = req.source_identity
+        return db.execute(text(f"""
             SELECT d.id, d.current_version_id
             FROM documents d
             JOIN document_versions dv
@@ -159,6 +192,7 @@ class IngestionService:
               AND d.vector_store_id IS NOT DISTINCT FROM :vs_id
               AND d.content_hash=:hash AND d.status='active'
               AND dv.status='indexed'
+              {identity_clause}
               AND EXISTS (
                 SELECT 1 FROM chunks c
                 WHERE c.document_id=d.id
@@ -177,28 +211,42 @@ class IngestionService:
                   AND c.business_instance_id=d.business_instance_id
                   AND c.active=true
                   AND (c.dense_index_status <> 'indexed' OR c.sparse_index_status <> 'indexed')
-              )
+            )
             ORDER BY d.created_at DESC LIMIT 1
-        """), {"tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "kb_id": req.knowledge_base_id, "vs_id": req.vector_store_id, "hash": content_hash}).mappings().first()
+        """), params).mappings().first()
 
     def _find_version_target(self, db: Session, principal: Principal, req: DocumentIngestRequest, content_hash: str):
-        if req.source_uri:
-            clause = "source_uri=:source_uri"
+        join = ""
+        if req.source_identity:
+            # Source identity is stable across content and citation URL changes;
+            # source_uri is a citation and may legitimately move.
+            join = """
+                JOIN document_versions dv
+                  ON dv.id = d.current_version_id
+                 AND dv.document_id = d.id
+                 AND dv.tenant_id = d.tenant_id
+                 AND dv.business_instance_id = d.business_instance_id
+            """
+            clause = "dv.metadata #>> '{source_identity}' = :source_identity"
+            params = {"source_identity": req.source_identity}
+        elif req.source_uri:
+            clause = "d.source_uri=:source_uri"
             params = {"source_uri": req.source_uri}
         elif req.filename:
-            clause = "filename=:filename"
+            clause = "d.filename=:filename"
             params = {"filename": req.filename}
         else:
             return None
         params.update({"tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "kb_id": req.knowledge_base_id, "vs_id": req.vector_store_id, "hash": content_hash})
         return db.execute(text(f"""
-            SELECT id, current_version_id FROM documents
-            WHERE tenant_id=:tenant_id AND business_instance_id=:biz_id
-              AND knowledge_base_id IS NOT DISTINCT FROM :kb_id
-              AND vector_store_id IS NOT DISTINCT FROM :vs_id
+            SELECT d.id, d.current_version_id FROM documents d
+            {join}
+            WHERE d.tenant_id=:tenant_id AND d.business_instance_id=:biz_id
+              AND d.knowledge_base_id IS NOT DISTINCT FROM :kb_id
+              AND d.vector_store_id IS NOT DISTINCT FROM :vs_id
               AND {clause}
-              AND content_hash <> :hash AND status='active'
-            ORDER BY created_at DESC LIMIT 1
+              AND d.content_hash <> :hash AND d.status='active'
+            ORDER BY d.created_at DESC LIMIT 1
         """), params).mappings().first()
 
     async def ingest_now(self, db: Session, principal: Principal, req: DocumentIngestRequest) -> IngestionJobResponse:
@@ -281,6 +329,7 @@ class IngestionService:
                 "docv_id": docv_id,
             })
 
+        version_metadata = _document_version_metadata(req, mode_id)
         db.execute(jsonb_text("""
             INSERT INTO document_versions(id, document_id, tenant_id, business_instance_id, version_number, object_key,
               parsed_object_key, parser_profile_id, vectorization_profile_id, embedding_profile_id, chunking_profile_id,
@@ -291,7 +340,7 @@ class IngestionService:
             "id": docv_id, "doc_id": doc_id, "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id,
             "version_number": version_number, "object_key": object_key, "parsed_key": parsed_key, "parser": mode.get("parser", "markdown_ast_v1"),
             "mode_id": mode_id, "embedding_profile_id": embedding_profile_id, "chunker": mode.get("chunker", "markdown_heading_hierarchy_v2"),
-            "hash": content_hash, "metadata": jsonb_param({"mode": mode_id, "attributes": req.attributes}),
+            "hash": content_hash, "metadata": jsonb_param(version_metadata),
         })
 
         parsed_chunks = choose_chunker(mode_id)(req.content)
@@ -302,8 +351,9 @@ class IngestionService:
         collection = self.qdrant.collection_name(principal.business_instance_id, embedding_profile_id)
         os_index = self.opensearch.index_name(principal.business_instance_id)
         acl_bucket = sha256_text("|".join(sorted(req.allowed_groups + req.allowed_roles)) or "default")[:16]
-        file_attrs = safe_file_attributes(req.attributes)
-        file_attr_payload = file_attribute_payload(req.attributes)
+        request_attributes = _request_attributes(req)
+        file_attrs = safe_file_attributes(request_attributes)
+        file_attr_payload = file_attribute_payload(request_attributes)
         points: list[dict] = []
         sparse_docs: list[tuple[str, dict]] = []
         chunk_ids: list[str] = []

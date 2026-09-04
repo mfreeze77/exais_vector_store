@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from svs_common.ingestion import (
     IngestionService,
+    SOURCE_IDENTITY_ATTRIBUTE,
     VECTOR_STORE_FILE_CHUNKING_STRATEGY_ATTRIBUTE,
+    _document_version_metadata,
 )
 from svs_common.schemas import DocumentIngestRequest, Principal
 
@@ -63,6 +67,13 @@ def _request() -> DocumentIngestRequest:
     )
 
 
+def test_source_identity_is_trimmed_and_must_not_be_blank():
+    request = DocumentIngestRequest(title="Fiscal report", content="body", source_identity=" id ")
+    assert request.source_identity == "id"
+    with pytest.raises(ValueError, match="source_identity"):
+        DocumentIngestRequest(title="Fiscal report", content="body", source_identity="   ")
+
+
 def test_link_vector_store_file_refreshes_existing_file_metadata():
     service = object.__new__(IngestionService)
     db = _FakeDb({"id": "vsf_existing"})
@@ -111,3 +122,66 @@ def test_refresh_document_metadata_updates_existing_document_identity_fields():
     assert params["source_uri"].endswith("CharterOrdinance126.pdf")
     assert params["hash"] == "hash-new"
     assert params["docv_id"] == "docv-new"
+
+
+def test_exact_duplicate_is_scoped_to_source_identity_when_supplied():
+    service = object.__new__(IngestionService)
+    db = _FakeDb()
+    request = _request().model_copy(update={"source_identity": "statecivics:logical-a"})
+
+    service._find_exact_duplicate(db, _principal(), request, "same-bytes")
+
+    sql, params = db.calls[0]
+    assert "dv.metadata #>> '{source_identity}' = :source_identity" in sql
+    assert params["source_identity"] == "statecivics:logical-a"
+
+
+def test_equal_bytes_keep_legacy_dedupe_when_no_source_identity_is_supplied():
+    service = object.__new__(IngestionService)
+    db = _FakeDb()
+
+    service._find_exact_duplicate(db, _principal(), _request(), "same-bytes")
+
+    sql, params = db.calls[0]
+    assert "dv.metadata #>> '{source_identity}'" not in sql
+    assert "source_identity" not in params
+
+
+def test_version_target_prefers_stable_identity_over_a_changed_citation_url():
+    service = object.__new__(IngestionService)
+    db = _FakeDb()
+    request = _request().model_copy(update={"source_identity": "statecivics:logical-a"})
+
+    service._find_version_target(db, _principal(), request, "new-bytes")
+
+    sql, params = db.calls[0]
+    assert "JOIN document_versions dv" in sql
+    assert "dv.metadata #>> '{source_identity}' = :source_identity" in sql
+    assert "d.source_uri=:source_uri" not in sql
+    assert params["source_identity"] == "statecivics:logical-a"
+
+
+def test_source_identity_is_persisted_and_exposed_as_retrieval_metadata():
+    request = _request().model_copy(
+        update={
+            "source_identity": "statecivics:logical-a",
+            "attributes": {**_request().attributes, "source_identity": "untrusted-duplicate"},
+        }
+    )
+
+    metadata = _document_version_metadata(request, "markdown_docs_v1")
+
+    assert metadata[SOURCE_IDENTITY_ATTRIBUTE] == "statecivics:logical-a"
+    assert metadata["attributes"][SOURCE_IDENTITY_ATTRIBUTE] == "statecivics:logical-a"
+
+
+def test_link_vector_store_file_uses_first_class_source_identity():
+    service = object.__new__(IngestionService)
+    db = _FakeDb({"id": "vsf_existing"})
+    request = _request().model_copy(update={"source_identity": "statecivics:logical-a"})
+
+    service._link_vector_store_file(db, _principal(), request, "doc_existing")
+
+    _, params = db.calls[1]
+    attrs = json.loads(params["attrs"])
+    assert attrs[SOURCE_IDENTITY_ATTRIBUTE] == "statecivics:logical-a"

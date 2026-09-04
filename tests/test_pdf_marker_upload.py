@@ -72,6 +72,10 @@ def test_marker_pdf_upload_request_builds_pdf_markdown_ingest(monkeypatch: pytes
             knowledge_base_id="kb_test",
             security_level=2,
             principal=principal(),
+            source_uri="https://budget.kansas.gov/fy2027.pdf",
+            source_identity="statecivics:logical-document",
+            attributes={"source_revision_id": "revision-1"},
+            classification="public",
         )
     )
 
@@ -81,7 +85,11 @@ def test_marker_pdf_upload_request_builds_pdf_markdown_ingest(monkeypatch: pytes
     assert req.mime_type == "text/markdown"
     assert req.mode == "pdf_markdown_external_v1"
     assert req.source_trust == "external_pdf_parser"
+    assert req.source_uri == "https://budget.kansas.gov/fy2027.pdf"
+    assert req.source_identity == "statecivics:logical-document"
+    assert req.classification == "public"
     assert "<!-- page: 7 -->" in req.content
+    assert req.attributes["source_revision_id"] == "revision-1"
     assert req.attributes["source_pdf_id"] == pdf_source_id(raw_pdf)
     assert req.attributes["source_pdf_filename"] == "Panel Schedule.pdf"
     assert req.attributes["pdf_parser"] == "runpod_marker"
@@ -95,9 +103,19 @@ def test_marker_pdf_upload_request_builds_pdf_markdown_ingest(monkeypatch: pytes
     source_key, body, content_type = fake_store.writes[0]
     assert source_key.startswith("tenants/ten_test/business/biz_test/source-pdfs/")
     assert source_key.endswith("/Panel-Schedule.pdf")
-    assert req.source_uri == f"object://{source_key}"
     assert body == raw_pdf
     assert content_type == "application/pdf"
+
+
+def test_upload_attributes_require_a_json_object():
+    assert api_main._document_upload_attributes(None) == {}
+    assert api_main._document_upload_attributes('{"source_revision_id":"revision-1"}') == {
+        "source_revision_id": "revision-1"
+    }
+    for value in ("not-json", "[]"):
+        with pytest.raises(HTTPException) as exc_info:
+            api_main._document_upload_attributes(value)
+        assert exc_info.value.status_code == 422
 
 
 def test_marker_pdf_upload_request_reports_missing_config(monkeypatch: pytest.MonkeyPatch):
