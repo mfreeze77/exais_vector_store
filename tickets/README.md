@@ -132,6 +132,7 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-122 Topeka Municipal Code GraphRAG API Handler](./WAVE-122-topeka-municipal-code-graphrag-api-handler.md)
 - [WAVE-123 Expert Conversation Sessions](./WAVE-123-expert-conversation-sessions.md)
 - [WAVE-125 Caller Jurisdiction Metadata And Per-User API Keys](./WAVE-125-caller-jurisdiction-metadata-and-per-user-api-keys.md)
+- [WAVE-126 Kansas Fiscal Documents Source Package](./WAVE-126-kansas-fiscal-documents-source-package.md)
 
 ## Execution Model
 

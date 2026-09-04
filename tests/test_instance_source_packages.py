@@ -31,7 +31,7 @@ def test_ks_civics_source_package_validates_in_production():
         production=True,
     )
 
-    assert len(packages) == 3
+    assert len(packages) == 4
     assert issues == []
     package = next(item for item in packages if item.source_slug == "kscourts-decisions")
     assert package.vector_store_slug == "kansas-court-decisions"
@@ -45,6 +45,24 @@ def test_ks_civics_source_package_validates_in_production():
         "canonical_source_url",
         "official_pdf_url",
     }
+
+    fiscal = next(
+        item for item in packages if item.vector_store_slug == "kansas-fiscal-documents"
+    )
+    assert fiscal.source_slug == "statecivics-fiscal-ledger"
+    assert module.get_path(fiscal.source, "metadata.productionReady") is False
+    assert module.get_path(fiscal.source, "source.manifest.stableIdentityFields") == [
+        "logical_document_id"
+    ]
+    assert (
+        module.get_path(fiscal.source, "artifactGeneration.routing.application/pdf")
+        == "marker_required"
+    )
+    assert (
+        module.get_path(fiscal.source, "artifactGeneration.routing.text/markdown")
+        == "direct_structured_ingest"
+    )
+    assert module.get_path(fiscal.source, "graph.enabled") is False
 
 
 def test_validator_fails_vector_store_without_source_package(tmp_path):
