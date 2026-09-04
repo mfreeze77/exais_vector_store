@@ -61,6 +61,32 @@ artifactGeneration:
       - marker_metadata
       - source_pdf_id
       - source_pdf_object_key
+  extractionHandoff:
+    mode: persisted_marker_markdown_export_v1
+    boundary: Fetches the Markdown and metadata already persisted by ExAIS; makes zero Marker requests and returns candidate evidence to StateCivics without resolving fiscal identities.
+    contract:
+      repository: operator-source://statecivics-recovered-local
+      revision: 083ec59ea7f33362d60170e729939fd2a902b570
+      path: contracts/civic-impact/marker-extraction-record.schema.json
+      sha256: 0c215c4e09c6fd48f40532f09a67682c65a9726a150654b4936f9e95e7252e40
+    runner: scripts/release/kansas-fiscal-marker-handoff.py
+    command:
+      - python
+      - scripts/release/kansas-fiscal-marker-handoff.py
+      - --manifest
+      - ${STATECIVICS_FISCAL_MANIFEST}
+      - --state
+      - .release/cells/ks-state-civics/kansas-fiscal-documents/state.json
+      - --output-dir
+      - .release/cells/ks-state-civics/kansas-fiscal-documents/marker-handoff
+      - --code-commit
+      - ${EXAIS_CODE_COMMIT}
+      - --api-transport
+      - docker-network
+    outputContract:
+      - marker-handoff/manifest.jsonl
+      - marker-handoff/extracted/*.md
+      - marker-handoff/handoff-proof.json
 qualityGate:
   requiredBeforeIngestion: true
   vectorizationAllowed: true
@@ -128,3 +154,4 @@ eval:
   expectedProofArtifacts:
     - .release/cells/ks-state-civics/kansas-fiscal-documents/ingest-proof.json
     - .release/cells/ks-state-civics/kansas-fiscal-documents/recall-proof.json
+    - .release/cells/ks-state-civics/kansas-fiscal-documents/marker-handoff/handoff-proof.json

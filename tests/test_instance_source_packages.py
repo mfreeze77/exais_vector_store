@@ -2,12 +2,10 @@ from __future__ import annotations
 
 import importlib.util
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 
-import pytest
 import yaml
-
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "release" / "instance_source_packages.py"
@@ -50,6 +48,12 @@ def test_ks_civics_source_package_validates_in_production():
         item for item in packages if item.vector_store_slug == "kansas-fiscal-documents"
     )
     assert fiscal.source_slug == "statecivics-fiscal-ledger"
+    assert module.get_path(fiscal.source, "metadata.instanceSlug") == "ks-state-civics"
+    assert (
+        module.get_path(fiscal.source, "vectorStore.businessInstanceId")
+        == "biz_ks_state_civics"
+    )
+    assert module.get_path(fiscal.source, "vectorStore.knowledgeBaseId") == "kb_ks_civics"
     assert module.get_path(fiscal.source, "metadata.productionReady") is False
     assert module.get_path(fiscal.source, "source.manifest.stableIdentityFields") == [
         "logical_document_id"

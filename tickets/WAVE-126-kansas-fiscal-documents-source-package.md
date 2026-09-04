@@ -27,6 +27,8 @@ The producer contract is pinned to StateCivics commit
 - Verify custody URI, bytes, ledger hash, MIME routing, rights, and lifecycle.
 - Prove representative fiscal-table fidelity from one Marker response without
   paying for or comparing against a second extraction.
+- Export that already-persisted Markdown back through a hash-bound StateCivics
+  handoff; never invoke Marker again for canonical candidate parsing.
 - Add a non-production source package and fiscal recall/provenance gate.
 
 ## Out Of Scope
@@ -40,6 +42,8 @@ The producer contract is pinned to StateCivics commit
 
 - `scripts/release/kansas-fiscal-document-ingest.py`
 - `scripts/release/kansas-fiscal-recall-eval.py`
+- `scripts/release/kansas-fiscal-marker-handoff.py`
+- `packages/svs_common/svs_common/fiscal_marker_handoff.py`
 - `instances/ks-state-civics/vector-stores/kansas-fiscal-documents/`
 - Multipart and JSON ingestion support for stable source identity/provenance.
 - Unit, contract, and disposable-PostgreSQL identity tests.
@@ -63,6 +67,9 @@ The producer contract is pinned to StateCivics commit
 - The Marker quality proof pins source bytes, requires expected document
   anchors, and matches nine fiscal rows across three tables from the same
   response used to compute its output digest and structural counts.
+- The extraction handoff verifies persisted ExAIS metadata and Markdown against
+  the original revision and source hash, emits byte-stable files/JSONL, and
+  validates against the StateCivics-owned contract at commit `083ec59e`.
 
 ## Dependencies
 
@@ -82,6 +89,7 @@ pytest -q \
   tests/test_ingestion_metadata_refresh.py \
   tests/test_pdf_marker_upload.py \
   tests/test_marker_quality.py \
+  tests/test_kansas_fiscal_marker_handoff.py \
   tests/test_instance_source_packages.py \
   tests/test_openapi_contract.py
 

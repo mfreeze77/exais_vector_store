@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lockedAt": "2026-09-04T16:28:38Z",
+  "lockedAt": "2026-09-04T16:50:07Z",
   "sourceType": "statecivics_custody_ledger_projection",
   "sourceManifest": {
     "format": "jsonl",
@@ -28,6 +28,18 @@
     "parser": "configured_runpod_marker_serverless",
     "structuredTextRoute": "/api/v1/documents/ingest",
     "localMarkerFallback": false,
+    "extractionHandoff": {
+      "status": "pending_first_api_ingest",
+      "runner": "scripts/release/kansas-fiscal-marker-handoff.py",
+      "markerRequests": 0,
+      "contract": {
+        "repository": "operator-source://statecivics-recovered-local",
+        "revision": "083ec59ea7f33362d60170e729939fd2a902b570",
+        "path": "contracts/civic-impact/marker-extraction-record.schema.json",
+        "sha256": "0c215c4e09c6fd48f40532f09a67682c65a9726a150654b4936f9e95e7252e40"
+      },
+      "boundary": "Exports persisted Marker Markdown through authenticated ExAIS APIs. It never invokes Marker and StateCivics must treat returned tables and cells as candidate evidence."
+    },
     "lastEndpointProof": {
       "observedAt": "2026-09-04T15:51:21Z",
       "status": "completed",

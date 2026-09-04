@@ -3,13 +3,13 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-
+from svs_common.fiscal_marker_handoff import build_marker_handoff
 
 ROOT = Path(__file__).resolve().parents[2]
 ADAPTER = ROOT / "scripts" / "release" / "kansas-fiscal-document-ingest.py"
@@ -103,3 +103,76 @@ def test_real_statecivics_export_is_accepted_by_fiscal_adapter_cli(
     assert proof["planned"] == {"remove": 0, "upsert": 1, "noop": 0}
     assert proof["applied"] is False
     assert not state.exists(), "dry-run must not create adapter state"
+
+
+def test_marker_handoff_matches_real_statecivics_contract() -> None:
+    schema_path = (
+        STATECIVICS_REPO
+        / "contracts"
+        / "civic-impact"
+        / "marker-extraction-record.schema.json"
+    )
+    assert hashlib.sha256(schema_path.read_bytes()).hexdigest() == (
+        "0c215c4e09c6fd48f40532f09a67682c65a9726a150654b4936f9e95e7252e40"
+    )
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    markdown = b"# Fiscal report\n\n| Fund | Amount |\n|---|---:|\n| SGF | 41.0 |\n"
+    markdown_hash = hashlib.sha256(markdown).hexdigest()
+    source_hash = "c" * 64
+    logical_id = "b" * 64
+    custody_uri = f"civic-custody://kansas_fiscal_documents/cc/{source_hash}"
+    source_record = {
+        "source_revision_id": "revision-contract-proof",
+        "logical_document_id": logical_id,
+        "content_hash_sha256": source_hash,
+        "custody_uri": custody_uri,
+        "citation_url": "https://budget.kansas.gov/fy2025-report.pdf",
+        "redistribution": "full",
+        "mime_type": "application/pdf",
+        "record_digest_sha256": "a" * 64,
+        "ingestion": {"action": "upsert"},
+    }
+    state = {
+        "action": "upsert",
+        "record_digest_sha256": "a" * 64,
+        "document_id": "doc-contract-proof",
+        "vector_store_file_id": "vsf-contract-proof",
+    }
+    metadata = {
+        "document_id": "doc-contract-proof",
+        "vector_store_file_id": "vsf-contract-proof",
+        "vector_store_id": "vs-contract-proof",
+        "status": "completed",
+        "attributes": {
+            "source_revision_id": "revision-contract-proof",
+            "logical_document_id": logical_id,
+            "source_content_hash_sha256": source_hash,
+            "custody_uri": custody_uri,
+            "citation_url": source_record["citation_url"],
+            "pdf_parser": "runpod_marker",
+            "source_pdf_id": f"pdf_sha256_{source_hash[:16]}",
+            "marker_job_id": "marker-job-contract-proof",
+            "marker_output_format": "markdown",
+            "marker_pages": 1,
+            "marker_markdown_sha256": markdown_hash,
+            "marker_markdown_chars": len(markdown.decode()),
+            "marker_table_count": 1,
+            "marker_table_row_count": 2,
+            "marker_table_cell_count": 4,
+        },
+    }
+    record = build_marker_handoff(
+        source_record=source_record,
+        state_entry=state,
+        file_metadata=metadata,
+        markdown_bytes=markdown,
+        vector_store_id="vs-contract-proof",
+        producer_commit="e" * 40,
+    ).record
+
+    assert set(record) == set(schema["required"])
+    for field in ("extracted_artifact", "marker", "exais", "producer"):
+        contract = schema["properties"][field]
+        assert set(contract["required"]) <= set(record[field])
+        assert set(record[field]) <= set(contract["properties"])

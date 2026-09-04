@@ -45,6 +45,29 @@ all nine pinned table rows matched. This proves representative extraction
 fidelity; it does not make PDF-derived amounts canonical. KanView and other
 registered structured feeds remain the numeric system of record.
 
+## One-pass extraction handoff
+
+After API ingestion, ExAIS already holds the exact Marker Markdown and its
+source/structure metadata. The handoff exporter retrieves those persisted
+objects through authenticated ExAIS APIs, verifies the StateCivics revision,
+original PDF hash, Markdown hash, character count, table counts, and ExAIS IDs,
+then writes deterministic Markdown plus JSONL for StateCivics:
+
+```bash
+python scripts/release/kansas-fiscal-marker-handoff.py \
+  --manifest "$STATECIVICS_FISCAL_MANIFEST" \
+  --state .release/cells/ks-state-civics/kansas-fiscal-documents/state.json \
+  --output-dir .release/cells/ks-state-civics/kansas-fiscal-documents/marker-handoff \
+  --code-commit "$EXAIS_CODE_COMMIT" \
+  --api-transport docker-network
+```
+
+That command plans only. Append `--apply` to fetch persisted content and write
+the local handoff package. It has no Marker client or RunPod path, so this is
+reuse of the original extraction, not another extraction charge. StateCivics
+may parse its tables into candidate observations, but it must independently
+resolve dimensions and publication status.
+
 ## Source and idempotency
 
 StateCivics exports a deterministic desired-state JSONL manifest from its
