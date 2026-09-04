@@ -114,7 +114,7 @@ passing live fiscal recall proof.
 
 Bounded quality proof completed 2026-09-04: one configured RunPod Marker job
 converted the real 717,996-byte FY2025 Kansas Governor's Budget director
-presentation into 30,615 Markdown characters containing 6 structured tables,
+presentation into 32,281 Markdown characters containing 6 structured tables,
 125 rows, and 927 cells. Three document anchors and nine pinned fiscal rows
 across three tables all matched. This closes the representative parser/table
 fidelity gate only; it does not close the API persistence, indexing,

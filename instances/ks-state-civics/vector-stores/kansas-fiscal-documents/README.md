@@ -39,7 +39,7 @@ python scripts/release/marker-fiscal-quality-proof.py \
   --output .release/cells/ks-state-civics/kansas-fiscal-documents/marker-quality-proof.json
 ```
 
-The 2026-09-04 live proof passed in one Marker job: 30,615 Markdown
+The 2026-09-04 live proof passed in one Marker job: 32,281 Markdown
 characters, 6 structured tables, 125 rows, and 927 cells. All three anchors and
 all nine pinned table rows matched. This proves representative extraction
 fidelity; it does not make PDF-derived amounts canonical. KanView and other
