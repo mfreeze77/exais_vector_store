@@ -71,6 +71,8 @@ def _file_metadata() -> dict:
         "vector_store_file_id": "vsf-1",
         "vector_store_id": "vs-fiscal",
         "status": "completed",
+        "created_at": 1788532800,
+        "completed_at": 1788532860,
         "attributes": {
             "source_revision_id": "revision-1",
             "logical_document_id": LOGICAL_ID,
@@ -135,6 +137,8 @@ def test_builder_binds_persisted_markdown_to_statecivics_revision() -> None:
         "table_cell_count": 4,
     }
     assert record["exais"]["content_api_path"] == "/v1/files/doc-1/content"
+    assert record["exais"]["created_at"] == 1788532800
+    assert record["exais"]["completed_at"] == 1788532860
     assert record["marker"]["profile"] == "fiscal_tables_page_aware_v1"
     assert record["marker"]["options"]["paginate_output"] is True
     assert record["marker"]["image_count"] == 2
@@ -168,6 +172,10 @@ def test_builder_binds_persisted_markdown_to_statecivics_revision() -> None:
         (
             lambda metadata: metadata.update(status="in_progress"),
             "not completed",
+        ),
+        (
+            lambda metadata: metadata.update(completed_at=1788532799),
+            "must not precede",
         ),
     ],
 )

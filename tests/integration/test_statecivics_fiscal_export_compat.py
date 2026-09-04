@@ -113,7 +113,7 @@ def test_marker_handoff_matches_real_statecivics_contract() -> None:
         / "marker-extraction-record.schema.json"
     )
     assert hashlib.sha256(schema_path.read_bytes()).hexdigest() == (
-        "5e4dac393d0ee24d5fa37b2868e4d8ae1b8546d852c2414f128011379129a2c1"
+        "a0ff93a4cca17d78f243007861a14f5c6249fb865180c255ca35dd995f617839"
     )
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
@@ -147,6 +147,8 @@ def test_marker_handoff_matches_real_statecivics_contract() -> None:
         "vector_store_file_id": "vsf-contract-proof",
         "vector_store_id": "vs-contract-proof",
         "status": "completed",
+        "created_at": 1788532800,
+        "completed_at": 1788532860,
         "attributes": {
             "source_revision_id": "revision-contract-proof",
             "logical_document_id": logical_id,

@@ -15,7 +15,7 @@ source:
   type: statecivics_custody_ledger_projection
   connector:
     kind: external_repo_custody_projection
-    repository: operator-source://statecivics-recovered-local
+    repository: operator-source://statecivics-ai
     entrypoint: scripts/operator/export_retrieval_manifest.py
     revision: 4a8cab323f73f360b4bfec2e361c3737f434c4bb
     contract: contracts/civic-impact/retrieval-export-record.schema.json
@@ -67,14 +67,16 @@ artifactGeneration:
       - marker_metadata
       - source_pdf_id
       - source_pdf_object_key
+      - created_at
+      - completed_at
   extractionHandoff:
     mode: persisted_marker_markdown_export_v1
     boundary: Fetches the Markdown and metadata already persisted by ExAIS; makes zero Marker requests and returns candidate evidence to StateCivics without resolving fiscal identities.
     contract:
-      repository: operator-source://statecivics-recovered-local
-      revision: 19e402cd59831fcc23125442270c4063dbf42a14
+      repository: operator-source://statecivics-ai
+      revision: 14e54878785387991aaf332eb8b416133934162e
       path: contracts/civic-impact/marker-extraction-record.schema.json
-      sha256: 5e4dac393d0ee24d5fa37b2868e4d8ae1b8546d852c2414f128011379129a2c1
+      sha256: a0ff93a4cca17d78f243007861a14f5c6249fb865180c255ca35dd995f617839
     runner: scripts/release/kansas-fiscal-marker-handoff.py
     command:
       - python

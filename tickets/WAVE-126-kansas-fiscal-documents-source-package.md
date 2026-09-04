@@ -69,7 +69,9 @@ The producer contract is pinned to StateCivics commit
   response used to compute its output digest and structural counts.
 - The extraction handoff verifies persisted ExAIS metadata and Markdown against
   the original revision and source hash, emits byte-stable files/JSONL, and
-  validates against the StateCivics-owned contract at commit `19e402cd`.
+  carries the persisted ingestion interval for honest replay-safe derivation
+  lineage. It validates against the StateCivics-owned contract at commit
+  `14e54878`.
 - The bounded `fiscal_tables_page_aware_v1` profile requests pagination,
   HTML-preserved tables, and retained images in that same Marker job; arbitrary
   operator-supplied Marker options are rejected.
@@ -119,6 +121,15 @@ presentation into 32,281 Markdown characters containing 6 structured tables,
 across three tables all matched. This closes the representative parser/table
 fidelity gate only; it does not close the API persistence, indexing,
 idempotency, or recall gates.
+
+Contract reconciliation completed 2026-09-04: the handoff now emits schema v2
+with ExAIS' persisted vector-store-file `created_at` and `completed_at` values,
+pins StateCivics commit `14e54878` and contract SHA-256
+`a0ff93a4cca17d78f243007861a14f5c6249fb865180c255ca35dd995f617839`,
+and names the canonical `operator-source://statecivics-ai` repository. The
+production source-package validator passed; 81 focused ExAIS tests and 2 live
+cross-repository compatibility tests passed in Docker. No API, Marker, vector,
+or production-data write was made.
 
 ## Notes
 

@@ -8,7 +8,7 @@
     "manifestUri": "statecivics-export://ks-state-civics/kansas-fiscal-documents.jsonl"
   },
   "producer": {
-    "repository": "operator-source://statecivics-recovered-local",
+    "repository": "operator-source://statecivics-ai",
     "revision": "4a8cab323f73f360b4bfec2e361c3737f434c4bb",
     "entrypoint": "scripts/operator/export_retrieval_manifest.py",
     "contract": "contracts/civic-impact/retrieval-export-record.schema.json",
@@ -41,10 +41,10 @@
       "runner": "scripts/release/kansas-fiscal-marker-handoff.py",
       "markerRequests": 0,
       "contract": {
-        "repository": "operator-source://statecivics-recovered-local",
-        "revision": "19e402cd59831fcc23125442270c4063dbf42a14",
+        "repository": "operator-source://statecivics-ai",
+        "revision": "14e54878785387991aaf332eb8b416133934162e",
         "path": "contracts/civic-impact/marker-extraction-record.schema.json",
-        "sha256": "5e4dac393d0ee24d5fa37b2868e4d8ae1b8546d852c2414f128011379129a2c1"
+        "sha256": "a0ff93a4cca17d78f243007861a14f5c6249fb865180c255ca35dd995f617839"
       },
       "boundary": "Exports persisted Marker Markdown through authenticated ExAIS APIs. It never invokes Marker and StateCivics must treat returned tables and cells as candidate evidence."
     },

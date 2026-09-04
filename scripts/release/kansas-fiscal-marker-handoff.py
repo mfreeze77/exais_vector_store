@@ -41,9 +41,9 @@ from topeka_pipeline_common import (
 
 ROOT = Path(__file__).resolve().parents[2]
 INGEST_COMMAND = ROOT / "scripts" / "release" / "kansas-fiscal-document-ingest.py"
-STATECIVICS_CONTRACT_REVISION = "19e402cd59831fcc23125442270c4063dbf42a14"
+STATECIVICS_CONTRACT_REVISION = "14e54878785387991aaf332eb8b416133934162e"
 STATECIVICS_CONTRACT_SHA256 = (
-    "5e4dac393d0ee24d5fa37b2868e4d8ae1b8546d852c2414f128011379129a2c1"
+    "a0ff93a4cca17d78f243007861a14f5c6249fb865180c255ca35dd995f617839"
 )
 _COMMIT_RE = re.compile(r"^[0-9a-f]{7,40}$")
 _HANDOFF_CODE_PATHS = (
@@ -225,7 +225,7 @@ def write_handoff_package(
         "source_manifest_sha256": source_manifest_sha256,
         "producer_commit": producer_commit,
         "contract": {
-            "repository": "operator-source://statecivics-recovered-local",
+            "repository": "operator-source://statecivics-ai",
             "revision": STATECIVICS_CONTRACT_REVISION,
             "path": "contracts/civic-impact/marker-extraction-record.schema.json",
             "sha256": STATECIVICS_CONTRACT_SHA256,

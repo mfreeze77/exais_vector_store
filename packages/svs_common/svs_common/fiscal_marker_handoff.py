@@ -172,9 +172,13 @@ def build_marker_handoff(
     _require_binding(attributes, "marker_output_format", "markdown")
     output_format = "markdown"
     job_id = _require_string(attributes.get("marker_job_id"), "marker_job_id")
+    created_at = _require_count(file_metadata.get("created_at"), "created_at")
+    completed_at = _require_count(file_metadata.get("completed_at"), "completed_at")
+    if completed_at < created_at:
+        raise MarkerHandoffError("completed_at must not precede created_at")
 
     record = {
-        "schema_version": 1,
+        "schema_version": 2,
         "extraction_record_id": extraction_record_id,
         "source_revision_id": source_revision_id,
         "logical_document_id": logical_document_id,
@@ -214,6 +218,8 @@ def build_marker_handoff(
             "document_id": document_id,
             "vector_store_file_id": vector_store_file_id,
             "vector_store_id": vector_store_id,
+            "created_at": created_at,
+            "completed_at": completed_at,
             "content_api_path": f"/v1/files/{document_id}/content",
             "metadata_api_path": (
                 f"/v1/vector_stores/{vector_store_id}/files/{vector_store_file_id}"
