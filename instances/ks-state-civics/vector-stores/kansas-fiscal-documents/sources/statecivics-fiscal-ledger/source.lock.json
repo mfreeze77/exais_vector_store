@@ -27,6 +27,27 @@
     "pdfMode": "auto_detect_v1",
     "parser": "configured_runpod_marker_serverless",
     "structuredTextRoute": "/api/v1/documents/ingest",
-    "localMarkerFallback": false
+    "localMarkerFallback": false,
+    "lastEndpointProof": {
+      "observedAt": "2026-09-04T15:51:21Z",
+      "status": "completed",
+      "scope": "direct_marker_endpoint_parser_only",
+      "sourceDocument": "FY2025_GBR_Director_Presentation-UPDATED_01.16.2024.pdf",
+      "sourceByteCount": 717996,
+      "sourceSha256": "8cc58bf8da72e204c2966fb7e8c1034aca334cbcf7b0f68a8ec4e701eea4c717",
+      "attemptCount": 1,
+      "markdownCharCount": 30615,
+      "markdownSha256Prefix": "9f43516abbac42fe",
+      "outputFields": [
+        "filename",
+        "images",
+        "metadata",
+        "output_format",
+        "pages",
+        "processing_time_seconds",
+        "text"
+      ],
+      "boundary": "Proves the configured RunPod Marker endpoint can parse a real Kansas fiscal PDF. It does not prove ExAIS API persistence, vector indexing, or recall."
+    }
   }
 }

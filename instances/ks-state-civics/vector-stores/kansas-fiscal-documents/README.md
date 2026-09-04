@@ -50,3 +50,8 @@ After reviewing the plan, supply the created vector-store ID and append
 `--apply`. Production readiness remains false until a disposable/live API run,
 repeat-run zero-mutation proof, Marker metadata proof, and recall evaluation
 all pass.
+
+Current bounded extraction proof: on 2026-09-04 the configured RunPod Marker
+endpoint converted the real 718 KB FY2025 Kansas Governor's Budget director
+presentation into 30,615 characters of Markdown in one attempt. This establishes
+endpoint parsing only; API persistence, vector indexing, and recall remain gated.

@@ -41,6 +41,8 @@ The producer contract is pinned to StateCivics commit
 - `instances/ks-state-civics/vector-stores/kansas-fiscal-documents/`
 - Multipart and JSON ingestion support for stable source identity/provenance.
 - Unit, contract, and disposable-PostgreSQL identity tests.
+- A cross-repository proof that passes output from the real StateCivics
+  exporter and custody implementation through the ExAIS adapter CLI.
 
 ## Acceptance Criteria
 
@@ -77,6 +79,9 @@ pytest -q \
   tests/test_instance_source_packages.py \
   tests/test_openapi_contract.py
 
+STATECIVICS_REPO=/statecivics pytest -q \
+  tests/integration/test_statecivics_fiscal_export_compat.py
+
 python scripts/release/validate-instance-source-packages.py \
   --instance ks-state-civics --production
 ```
@@ -84,6 +89,11 @@ python scripts/release/validate-instance-source-packages.py \
 The final production gate additionally requires a real API `--apply`, an
 unchanged repeat run showing zero mutations, persisted Marker provenance, and a
 passing live fiscal recall proof.
+
+Bounded endpoint proof completed 2026-09-04: the configured RunPod Marker
+endpoint converted the real 717,996-byte FY2025 Kansas Governor's Budget
+director presentation into 30,615 Markdown characters in one attempt. This is
+parser proof only and does not close the API/index/recall gates.
 
 ## Notes
 
