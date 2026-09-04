@@ -113,11 +113,14 @@ def test_marker_handoff_matches_real_statecivics_contract() -> None:
         / "marker-extraction-record.schema.json"
     )
     assert hashlib.sha256(schema_path.read_bytes()).hexdigest() == (
-        "0c215c4e09c6fd48f40532f09a67682c65a9726a150654b4936f9e95e7252e40"
+        "5e4dac393d0ee24d5fa37b2868e4d8ae1b8546d852c2414f128011379129a2c1"
     )
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
-    markdown = b"# Fiscal report\n\n| Fund | Amount |\n|---|---:|\n| SGF | 41.0 |\n"
+    markdown = (
+        b"{0}------------------------------------------------\n"
+        b"# Fiscal report\n\n| Fund | Amount |\n|---|---:|\n| SGF | 41.0 |\n"
+    )
     markdown_hash = hashlib.sha256(markdown).hexdigest()
     source_hash = "c" * 64
     logical_id = "b" * 64
@@ -151,12 +154,24 @@ def test_marker_handoff_matches_real_statecivics_contract() -> None:
             "custody_uri": custody_uri,
             "citation_url": source_record["citation_url"],
             "pdf_parser": "runpod_marker",
+            "marker_profile": "fiscal_tables_page_aware_v1",
+            "marker_options": {
+                "output_format": "markdown",
+                "paginate_output": True,
+                "html_tables_in_markdown": True,
+                "disable_image_extraction": False,
+            },
             "source_pdf_id": f"pdf_sha256_{source_hash[:16]}",
             "marker_job_id": "marker-job-contract-proof",
             "marker_output_format": "markdown",
             "marker_pages": 1,
             "marker_markdown_sha256": markdown_hash,
             "marker_markdown_chars": len(markdown.decode()),
+            "marker_page_marker_count": 1,
+            "marker_page_marker_first": 0,
+            "marker_page_marker_last": 0,
+            "marker_page_marker_sequence_complete": True,
+            "marker_image_count": 0,
             "marker_table_count": 1,
             "marker_table_row_count": 2,
             "marker_table_cell_count": 4,

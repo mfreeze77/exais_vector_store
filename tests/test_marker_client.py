@@ -7,17 +7,17 @@ from types import SimpleNamespace
 
 import httpx
 import pytest
-
 from svs_common.marker_client import (
+    FISCAL_TABLES_PAGE_AWARE_PROFILE,
     MarkerRunpodClient,
     MarkerRunpodError,
     extract_markdown,
     is_marker_pdf_upload,
     is_retryable_marker_error,
     markdown_filename_for_pdf,
+    marker_options_for_profile,
     resolve_image,
 )
-
 
 API_KEY = "rp-test-secret"
 ENDPOINT_ID = "ep-test"
@@ -75,6 +75,7 @@ def test_marker_client_happy_path_returns_output_and_keeps_secret_out_of_logs():
         client_with_handler(handler).process_pdf_bytes(
             filename="source.pdf",
             pdf_bytes=raw_pdf,
+            **marker_options_for_profile(FISCAL_TABLES_PAGE_AWARE_PROFILE),
             log_callback=logs.append,
             job_id_callback=jobs.append,
         )
@@ -91,6 +92,19 @@ def test_marker_client_happy_path_returns_output_and_keeps_secret_out_of_logs():
     body = json.loads(submit.read().decode("utf-8"))
     assert body["input"]["filename"] == "source.pdf"
     assert base64.b64decode(body["input"]["pdf_base64"]) == raw_pdf
+    assert body["input"] | {"pdf_base64": "<omitted>"} == {
+        "pdf_base64": "<omitted>",
+        "filename": "source.pdf",
+        "output_format": "markdown",
+        "paginate_output": True,
+        "html_tables_in_markdown": True,
+        "disable_image_extraction": False,
+    }
+
+
+def test_marker_profile_refuses_unbounded_request_options() -> None:
+    with pytest.raises(ValueError, match="unsupported Marker extraction profile"):
+        marker_options_for_profile("operator_supplied_arbitrary_options")
 
 
 def test_marker_client_rejects_non_remote_mode():

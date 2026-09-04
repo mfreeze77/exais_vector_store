@@ -30,7 +30,11 @@ def _load_script():
 
 
 command = _load_script()
-MARKDOWN = "# Kansas FY2025\n\n| Fund | Amount |\n|---|---:|\n| SGF | $41.0 |\n"
+MARKDOWN = (
+    "{0}"
+    + "-" * 48
+    + "\n# Kansas FY2025\n\n| Fund | Amount |\n|---|---:|\n| SGF | $41.0 |\n"
+)
 MARKDOWN_BYTES = MARKDOWN.encode("utf-8")
 MARKDOWN_SHA256 = hashlib.sha256(MARKDOWN_BYTES).hexdigest()
 SOURCE_SHA256 = "c" * 64
@@ -76,12 +80,24 @@ def _file_metadata() -> dict:
             ),
             "citation_url": "https://budget.kansas.gov/fy2025-report.pdf",
             "pdf_parser": "runpod_marker",
+            "marker_profile": "fiscal_tables_page_aware_v1",
+            "marker_options": {
+                "output_format": "markdown",
+                "paginate_output": True,
+                "html_tables_in_markdown": True,
+                "disable_image_extraction": False,
+            },
             "source_pdf_id": f"pdf_sha256_{SOURCE_SHA256[:16]}",
             "marker_job_id": "marker-job-1",
             "marker_output_format": "markdown",
             "marker_pages": 31,
             "marker_markdown_sha256": MARKDOWN_SHA256,
             "marker_markdown_chars": len(MARKDOWN),
+            "marker_page_marker_count": 1,
+            "marker_page_marker_first": 0,
+            "marker_page_marker_last": 0,
+            "marker_page_marker_sequence_complete": True,
+            "marker_image_count": 2,
             "marker_table_count": 1,
             "marker_table_row_count": 2,
             "marker_table_cell_count": 4,
@@ -113,11 +129,15 @@ def test_builder_binds_persisted_markdown_to_statecivics_revision() -> None:
         "content_hash_sha256": MARKDOWN_SHA256,
         "byte_count": len(MARKDOWN_BYTES),
         "character_count": len(MARKDOWN),
+        "page_marker_count": 1,
         "table_count": 1,
         "table_row_count": 2,
         "table_cell_count": 4,
     }
     assert record["exais"]["content_api_path"] == "/v1/files/doc-1/content"
+    assert record["marker"]["profile"] == "fiscal_tables_page_aware_v1"
+    assert record["marker"]["options"]["paginate_output"] is True
+    assert record["marker"]["image_count"] == 2
     shadow = dict(record)
     digest = shadow.pop("record_digest_sha256")
     assert (
@@ -162,6 +182,33 @@ def test_builder_fails_closed_on_persisted_metadata_mismatch(
             state_entry=_state_entry(),
             file_metadata=metadata,
             markdown_bytes=MARKDOWN_BYTES,
+            vector_store_id="vs-fiscal",
+            producer_commit=PRODUCER_COMMIT,
+        )
+
+
+def test_builder_refuses_markdown_without_real_page_delimiters() -> None:
+    markdown = b"# Page labels were not preserved\n"
+    metadata = _file_metadata()
+    metadata["attributes"].update(
+        {
+            "marker_markdown_sha256": hashlib.sha256(markdown).hexdigest(),
+            "marker_markdown_chars": len(markdown.decode()),
+            "marker_page_marker_count": 0,
+            "marker_page_marker_first": None,
+            "marker_page_marker_last": None,
+            "marker_page_marker_sequence_complete": False,
+            "marker_table_count": 0,
+            "marker_table_row_count": 0,
+            "marker_table_cell_count": 0,
+        }
+    )
+    with pytest.raises(MarkerHandoffError, match="no page delimiters"):
+        build_marker_handoff(
+            source_record=_source_record(),
+            state_entry=_state_entry(),
+            file_metadata=metadata,
+            markdown_bytes=markdown,
             vector_store_id="vs-fiscal",
             producer_commit=PRODUCER_COMMIT,
         )

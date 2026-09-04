@@ -51,7 +51,11 @@ After API ingestion, ExAIS already holds the exact Marker Markdown and its
 source/structure metadata. The handoff exporter retrieves those persisted
 objects through authenticated ExAIS APIs, verifies the StateCivics revision,
 original PDF hash, Markdown hash, character count, table counts, and ExAIS IDs,
-then writes deterministic Markdown plus JSONL for StateCivics:
+then writes deterministic Markdown plus JSONL for StateCivics.
+
+The source adapter selects the jurisdiction-neutral
+`fiscal_tables_page_aware_v1` profile, so that original Marker job also requests
+page markers, HTML-preserved tables, and image retention.
 
 ```bash
 python scripts/release/kansas-fiscal-marker-handoff.py \

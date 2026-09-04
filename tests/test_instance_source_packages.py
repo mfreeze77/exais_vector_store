@@ -66,6 +66,13 @@ def test_ks_civics_source_package_validates_in_production():
         module.get_path(fiscal.source, "artifactGeneration.routing.text/markdown")
         == "direct_structured_ingest"
     )
+    assert module.get_path(fiscal.source, "artifactGeneration.profile") == {
+        "name": "fiscal_tables_page_aware_v1",
+        "outputFormat": "markdown",
+        "paginateOutput": True,
+        "htmlTablesInMarkdown": True,
+        "disableImageExtraction": False,
+    }
     assert module.get_path(fiscal.source, "graph.enabled") is False
 
 

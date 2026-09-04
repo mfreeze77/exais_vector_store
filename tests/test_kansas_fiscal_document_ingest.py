@@ -3,11 +3,10 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pytest
-
 
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = ROOT / "scripts" / "release"
@@ -242,6 +241,7 @@ def test_pdf_upsert_uses_marker_upload_and_stable_identity(ingest, monkeypatch):
     assert captured["fields"]["source_uri"] == record["citation_url"]
     assert captured["fields"]["source_identity"] == record["logical_document_id"]
     attrs = json.loads(captured["fields"]["attributes_json"])
+    assert attrs["marker_profile"] == "fiscal_tables_page_aware_v1"
     assert attrs["source_revision_id"] == "revision-1"
     assert attrs["source_content_hash_sha256"] == record["content_hash_sha256"]
 

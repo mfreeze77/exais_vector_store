@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
+from svs_common.marker_client import FISCAL_TABLES_PAGE_AWARE_PROFILE
 from topeka_pipeline_common import (
     DEFAULT_CELL,
     DEFAULT_KNOWLEDGE_BASE_ID,
@@ -35,7 +36,6 @@ from topeka_pipeline_common import (
     ensure_vector_store,
     safe_filename,
 )
-
 
 DEFAULT_INSTANCE_SLUG = "ks-state-civics"
 DEFAULT_VECTOR_STORE_SLUG = "kansas-fiscal-documents"
@@ -450,6 +450,7 @@ def _record_attributes(record: dict[str, Any]) -> dict[str, Any]:
     exporter = record.get("exporter")
     return {
         "force_sync": True,
+        "marker_profile": FISCAL_TABLES_PAGE_AWARE_PROFILE,
         "source_collection": "statecivics-kansas-fiscal-documents",
         "logical_document_id": record["logical_document_id"],
         "source_revision_id": record["source_revision_id"],

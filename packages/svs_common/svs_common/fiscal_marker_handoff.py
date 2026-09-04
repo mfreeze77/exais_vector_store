@@ -8,6 +8,12 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
+from svs_common.marker_client import (
+    FISCAL_TABLES_PAGE_AWARE_PROFILE,
+    marker_options_for_profile,
+)
+from svs_common.marker_quality import extract_page_markers, summarize_markdown
+
 HANDOFF_VERSION = "1"
 RECORD_DIGEST_ALGORITHM = "statecivics-marker-extraction-canonical-json-v1"
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -115,6 +121,11 @@ def build_marker_handoff(
         ("custody_uri", source_record.get("custody_uri")),
         ("citation_url", source_record.get("citation_url")),
         ("pdf_parser", "runpod_marker"),
+        ("marker_profile", FISCAL_TABLES_PAGE_AWARE_PROFILE),
+        (
+            "marker_options",
+            marker_options_for_profile(FISCAL_TABLES_PAGE_AWARE_PROFILE),
+        ),
         ("source_pdf_id", f"pdf_sha256_{source_hash[:16]}"),
     ):
         _require_binding(attributes, field, expected)
@@ -126,17 +137,22 @@ def build_marker_handoff(
     if not markdown.strip():
         raise MarkerHandoffError("persisted Marker artifact is empty")
     markdown_hash = _sha256(markdown_bytes)
-    _require_binding(attributes, "marker_markdown_sha256", markdown_hash)
-    _require_binding(attributes, "marker_markdown_chars", len(markdown))
-
-    table_count = _require_count(
-        attributes.get("marker_table_count"), "marker_table_count"
-    )
-    table_row_count = _require_count(
-        attributes.get("marker_table_row_count"), "marker_table_row_count"
-    )
-    table_cell_count = _require_count(
-        attributes.get("marker_table_cell_count"), "marker_table_cell_count"
+    metrics = summarize_markdown(markdown)
+    for field, expected in metrics.items():
+        _require_binding(attributes, field, expected)
+    page_markers = extract_page_markers(markdown)
+    if page_markers != list(range(len(page_markers))):
+        raise MarkerHandoffError(
+            "persisted Marker pagination must be a complete zero-based sequence"
+        )
+    table_count = metrics["marker_table_count"]
+    table_row_count = metrics["marker_table_row_count"]
+    table_cell_count = metrics["marker_table_cell_count"]
+    page_marker_count = metrics["marker_page_marker_count"]
+    if not isinstance(page_marker_count, int) or page_marker_count < 1:
+        raise MarkerHandoffError("persisted Marker artifact has no page delimiters")
+    image_count = _require_count(
+        attributes.get("marker_image_count"), "marker_image_count"
     )
     producer_commit = _require_string(producer_commit, "producer_commit")
     if not re.fullmatch(r"[0-9a-f]{40}", producer_commit):
@@ -153,12 +169,9 @@ def build_marker_handoff(
     pages = attributes.get("marker_pages")
     if pages is not None:
         pages = _require_count(pages, "marker_pages")
-    output_format = attributes.get("marker_output_format")
-    if output_format is not None and not isinstance(output_format, str):
-        raise MarkerHandoffError("marker_output_format must be a string or null")
-    job_id = attributes.get("marker_job_id")
-    if job_id is not None:
-        job_id = _require_string(job_id, "marker_job_id")
+    _require_binding(attributes, "marker_output_format", "markdown")
+    output_format = "markdown"
+    job_id = _require_string(attributes.get("marker_job_id"), "marker_job_id")
 
     record = {
         "schema_version": 1,
@@ -182,6 +195,7 @@ def build_marker_handoff(
             "content_hash_sha256": markdown_hash,
             "byte_count": len(markdown_bytes),
             "character_count": len(markdown),
+            "page_marker_count": page_marker_count,
             "table_count": table_count,
             "table_row_count": table_row_count,
             "table_cell_count": table_cell_count,
@@ -189,8 +203,11 @@ def build_marker_handoff(
         "marker": {
             "engine": "runpod_marker",
             "mode": "pdf_markdown_external_v1",
+            "profile": FISCAL_TABLES_PAGE_AWARE_PROFILE,
+            "options": marker_options_for_profile(FISCAL_TABLES_PAGE_AWARE_PROFILE),
             "job_id": job_id,
             "output_format": output_format,
+            "image_count": image_count,
             "pages": pages,
         },
         "exais": {

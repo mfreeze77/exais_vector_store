@@ -5,7 +5,12 @@ import asyncio
 import pytest
 from fastapi import HTTPException
 from svs_api import main as api_main
-from svs_common.marker_client import MarkerRunpodError, pdf_source_id
+from svs_common.marker_client import (
+    FISCAL_TABLES_PAGE_AWARE_OPTIONS,
+    FISCAL_TABLES_PAGE_AWARE_PROFILE,
+    MarkerRunpodError,
+    pdf_source_id,
+)
 from svs_common.schemas import Principal
 
 
@@ -42,13 +47,17 @@ def test_marker_pdf_upload_request_builds_pdf_markdown_ingest(monkeypatch: pytes
     fake_store = FakeObjectStore()
 
     class FakeMarkerClient:
-        async def process_pdf_bytes(self, *, filename, pdf_bytes, job_id_callback=None):
+        async def process_pdf_bytes(
+            self, *, filename, pdf_bytes, job_id_callback=None, **options
+        ):
             assert filename == "Panel Schedule.pdf"
             assert pdf_bytes == raw_pdf
+            assert options == FISCAL_TABLES_PAGE_AWARE_OPTIONS
             if job_id_callback:
                 job_id_callback("job-xyz")
             return {
-                "text": "<!-- page: 7 -->\n# Panel Schedule\nCircuit rows",
+                "text": "{0}" + "-" * 48 + "\n# Panel Schedule\nCircuit rows",
+                "images": [{"filename": "page-0.jpeg"}],
                 "pages": 7,
                 "output_format": "markdown",
                 "metadata": {
@@ -73,7 +82,10 @@ def test_marker_pdf_upload_request_builds_pdf_markdown_ingest(monkeypatch: pytes
             principal=principal(),
             source_uri="https://budget.kansas.gov/fy2027.pdf",
             source_identity="statecivics:logical-document",
-            attributes={"source_revision_id": "revision-1"},
+            attributes={
+                "source_revision_id": "revision-1",
+                "marker_profile": FISCAL_TABLES_PAGE_AWARE_PROFILE,
+            },
             classification="public",
         )
     )
@@ -87,21 +99,28 @@ def test_marker_pdf_upload_request_builds_pdf_markdown_ingest(monkeypatch: pytes
     assert req.source_uri == "https://budget.kansas.gov/fy2027.pdf"
     assert req.source_identity == "statecivics:logical-document"
     assert req.classification == "public"
-    assert "<!-- page: 7 -->" in req.content
+    assert "{0}" + "-" * 48 in req.content
     assert req.attributes["source_revision_id"] == "revision-1"
     assert req.attributes["source_pdf_id"] == pdf_source_id(raw_pdf)
     assert req.attributes["source_pdf_filename"] == "Panel Schedule.pdf"
     assert req.attributes["pdf_parser"] == "runpod_marker"
     assert req.attributes["marker_job_id"] == "job-xyz"
     assert req.attributes["marker_pages"] == 7
+    assert req.attributes["marker_profile"] == FISCAL_TABLES_PAGE_AWARE_PROFILE
+    assert req.attributes["marker_options"] == FISCAL_TABLES_PAGE_AWARE_OPTIONS
+    assert req.attributes["marker_image_count"] == 1
     assert req.attributes["marker_metadata"] == {"marker_version": "test"}
     assert req.attributes["marker_markdown_chars"] == len(
-        "<!-- page: 7 -->\n# Panel Schedule\nCircuit rows"
+        "{0}" + "-" * 48 + "\n# Panel Schedule\nCircuit rows"
     )
     assert len(req.attributes["marker_markdown_sha256"]) == 64
     assert req.attributes["marker_table_count"] == 0
     assert req.attributes["marker_table_row_count"] == 0
     assert req.attributes["marker_table_cell_count"] == 0
+    assert req.attributes["marker_page_marker_count"] == 1
+    assert req.attributes["marker_page_marker_first"] == 0
+    assert req.attributes["marker_page_marker_last"] == 0
+    assert req.attributes["marker_page_marker_sequence_complete"] is True
     assert "api_key" not in req.attributes["marker_metadata"]
     assert "secret_note" not in req.attributes["marker_metadata"]
 
@@ -122,6 +141,31 @@ def test_upload_attributes_require_a_json_object():
         with pytest.raises(HTTPException) as exc_info:
             api_main._document_upload_attributes(value)
         assert exc_info.value.status_code == 422
+
+
+def test_marker_pdf_upload_request_refuses_unknown_profile_before_marker(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    class ShouldNotRunMarkerClient:
+        async def process_pdf_bytes(self, **kwargs):
+            raise AssertionError("unknown profile reached Marker")
+
+    monkeypatch.setattr(api_main, "MarkerRunpodClient", ShouldNotRunMarkerClient)
+    with pytest.raises(HTTPException) as exc_info:
+        run(
+            api_main.marker_pdf_upload_request(
+                file=FakeUpload(),
+                content_bytes=b"%PDF",
+                title=None,
+                mode="auto_detect_v1",
+                vector_store_id=None,
+                knowledge_base_id=None,
+                security_level=1,
+                principal=principal(),
+                attributes={"marker_profile": "arbitrary_operator_options"},
+            )
+        )
+    assert exc_info.value.status_code == 422
 
 
 def test_marker_pdf_upload_request_reports_missing_config(monkeypatch: pytest.MonkeyPatch):

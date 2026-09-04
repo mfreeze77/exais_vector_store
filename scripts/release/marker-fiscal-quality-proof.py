@@ -11,11 +11,13 @@ from pathlib import Path
 from typing import Any
 
 from svs_common.marker_client import (
+    FISCAL_TABLES_PAGE_AWARE_PROFILE,
     MarkerRunpodClient,
     MarkerRunpodError,
     extract_markdown,
+    marker_options_for_profile,
 )
-from svs_common.marker_quality import evaluate_profile
+from svs_common.marker_quality import evaluate_profile, extract_page_markers
 
 
 def load_profile(path: Path, expected_sha256: str) -> dict[str, Any]:
@@ -77,6 +79,7 @@ async def run_quality(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
         filename=pdf_path.name,
         pdf_bytes=content,
         job_id_callback=job_ids.append,
+        **marker_options_for_profile(FISCAL_TABLES_PAGE_AWARE_PROFILE),
     )
     observed_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
     if result is None:
@@ -92,7 +95,22 @@ async def run_quality(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
         }
         return 1, proof
 
-    assessment = evaluate_profile(extract_markdown(result), profile)
+    markdown = extract_markdown(result)
+    assessment = evaluate_profile(markdown, profile)
+    page_markers = extract_page_markers(markdown)
+    pagination_check = {
+        "id": "profile:zero_based_page_markers",
+        "passed": bool(page_markers) and page_markers == list(range(len(page_markers))),
+        "marker_count": len(page_markers),
+        "first_page": page_markers[0] if page_markers else None,
+        "last_page": page_markers[-1] if page_markers else None,
+    }
+    assessment["checks"].append(pagination_check)
+    assessment["passed"] = assessment["passed"] and pagination_check["passed"]
+    images = result.get("images")
+    assessment["metrics"]["marker_image_count"] = (
+        len(images) if isinstance(images, dict | list) else 0
+    )
     proof = {
         "schema_version": 1,
         "observed_at": observed_at,
@@ -102,6 +120,8 @@ async def run_quality(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
         "source_bytes": len(content),
         "marker_job_count": len(job_ids),
         "marker_job_id": job_ids[-1] if job_ids else None,
+        "marker_profile": FISCAL_TABLES_PAGE_AWARE_PROFILE,
+        "marker_options": marker_options_for_profile(FISCAL_TABLES_PAGE_AWARE_PROFILE),
         "marker_output_fields": sorted(result),
         "assessment": assessment,
     }

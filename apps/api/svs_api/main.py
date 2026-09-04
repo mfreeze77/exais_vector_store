@@ -165,6 +165,7 @@ from svs_common.marker_client import (
     is_marker_pdf_upload,
     markdown_filename_for_pdf,
     marker_attribute_summary,
+    marker_options_for_profile,
     pdf_source_id,
     sanitize_stem,
 )
@@ -327,11 +328,17 @@ async def marker_pdf_upload_request(
     classification: str = 'tenant_private',
 ) -> DocumentIngestRequest:
     job_ids: list[str] = []
+    extraction_profile = (attributes or {}).get('marker_profile')
+    try:
+        marker_options = marker_options_for_profile(extraction_profile)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     try:
         output = await MarkerRunpodClient().process_pdf_bytes(
             filename=file.filename or 'uploaded.pdf',
             pdf_bytes=content_bytes,
             job_id_callback=job_ids.append,
+            **marker_options,
         )
     except MarkerRunpodError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
@@ -355,6 +362,10 @@ async def marker_pdf_upload_request(
         output=output,
         job_id=job_ids[-1] if job_ids else None,
         source_object_key=source_key,
+        extraction_profile=(
+            extraction_profile if isinstance(extraction_profile, str) else None
+        ),
+        request_options=marker_options,
     ))
     return DocumentIngestRequest(
         vector_store_id=vector_store_id,

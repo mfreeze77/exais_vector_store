@@ -69,7 +69,15 @@ The producer contract is pinned to StateCivics commit
   response used to compute its output digest and structural counts.
 - The extraction handoff verifies persisted ExAIS metadata and Markdown against
   the original revision and source hash, emits byte-stable files/JSONL, and
-  validates against the StateCivics-owned contract at commit `083ec59e`.
+  validates against the StateCivics-owned contract at commit `19e402cd`.
+- The bounded `fiscal_tables_page_aware_v1` profile requests pagination,
+  HTML-preserved tables, and retained images in that same Marker job; arbitrary
+  operator-supplied Marker options are rejected.
+- Live profile proof returned 31 consecutive page delimiters (0–30), 4 images,
+  4 matching Markdown image references, and 6 HTML-preserved tables/125
+  rows/927 cells with all 9 semantic rows matched.
+  The endpoint's `pages` summary was zero, so only the actual delimiters are
+  accepted as page evidence.
 
 ## Dependencies
 

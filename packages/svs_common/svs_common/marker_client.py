@@ -22,10 +22,30 @@ DEFAULT_MARKER_MAX_ATTEMPTS = 2
 DEFAULT_MARKER_RETRY_BACKOFF_SEC = 5
 DEFAULT_HTTP_TIMEOUT_SEC = 30
 RUNPOD_BASE_URL = "https://api.runpod.ai/v2"
+FISCAL_TABLES_PAGE_AWARE_PROFILE = "fiscal_tables_page_aware_v1"
+FISCAL_TABLES_PAGE_AWARE_OPTIONS: dict[str, str | bool] = {
+    "output_format": "markdown",
+    "paginate_output": True,
+    "html_tables_in_markdown": True,
+    "disable_image_extraction": False,
+}
 
 
 class MarkerRunpodError(RuntimeError):
     pass
+
+
+def marker_options_for_profile(profile: Any) -> dict[str, str | bool]:
+    """Resolve a named, bounded Marker request profile.
+
+    Profiles are chosen by the source adapter. Arbitrary request attributes
+    must never become unchecked RunPod options.
+    """
+    if profile is None:
+        return {}
+    if profile == FISCAL_TABLES_PAGE_AWARE_PROFILE:
+        return dict(FISCAL_TABLES_PAGE_AWARE_OPTIONS)
+    raise ValueError(f"unsupported Marker extraction profile {profile!r}")
 
 
 def _read_config() -> dict[str, str | None]:
@@ -138,6 +158,8 @@ def marker_attribute_summary(
     output: dict[str, Any],
     job_id: str | None = None,
     source_object_key: str | None = None,
+    extraction_profile: str | None = None,
+    request_options: dict[str, str | bool] | None = None,
 ) -> dict[str, Any]:
     attrs: dict[str, Any] = {
         "source_pdf_id": pdf_source_id(pdf_bytes),
@@ -148,6 +170,11 @@ def marker_attribute_summary(
         attrs["marker_job_id"] = job_id
     if source_object_key:
         attrs["source_pdf_object_key"] = source_object_key
+    if extraction_profile:
+        attrs["marker_profile"] = extraction_profile
+        attrs["marker_options"] = dict(request_options or {})
+    images = output.get("images")
+    attrs["marker_image_count"] = len(images) if isinstance(images, dict | list) else 0
     for source_key, attr_key in (
         ("pages", "marker_pages"),
         ("processing_time_seconds", "marker_processing_time_seconds"),
@@ -244,6 +271,10 @@ class MarkerRunpodClient:
         poll_interval_sec: int | None = None,
         max_poll_sec: int | None = None,
         max_attempts: int | None = None,
+        output_format: str | None = None,
+        paginate_output: bool | None = None,
+        html_tables_in_markdown: bool | None = None,
+        disable_image_extraction: bool | None = None,
         log_callback: Callable[[str], None] | Callable[[str], Awaitable[None]] | None = None,
         job_id_callback: Callable[[str], None] | Callable[[str], Awaitable[None]] | None = None,
     ) -> dict[str, Any] | None:
@@ -275,6 +306,15 @@ class MarkerRunpodClient:
                 "filename": filename,
             }
         }
+        marker_input = payload["input"]
+        for key, value in (
+            ("output_format", output_format),
+            ("paginate_output", paginate_output),
+            ("html_tables_in_markdown", html_tables_in_markdown),
+            ("disable_image_extraction", disable_image_extraction),
+        ):
+            if value is not None:
+                marker_input[key] = value
 
         for attempt in range(1, attempts + 1):
             await emit(f"attempt start attempt={attempt} max_attempts={attempts}")

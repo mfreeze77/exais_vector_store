@@ -7,6 +7,9 @@ import unicodedata
 from html.parser import HTMLParser
 from typing import Any
 
+_MARKER_PAGE_DELIMITER_RE = re.compile(r"(?m)^\{([0-9]+)\}-{48}\s*$")
+_COMMENT_PAGE_DELIMITER_RE = re.compile(r"(?im)^<!--\s*page:\s*([0-9]+)\s*-->\s*$")
+
 
 def normalize_text(value: str) -> str:
     value = html.unescape(unicodedata.normalize("NFKC", value))
@@ -104,15 +107,32 @@ def extract_tables(markdown: str) -> list[list[list[str]]]:
     return _markdown_tables(markdown) + parser.tables
 
 
+def extract_page_markers(markdown: str) -> list[int]:
+    """Return page numbers from Marker pagination or legacy HTML comments."""
+    matches = [
+        (match.start(), int(match.group(1)))
+        for pattern in (_MARKER_PAGE_DELIMITER_RE, _COMMENT_PAGE_DELIMITER_RE)
+        for match in pattern.finditer(markdown)
+    ]
+    return [page for _offset, page in sorted(matches)]
+
+
 def summarize_markdown(markdown: str) -> dict[str, Any]:
     tables = extract_tables(markdown)
     rows = [row for table in tables for row in table]
+    page_markers = extract_page_markers(markdown)
     return {
         "marker_markdown_chars": len(markdown),
         "marker_markdown_sha256": hashlib.sha256(markdown.encode("utf-8")).hexdigest(),
         "marker_table_count": len(tables),
         "marker_table_row_count": len(rows),
         "marker_table_cell_count": sum(len(row) for row in rows),
+        "marker_page_marker_count": len(page_markers),
+        "marker_page_marker_first": page_markers[0] if page_markers else None,
+        "marker_page_marker_last": page_markers[-1] if page_markers else None,
+        "marker_page_marker_sequence_complete": bool(page_markers)
+        and page_markers
+        == list(range(page_markers[0], page_markers[0] + len(page_markers))),
     }
 
 
@@ -228,6 +248,7 @@ def evaluate_profile(markdown: str, profile: dict[str, Any]) -> dict[str, Any]:
 
 __all__ = [
     "evaluate_profile",
+    "extract_page_markers",
     "extract_tables",
     "normalize_text",
     "summarize_markdown",

@@ -41,9 +41,9 @@ from topeka_pipeline_common import (
 
 ROOT = Path(__file__).resolve().parents[2]
 INGEST_COMMAND = ROOT / "scripts" / "release" / "kansas-fiscal-document-ingest.py"
-STATECIVICS_CONTRACT_REVISION = "083ec59ea7f33362d60170e729939fd2a902b570"
+STATECIVICS_CONTRACT_REVISION = "19e402cd59831fcc23125442270c4063dbf42a14"
 STATECIVICS_CONTRACT_SHA256 = (
-    "0c215c4e09c6fd48f40532f09a67682c65a9726a150654b4936f9e95e7252e40"
+    "5e4dac393d0ee24d5fa37b2868e4d8ae1b8546d852c2414f128011379129a2c1"
 )
 _COMMIT_RE = re.compile(r"^[0-9a-f]{7,40}$")
 _HANDOFF_CODE_PATHS = (

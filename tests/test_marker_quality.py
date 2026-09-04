@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 from svs_common.marker_quality import (
     evaluate_profile,
+    extract_page_markers,
     extract_tables,
     summarize_markdown,
 )
@@ -71,6 +72,19 @@ def test_summary_is_derived_from_the_same_markdown() -> None:
     assert summary["marker_table_count"] == 2
     assert summary["marker_table_row_count"] == 5
     assert summary["marker_table_cell_count"] == 17
+    assert summary["marker_page_marker_count"] == 0
+    assert summary["marker_page_marker_first"] is None
+    assert summary["marker_page_marker_last"] is None
+    assert summary["marker_page_marker_sequence_complete"] is False
+
+
+def test_page_markers_accept_marker_pagination_and_legacy_comments() -> None:
+    markdown = (
+        "{0}" + "-" * 48 + "\nfirst\n"
+        "<!-- page: 7 -->\nlegacy\n"
+        "{1}" + "-" * 48 + "\nsecond\n"
+    )
+    assert extract_page_markers(markdown) == [0, 7, 1]
 
 
 def test_profile_requires_values_to_remain_on_their_source_row() -> None:

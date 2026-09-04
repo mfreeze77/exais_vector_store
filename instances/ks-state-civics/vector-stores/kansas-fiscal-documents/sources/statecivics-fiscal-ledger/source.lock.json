@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lockedAt": "2026-09-04T16:50:07Z",
+  "lockedAt": "2026-09-04T17:15:01Z",
   "sourceType": "statecivics_custody_ledger_projection",
   "sourceManifest": {
     "format": "jsonl",
@@ -26,6 +26,14 @@
     "pdfRoute": "/api/v1/documents/upload",
     "pdfMode": "auto_detect_v1",
     "parser": "configured_runpod_marker_serverless",
+    "profile": {
+      "name": "fiscal_tables_page_aware_v1",
+      "proofStatus": "passed",
+      "outputFormat": "markdown",
+      "paginateOutput": true,
+      "htmlTablesInMarkdown": true,
+      "disableImageExtraction": false
+    },
     "structuredTextRoute": "/api/v1/documents/ingest",
     "localMarkerFallback": false,
     "extractionHandoff": {
@@ -34,22 +42,29 @@
       "markerRequests": 0,
       "contract": {
         "repository": "operator-source://statecivics-recovered-local",
-        "revision": "083ec59ea7f33362d60170e729939fd2a902b570",
+        "revision": "19e402cd59831fcc23125442270c4063dbf42a14",
         "path": "contracts/civic-impact/marker-extraction-record.schema.json",
-        "sha256": "0c215c4e09c6fd48f40532f09a67682c65a9726a150654b4936f9e95e7252e40"
+        "sha256": "5e4dac393d0ee24d5fa37b2868e4d8ae1b8546d852c2414f128011379129a2c1"
       },
       "boundary": "Exports persisted Marker Markdown through authenticated ExAIS APIs. It never invokes Marker and StateCivics must treat returned tables and cells as candidate evidence."
     },
     "lastEndpointProof": {
-      "observedAt": "2026-09-04T15:51:21Z",
+      "observedAt": "2026-09-04T17:10:16Z",
       "status": "completed",
       "scope": "direct_marker_endpoint_parser_only",
       "sourceDocument": "FY2025_GBR_Director_Presentation-UPDATED_01.16.2024.pdf",
       "sourceByteCount": 717996,
       "sourceSha256": "8cc58bf8da72e204c2966fb7e8c1034aca334cbcf7b0f68a8ec4e701eea4c717",
       "attemptCount": 1,
-      "markdownCharCount": 30615,
-      "markdownSha256Prefix": "9f43516abbac42fe",
+      "markdownCharCount": 32281,
+      "markdownSha256Prefix": "33362b9a155976fe",
+      "pageMarkerCount": 31,
+      "firstPageMarker": 0,
+      "lastPageMarker": 30,
+      "providerReportedPages": 0,
+      "imageCount": 4,
+      "imageReferenceCount": 4,
+      "htmlTableCount": 6,
       "outputFields": [
         "filename",
         "images",
@@ -59,10 +74,11 @@
         "processing_time_seconds",
         "text"
       ],
-      "boundary": "Proves the configured RunPod Marker endpoint can parse a real Kansas fiscal PDF. It does not prove ExAIS API persistence, vector indexing, or recall."
+      "requestProfile": "fiscal_tables_page_aware_v1",
+      "boundary": "Proves the configured RunPod Marker endpoint honored the bounded one-pass fiscal profile. Actual Markdown delimiters prove 31 pages despite the provider summary field reporting zero. It does not prove ExAIS API persistence, vector indexing, or recall."
     },
     "lastQualityProof": {
-      "observedAt": "2026-09-04T16:28:38Z",
+      "observedAt": "2026-09-04T17:10:16Z",
       "status": "passed",
       "scope": "single_marker_response_fiscal_table_fidelity",
       "profile": "quality/fy2025-director-presentation.json",
@@ -72,15 +88,23 @@
       "sourceSha256": "8cc58bf8da72e204c2966fb7e8c1034aca334cbcf7b0f68a8ec4e701eea4c717",
       "attemptCount": 1,
       "markerJobCount": 1,
-      "markdownCharCount": 30615,
-      "markdownSha256": "9f43516abbac42fe4b383fd7352f1699a0b34f448081981981204f702274c33c",
+      "extractionProfile": "fiscal_tables_page_aware_v1",
+      "markdownCharCount": 32281,
+      "markdownSha256": "33362b9a155976fe7a616fa5c240e7598f1e1163851af04a251770b1f4591f80",
+      "pageMarkerCount": 31,
+      "firstPageMarker": 0,
+      "lastPageMarker": 30,
+      "imageCount": 4,
+      "imageReferenceCount": 4,
+      "htmlTableCount": 6,
       "tableCount": 6,
       "tableRowCount": 125,
       "tableCellCount": 927,
       "anchorChecksPassed": 3,
       "tableChecksPassed": 3,
       "expectedRowsMatched": 9,
-      "boundary": "One Marker job produced one response. All quality metrics and row checks were computed from that response; no second extraction was run."
+      "requestProfile": "fiscal_tables_page_aware_v1",
+      "boundary": "One Marker job produced one response. All table, page-marker, image-count, digest, and semantic-row checks were computed from that response; no second extraction was run."
     }
   }
 }
