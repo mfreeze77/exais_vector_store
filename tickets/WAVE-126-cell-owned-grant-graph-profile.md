@@ -56,7 +56,29 @@ pytest -q -p no:cacheprovider tests/test_grant_graph_postgres.py \
 ```
 
 Set `SVS_GRANT_GRAPH_TEST_DATABASE_URL` only to the disposable migrated test
-database; without it the 29 SQL tests skip. No normal `DATABASE_URL` fallback.
+database; without it the SQL tests skip. No normal `DATABASE_URL` fallback.
+
+### Committed baseline and evidence-ACL hardening
+
+- Baseline committed as `3e55104`. A clean detached clone then passed the entire
+  non-integration suite: **924 passed, 29 skipped**, 3 dependency deprecation
+  warnings, 6.95s. The clone stayed clean; `tests/integration` was explicitly
+  excluded and the dedicated SQL URL was unset. This does not claim unrun gates.
+- Final review identified a third-document evidence boundary: valid public
+  endpoints alone do not authorize publishing a supporting citation ID after
+  its source becomes private, stale, deleted or unavailable. Candidate SQL now
+  requires every evidence citation to resolve to current, public, exactly bound
+  same-cell/generation source chunks with the principal's group/role access.
+- The real SQL fixture now uses a distinct third evidence document. Eight
+  negative cases cover evidence groups/roles, private document/chunk, cancelled
+  file, stale source hash/version and missing citation. Two positive cases prove
+  actual group/role members retain access.
+- Updated focused result: **231 passed**, including **39 real PostgreSQL cases**,
+  2 existing warnings, 2.94s. New throwaway database:
+  `svs-grant-evidence-test-20260905`, again tmpfs/network-isolated/no host port.
+  All writes roll back; no operating database or provider calls are involved.
+- The original `svs-grant-graph-test-20260905` container was stopped and removed
+  after its tests; only synthetic tmpfs fixture data was discarded.
 
 ## Still open — do not relabel this as a complete grant graph
 

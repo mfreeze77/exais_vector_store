@@ -159,6 +159,12 @@ requires active current-version public chunks and accepted public graph edges.
 Candidate SQL enforces tenant/business/store and document/knowledge-base/
 classification/ACL-bucket filters. The existing hydrator reapplies file
 comparison/range/alternative/exclusion filters and principal group/role ACLs.
+Supporting citations may point to a third document rather than an endpoint.
+Every supporting citation must still resolve to a completed, exactly bound,
+current public document/chunk accessible to the principal's groups/roles. A
+private, stale, missing or cancelled supporting document suppresses the edge;
+even its canonical citation ID is not exposed through graph metadata. Supporting
+evidence is access-checked but need not match the returned result's topic filters.
 At most 10 seed documents and `20 * max_expansions` candidate rows are inspected;
 bounded candidate selection can omit relevant relationships. This is not an
 exhaustive funding-chain traversal.

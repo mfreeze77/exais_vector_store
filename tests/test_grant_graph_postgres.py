@@ -76,7 +76,7 @@ def corpus():
             )
             generation = str(uuid4())
             nodes, documents, chunks = [], [], []
-            for kind in ("award", "project"):
+            for kind in ("award", "project", "document"):
                 projection_id, entity_id = str(uuid4()), str(uuid4())
                 document_id, version_id, chunk_id = (
                     f"doc_{uuid4().hex}",
@@ -147,7 +147,7 @@ def corpus():
                     "review_status": "accepted",
                     "visibility": "public",
                     "evidence_citation_ids": [
-                        nodes[0]["attributes"]["gip_citation_id"]
+                        nodes[2]["attributes"]["gip_citation_id"]
                     ],
                 },
             }
@@ -164,7 +164,7 @@ def corpus():
             ).one()
             assert tuple(role) == (False, False)
             result = _load_vector_store_graph(db, principal, store, request)
-            assert result["loaded_nodes"] == 2 and result["loaded_edges"] == 1
+            assert result["loaded_nodes"] == 3 and result["loaded_edges"] == 1
             yield {
                 "db": db,
                 "principal": principal,
@@ -272,6 +272,60 @@ def test_stale_private_or_unbound_graph_never_expands(corpus, case):
     db.execute(text(statements[case]), params)
     db.execute(text("SET LOCAL ROLE svs_app"))
     assert expand(corpus)[0] == []
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "group",
+        "role",
+        "private_document",
+        "private_chunk",
+        "cancelled_file",
+        "source_hash",
+        "version",
+        "missing_citation",
+    ],
+)
+def test_supporting_third_document_citation_requires_current_public_acl(corpus, case):
+    db = corpus["db"]
+    db.execute(text("RESET ROLE"))
+    params = {
+        "document": corpus["documents"][2],
+        "node": corpus["nodes"][2]["id"],
+        "edge": corpus["edge"]["id"],
+    }
+    statements = {
+        "group": "UPDATE chunks SET allowed_groups=ARRAY['not_a_member'] WHERE document_id=:document",
+        "role": "UPDATE chunks SET allowed_roles=ARRAY['not_authorized'] WHERE document_id=:document",
+        "private_document": "UPDATE documents SET security_level=1 WHERE id=:document",
+        "private_chunk": "UPDATE chunks SET security_level=1,classification='tenant_private' WHERE document_id=:document",
+        "cancelled_file": "UPDATE vector_store_files SET status='cancelled' WHERE document_id=:document",
+        "source_hash": "UPDATE graph_nodes SET attributes=jsonb_set(attributes,'{gip_source_version_sha256}','\"stale\"') WHERE id=:node",
+        "version": "UPDATE documents SET current_version_id='stale' WHERE id=:document",
+        "missing_citation": "UPDATE graph_edges SET attributes=jsonb_set(attributes,'{evidence_citation_ids}','[\"missing\"]') WHERE id=:edge",
+    }
+    db.execute(text(statements[case]), params)
+    db.execute(text("SET LOCAL ROLE svs_app"))
+    assert expand(corpus)[0] == []
+
+
+@pytest.mark.parametrize("kind", ["groups", "roles"])
+def test_supporting_citation_allows_actual_group_or_role_member(corpus, kind):
+    db = corpus["db"]
+    db.execute(text("RESET ROLE"))
+    # Column name comes from this fixed test parameterization, not a request.
+    db.execute(
+        text(
+            f"UPDATE chunks SET allowed_{kind}=ARRAY['reviewers'] WHERE document_id=:document"
+        ),
+        {"document": corpus["documents"][2]},
+    )
+    db.execute(text("SET LOCAL ROLE svs_app"))
+    principal = corpus["principal"].model_copy(update={kind: ["reviewers"]})
+    assert [chunk.document_id for chunk in expand(corpus, principal=principal)[0]] == [
+        corpus["documents"][1]
+    ]
 
 
 @pytest.mark.parametrize(

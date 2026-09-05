@@ -261,6 +261,39 @@ def expand_grant_graph(
           AND (CAST(:filter_knowledge_base_id AS text) IS NULL OR c.knowledge_base_id=:filter_knowledge_base_id)
           AND (CAST(:filter_classification AS text) IS NULL OR c.classification=:filter_classification)
           AND (CAST(:filter_acl_bucket AS text) IS NULL OR c.acl_bucket=:filter_acl_bucket)
+          -- A supporting citation may be a third document, not an endpoint.
+          -- Do not expose even its canonical ID after it becomes unavailable
+          -- or inaccessible. Evidence need not match the result's topic filters,
+          -- but must match this generation, exact source binding and caller ACL.
+          AND NOT EXISTS (
+            SELECT 1 FROM jsonb_array_elements_text(
+              CASE WHEN jsonb_typeof(e.attributes->'evidence_citation_ids')='array'
+                THEN e.attributes->'evidence_citation_ids' ELSE '[]'::jsonb END
+            ) AS evidence(citation_id)
+            WHERE NOT EXISTS (
+              SELECT 1 FROM graph_nodes en
+              JOIN vector_store_files ef ON ef.tenant_id=en.tenant_id
+                AND ef.business_instance_id=en.business_instance_id AND ef.vector_store_id=en.vector_store_id
+                AND ef.status='completed'
+                AND ef.attributes->>'gip_search_document_id'=en.attributes->>'gip_search_document_id'
+                AND ef.attributes->>'gip_generation_id'=en.attributes->>'gip_generation_id'
+                AND ef.attributes->>'gip_source_version_sha256'=en.attributes->>'gip_source_version_sha256'
+                AND ef.attributes->>'gip_entity_id'=en.attributes->>'gip_entity_id'
+                AND ef.attributes->>'gip_entity_type'=en.node_type
+                AND ef.attributes->>'gip_citation_id'=en.attributes->>'gip_citation_id'
+              JOIN documents ed ON ed.id=ef.document_id AND ed.tenant_id=ef.tenant_id
+                AND ed.business_instance_id=ef.business_instance_id AND ed.status='active'
+              JOIN chunks ec ON ec.document_id=ed.id AND ec.document_version_id=ed.current_version_id
+                AND ec.tenant_id=ed.tenant_id AND ec.business_instance_id=ed.business_instance_id
+                AND ec.vector_store_id=:store_id AND ec.active=true
+                AND ec.security_level=0 AND ec.classification='public'
+                AND (cardinality(ec.allowed_groups)=0 OR ec.allowed_groups && CAST(:groups AS text[]))
+                AND (cardinality(ec.allowed_roles)=0 OR ec.allowed_roles && CAST(:roles AS text[]))
+              WHERE en.tenant_id=:tenant_id AND en.business_instance_id=:biz_id AND en.vector_store_id=:store_id
+                AND en.attributes->>'gip_generation_id'=:generation AND en.attributes->>'visibility'='public'
+                AND en.attributes->>'gip_citation_id'=evidence.citation_id
+            )
+          )
         ORDER BY s.seed_rank, e.id, c.ordinal, c.id
         LIMIT :candidate_limit
     """),
@@ -272,6 +305,8 @@ def expand_grant_graph(
                 "seed_ids": seed_ids,
                 "relations": list(relation_types),
                 "candidate_limit": limit * 20,
+                "groups": principal.groups,
+                "roles": principal.roles,
                 **column_filters,
             },
         )
