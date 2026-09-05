@@ -80,6 +80,21 @@ database; without it the SQL tests skip. No normal `DATABASE_URL` fallback.
 - The original `svs-grant-graph-test-20260905` container was stopped and removed
   after its tests; only synthetic tmpfs fixture data was discarded.
 
+### Final clean-checkout qualification
+
+- Hardening committed as `2da4954`. A clean detached clone of that revision ran
+  the complete non-integration suite **with** the dedicated PostgreSQL URL:
+  **963 passed, 0 skipped**, 3 existing dependency deprecation warnings, 8.53s.
+  This includes all 39 real graph SQL/RLS cases. `tests/integration` remains
+  explicitly excluded; no provider or running-cell integration is inferred.
+- Command: the pinned dependency image above, clone mounted at `/app`,
+  `PYTHONDONTWRITEBYTECODE=1`, dedicated test URL, then
+  `pytest -q -p no:cacheprovider --ignore=tests/integration`.
+  The clone at `/tmp/exais-grant-profile-qualification.SOYtcv/repo` stayed clean.
+- `svs-grant-evidence-test-20260905` was stopped and removed after completion;
+  only throwaway synthetic tmpfs data was discarded. StateCivics has no changed
+  files relative to `11eebf7`; Grant runtime image and credentials are unchanged.
+
 ## Still open — do not relabel this as a complete grant graph
 
 - Canonical Grant DB target selection remains outside this ExAIS change.
