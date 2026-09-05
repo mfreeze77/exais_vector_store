@@ -1,0 +1,25 @@
+apiVersion: svs/v1
+kind: InstanceVectorStore
+metadata:
+  instanceSlug: grant-intelligence
+  vectorStoreSlug: public-grant-evidence
+vectorStore:
+  id: vs_ae6d7d036f604b36ad0d81d0
+  name: Grant Intelligence public evidence
+  tenantId: public
+  businessInstanceId: grant-intelligence
+  knowledgeBaseId: kb_grant_intelligence
+  corpus: reviewed_public_grant_evidence
+  embeddingProfile: openai_text_embedding_3_small_1536
+  embeddingProvider: openai
+  embeddingModel: text-embedding-3-small
+  embeddingDimensions: 1536
+  graphStatus: profile_implemented_runtime_not_activated
+  graphProfileId: grant-intelligence.public-evidence.v1
+  currentLocalProof:
+    observedAt: '2026-09-05'
+    status: synthetic_connection_only
+    realCorpusLoaded: false
+    syntheticCanaryRemovedFromRetrieval: true
+    canonicalGrantDatabaseUntouched: true
+    note: Real source packages, approved projections, and graph coverage remain pending.

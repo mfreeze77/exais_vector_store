@@ -70,6 +70,11 @@ Status legend:
 
 ## EPIC-005 Model gateway/router
 
+WAVE-126 adds the cell-owned Grant graph profile extension to EPIC-004. See
+`tickets/WAVE-126-cell-owned-grant-graph-profile.md` for scope, SQL/RLS proof and
+remaining canonical-export/runtime activation gates. Existing civics graph
+behavior is unchanged; a tested disabled profile is not a populated grant graph.
+
 - SVS-040 Vectorization mode registry — scaffolded; routed multimodal
   retrieval profile resolution implemented.
 - SVS-041 Model registry — scaffolded.

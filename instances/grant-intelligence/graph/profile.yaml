@@ -1,0 +1,14 @@
+# Operator-owned deployment configuration, never accepted from API requests.
+# Mount read-only and set SVS_CELL_GRAPH_PROFILE_PATH to its absolute container path.
+schema_version: svs.cell-graph.v1
+profile_id: grant-intelligence.public-evidence.v1
+handler_id: grant_canonical_evidence_graph_v1
+corpus_kind: reviewed_public_grant_evidence
+binding:
+  tenant_id: public
+  business_instance_id: grant-intelligence
+  vector_store_ids: [vs_ae6d7d036f604b36ad0d81d0]
+# Enable only after the matching artifact and runtime have been verified.
+enabled: false
+max_expansions: 3
+max_hops: 1

@@ -107,6 +107,8 @@ from svs_common.users import (
     list_users,
 )
 from svs_common.security import ExpertInteractionSensitiveDataError
+from svs_common.cell_graph import CellGraphProfile, cell_graph_profile_for_store
+from svs_common.grant_graph import GRANT_CORPUS_KIND, expand_grant_graph, validate_grant_graph
 from svs_common.query_planner import KANSAS_CIVICS_LEGAL_PROFILE_ID, merge_query_filters, plan_query
 from svs_common.search_lenses import (
     DEFAULT_SEARCH_LENS_ID,
@@ -2713,7 +2715,13 @@ def load_vector_store_graph(
     ensure_scope(principal, 'vector_stores:write')
     enforce_rate_limit(db, principal, 'vector_stores.graph.load')
     _refresh_vector_store_activity_or_404(db, principal, vector_store_id)
+    attrs = _vector_store_attributes_for_search(db, principal, vector_store_id)
+    cell_profile = _cell_graph_profile_or_503(attrs, principal, vector_store_id)
     try:
+        if corpus_kind_for_vector_store(attrs, None) == GRANT_CORPUS_KIND:
+            if cell_profile is None:
+                raise ValueError('Grant graph load requires an explicitly bound cell profile')
+            validate_grant_graph(req, vector_store_id)
         result = _load_vector_store_graph(db, principal, vector_store_id, req)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -2924,7 +2932,8 @@ def _vector_store_search_lenses_payload(
 ) -> dict[str, Any]:
     attrs = _vector_store_attributes_for_search(db, principal, vector_store_id)
     query_planner_profile_id = _query_planner_profile_id_from_vector_store_attributes(attrs)
-    graph_enabled = _graphrag_enabled_for_vector_store(attrs, query_planner_profile_id)
+    cell_profile = _cell_graph_profile_or_503(attrs, principal, vector_store_id)
+    graph_enabled = _graphrag_enabled_for_vector_store(attrs, query_planner_profile_id, cell_profile=cell_profile)
     graph_coverage = None
     if include_graph_coverage and graph_enabled:
         graph_coverage = _graph_coverage_for_vector_store(db, principal, vector_store_id)
@@ -2987,12 +2996,28 @@ def _topeka_graphrag_enabled() -> bool:
     return _env_truthy("SVS_TOPEKA_GRAPHRAG_ENABLED") or _env_truthy("SVS_MUNICIPAL_GRAPHRAG_ENABLED")
 
 
-def _graphrag_enabled_for_vector_store(attrs: dict[str, Any], query_planner_profile_id: str | None) -> bool:
+def _cell_graph_profile_or_503(
+    attrs: dict[str, Any], principal: Principal, vector_store_id: str,
+) -> CellGraphProfile | None:
+    if corpus_kind_for_vector_store(attrs, None) != GRANT_CORPUS_KIND:
+        return None
+    try:
+        return cell_graph_profile_for_store(principal, vector_store_id, attrs)
+    except ValueError as exc:
+        raise HTTPException(status_code=503, detail='Cell graph profile configuration is invalid or unavailable') from exc
+
+
+def _graphrag_enabled_for_vector_store(
+    attrs: dict[str, Any], query_planner_profile_id: str | None,
+    *, cell_profile: CellGraphProfile | None = None,
+) -> bool:
     corpus_kind = corpus_kind_for_vector_store(attrs, query_planner_profile_id)
     if corpus_kind == KSCOURTS_CORPUS_KIND:
         return _kscourts_graphrag_enabled(query_planner_profile_id)
     if corpus_kind == TOPEKA_CORPUS_KIND:
         return _topeka_graphrag_enabled()
+    if corpus_kind == GRANT_CORPUS_KIND:
+        return bool(cell_profile and cell_profile.enabled)
     return False
 
 
@@ -4186,7 +4211,8 @@ async def _openai_vector_store_search_page(
     vector_store_attrs = _vector_store_attributes_for_search(db, principal, vector_store_id)
     query_planner_profile_id = _query_planner_profile_id_from_vector_store_attributes(vector_store_attrs)
     corpus_kind = corpus_kind_for_vector_store(vector_store_attrs, query_planner_profile_id)
-    graphrag_enabled = _graphrag_enabled_for_vector_store(vector_store_attrs, query_planner_profile_id)
+    cell_profile = _cell_graph_profile_or_503(vector_store_attrs, principal, vector_store_id)
+    graphrag_enabled = _graphrag_enabled_for_vector_store(vector_store_attrs, query_planner_profile_id, cell_profile=cell_profile)
     requested_lens_id = req.lens
     graph_coverage: dict[str, Any] | None = None
     search_lens: dict[str, Any] | None = None
@@ -4293,7 +4319,21 @@ async def _openai_vector_store_search_page(
     graph_metadata_by_document_id: dict[str, dict[str, Any]] = {}
     graph_metadata_by_chunk_id: dict[str, dict[str, Any]] = {}
     graph_summary: dict[str, Any] | None = None
-    if graph_lens and corpus_kind == TOPEKA_CORPUS_KIND:
+    if graph_lens and corpus_kind == GRANT_CORPUS_KIND and cell_profile:
+        expansion_limit = cell_profile.max_expansions
+        if req.graph_expansion_limit is not None:
+            expansion_limit = min(expansion_limit, req.graph_expansion_limit)
+        try:
+            additions, graph_metadata_by_chunk_id, graph_summary = expand_grant_graph(
+                db, principal, vector_store_id, chunks,
+                filters=base_filters, relation_types=graph_relation_types,
+                limit=expansion_limit, hydrate=retrieval._hydrate_and_acl,
+            )
+        except ValueError as exc:
+            raise OpenAICompatError(str(exc)) from exc
+        graph_summary['cell_profile_id'] = cell_profile.profile_id
+        chunks = _interleave_graph_expansion_chunks(chunks, additions)
+    elif graph_lens and corpus_kind == TOPEKA_CORPUS_KIND:
         chunks, graph_metadata_by_document_id, graph_metadata_by_chunk_id, graph_summary = _apply_topeka_municipal_graphrag_expansion(
             db,
             principal,

@@ -1,0 +1,29 @@
+apiVersion: svs/v1
+kind: Instance
+metadata:
+  instanceId: inst_grant_intelligence
+  slug: grant-intelligence
+  environment: local
+  ownerTenantId: public
+  businessInstanceId: grant-intelligence
+product:
+  version: 0.9.8-production-candidate
+  releaseChannel: local
+runtime:
+  deploymentMode: local
+  composeProjectName: exais-vector-store-grant-intelligence
+security:
+  maxSecurityLevel: 5
+  requirePreRetrievalFilter: true
+  requirePostRetrievalAclCheck: true
+  requireCitations: true
+retrieval:
+  defaultProfile: hybrid_rrf_secure_v2
+  graphExpansion:
+    enabled: false
+    profileManifest: graph/profile.yaml
+    profileId: grant-intelligence.public-evidence.v1
+models:
+  allowedProviders: [openai]
+  preferredEmbeddingProfiles:
+    markdown_docs_v1: openai_text_embedding_3_small_1536

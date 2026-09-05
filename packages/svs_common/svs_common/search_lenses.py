@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from .query_planner import KANSAS_CIVICS_LEGAL_PROFILE_ID
+from .grant_graph import GRANT_CORPUS_KIND, GRANT_GRAPH_HANDLER_ID, GRANT_RELATIONS
 
 
 SearchLensKind = Literal["semantic", "graph"]
@@ -47,6 +48,25 @@ SEARCH_LENS_REGISTRY: tuple[SearchLensDefinition, ...] = (
         description="Default hybrid semantic and sparse text search with source citations.",
         kind="semantic",
         input_schema=_object_schema({}),
+    ),
+    SearchLensDefinition(
+        id="grant_evidence",
+        label="Grant Evidence Relationships",
+        description="One-hop expansion through accepted public canonical grant relationships in the requested projection generation.",
+        kind="graph",
+        corpus_kinds=(GRANT_CORPUS_KIND,),
+        requires_graph=True,
+        graph_profile_id=GRANT_GRAPH_HANDLER_ID,
+        handler_id=GRANT_GRAPH_HANDLER_ID,
+        relation_types=GRANT_RELATIONS,
+        input_schema=_object_schema({
+            "relationship": {"type": "string", "enum": ["all", *GRANT_RELATIONS]},
+        }),
+        caveats=(
+            "Requires an explicitly bound cell profile and an exact gip_generation_id equality filter.",
+            "Canonical approvals are asserted by the authorized publisher, not independently verified by ExAIS.",
+            "Coverage counts describe the loaded store, not completeness of the requested generation or grant corpus.",
+        ),
     ),
     SearchLensDefinition(
         id="court_citator",
@@ -196,6 +216,8 @@ def corpus_kind_for_vector_store(attributes: dict[str, Any] | None, query_planne
         return TOPEKA_CORPUS_KIND
     if query_planner_profile_id == KANSAS_CIVICS_LEGAL_PROFILE_ID:
         return None
+    if corpus == GRANT_CORPUS_KIND:
+        return GRANT_CORPUS_KIND
     return None
 
 
