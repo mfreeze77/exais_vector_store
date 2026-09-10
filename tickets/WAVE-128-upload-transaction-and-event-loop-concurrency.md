@@ -15,7 +15,7 @@ estimated ~10-15 hours.
 
 ## Background
 
-Measured during the WAVE-126 Kansas fiscal corpus sweep. Queue time exceeds GPU
+Measured during the WAVE-129 Kansas fiscal corpus sweep. Queue time exceeds GPU
 time on small documents (11.5 s queued against 9.6 s executing), so concurrency
 looked like the obvious win. Two concurrent submissions instead produced **28
 minutes of total API blackout, zero extractions, and zero output**.

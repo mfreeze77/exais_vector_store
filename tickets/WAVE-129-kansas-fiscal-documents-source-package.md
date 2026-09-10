@@ -1,4 +1,4 @@
-# WAVE-126 Kansas Fiscal Documents Source Package
+# WAVE-129 Kansas Fiscal Documents Source Package
 
 ## Summary
 
@@ -130,6 +130,43 @@ and names the canonical `operator-source://statecivics-ai` repository. The
 production source-package validator passed; 81 focused ExAIS tests and 2 live
 cross-repository compatibility tests passed in Docker. No API, Marker, vector,
 or production-data write was made.
+
+## Ticket Id Allocation
+
+This ticket was originally authored as WAVE-126 on 2026-09-04 and renumbered to
+129 on 2026-09-10. `WAVE-126` had been allocated twice, independently and in
+good faith: this fiscal source package on
+`feat/wave-126-kansas-fiscal-documents`, and
+`WAVE-126-cell-owned-grant-graph-profile.md` on
+`chore/dropbox-relocation-paths` a day later. Canonical's 126 is merged and
+referenced, so this one moved. 129 was verified free on both branches before
+the rename, and 17 cross-references were updated with it.
+
+**ExAIS has no documented next-id rule, and that is the actual defect here.**
+`tickets/README.md` says which prefix to use but never says how to choose the
+number, so two branches picked the same one without either being careless. The
+collision was caught only because both branches happened to be inspected
+together.
+
+An audit of the whole store while renumbering found this is not isolated.
+**WAVE-005** and **WAVE-123** are each used by two different files, and both
+duplicates already exist on `chore/dropbox-relocation-paths`:
+
+- `WAVE-005-v0.9.7-live-postgres-jsonb-portability.md` and
+  `WAVE-005-v0.9.7-live-postgres-portability.md`
+- `WAVE-123-expert-conversation-sessions-kickoff.md` and
+  `WAVE-123-expert-conversation-sessions.md`
+
+So the store has carried duplicate ids for some time. Those two are left alone
+here: they are merged, referenced, and renumbering them is a separate change
+that should not ride along with a fiscal ticket.
+
+StateCivics solves this explicitly — its `CLAUDE.md` fixes the next id at one
+past the highest in `tickets/`, keeps ids contiguous and stable, and forbids
+deriving an id from any other store. ExAIS should adopt an equivalent written
+rule, and ideally a check that fails on a duplicate id, since a duplicate is
+cheap to prevent and expensive to unpick once both branches have references.
+Recommend raising that as its own ticket rather than widening this one.
 
 ## Notes
 

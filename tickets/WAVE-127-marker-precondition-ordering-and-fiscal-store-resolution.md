@@ -2,20 +2,20 @@
 
 ## Summary
 
-Seven defects found while running the WAVE-126 Kansas fiscal pipeline end to end
+Seven defects found while running the WAVE-129 Kansas fiscal pipeline end to end
 for the first time against a real RunPod Marker endpoint. The most expensive one
 checks the target vector store only after the extraction is complete, and by
 then the request's transaction-local RLS context is gone, so the lookup finds
 nothing and 404s. That makes the PDF path unusable for any document slow enough
 to matter, and it discards a Marker job that has already been paid for. Three
 more defects explain how a caller reaches a bad store id, mislabel the store if
-it is ever created, and block the removal path WAVE-126 depends on. The fifth is
+it is ever created, and block the removal path WAVE-129 depends on. The fifth is
 why none of this can currently be costed: the client discards RunPod's own
 timing fields.
 
 ## Background
 
-The first live WAVE-126 ingest of a Division of the Budget comparison report
+The first live WAVE-129 ingest of a Division of the Budget comparison report
 (`fy2005-comp-rpt.pdf`, 727,758 bytes) ran for 24 minutes and returned
 `HTTP 404 Vector store not found`. The extraction had already completed and was
 discarded. Nothing was persisted, so the idempotency record was never written and
@@ -27,7 +27,7 @@ placeholder name and not a settable id — `POST /v1/vector_stores` generates id
 and `ensure_vector_store` is designed to resolve a store by **name**. That
 operator error should have been rejected in milliseconds. Instead it was billed.
 
-WAVE-126's Notes already describe a narrow compute-reservation window where a
+WAVE-129's Notes already describe a narrow compute-reservation window where a
 process failure after Marker returns can repeat extraction cost. Defect 1 is
 adjacent but distinct and worse: it is not a crash after Marker, it is a
 precondition that is never evaluated before Marker.
@@ -41,7 +41,7 @@ precondition that is never evaluated before Marker.
 
 ## Out Of Scope
 
-- Closing the compute-reservation window described in WAVE-126's Notes; that is
+- Closing the compute-reservation window described in WAVE-129's Notes; that is
   a request-control change and remains separate.
 - Changing Marker request profiles, the `fiscal_tables_page_aware_v1` bounds, or
   any extraction behavior.
@@ -89,7 +89,7 @@ Evidence:
   slow happens in between, so the gap is invisible. On the PDF path a full
   Marker job sits in that gap.
 
-The consequence is that the WAVE-126 PDF ingestion path cannot currently succeed
+The consequence is that the WAVE-129 PDF ingestion path cannot currently succeed
 for any document large enough to take a meaningful amount of Marker time. It is
 not an intermittent or configuration-dependent failure; it reproduced exactly
 twice, and the faster the document the more likely it is to slip under whatever
@@ -131,7 +131,7 @@ The same helper's create payload hardcodes:
 ```
 
 Had creation been reachable for Kansas fiscal documents, the resulting store would
-have carried Topeka municipal-code provenance. The store used for the WAVE-126
+have carried Topeka municipal-code provenance. The store used for the WAVE-129
 proof was created out of band with correct Kansas fiscal attributes and
 `production_ready: false` to avoid this.
 
@@ -149,7 +149,7 @@ before its `UPDATE chunks`, and so does the vector-store delete path.
 `delete_vector_store_file` updates `chunks` with no such flag.
 
 Deleting the entire store still succeeds, so the gap is specific to per-file
-removal. This matters beyond tidiness: WAVE-126 requires that restricted,
+removal. This matters beyond tidiness: WAVE-129 requires that restricted,
 withdrawn, unavailable, corrected, and superseded records remove a previously
 indexed file *before* any additions are applied. That convergence path runs
 through this route.
@@ -168,7 +168,7 @@ there is no way to tell whether a slow corpus is GPU-bound or queue-bound, and
 therefore no way to decide whether adding concurrency would help or would merely
 parallelise a queue. Capturing `delayTime` and `executionTime` into the persisted
 Marker attributes would make that decision evidence-based and would also give
-WAVE-126 a real per-document cost figure.
+WAVE-129 a real per-document cost figure.
 
 ### 6. Caller identity depends on whether `.release/` happens to be visible
 
@@ -210,7 +210,7 @@ FY2005 comparison report (937,624 characters):
 The 2026-09-04 bounded proof recorded 31 consecutive page delimiters and 6
 HTML-preserved tables from the same profile, so the endpoint's behaviour has
 changed since. The consequence is that the handoff refuses with
-`persisted Marker artifact has no page delimiters`, and WAVE-126's requirement
+`persisted Marker artifact has no page delimiters`, and WAVE-129's requirement
 for HTML-preserved table geometry (rowspan/colspan) cannot be satisfied from this
 output either.
 
@@ -243,7 +243,7 @@ the deployed Marker image and option names before spending further GPU.
   the created store carries that adapter's own corpus attributes, not Topeka's.
 - `DELETE /v1/vector_stores/{id}/files/{file_id}` returns success, marks chunks
   inactive, and queues index cleanup without weakening tenant/business RLS.
-- The WAVE-126 removal ordering (removals converge before additions) is proven
+- The WAVE-129 removal ordering (removals converge before additions) is proven
   through the per-file route.
 - A completed Marker extraction records its queue time and its GPU execution
   time, so per-document cost can be read off a run rather than inferred from
@@ -252,7 +252,7 @@ the deployed Marker image and option names before spending further GPU.
 ## Dependencies
 
 - WAVE-012, whose system-worker fix this extends to the third delete route.
-- WAVE-126, whose live run surfaced all seven defects.
+- WAVE-129, whose live run surfaced all seven defects.
 
 ## Verification
 
@@ -264,7 +264,7 @@ pytest -q \
   tests/test_openai_vector_store_file_routes.py
 ```
 
-Plus a live re-run of the WAVE-126 single-document ingest confirming that a bad
+Plus a live re-run of the WAVE-129 single-document ingest confirming that a bad
 store id is rejected before extraction rather than after.
 
 ## Notes
