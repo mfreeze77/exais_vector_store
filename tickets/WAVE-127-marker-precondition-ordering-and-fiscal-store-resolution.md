@@ -4,11 +4,14 @@
 
 Five defects found while running the WAVE-126 Kansas fiscal pipeline end to end
 for the first time against a real RunPod Marker endpoint. The most expensive one
-runs a complete Marker extraction before checking whether the target vector store
-exists, so any store misconfiguration costs a full GPU job to discover. Three
-more explain how a caller reaches that state, mislabel the store if it is ever
-created, and block the removal path WAVE-126 depends on. The fifth is why none of
-this can currently be costed: the client discards RunPod's own timing fields.
+checks the target vector store only after the extraction is complete, and by
+then the request's transaction-local RLS context is gone, so the lookup finds
+nothing and 404s. That makes the PDF path unusable for any document slow enough
+to matter, and it discards a Marker job that has already been paid for. Three
+more defects explain how a caller reaches a bad store id, mislabel the store if
+it is ever created, and block the removal path WAVE-126 depends on. The fifth is
+why none of this can currently be costed: the client discards RunPod's own
+timing fields.
 
 ## Background
 
@@ -46,19 +49,57 @@ precondition that is never evaluated before Marker.
 
 ## Defects
 
-### 1. Marker runs before the vector-store precondition is checked
+### 1. The PDF upload path loses its RLS context across the Marker call, so every slow PDF 404s after extraction
 
 `apps/api/svs_api/main.py::upload_document` calls `marker_pdf_upload_request(...)`,
 which performs the full RunPod extraction, and only afterwards calls
 `ingest_or_enqueue`, whose first statement is
 `_refresh_vector_store_activity_or_404(db, principal, req.vector_store_id)`.
 
-A nonexistent, expired, or cross-tenant vector store therefore costs one complete
-extraction before the 404 is raised. Measured cost of one such discovery: 24
-minutes of wall clock on a 727,758-byte PDF.
+The ordering is bad on its own, but the failure is worse than ordering. RLS
+context is established once per request by `db_for_principal` (line 195) using
+`set_config(..., true)`, which is **transaction-local**. By the time the Marker
+call returns roughly twenty minutes later, that context is gone.
+`refresh_vector_store_activity` then runs an `UPDATE ... RETURNING id` against
+`vector_stores`, RLS matches no rows, the function returns `False`, and the
+handler raises `404 Vector store not found or expired` — discarding a completed
+extraction that has already been paid for.
 
-This is the highest-value fix in this ticket. The vector store is known from the
-multipart form before a single byte is sent to RunPod.
+Evidence:
+
+- Two independent live runs failed identically. Run 1: submitted 02:26:38Z,
+  404 at 02:49:56Z (23m18s). Run 2, with a verified-good store id: submitted
+  02:54:01Z, 404 at 03:13:42Z (19m41s).
+- The store was healthy and resolvable throughout. `GET /v1/vector_stores`
+  returned exactly one match by name, `status=completed`, `expires_at=NULL`,
+  which satisfies every non-RLS condition in the `UPDATE`'s `WHERE` clause.
+- The same store accepted documents through `POST /api/v1/documents/ingest` and
+  through `POST /api/v1/documents/upload` with a **non-PDF** file, using
+  identical principal headers and identical form fields. Those requests are fast
+  and take the non-Marker branch. Only the slow PDF branch fails.
+- Direct database check: as `svs_app` with no RLS context,
+  `SELECT count(*) FROM vector_stores` returns **0**; with
+  `svs.tenant_id` / `svs.business_instance_id` set transaction-locally it
+  returns 2. RLS invisibility is the only condition in that `WHERE` clause that
+  was not satisfied.
+- The codebase already knows this context can be lost mid-request: both
+  `ingest_document` (line 1843) and `upload_document` (line 1893) call
+  `set_rls_context(db, principal)` again immediately before `store_idempotency`.
+  Neither re-establishes it before `ingest_or_enqueue`. On the JSON path nothing
+  slow happens in between, so the gap is invisible. On the PDF path a full
+  Marker job sits in that gap.
+
+The consequence is that the WAVE-126 PDF ingestion path cannot currently succeed
+for any document large enough to take a meaningful amount of Marker time. It is
+not an intermittent or configuration-dependent failure; it reproduced exactly
+twice, and the faster the document the more likely it is to slip under whatever
+window the transaction survives.
+
+Resolving the vector store **before** extraction fixes both the wasted-GPU
+ordering and this failure, because the lookup then happens while the request's
+original transaction and its RLS context are still live. Re-establishing RLS
+context after the Marker call is the narrower fix and would still leave the
+precondition being checked after the money is spent.
 
 ### 2. `--allow-create-vector-store` is unreachable on the fiscal path
 
@@ -146,6 +187,9 @@ WAVE-126 a real per-document cost figure.
 - Uploading a PDF for a nonexistent vector store returns 404 without any RunPod
   request being issued; proven by a test that fails if the Marker client is
   called.
+- A PDF whose Marker extraction takes long enough to outlive the request's
+  original transaction still persists successfully; proven by a test that
+  simulates a slow extraction and asserts the vector-store lookup still resolves.
 - A supplied `--vector-store-id` that does not exist fails closed before upload.
 - `--allow-create-vector-store` creates a store on the Kansas fiscal path, and
   the created store carries that adapter's own corpus attributes, not Topeka's.
