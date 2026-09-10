@@ -135,6 +135,18 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-127 Marker Precondition Ordering And Fiscal Store Resolution](./WAVE-127-marker-precondition-ordering-and-fiscal-store-resolution.md)
 - [WAVE-128 Upload Transaction Scope And Event-Loop Concurrency](./WAVE-128-upload-transaction-and-event-loop-concurrency.md)
 - [WAVE-129 Kansas Fiscal Documents Source Package](./WAVE-129-kansas-fiscal-documents-source-package.md)
+- [WAVE-130 Fiscal Law-and-Money Graph Artifact Contract — historical v1](./WAVE-130-fiscal-graph-artifact-attribute-contract.md)
+- [WAVE-131 Embedding Request Batching](./WAVE-131-embedding-request-batching.md)
+- [WAVE-132 Fiscal Law-and-Money GraphRAG Runtime — reopened parent](./WAVE-132-fiscal-law-money-graphrag-runtime.md)
+- [WAVE-133 Fiscal Canonical Projection Contract](./WAVE-133-fiscal-canonical-projection-contract.md)
+- [WAVE-134 Fiscal Projection Ingestion and Lifecycle](./WAVE-134-fiscal-projection-ingestion-lifecycle.md)
+- [WAVE-135 Fiscal Hybrid Retrieval and Typed Traversal](./WAVE-135-fiscal-hybrid-retrieval-and-typed-traversal.md)
+- [WAVE-136 Fiscal Real-Source Generalization Evaluation](./WAVE-136-fiscal-real-source-generalization-evaluation.md)
+
+For the corrected StateCivics ownership, read
+[the unified law-and-money handoff](../docs/STATECIVICS_LAW_MONEY_ALIGNMENT.md).
+The new follow-ups are proposed implementation work; prior v1 mechanics proof
+does not establish their completion or authorize activation.
 
 ## Execution Model
 

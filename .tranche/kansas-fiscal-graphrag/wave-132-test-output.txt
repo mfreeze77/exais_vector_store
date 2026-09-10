@@ -1,0 +1,52 @@
+ssssssssss.............................................................. [  6%]
+........................................................................ [ 12%]
+........................................................................ [ 18%]
+........................................................................ [ 25%]
+........................................................................ [ 31%]
+........................................................................ [ 37%]
+........................................................................ [ 44%]
+........................................................................ [ 50%]
+........................................................................ [ 56%]
+........................................................................ [ 63%]
+........................................................................ [ 69%]
+........................................................................ [ 75%]
+........................................................................ [ 82%]
+........................................................................ [ 88%]
+........................................................................ [ 94%]
+.........................................................                [100%]
+=============================== warnings summary ===============================
+../usr/local/lib/python3.12/site-packages/starlette/testclient.py:40
+  /usr/local/lib/python3.12/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+apps/api/svs_api/main.py:286
+  /work/apps/api/svs_api/main.py:286: DeprecationWarning:
+          on_event is deprecated, use lifespan event handlers instead.
+
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+
+    @app.on_event('startup')
+
+../usr/local/lib/python3.12/site-packages/fastapi/applications.py:4495
+  /usr/local/lib/python3.12/site-packages/fastapi/applications.py:4495: DeprecationWarning:
+          on_event is deprecated, use lifespan event handlers instead.
+
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+
+    return self.router.on_event(event_type)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_expert_sessions_postgres.py:60: set SVS_RUN_EXPERT_SESSION_INTEGRATION=1 against a disposable migrated Postgres
+SKIPPED [1] tests/integration/test_expert_sessions_postgres.py:88: set SVS_RUN_EXPERT_SESSION_INTEGRATION=1 against a disposable migrated Postgres
+SKIPPED [1] tests/integration/test_ingestion_source_identity_postgres.py:108: SVS_TEST_SOURCE_IDENTITY_DSN must name a disposable migrated PostgreSQL database
+SKIPPED [1] tests/integration/test_postgres_rls_and_worker.py:85: set SVS_RUN_INTEGRATION=1 and run docker compose postgres
+SKIPPED [1] tests/integration/test_postgres_rls_and_worker.py:91: set SVS_RUN_INTEGRATION=1 and run docker compose postgres
+SKIPPED [1] tests/integration/test_postgres_rls_and_worker.py:103: set SVS_RUN_INTEGRATION=1 and run docker compose postgres
+SKIPPED [1] tests/integration/test_postgres_rls_and_worker.py:114: set SVS_RUN_INTEGRATION=1 and run docker compose postgres
+SKIPPED [1] tests/integration/test_postgres_rls_and_worker.py:139: set SVS_RUN_INTEGRATION=1 and run docker compose postgres
+SKIPPED [1] tests/integration/test_statecivics_fiscal_export_compat.py:23: STATECIVICS_REPO must name the compatible StateCivics checkout
+SKIPPED [1] tests/integration/test_statecivics_fiscal_export_compat.py:108: STATECIVICS_REPO must name the compatible StateCivics checkout
+1127 passed, 10 skipped, 3 warnings in 16.57s

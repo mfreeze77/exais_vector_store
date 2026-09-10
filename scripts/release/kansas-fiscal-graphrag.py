@@ -1,0 +1,136 @@
+#!/usr/bin/env python3
+"""Build, validate, stage, and evaluate StateCivics fiscal GraphRAG artifacts."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+from pathlib import Path
+from typing import Any
+from urllib import error, request
+from urllib.parse import urlsplit
+
+from svs_common.fiscal_graph_artifact import (
+    MAX_INPUT_FILE_BYTES,
+    build_fiscal_graph_artifact,
+    validate_built_artifact,
+    validate_vector_store_id,
+)
+
+
+class _NoRedirect(request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise RuntimeError("authenticated API redirects are forbidden")
+
+
+def _read(path: Path) -> Any:
+    if path.stat().st_size > MAX_INPUT_FILE_BYTES:
+        raise ValueError(f"input JSON exceeds {MAX_INPUT_FILE_BYTES} bytes")
+    raw = path.read_bytes()
+    if len(raw) > MAX_INPUT_FILE_BYTES:
+        raise ValueError(f"input JSON exceeds {MAX_INPUT_FILE_BYTES} bytes")
+    return json.loads(raw)
+
+
+def _write(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _safe_api(value: str) -> str:
+    parsed = urlsplit(value)
+    if parsed.username or parsed.password or parsed.query or parsed.fragment or parsed.path not in {"", "/"}:
+        raise ValueError("API URL cannot contain credentials, path, query, or fragment")
+    if parsed.scheme == "https" and parsed.netloc:
+        return value.rstrip("/")
+    if parsed.scheme == "http" and parsed.hostname in {"localhost", "127.0.0.1", "::1"}:
+        return value.rstrip("/")
+    raise ValueError("API URL must use HTTPS, or HTTP on localhost")
+
+
+def _call(method: str, url: str, payload: dict[str, Any], token_env: str, timeout: int) -> dict[str, Any]:
+    token = os.getenv(token_env)
+    if not token:
+        raise ValueError(f"authentication token is required in environment variable {token_env}")
+    body = json.dumps(payload).encode("utf-8")
+    req = request.Request(url, data=body, method=method, headers={
+        "Authorization": f"Bearer {token}", "Content-Type": "application/json",
+    })
+    try:
+        with request.build_opener(_NoRedirect).open(req, timeout=timeout) as response:
+            raw = response.read()
+    except error.HTTPError as exc:
+        raise RuntimeError(f"API request failed with HTTP {exc.code}") from exc
+    return json.loads(raw) if raw else {}
+
+
+def _relationship_ids(value: Any) -> set[str]:
+    found: set[str] = set()
+    if isinstance(value, dict):
+        candidate = value.get("relationship_id")
+        if isinstance(candidate, str):
+            found.add(candidate)
+        for child in value.values():
+            found.update(_relationship_ids(child))
+    elif isinstance(value, list):
+        for child in value:
+            found.update(_relationship_ids(child))
+    return found
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    sub = parser.add_subparsers(dest="command", required=True)
+    build = sub.add_parser("build")
+    build.add_argument("--publisher", type=Path, required=True); build.add_argument("--chunks", type=Path, required=True)
+    build.add_argument("--vector-store-id", required=True); build.add_argument("--output", type=Path, required=True)
+    build.add_argument("--allow-fixture", action="store_true")
+    validate = sub.add_parser("validate")
+    validate.add_argument("--artifact", type=Path, required=True); validate.add_argument("--allow-fixture", action="store_true")
+    remote_commands = {}
+    for name in ("load", "evaluate"):
+        cmd = sub.add_parser(name); remote_commands[name] = cmd
+        cmd.add_argument("--artifact", type=Path, required=True)
+        cmd.add_argument("--api", required=True); cmd.add_argument("--token-env", default="SVS_OPERATOR_KEY")
+        cmd.add_argument("--timeout", type=int, default=120); cmd.add_argument("--apply", action="store_true")
+    evaluate = remote_commands["evaluate"]
+    evaluate.add_argument("--query", required=True); evaluate.add_argument("--expected-relation-id", action="append", required=True)
+    args = parser.parse_args()
+
+    if args.command == "build":
+        chunks = _read(args.chunks)
+        if not isinstance(chunks, list):
+            raise ValueError("chunk inventory must be a JSON array")
+        artifact = build_fiscal_graph_artifact(_read(args.publisher), chunks, args.vector_store_id,
+                                               allow_fixture=args.allow_fixture)
+        _write(args.output, artifact)
+        print(json.dumps(artifact["validation"], sort_keys=True)); return 0
+    artifact = _read(args.artifact)
+    summary = validate_built_artifact(artifact, allow_fixture=getattr(args, "allow_fixture", False))
+    validate_vector_store_id(artifact.get("vector_store_id"))
+    if args.command == "validate":
+        print(json.dumps(summary, sort_keys=True)); return 0
+    if artifact["artifact_class"] == "fixture_only":
+        raise ValueError("fixture_only artifacts cannot be uploaded or evaluated against runtime")
+    if not args.apply:
+        print(json.dumps({"dry_run": True, "command": args.command, "vector_store_id": artifact["vector_store_id"],
+                          "derivation_run_id": artifact["derivation_run_id"], "validation": summary}, sort_keys=True)); return 0
+    api = _safe_api(args.api)
+    if args.command == "load":
+        payload = dict(artifact["load_request"]); payload["dry_run"] = False; payload["replace"] = False
+        result = _call("POST", f"{api}/v1/vector_stores/{artifact['vector_store_id']}/graph", payload, args.token_env, args.timeout)
+    else:
+        payload = {"query": args.query, "max_num_results": 10, "include_metadata": True, "include_content": True,
+                   "lens": "fiscal_relationships", "inputs": {"relationship": "all", "derivation_run_id": artifact["derivation_run_id"]}}
+        response = _call("POST", f"{api}/v1/vector_stores/{artifact['vector_store_id']}/search", payload, args.token_env, args.timeout)
+        found = _relationship_ids(response); expected = set(args.expected_relation_id)
+        result = {"passed": expected <= found, "expected_relation_ids": sorted(expected), "observed_relation_ids": sorted(found),
+                  "derivation_run_id": artifact["derivation_run_id"]}
+        if not result["passed"]:
+            print(json.dumps(result, sort_keys=True)); return 1
+    print(json.dumps(result, indent=2, sort_keys=True)); return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

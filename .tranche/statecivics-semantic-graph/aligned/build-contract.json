@@ -1,0 +1,1788 @@
+{
+  "end_goal": "Enable the Kansas State Civics cell to answer law-to-money questions across bills and fiscal years by combining semantic and exact retrieval over source-bound entity descriptions and documents with validated structured graph relationships, proven on diverse real sources including an unseen bill.",
+  "artifact_status": "Wave 3 proposed build contract; no runtime implementation, source publication/indexing, activation or provider tests performed. Existing signatures are grounded; all new interfaces and model-field extensions are proposed. Planning changes are separately marked in the file map.",
+  "authoritative_handoff": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/manager-alignment.md",
+  "shared_functions": [
+    {
+      "name": "reconcile_authority",
+      "owner_ticket": "T-001",
+      "owner_file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/services/civic_impact/appropriation_reconciler.py",
+      "is_new": true,
+      "signature": "reconcile_authority(actions: Sequence[Mapping[str, Any]], *, facts: Sequence[Mapping[str, Any]], derivations: Sequence[Mapping[str, Any]], snapshot: Mapping[str, Any], account_id: str, fiscal_year: int) -> dict[str, Any]",
+      "used_by": [
+        "T-001",
+        "T-002",
+        "T-003",
+        "T-006"
+      ],
+      "note": "Proposed pure upstream authority/snapshot policy; ExAIS consumes canonical result/derivation, never ports policy.",
+      "status": "proposed"
+    },
+    {
+      "name": "build_entity_record",
+      "owner_ticket": "T-002",
+      "owner_file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/services/civic_impact/retrieval_exporter.py",
+      "is_new": true,
+      "signature": "build_entity_record(*, entity: dict, relationships: list[dict], publication: dict, snapshot: dict, evidence: list[dict], derivations: list[dict], exporter: ExporterIdentity) -> dict",
+      "used_by": [
+        "T-002",
+        "T-004",
+        "T-005"
+      ],
+      "note": "Proposed second-kind builder inside existing exporter; no independent exporter stack.",
+      "status": "proposed"
+    },
+    {
+      "name": "render_manifest",
+      "owner_ticket": "T-002",
+      "owner_file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/services/civic_impact/retrieval_exporter.py",
+      "is_new": false,
+      "signature": "render_manifest(records: Iterable[dict]) -> str",
+      "used_by": [
+        "T-002",
+        "T-005"
+      ],
+      "note": "Existing signature preserved, explicit kind dispatch; legacy document bytes remain stable.",
+      "status": "existing_signature_preserved_planned_behavior_extension",
+      "actual_signature": "render_manifest(records: Iterable[dict]) -> str"
+    },
+    {
+      "name": "validate_law_money_benchmark",
+      "owner_ticket": "T-003",
+      "owner_file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/scripts/operator/validate_law_money_benchmark.py",
+      "is_new": true,
+      "signature": "validate_law_money_benchmark(manifest: dict, *, reviewer_labels: dict | None = None) -> dict",
+      "used_by": [
+        "T-003",
+        "T-007"
+      ],
+      "note": "Public validation requires no heldout labels; reviewer labels never retained in development artifacts.",
+      "status": "proposed"
+    },
+    {
+      "name": "FiscalEvidenceCitation",
+      "owner_ticket": "T-004",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/schemas.py",
+      "is_new": true,
+      "signature": "class FiscalEvidenceCitation(BaseModel): evidence_kind: Literal[\"document_span\", \"structured_record\"]; canonical_reference: FiscalCanonicalReference; source_revision_id: str; source_content_hash_sha256: str; extraction_revision_id: str | None = None; extraction_content_hash_sha256: str | None = None; locator: dict[str, Any]; citation_url: str; evidence_hash: str; document_id: str | None = None; chunk_id: str | None = None",
+      "used_by": [
+        "T-004",
+        "T-005",
+        "T-006",
+        "T-007"
+      ],
+      "note": "Proposed sole citation type. document_span locator must contain exact source span/section coordinates and may bind only real document/chunk IDs. structured_record locator requires observation identity, parser revision, logical data-record number, selected columns and raw record digest; extraction revision/hash required, document_id/chunk_id forbidden. Raw source identity is never replaced by extraction identity. Canonical hydration and eligibility precede citation serialization.",
+      "status": "proposed"
+    },
+    {
+      "name": "FiscalEntityResult",
+      "owner_ticket": "T-004",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/schemas.py",
+      "is_new": true,
+      "signature": "class FiscalEntityResult(BaseModel): canonical_reference: FiscalCanonicalReference; description: str; structured_fields: dict[str, Any]; evidence: list[FiscalEvidenceCitation]; snapshot_id: str; manifest_id: str; score: float | None; provenance: dict[str, Any]",
+      "used_by": [
+        "T-004",
+        "T-005",
+        "T-006",
+        "T-007"
+      ],
+      "note": "Proposed native entity result, separate from ChunkRecord; source-backed exact structured fields remain canonical and descriptions only propose candidates.",
+      "status": "proposed"
+    },
+    {
+      "name": "FiscalProjectionBatch",
+      "owner_ticket": "T-004",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/schemas.py",
+      "is_new": true,
+      "signature": "class FiscalProjectionBatch(BaseModel): schema_version: Literal[\"statecivics.fiscal-projection.v2\"]; manifest_id: str; partition_id: str; snapshot_id: str; expected_counts: FiscalProjectionCounts; content_hash: str; nodes: list[dict[str, Any]]; edges: list[dict[str, Any]]",
+      "used_by": [
+        "T-004",
+        "T-005"
+      ],
+      "note": "Proposed ExAIS batch, not an upstream publisher envelope requirement. Max 1000 nodes/2000 edges per batch; typed node/edge/evidence validation remains in validate_fiscal_graph. Immutable partition identity/hash; complete top-manifest validation is separately mandatory.",
+      "status": "proposed"
+    },
+    {
+      "name": "validate_fiscal_graph",
+      "owner_ticket": "T-004",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_graph.py",
+      "is_new": false,
+      "signature": "validate_fiscal_graph(req: VectorStoreGraphLoadRequest, vector_store_id: str, *, allow_fixture: bool=False) -> dict[str, Any]",
+      "used_by": [
+        "T-004",
+        "T-005",
+        "T-006"
+      ],
+      "note": "One version-dispatch validator; future batch adaptation reuses it, no duplicate relation validator.",
+      "status": "existing_signature_preserved_planned_behavior_extension",
+      "actual_signature": "validate_fiscal_graph(req: VectorStoreGraphLoadRequest, vector_store_id: str, *, allow_fixture: bool=False) -> dict[str, Any]"
+    },
+    {
+      "name": "build_fiscal_graph_artifact",
+      "owner_ticket": "T-004",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_graph_artifact.py",
+      "is_new": false,
+      "signature": "build_fiscal_graph_artifact(publisher: dict[str, Any], chunk_inventory: list[dict[str, Any]], vector_store_id: str, *, allow_fixture: bool=False) -> dict[str, Any]",
+      "used_by": [
+        "T-004",
+        "T-005"
+      ],
+      "note": "Retain existing signature as versioned compatibility wrapper; v2 source is KS-650 record batches and typed evidence, not demanded upstream provisional envelope.",
+      "status": "existing_signature_preserved_planned_behavior_extension",
+      "actual_signature": "build_fiscal_graph_artifact(publisher: dict[str, Any], chunk_inventory: list[dict[str, Any]], vector_store_id: str, *, allow_fixture: bool=False) -> dict[str, Any]"
+    },
+    {
+      "name": "fiscal_record_eligible",
+      "owner_ticket": "T-005",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_projection.py",
+      "is_new": true,
+      "signature": "fiscal_record_eligible(record: dict, *, scope: RetrievalScope, snapshot: dict, active_manifest: dict) -> bool",
+      "used_by": [
+        "T-005",
+        "T-006",
+        "T-007"
+      ],
+      "note": "Single canonical eligibility predicate, mandatory graph-off ordinary retrieval and final evidence hydration; pure predicate consumes refreshed authoritative projection state.",
+      "status": "proposed"
+    },
+    {
+      "name": "IngestionService.ingest_fiscal_projection",
+      "owner_ticket": "T-005",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/ingestion.py",
+      "is_new": true,
+      "signature": "async IngestionService.ingest_fiscal_projection(self, db: Session, principal: Principal, batch: FiscalProjectionBatch) -> dict[str, Any]",
+      "used_by": [
+        "T-005"
+      ],
+      "note": "Proposed existing-service extension; stages descriptor points via existing clients, does not invent document/chunk IDs or activate incomplete manifests.",
+      "status": "proposed"
+    },
+    {
+      "name": "RetrievalService.search",
+      "owner_ticket": "T-006",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/retrieval.py",
+      "is_new": false,
+      "signature": "async RetrievalService.search(self, db: Session, principal: Principal, req: SearchRequest) -> SearchResponse",
+      "used_by": [
+        "T-005",
+        "T-006",
+        "T-007"
+      ],
+      "note": "One orchestration owner. T-005 adds mandatory eligibility hooks; T-006 owns mode dispatch. Serialize edits to this symbol.",
+      "status": "existing_signature_preserved_planned_behavior_extension",
+      "actual_signature": "async RetrievalService.search(self, db: Session, principal: Principal, req: SearchRequest) -> SearchResponse"
+    },
+    {
+      "name": "traverse_fiscal_paths",
+      "owner_ticket": "T-006",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_graph.py",
+      "is_new": true,
+      "signature": "traverse_fiscal_paths(db: Session, principal: Principal, vector_store_id: str, seeds: list[FiscalEntityResult], *, manifest: dict, fiscal_year: int | None, as_of: str, max_hops: int = 6, max_candidates: int = 200) -> dict[str, Any]",
+      "used_by": [
+        "T-006",
+        "T-007"
+      ],
+      "note": "Proposed fiscal-only bounded typed traversal; existing expand_fiscal_graph remains legacy wrapper, no global handler widening.",
+      "status": "proposed"
+    },
+    {
+      "name": "score_fiscal_benchmark",
+      "owner_ticket": "T-007",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/scripts/release/kansas-fiscal-recall-eval.py",
+      "is_new": true,
+      "signature": "score_fiscal_benchmark(manifest: dict, results_by_mode: dict[str, list[dict]], *, expected_labels: dict, split: str) -> dict",
+      "used_by": [
+        "T-007",
+        "T-008"
+      ],
+      "note": "Proposed single scorer; heldout invocation reviewer-controlled, output excludes protected answers.",
+      "status": "proposed"
+    },
+    {
+      "name": "FiscalCanonicalReference",
+      "signature": "class FiscalCanonicalReference(BaseModel): type: str; id: str; revision_or_hash: str",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/schemas.py",
+      "owner_ticket": "T-004",
+      "is_new": true,
+      "status": "proposed",
+      "used_by": [
+        "T-004",
+        "T-005",
+        "T-006",
+        "T-007"
+      ],
+      "note": "Proposed normalized projection reference only. Validate canonical type/id/revision against KS-600/650. When adapted from a native derivation output, preserve original {type,id,hash_sha256} alongside the normalized reference and preserve existing run/set hashes; never rewrite native storage."
+    },
+    {
+      "name": "FiscalProjectionCounts",
+      "signature": "class FiscalProjectionCounts(BaseModel): nodes: int; edges: int; descriptions: int",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/schemas.py",
+      "owner_ticket": "T-004",
+      "is_new": true,
+      "status": "proposed",
+      "used_by": [
+        "T-004",
+        "T-005",
+        "T-007"
+      ],
+      "note": "Proposed nonnegative immutable expected counts. descriptions counts distinct source-derived entity descriptors, not every CSV observation."
+    },
+    {
+      "name": "FiscalProjectionPartition",
+      "signature": "class FiscalProjectionPartition(BaseModel): partition_id: str; content_hash: str; expected_counts: FiscalProjectionCounts",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/schemas.py",
+      "owner_ticket": "T-004",
+      "is_new": true,
+      "status": "proposed",
+      "used_by": [
+        "T-004",
+        "T-005"
+      ],
+      "note": "Proposed sole partition descriptor. Ordered unique partition IDs/digests/counts are bound into manifest hash; no missing/duplicate partition is silently accepted."
+    },
+    {
+      "name": "FiscalProjectionManifest",
+      "signature": "class FiscalProjectionManifest(BaseModel): schema_version: Literal[\"statecivics.fiscal-projection-manifest.v2\"]; manifest_id: str; vector_store_id: str; snapshot_id: str; source_revision_set_hash_sha256: str; derivation_run_ids: list[str]; profile_ids: list[str]; partitions: list[FiscalProjectionPartition]; total_expected_counts: FiscalProjectionCounts; content_hash: str",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/schemas.py",
+      "owner_ticket": "T-004",
+      "is_new": true,
+      "status": "proposed",
+      "used_by": [
+        "T-004",
+        "T-005",
+        "T-006",
+        "T-007",
+        "T-008"
+      ],
+      "note": "Proposed sole ExAIS generation manifest. Immutable identity binds scoped store, canonical/source snapshot, run/profile set and every ordered partition/count/digest. Active state and durable denial state are separate lifecycle metadata owned by T-005, not mutable contents of an approved manifest. New bill/FY generation explicitly retains all approved partitions intended to coexist."
+    },
+    {
+      "name": "validate_fiscal_projection_manifest",
+      "signature": "validate_fiscal_projection_manifest(manifest: FiscalProjectionManifest, batches: Iterable[FiscalProjectionBatch], *, vector_store_id: str) -> dict[str, Any]",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_graph_artifact.py",
+      "owner_ticket": "T-004",
+      "is_new": true,
+      "status": "proposed",
+      "used_by": [
+        "T-004",
+        "T-005",
+        "T-007"
+      ],
+      "note": "Proposed complete accounting owner; delegates typed relation/evidence validation to validate_fiscal_graph and immutable replay checks to guard_fiscal_graph_generation. Verifies every partition/digest/count, global identity conflicts, cross-partition endpoints and bounded streaming. Does not activate or define eligibility."
+    },
+    {
+      "name": "guard_fiscal_graph_generation",
+      "signature": "guard_fiscal_graph_generation(db: Any, principal: Principal, vector_store_id: str, req: VectorStoreGraphLoadRequest) -> None",
+      "actual_signature": "guard_fiscal_graph_generation(db: Any, principal: Principal, vector_store_id: str, req: VectorStoreGraphLoadRequest) -> None",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_graph.py",
+      "owner_ticket": "T-004",
+      "is_new": false,
+      "status": "existing_signature_preserved_planned_behavior_extension",
+      "used_by": [
+        "T-004",
+        "T-005"
+      ],
+      "note": "Single immutable generation/partition replay guard. Existing signature preserved through version-dispatched VectorStoreGraphLoadRequest fields; compare each immutable partition content, not one whole-run load. T-005 consumes this result and owns pointer transition, never a second generation validator."
+    },
+    {
+      "name": "validate_fiscal_graph_bindings",
+      "signature": "validate_fiscal_graph_bindings(db: Any, principal: Principal, vector_store_id: str, req: VectorStoreGraphLoadRequest, *, hydrate: Callable[..., list[ChunkRecord]]) -> None",
+      "actual_signature": "validate_fiscal_graph_bindings(db: Any, principal: Principal, vector_store_id: str, req: VectorStoreGraphLoadRequest, *, hydrate: Callable[..., list[ChunkRecord]]) -> None",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_graph.py",
+      "owner_ticket": "T-004",
+      "is_new": false,
+      "status": "existing_signature_preserved_planned_behavior_extension",
+      "used_by": [
+        "T-004",
+        "T-005",
+        "T-006"
+      ],
+      "note": "Version dispatch retains real document hydration for spans and adds structured evidence binding. T-005 then integrates its sole eligibility predicate; the validator never manufactures chunks or independently interprets source policy."
+    },
+    {
+      "name": "RetrievalService._hydrate_and_acl",
+      "signature": "RetrievalService._hydrate_and_acl(self, db: Session, principal: Principal, fused: list[dict], limit: int, filters: dict | None=None) -> list[ChunkRecord]",
+      "actual_signature": "RetrievalService._hydrate_and_acl(self, db: Session, principal: Principal, fused: list[dict], limit: int, filters: dict | None=None) -> list[ChunkRecord]",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/retrieval.py",
+      "owner_ticket": "T-005",
+      "is_new": false,
+      "status": "existing_signature_preserved_planned_behavior_extension",
+      "used_by": [
+        "T-005",
+        "T-006",
+        "T-007"
+      ],
+      "note": "Mandatory ordinary document hydration invokes fiscal_record_eligible using trusted fiscal scope even when graph is disabled or request omits fiscal lens metadata. Native entity hydration uses the same predicate; no independent eligibility policy."
+    },
+    {
+      "name": "build_qdrant_filter",
+      "signature": "build_qdrant_filter(scope: RetrievalScope, filters: dict | None=None) -> dict",
+      "actual_signature": "build_qdrant_filter(scope: RetrievalScope, filters: dict | None=None) -> dict",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/security.py",
+      "owner_ticket": "T-005",
+      "is_new": false,
+      "status": "existing_signature_preserved_planned_behavior_extension",
+      "used_by": [
+        "T-005",
+        "T-006"
+      ],
+      "note": "Fiscal-only mandatory backend candidate/lifecycle/scope filters are a projection of fiscal_record_eligible. Preserve other-domain behavior. Backend filtering never replaces refreshed canonical hydration."
+    },
+    {
+      "name": "RetrievalService.answer",
+      "signature": "async RetrievalService.answer(self, db: Session, principal: Principal, req: RetrievalAnswerRequest) -> RetrievalAnswerResponse",
+      "actual_signature": "async RetrievalService.answer(self, db: Session, principal: Principal, req: RetrievalAnswerRequest) -> RetrievalAnswerResponse",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/retrieval.py",
+      "owner_ticket": "T-006",
+      "is_new": false,
+      "status": "existing_signature_preserved_planned_behavior_extension",
+      "used_by": [
+        "T-006",
+        "T-007"
+      ],
+      "note": "Single answer owner consumes canonical arithmetic and T-004 native entity/citation models; preserves document-only behavior and revalidates eligibility after external awaits."
+    },
+    {
+      "name": "SearchResponse",
+      "signature": "class SearchResponse(BaseModel)",
+      "actual_signature": "class SearchResponse(BaseModel)",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/schemas.py",
+      "owner_ticket": "T-004",
+      "is_new": false,
+      "status": "existing_with_explicit_proposed_extension",
+      "used_by": [
+        "T-004",
+        "T-005",
+        "T-006",
+        "T-007"
+      ],
+      "note": "T-004 owns shared response declaration; T-006 wires it into native fiscal paths. Existing document result fields remain compatible. This is a proposed model-field extension, not already implemented.",
+      "planned_signature": "class SearchResponse(BaseModel): preserve existing fields; add fiscal_entities: list[FiscalEntityResult] = []; fiscal_evidence: list[FiscalEvidenceCitation] = []; fiscal_metadata: dict[str, Any] | None = None"
+    },
+    {
+      "name": "RetrievalService._audit",
+      "signature": "RetrievalService._audit(self, db: Session, principal: Principal, req: SearchRequest, result_ids: list[str], retrieval_metadata: dict | None=None) -> str",
+      "actual_signature": "RetrievalService._audit(self, db: Session, principal: Principal, req: SearchRequest, result_ids: list[str], retrieval_metadata: dict | None=None) -> str",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/retrieval.py",
+      "owner_ticket": "T-007",
+      "is_new": false,
+      "status": "existing_signature_preserved_planned_behavior_extension",
+      "used_by": [
+        "T-006",
+        "T-007"
+      ],
+      "note": "Single measurement extension after T-006 integration; record actual modes/profiles/provider/reranker calls, latency and degradation in existing retrieval_metadata without logging protected expected labels."
+    },
+    {
+      "name": "DerivationService.record",
+      "signature": "async DerivationService.record(self, registration: DerivationRegistration) -> DerivationRegistrationResult",
+      "actual_signature": "async DerivationService.record(self, registration: DerivationRegistration) -> DerivationRegistrationResult",
+      "owner_file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/services/civic_impact/derivation_service.py",
+      "owner_ticket": "T-001",
+      "is_new": false,
+      "status": "existing_reuse",
+      "used_by": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "note": "Existing upstream typed storage reused unchanged; native input/output asymmetry and ordered hashes are authoritative. KS-600 performs additional canonical operand validation at its boundary.",
+      "modification_required": false
+    },
+    {
+      "name": "SourceArtifactService.register_span",
+      "signature": "async SourceArtifactService.register_span(self, *, source_revision_id: str, registration: SourceSpanRegistration) -> RegistrationResult[SourceSpan]",
+      "actual_signature": "async SourceArtifactService.register_span(self, *, source_revision_id: str, registration: SourceSpanRegistration) -> RegistrationResult[SourceSpan]",
+      "owner_file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/services/civic_impact/source_artifact_service.py",
+      "owner_ticket": "T-002",
+      "is_new": false,
+      "status": "existing_reuse",
+      "used_by": [
+        "T-001",
+        "T-002"
+      ],
+      "note": "Existing KS-595 source-span service reused unchanged; no competing evidence registrar or fake structured-record spans.",
+      "modification_required": false
+    },
+    {
+      "name": "build_record",
+      "signature": "build_record(*, artifact, revision, exporter: ExporterIdentity, lifecycle_state: str=_CURRENT, lifecycle_reason: str | None=None, supersedes_export_record_id: str | None=None, superseded_by_export_record_id: str | None=None, target_instance_slug: str | None=None, target_vector_store_slug: str | None=None, exported_at: datetime | None=None) -> dict",
+      "actual_signature": "build_record(*, artifact, revision, exporter: ExporterIdentity, lifecycle_state: str=_CURRENT, lifecycle_reason: str | None=None, supersedes_export_record_id: str | None=None, superseded_by_export_record_id: str | None=None, target_instance_slug: str | None=None, target_vector_store_slug: str | None=None, exported_at: datetime | None=None) -> dict",
+      "owner_file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/services/civic_impact/retrieval_exporter.py",
+      "owner_ticket": "T-002",
+      "is_new": false,
+      "status": "existing_reuse",
+      "used_by": [
+        "T-002",
+        "T-005"
+      ],
+      "note": "Existing document builder and signature preserved; golden bytes/record acceptance remain compatible beside explicit second-kind dispatch.",
+      "modification_required": false
+    },
+    {
+      "name": "record_digest",
+      "signature": "record_digest(record: dict) -> str",
+      "actual_signature": "record_digest(record: dict) -> str",
+      "owner_file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/services/civic_impact/retrieval_exporter.py",
+      "owner_ticket": "T-002",
+      "is_new": false,
+      "status": "existing_reuse",
+      "used_by": [
+        "T-002",
+        "T-005"
+      ],
+      "note": "Reuse existing deterministic digest excluding export clock; no second document digest algorithm.",
+      "modification_required": false
+    },
+    {
+      "name": "resolve_action",
+      "signature": "resolve_action(lifecycle_state: str, redistribution: str, custody_status: str) -> tuple[str, bool]",
+      "actual_signature": "resolve_action(lifecycle_state: str, redistribution: str, custody_status: str) -> tuple[str, bool]",
+      "owner_file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/services/civic_impact/retrieval_exporter.py",
+      "owner_ticket": "T-002",
+      "is_new": false,
+      "status": "existing_reuse",
+      "used_by": [
+        "T-002",
+        "T-005"
+      ],
+      "note": "Preserve existing document lifecycle/removal policy; explicit entity prerequisites extend exporter branch, not invented publication status.",
+      "modification_required": false
+    },
+    {
+      "name": "reciprocal_rank_fusion",
+      "signature": "reciprocal_rank_fusion(result_lists: list[list[dict]], k: int=60, weights: list[float] | None=None) -> list[dict]",
+      "actual_signature": "reciprocal_rank_fusion(result_lists: list[list[dict]], k: int=60, weights: list[float] | None=None) -> list[dict]",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/retrieval.py",
+      "owner_ticket": "T-006",
+      "is_new": false,
+      "status": "existing_reuse",
+      "used_by": [
+        "T-006",
+        "T-007"
+      ],
+      "note": "Reuse existing local rank fusion within compatible candidate groups; no raw-score comparison across profiles.",
+      "modification_required": false
+    },
+    {
+      "name": "load_vector_store_graph",
+      "signature": "load_vector_store_graph(vector_store_id: str, req: VectorStoreGraphLoadRequest, principal: Principal=Depends(get_request_principal), db: Session=Depends(db_for_principal))",
+      "actual_signature": "load_vector_store_graph(vector_store_id: str, req: VectorStoreGraphLoadRequest, principal: Principal=Depends(get_request_principal), db: Session=Depends(db_for_principal))",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/apps/api/svs_api/main.py",
+      "owner_ticket": "T-004",
+      "is_new": false,
+      "status": "existing_signature_preserved_planned_behavior_extension",
+      "used_by": [
+        "T-004",
+        "T-005"
+      ],
+      "note": "Existing shared load API signature preserved. T-004 owns versioned batch/manifest validation and persistence request compatibility; T-005 sequentially adds mandatory lifecycle/eligibility checks without a competing loader."
+    },
+    {
+      "name": "update_vector_store",
+      "signature": "update_vector_store(vector_store_id: str, patch: VectorStoreUpdateRequest | None=Body(default=None), principal: Principal=Depends(get_request_principal), db: Session=Depends(db_for_principal), idempotency_key: str | None=Header(default=None, alias='Idempotency-Key'))",
+      "actual_signature": "update_vector_store(vector_store_id: str, patch: VectorStoreUpdateRequest | None=Body(default=None), principal: Principal=Depends(get_request_principal), db: Session=Depends(db_for_principal), idempotency_key: str | None=Header(default=None, alias='Idempotency-Key'))",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/apps/api/svs_api/main.py",
+      "owner_ticket": "T-005",
+      "is_new": false,
+      "status": "existing_signature_preserved_planned_behavior_extension",
+      "used_by": [
+        "T-005",
+        "T-008"
+      ],
+      "note": "Existing scoped store mutation signature preserved. T-005 owns guarded expected-current-pointer compare-and-swap and rollback revalidation; no direct unguarded active-manifest attribute updates."
+    },
+    {
+      "name": "active_fiscal_manifest",
+      "signature": "active_fiscal_manifest(db: Session, principal: Principal, vector_store_id: str, *, expected_snapshot_id: str | None = None) -> FiscalProjectionManifest | None",
+      "owner_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_projection.py",
+      "owner_ticket": "T-005",
+      "is_new": true,
+      "status": "proposed",
+      "used_by": [
+        "T-005",
+        "T-006",
+        "T-007"
+      ],
+      "note": "Single refreshed scoped generation lookup for native v2 retrieval; resolve the active pointer to the complete T-004 manifest, validate trusted store/principal/expected snapshot and current denial state, and refuse incomplete or unavailable view. Historical fiscal_search_run_id remains v1-only; never reinterpret one selected run as complete multi-partition v2 activation. Recheck after external awaits."
+    }
+  ],
+  "file_modification_map": [
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-600-reconcile-appropriations-from-bill-versions-through-final-law-and-vetoes.md",
+      "ticket_ids": [
+        "T-001"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-001",
+      "what": "Sole existing legal reconciliation owner; preserve root amendments and correct typed-output shorthand.",
+      "edit_sequence": [
+        "T-001"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/appropriation-action.schema.json",
+      "ticket_ids": [
+        "T-001"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-001",
+      "what": "Add reference to sole provision definition; preserve enum.",
+      "edit_sequence": [
+        "T-001"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/derivation.schema.json",
+      "ticket_ids": [
+        "T-001"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-001",
+      "what": "Document/test actual input/output contract compatibility.",
+      "edit_sequence": [
+        "T-001"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/methodology-enums.yaml",
+      "ticket_ids": [
+        "T-001"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-001",
+      "what": "Bounded allowed-combinations policy without competing enum.",
+      "edit_sequence": [
+        "T-001"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/models/fiscal_intelligence.py",
+      "ticket_ids": [
+        "T-001"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-001",
+      "what": "Missing provision/action persistence under KS-600 only.",
+      "edit_sequence": [
+        "T-001"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/provision-reference.schema.json",
+      "ticket_ids": [
+        "T-001"
+      ],
+      "is_new": true,
+      "phase": "future_implementation",
+      "owner_ticket": "T-001",
+      "what": "NEW: canonical version-specific provision reference, evidence-independent identity.",
+      "edit_sequence": [
+        "T-001"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/services/civic_impact/appropriation_reconciler.py",
+      "ticket_ids": [
+        "T-001"
+      ],
+      "is_new": true,
+      "phase": "future_implementation",
+      "owner_ticket": "T-001",
+      "what": "NEW: sole snapshot selection, operation validation and authority arithmetic.",
+      "edit_sequence": [
+        "T-001"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tests/unit/civic_impact/test_appropriation_reconciler.py",
+      "ticket_ids": [
+        "T-001"
+      ],
+      "is_new": true,
+      "phase": "future_implementation",
+      "owner_ticket": "T-001",
+      "what": "NEW: arithmetic, missing/no-limit, multi-input, duplicate representations and temporal cases.",
+      "edit_sequence": [
+        "T-001"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tests/integration/civic_impact/test_final_authority_lineage.py",
+      "ticket_ids": [
+        "T-001"
+      ],
+      "is_new": true,
+      "phase": "future_implementation",
+      "owner_ticket": "T-001",
+      "what": "NEW: persisted canonical revisions/lineage and source-backed reproduction.",
+      "edit_sequence": [
+        "T-001"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/retrieval-export-record.schema.json",
+      "ticket_ids": [
+        "T-002"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-002",
+      "what": "Compatible legacy branch plus tagged second versioned record kind.",
+      "edit_sequence": [
+        "T-002"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/services/civic_impact/retrieval_exporter.py",
+      "ticket_ids": [
+        "T-002"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-002",
+      "what": "Own dispatch/entity record/description/digest/lifecycle manifest logic.",
+      "edit_sequence": [
+        "T-002"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/scripts/operator/export_retrieval_manifest.py",
+      "ticket_ids": [
+        "T-002"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-002",
+      "what": "Existing CLI gains kind and source snapshot selection.",
+      "edit_sequence": [
+        "T-002"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/publication-record.schema.json",
+      "ticket_ids": [
+        "T-002"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-002",
+      "what": "Bounded fiscal subject compatibility, coordinated KS-605 owner.",
+      "edit_sequence": [
+        "T-002"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/services/civic_impact/kanview_parser.py",
+      "ticket_ids": [
+        "T-002"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-002",
+      "what": "Preserve exact row/column evidence for bounded selected observations.",
+      "edit_sequence": [
+        "T-002"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/services/civic_impact/kanview_loader.py",
+      "ticket_ids": [
+        "T-002"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-002",
+      "what": "Idempotent missing locator registration through existing loader.",
+      "edit_sequence": [
+        "T-002"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tests/unit/civic_impact/test_retrieval_export_contract.py",
+      "ticket_ids": [
+        "T-002"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-002",
+      "what": "Golden legacy and second-kind contract/lifecycle fixtures.",
+      "edit_sequence": [
+        "T-002"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tests/unit/civic_impact/test_retrieval_exporter.py",
+      "ticket_ids": [
+        "T-002"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-002",
+      "what": "Determinism, eligibility, structured evidence and deltas.",
+      "edit_sequence": [
+        "T-002"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tests/unit/civic_impact/test_retrieval_export_command.py",
+      "ticket_ids": [
+        "T-002"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-002",
+      "what": "Kind dispatch, same-commit replay/no-op and snapshot selection.",
+      "edit_sequence": [
+        "T-002"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tests/unit/civic_impact/test_kanview_loader.py",
+      "ticket_ids": [
+        "T-002"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-002",
+      "what": "Source locator recovery preserves entity identities.",
+      "edit_sequence": [
+        "T-002"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-650-extend-retrieval-export-with-canonical-entity-records.md",
+      "ticket_ids": [
+        "T-002"
+      ],
+      "is_new": true,
+      "phase": "planning",
+      "owner_ticket": "T-002",
+      "what": "NEW: intended exporter extension ticket; root materializes after gates.",
+      "edit_sequence": [
+        "T-002"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-613-deliver-kansas-school-finance-civic-impact-vertical-slice.md",
+      "ticket_ids": [
+        "T-003"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-003",
+      "what": "Sibling pointer only; preserve already-amended scope/status/history.",
+      "edit_sequence": [
+        "T-003"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-651-freeze-real-source-law-money-generalization-benchmark.md",
+      "ticket_ids": [
+        "T-003"
+      ],
+      "is_new": true,
+      "phase": "planning",
+      "owner_ticket": "T-003",
+      "what": "NEW: sibling generalization benchmark ticket.",
+      "edit_sequence": [
+        "T-003"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/law-money-benchmark.schema.json",
+      "ticket_ids": [
+        "T-003"
+      ],
+      "is_new": true,
+      "phase": "future_implementation",
+      "owner_ticket": "T-003",
+      "what": "NEW: public frozen benchmark metadata/split/counts/threshold schema; no heldout answers.",
+      "edit_sequence": [
+        "T-003"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/scripts/operator/validate_law_money_benchmark.py",
+      "ticket_ids": [
+        "T-003"
+      ],
+      "is_new": true,
+      "phase": "future_implementation",
+      "owner_ticket": "T-003",
+      "what": "NEW: offline source/split/coverage/label-provenance validator.",
+      "edit_sequence": [
+        "T-003"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tests/unit/civic_impact/test_law_money_benchmark_contract.py",
+      "ticket_ids": [
+        "T-003"
+      ],
+      "is_new": true,
+      "phase": "future_implementation",
+      "owner_ticket": "T-003",
+      "what": "NEW: freeze, provenance, leakage, coverage and denominator validation.",
+      "edit_sequence": [
+        "T-003"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_graph.py",
+      "ticket_ids": [
+        "T-004",
+        "T-005",
+        "T-006"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-004",
+      "what": "Own v2 identity, evidence, relation, partition and manifest validation. Guard active complete manifest and lifecycle invalidation. Bounded directed path traversal using T-004 relations and T-005 eligibility.",
+      "edit_sequence": [
+        "T-004",
+        "T-005",
+        "T-006"
+      ],
+      "coordination": "Exclusive sequential edits in edit_sequence; owner_ticket stewards the shared contract. Later tickets consume earlier APIs and add only their assigned concern."
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_graph_artifact.py",
+      "ticket_ids": [
+        "T-004"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-004",
+      "what": "Own KS-650 adapter and complete bounded manifest validation.",
+      "edit_sequence": [
+        "T-004"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/schemas.py",
+      "ticket_ids": [
+        "T-004",
+        "T-006"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-004",
+      "what": "Own fiscal typed evidence/citation/entity-result/batch/manifest definitions. Wire native fiscal response/options using T-004 single-owner types.",
+      "edit_sequence": [
+        "T-004",
+        "T-006"
+      ],
+      "coordination": "Exclusive sequential edits in edit_sequence; owner_ticket stewards the shared contract. Later tickets consume earlier APIs and add only their assigned concern."
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/apps/api/svs_api/main.py",
+      "ticket_ids": [
+        "T-004",
+        "T-005",
+        "T-006"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-004",
+      "what": "Wire fiscal v2 validation to existing graph persistence. Existing graph staging and guarded store-pointer transition. Native typed fiscal search/context/answer and truthful compatibility handling.",
+      "edit_sequence": [
+        "T-004",
+        "T-005",
+        "T-006"
+      ],
+      "coordination": "Exclusive sequential edits in edit_sequence; owner_ticket stewards the shared contract. Later tickets consume earlier APIs and add only their assigned concern."
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/scripts/release/kansas-fiscal-graphrag.py",
+      "ticket_ids": [
+        "T-004",
+        "T-005",
+        "T-007"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-004",
+      "what": "Extend existing build/validate dispatch. Existing load/activation/rollback preflight extension. Keep relation-ID smoke separate; delegate product scoring to existing recall evaluator.",
+      "edit_sequence": [
+        "T-004",
+        "T-005",
+        "T-007"
+      ],
+      "coordination": "Exclusive sequential edits in edit_sequence; owner_ticket stewards the shared contract. Later tickets consume earlier APIs and add only their assigned concern."
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tests/test_fiscal_graph.py",
+      "ticket_ids": [
+        "T-004",
+        "T-006"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-004",
+      "what": "Version/identity/typed relationship mechanics. Multistep direction/provenance/joint-lineage guards.",
+      "edit_sequence": [
+        "T-004",
+        "T-006"
+      ],
+      "coordination": "Exclusive sequential edits in edit_sequence; owner_ticket stewards the shared contract. Later tickets consume earlier APIs and add only their assigned concern."
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tests/test_fiscal_graph_artifact.py",
+      "ticket_ids": [
+        "T-004"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-004",
+      "what": "Second-kind and structured-only evidence proof.",
+      "edit_sequence": [
+        "T-004"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tests/test_fiscal_graph_postgres.py",
+      "ticket_ids": [
+        "T-004",
+        "T-005",
+        "T-006"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-004",
+      "what": "Coexisting partitions and immutable replay. Canonical eligibility, complete activation, rollback and failure proof. Exact/entity canonical hydration and full typed path proof.",
+      "edit_sequence": [
+        "T-004",
+        "T-005",
+        "T-006"
+      ],
+      "coordination": "Exclusive sequential edits in edit_sequence; owner_ticket stewards the shared contract. Later tickets consume earlier APIs and add only their assigned concern."
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-133-fiscal-canonical-projection-contract.md",
+      "ticket_ids": [
+        "T-004"
+      ],
+      "is_new": true,
+      "phase": "planning",
+      "owner_ticket": "T-004",
+      "what": "NEW: typed projection/evidence follow-up.",
+      "edit_sequence": [
+        "T-004"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/scripts/release/kansas-fiscal-document-ingest.py",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-005",
+      "what": "Single upstream manifest consumer gains explicit record dispatch.",
+      "edit_sequence": [
+        "T-005"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/ingestion.py",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-005",
+      "what": "Typed fiscal descriptor indexing through existing profile/provider/index clients.",
+      "edit_sequence": [
+        "T-005"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/retrieval.py",
+      "ticket_ids": [
+        "T-005",
+        "T-006",
+        "T-007"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-006",
+      "what": "Mandatory ordinary dense/sparse/exact hydration checks. Own five modes/exact canonical lookup/fusion/bypass/native fiscal answer. Add narrowly scoped audit fields needed to measure existing provider/profile behavior.",
+      "edit_sequence": [
+        "T-005",
+        "T-006",
+        "T-007"
+      ],
+      "coordination": "Exclusive sequential edits in edit_sequence; owner_ticket stewards the shared contract. Later tickets consume earlier APIs and add only their assigned concern."
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/security.py",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-005",
+      "what": "Fiscal-only forced payload predicates, no other-domain policy change.",
+      "edit_sequence": [
+        "T-005"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tests/test_kansas_fiscal_document_ingest.py",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-005",
+      "what": "Dispatch, removals, failed/repeated replay.",
+      "edit_sequence": [
+        "T-005"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tests/test_fiscal_graph_routes.py",
+      "ticket_ids": [
+        "T-005",
+        "T-006"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-005",
+      "what": "Graph-off candidate exclusion and late revocation. Five modes, exact bypass and scope/citation wiring.",
+      "edit_sequence": [
+        "T-005",
+        "T-006"
+      ],
+      "coordination": "Exclusive sequential edits in edit_sequence; owner_ticket stewards the shared contract. Later tickets consume earlier APIs and add only their assigned concern."
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-134-fiscal-projection-ingestion-lifecycle.md",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": true,
+      "phase": "planning",
+      "owner_ticket": "T-005",
+      "what": "NEW: scoped projection/lifecycle follow-up.",
+      "edit_sequence": [
+        "T-005"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_projection.py",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": true,
+      "phase": "future_implementation",
+      "owner_ticket": "T-005",
+      "what": "NEW: one fiscal eligibility/hydration adapter, shared with retrieval/traversal/citations.",
+      "edit_sequence": [
+        "T-005"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/cell_graph.py",
+      "ticket_ids": [
+        "T-006"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-006",
+      "what": "Fiscal-only bounded multihop configuration, preserve other handlers.",
+      "edit_sequence": [
+        "T-006"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/search_lenses.py",
+      "ticket_ids": [
+        "T-006"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-006",
+      "what": "Explicit fiscal query mode/snapshot inputs.",
+      "edit_sequence": [
+        "T-006"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-135-fiscal-hybrid-retrieval-and-typed-traversal.md",
+      "ticket_ids": [
+        "T-006"
+      ],
+      "is_new": true,
+      "phase": "planning",
+      "owner_ticket": "T-006",
+      "what": "NEW: single pipeline five-mode retrieval follow-up.",
+      "edit_sequence": [
+        "T-006"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tests/test_fiscal_hybrid_retrieval.py",
+      "ticket_ids": [
+        "T-006",
+        "T-007"
+      ],
+      "is_new": true,
+      "phase": "future_implementation",
+      "owner_ticket": "T-006",
+      "what": "NEW: provider spies, mode separation, answer/citation correctness and outage fallback. Dependency-owned T-006 test file: extend lifecycle/leakage/provider measurement cases only.",
+      "edit_sequence": [
+        "T-006",
+        "T-007"
+      ],
+      "coordination": "Exclusive sequential edits in edit_sequence; owner_ticket stewards the shared contract. Later tickets consume earlier APIs and add only their assigned concern."
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/scripts/release/kansas-fiscal-recall-eval.py",
+      "ticket_ids": [
+        "T-007"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-007",
+      "what": "Single evaluator extended with frozen benchmark modes/labels/metrics/heldout interface.",
+      "edit_sequence": [
+        "T-007"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tests/test_kansas_fiscal_recall_eval.py",
+      "ticket_ids": [
+        "T-007"
+      ],
+      "is_new": false,
+      "phase": "future_implementation",
+      "owner_ticket": "T-007",
+      "what": "Scoring, no post-hoc exclusions, dry-run distinction and frozen thresholds.",
+      "edit_sequence": [
+        "T-007"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-136-fiscal-real-source-generalization-evaluation.md",
+      "ticket_ids": [
+        "T-007"
+      ],
+      "is_new": true,
+      "phase": "planning",
+      "owner_ticket": "T-007",
+      "what": "NEW: five-mode real-source product acceptance follow-up.",
+      "edit_sequence": [
+        "T-007"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-132-fiscal-law-money-graphrag-runtime.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Reopened parent; preserve historical proof and link outstanding current product acceptance.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-130-fiscal-graph-artifact-attribute-contract.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Mark historical SourceSpan/chunk rules and required canonical v2 replacement.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/README.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Actual ExAIS ticket index; add WAVE-133 through 136, no WAVE-137.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/docs/CELL_GRAPH_PROFILES.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Correct historical/runtime distinction, v2 contract and scoped activation/rollback.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/docs/FISCAL_GRAPH_REAL_DATA.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Link real-source gaps, owner/benchmark/reproduction proof and source inspection limitations.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/INDEX.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Actual upstream index for KS-650/651; root materializes after gates.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/docs/specs/civic-impact-intelligence/LAW_AND_MONEY_RETRIEVAL_HANDOFF.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": true,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Existing owner-approved boundary and links; preserve root amendments. Root-authored handoff; preserve settled upstream authority/export/consumer and source boundaries.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Dropbox/AI_Projects/exai_projects/exais_vector_store/instances/ks-state-civics/research/law-and-money-backbone.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Research handoff links/limits and optional downloaded-source role.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Dropbox/AI_Projects/exai_projects/exais_vector_store/instances/ks-state-civics/README.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Cell handoff and current acceptance status.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Dropbox/AI_Projects/exai_projects/exais_vector_store/instances/ks-state-civics/vector-stores/kansas-fiscal-documents/README.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Store-scoped eligibility/profile/snapshot/rollback preconditions.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/build-contract.json",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": true,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "NEW: wave3 mesher output, not implementation-owned source.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/stack.index.json",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": true,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "NEW: wave3 addressable index, not runtime dependency.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/docs/specs/civic-impact-intelligence/02_ARCHITECTURE_AND_DATA_MODEL.md",
+      "ticket_ids": [
+        "T-001"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-001",
+      "what": "Root amendment: canonical provision/graph ownership and typed native derivation distinction.",
+      "edit_sequence": [
+        "T-001"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/docs/specs/civic-impact-intelligence/05_FISCAL_IMPACT_AND_OUTCOME_ENGINE.md",
+      "ticket_ids": [
+        "T-001"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-001",
+      "what": "Root amendment: upstream legal reconciliation, exact authority arithmetic and export boundary.",
+      "edit_sequence": [
+        "T-001"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-595-create-immutable-source-artifact-and-derivation-ledger.md",
+      "ticket_ids": [
+        "T-002"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-002",
+      "what": "Owner pointer only to KS-600/650; preserve source/export ownership, status and history.",
+      "edit_sequence": [
+        "T-002"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-597-parse-fiscal-and-supplemental-notes-into-structured-estimates.md",
+      "ticket_ids": [
+        "T-001"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-001",
+      "what": "Owner pointer only to KS-600/650 exact field-evidence prerequisites; preserve status/history.",
+      "edit_sequence": [
+        "T-001"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-601-build-kansas-budget-account-crosswalk-and-actual-payment-bridge.md",
+      "ticket_ids": [
+        "T-001"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-001",
+      "what": "Owner pointer only: reviewed agency/FY/code-system/effective-date crosswalk consumed by KS-600/650/651; no duplicate resolver.",
+      "edit_sequence": [
+        "T-001"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-605-create-evidence-adjudication-source-tier-and-correction-ledger.md",
+      "ticket_ids": [
+        "T-002"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-002",
+      "what": "Bounded owner pointer: KS-650 fiscal subject compatibility and actual reviewed publication prerequisites; preserve status/history.",
+      "edit_sequence": [
+        "T-002"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/docs/STATECIVICS_LAW_MONEY_ALIGNMENT.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": true,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Root-authored controlling consumer handoff; link all eight canonical owners and corrected acceptance.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/docs/FISCAL_GRAPH_OPERATOR.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Root amendment: complete eligible manifest, frozen evaluation and scoped activation/rollback preconditions.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/instances/ks-state-civics/vector-stores/kansas-fiscal-documents/README.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Root amendment: active store handoff, canonical v2/eligibility/real-source acceptance requirements.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/README.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Root amendment: aligned pipeline entry and superseded draft disposition.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/intent.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Root amendment: historical intent points to authoritative manager alignment.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/legal-assets-alignment.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Root amendment: supersession by manager alignment; running harvest is not a new task.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/manager-alignment.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": false,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Authoritative approved intent and verified schema corrections.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/root-edit-notes.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": true,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Root planning-edit inventory and verification limitations.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/tickets.base.json",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": true,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Aligned wave 1 ticket continuity artifact; planning only.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/tickets.enriched.json",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": true,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Aligned wave 2 grounded requirements and actual signatures; planning only.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Dropbox/AI_Projects/exai_projects/exais_vector_store/instances/ks-state-civics/research/ticket-alignment.md",
+      "ticket_ids": [
+        "T-008"
+      ],
+      "is_new": true,
+      "phase": "planning",
+      "owner_ticket": "T-008",
+      "what": "Root-authored planning discovery index linking the aligned ticket handoff; newly authored this turn, with no future runtime work.",
+      "edit_sequence": [
+        "T-008"
+      ]
+    }
+  ],
+  "anti_duplication_rules": [
+    "Statewide StateCivics PostgreSQL and existing custody/source-ledger services remain canonical. ExAIS stores only rebuildable scoped projections; no second canonical graph, provider, graph engine, global policy or direct authoritative upstream write.",
+    "KS-600/T-001 alone defines provision identity, field-combination/evidence interpretation, snapshot selection and authority arithmetic in provision-reference.schema.json and appropriation_reconciler.py. ExAIS consumes exact canonical results/derivations; never port arithmetic, sum snippets, or add an action amount to its linked fact.",
+    "Native derivation inputs are {type,id,revision_or_hash}; native outputs are {type,id,hash_sha256}. JSON-schema optional/null output hashes are insufficient for reviewed lineage: require the supported hash required by typed record/ORM. Preserve ordered input/output set hashes and run context. Normalized projection refs retain original shape; no symmetric-storage rewrite, appropriation_action_id fact field, second lineage table, or Cartesian input/output edges.",
+    "Canonical provision version identity is separate from display numbering, source spans, re-extraction and observation/effective time. KS-601 owns reviewed effective-dated account crosswalks; equal codes/labels, section numbers, similarity or unresolved statute History cannot create identity or edges. Unknown dates/subunits/matches remain unknown.",
+    "KS-650/T-002 extends only the existing retrieval exporter/schema/CLI with explicit kind/version dispatch. Keep legacy document records/bytes compatible. Never require the provisional ExAIS publisher v1 envelope upstream or build a second exporter/ledger/locator pipeline. Fill only idempotent missing evidence through existing services; no copied CSV corpus, fake PDFs or harvest restart.",
+    "KS-650 owns the bounded compatible publication-record.subject_type fiscal extension coordinated with KS-605. Existing allowed subject types exclude fiscal entities; never mislabel them. Actual reviewed publication and nonrevoked snapshot/source records are prerequisites; schemas alone are not producer/readiness proof and unrelated entire epics are not gates.",
+    "T-004 alone owns FiscalCanonicalReference, FiscalEvidenceCitation, FiscalEntityResult, FiscalProjectionBatch, FiscalProjectionPartition, FiscalProjectionManifest and response model extensions in schemas.py. T-005/006/007 import these; do not redeclare dict/envelope/citation variants or manufacture document/chunk IDs for structured evidence.",
+    "T-004 owns generation/partition identity and complete-manifest validation through fiscal_graph_artifact.py:validate_fiscal_projection_manifest and fiscal_graph.py:guard_fiscal_graph_generation. Every declared partition/count/hash and cross-partition endpoint must resolve; keep 1000-node/2000-edge per-batch bounds. New bill/FY generations explicitly include all retained approved partitions; never silently replace another bill or truncate.",
+    "T-005 owns active pointer transitions and durable lifecycle denial; it consumes the T-004 immutable manifest validator and does not duplicate it. Stage all counts/hash/source/profile/index acknowledgements before scoped compare-and-swap. Failed/partial stages preserve the prior approved view; rollback rechecks current rights/tombstones and never resurrects denied material.",
+    "T-005 alone defines fiscal_projection.py:fiscal_record_eligible. Ordinary graph-off/unscoped requests, dense/sparse/exact lookup, traversal and citations must use trusted server-derived fiscal scope and refreshed canonical eligibility. Backend filters are defense in depth; stale vector points, graph disablement, omitted client metadata or late external awaits cannot bypass final hydration/serialization checks.",
+    "T-006 stewards RetrievalService.search/answer and five-mode dispatch; T-005 installs mandatory eligibility hooks first, T-006 integrates retrieval second, T-007 adds audit measurements last. Retain existing signatures; do not build a parallel retriever. Exact baseline and outage fallback branch before both embeddings and remote reranking and reuse the same local exact/lexical branch.",
+    "T-006 traversal consumes T-004 relation validation and T-005 eligibility: maximum six hops, ten seeds and 200 visited/candidate nodes with explicit result/time bounds, cycles and truncation metadata. Preserve other handlers at one hop. Stronger action/fact correspondence requires source-backed assertion within its run; no similarity or unresolved History edges.",
+    "Use configured existing embedding/profile/index clients and encode each store query with its own profile. Keep exact fiscal numbers structured and compact source-derived descriptions separately versioned. Equal description text cannot merge canonical FY/agency identities; no per-row/quarterly-total embedding, raw-score cross-profile comparison, equal-dimension requirement or automatic cross-store execution.",
+    "KS-651/T-003 alone owns benchmark labels/splits/coverage/denominators/initial threshold freeze before any extraction/prompt/ranking/description tuning. The reviewer protects positive entire-bill/agency-account-family heldout answers from developer prompts/checkouts/indexes/logs/artifacts. Retained evidence may be indexed after freeze for answering; protected labels may not. Contamination requires an explicit new unseen positive split.",
+    "WAVE-136/T-007 owns the single existing recall evaluator/scorer; graph relationship-ID/keyword tests remain smoke proof. Measure five modes on identical frozen source snapshots; require nontrivial positive correctness and material graph gain in each split, exact-ID nonregression, correct numeric/FY/citations and zero prohibited leakage. No all-refusal, synthetic-only, duplicate-inflated, post-hoc excluded or dry-run product PASS.",
+    "KS-613 retains original FY2026 authority, $4M lapse, calculated adjusted authority, FY2027 authority, crosswalk, separately evidenced payments, forecast absence where applicable, non-causal result, correction path and reproduction bundle. Add only its KS-651 sibling pointer; its broader payment/forecast/outcome work and full optional statute harvest do not gate this narrower milestone.",
+    "WAVE-132/T-008 is the sole parent activation acceptance gate; do not create WAVE-137. Six new canonical tickets are KS-650/651 and WAVE-133..136 at the exact suffixed paths in this map. Preserve existing KS-600/WAVE-130/WAVE-132 amendments and support-ticket status/history. Historical v1/PASS and inventory counts are not current product acceptance.",
+    "This turn writes planning artifacts/tickets/docs only. Do not implement runtime code, call providers, publish/index/activate/deploy, alter operational StateCivics data or running K.S.A. harvest, restart scraping, add pre-harvest canaries, or pin/submodule optional research downloads. The 2062/31085 sections, chapter 9/91, no-failures harvest statement is a dated handoff report, not live completion.",
+    "Each overlapping file has one steward and an exclusive dependency-ordered edit_sequence. Each shared symbol has one owner/signature; later tickets consume it or make only the assigned sequential amendment. No speculative migration/producer file is treated as existing: resolve a necessary file from the then-current owner/head and amend this map/index before implementation, preserving the assigned ticket scope."
+  ],
+  "tickets": [
+    {
+      "id": "T-001",
+      "canonical_ticket_id": "KS-600",
+      "canonical_ticket_file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-600-reconcile-appropriations-from-bill-versions-through-final-law-and-vetoes.md",
+      "repository": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan",
+      "ticket_operation": "amend",
+      "dependencies": [],
+      "expected_output": "Amended KS-600 remains sole provision/reconciliation owner: a version-specific evidence-independent provision reference, persisted canonical revisions, validated native typed derivation lineage and exact Decimal authority result with reproducible snapshot/source/run hashes. Tests prove re-extraction identity stability, version separation, missing/null/no-limit and temporal rules, multi-input joint-lineage limits, account ambiguity, and no action/fact or transfer double counting. Reuse KS-595/597/601; no second lineage table or resolver.",
+      "requirements_source": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/tickets.enriched.json#/tickets/0",
+      "verification": {
+        "commands": [
+          "./scripts/run_gate.sh statewide tests/unit/civic_impact/test_source_artifacts.py tests/unit/civic_impact/test_appropriation_reconciler.py tests/integration/civic_impact/test_final_authority_lineage.py"
+        ],
+        "status": "Proposed implementation verification; not executed by this enrichment wave.",
+        "required_evidence": "Real retained legal revisions, typed run hashes and reproducible arithmetic, plus synthetic mechanics.",
+        "execution_boundary": "StateCivics commands must use scripts/run_gate.sh statewide; no host dependency installs. ExAIS pytest commands run inside its existing configured test/container environment; PostgreSQL proof needs explicitly disposable SVS_FISCAL_GRAPH_TEST_DATABASE_URL and cannot count skipped tests as passed. Real-source product acceptance is separate from synthetic tests."
+      }
+    },
+    {
+      "id": "T-002",
+      "canonical_ticket_id": "KS-650",
+      "canonical_ticket_file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-650-extend-retrieval-export-with-canonical-entity-records.md",
+      "repository": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan",
+      "ticket_operation": "create",
+      "dependencies": [
+        "T-001"
+      ],
+      "expected_output": "KS-650 extends the existing KS-595 exporter/schema/CLI with explicit compatible document versus versioned entity dispatch, deterministic compact descriptions, typed relationships/native derivations, structured-record or document-span evidence, complete export counts/hashes and replayable lifecycle removals. It owns the bounded compatible fiscal publication-subject extension with KS-605 and withholds records missing actual reviewed publication/snapshot/source prerequisites. Golden old document bytes and second-kind/locator/removal tests pass; no new exporter stack, fake PDFs or reharvest.",
+      "requirements_source": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/tickets.enriched.json#/tickets/1",
+      "verification": {
+        "commands": [
+          "./scripts/run_gate.sh statewide tests/unit/civic_impact/test_retrieval_export_contract.py tests/unit/civic_impact/test_retrieval_exporter.py tests/unit/civic_impact/test_retrieval_export_command.py tests/unit/civic_impact/test_kanview_loader.py"
+        ],
+        "status": "Proposed implementation verification; not executed by this enrichment wave.",
+        "required_evidence": "Byte-stable document compatibility; deterministic second-kind/lifecycle/structured evidence and missing-prerequisite refusal.",
+        "execution_boundary": "StateCivics commands must use scripts/run_gate.sh statewide; no host dependency installs. ExAIS pytest commands run inside its existing configured test/container environment; PostgreSQL proof needs explicitly disposable SVS_FISCAL_GRAPH_TEST_DATABASE_URL and cannot count skipped tests as passed. Real-source product acceptance is separate from synthetic tests."
+      }
+    },
+    {
+      "id": "T-003",
+      "canonical_ticket_id": "KS-651",
+      "canonical_ticket_file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-651-freeze-real-source-law-money-generalization-benchmark.md",
+      "repository": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan",
+      "ticket_operation": "create",
+      "dependencies": [
+        "T-001"
+      ],
+      "expected_output": "KS-651 produces a reviewer-frozen real-source benchmark contract with at least three enacted bills, two sessions, two fiscal years, three agencies, multiple operations, positive and gap cases, exact source/snapshot/derivation labels and fixed denominators/thresholds before tuning. At least one positive entire bill and agency/account family remains unseen in development. Protected answer labels stay outside developer prompts/checkouts/indexes/logs; public artifacts contain only opaque bundle references/hashes. Source readiness and positive reproduction are reviewed; KS-613 gains only a sibling pointer.",
+      "requirements_source": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/tickets.enriched.json#/tickets/2",
+      "verification": {
+        "commands": [
+          "./scripts/run_gate.sh statewide tests/unit/civic_impact/test_law_money_benchmark_contract.py"
+        ],
+        "status": "Proposed implementation verification; not executed by this enrichment wave.",
+        "required_evidence": "Reviewed source readiness and frozen public manifest plus protected positive heldout labels/hash; no labels in developer artifacts.",
+        "execution_boundary": "StateCivics commands must use scripts/run_gate.sh statewide; no host dependency installs. ExAIS pytest commands run inside its existing configured test/container environment; PostgreSQL proof needs explicitly disposable SVS_FISCAL_GRAPH_TEST_DATABASE_URL and cannot count skipped tests as passed. Real-source product acceptance is separate from synthetic tests."
+      }
+    },
+    {
+      "id": "T-004",
+      "canonical_ticket_id": "WAVE-133",
+      "canonical_ticket_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-133-fiscal-canonical-projection-contract.md",
+      "repository": "/Users/mfrieson/Developer/exais-vector-store-ovh",
+      "ticket_operation": "create",
+      "dependencies": [
+        "T-001",
+        "T-002"
+      ],
+      "expected_output": "WAVE-133 defines one v2 canonical-reference/evidence/citation/entity-result/batch/complete-manifest contract and consumes KS-650 through the existing fiscal graph adapter/validator/API. Multiple bill/FY partitions coexist, each bounded at 1000 nodes/2000 edges, with global counts/hashes/endpoint/replay checks; structured-only evidence needs no chunk. Typed run lineage preserves direction and excludes Cartesian correspondence. Contract and disposable PostgreSQL proof cover prior document compatibility and incomplete/conflicting partition rejection; historical v1 remains explicit audit/approved-rollback behavior.",
+      "requirements_source": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/tickets.enriched.json#/tickets/3",
+      "verification": {
+        "commands": [
+          "pytest -q tests/test_fiscal_graph.py tests/test_fiscal_graph_artifact.py tests/test_fiscal_graph_postgres.py"
+        ],
+        "status": "Proposed implementation verification; not executed by this enrichment wave.",
+        "required_evidence": "Structured-only entities, independent legal identity, typed directed lineage, coexisting partitions and complete manifest accounting.",
+        "execution_boundary": "StateCivics commands must use scripts/run_gate.sh statewide; no host dependency installs. ExAIS pytest commands run inside its existing configured test/container environment; PostgreSQL proof needs explicitly disposable SVS_FISCAL_GRAPH_TEST_DATABASE_URL and cannot count skipped tests as passed. Real-source product acceptance is separate from synthetic tests."
+      }
+    },
+    {
+      "id": "T-005",
+      "canonical_ticket_id": "WAVE-134",
+      "canonical_ticket_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-134-fiscal-projection-ingestion-lifecycle.md",
+      "repository": "/Users/mfrieson/Developer/exais-vector-store-ovh",
+      "ticket_operation": "create",
+      "dependencies": [
+        "T-002",
+        "T-004"
+      ],
+      "expected_output": "WAVE-134 stages eligible entity descriptor points through existing scoped ingestion/profile/index clients and activates only a complete verified manifest through a guarded scoped pointer transition. One refreshed eligibility predicate excludes candidate/denied/wrong-scope records from ordinary graph-off dense/sparse/exact retrieval, traversal and final citations. Replay/removal/late revocation/failure/rollback proof demonstrates durable denial before index deletion, no fake chunks, no hidden partial success, preserved prior approved view, and rollback that cannot resurrect withdrawn evidence.",
+      "requirements_source": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/tickets.enriched.json#/tickets/4",
+      "verification": {
+        "commands": [
+          "pytest -q tests/test_kansas_fiscal_document_ingest.py tests/test_fiscal_graph_routes.py tests/test_fiscal_graph_postgres.py"
+        ],
+        "status": "Proposed implementation verification; not executed by this enrichment wave.",
+        "required_evidence": "Graph-off/unscoped candidate exclusion, stale injected points, late revocation, failed deletion, partial activation, safe rollback and scope/profile isolation.",
+        "execution_boundary": "StateCivics commands must use scripts/run_gate.sh statewide; no host dependency installs. ExAIS pytest commands run inside its existing configured test/container environment; PostgreSQL proof needs explicitly disposable SVS_FISCAL_GRAPH_TEST_DATABASE_URL and cannot count skipped tests as passed. Real-source product acceptance is separate from synthetic tests."
+      }
+    },
+    {
+      "id": "T-006",
+      "canonical_ticket_id": "WAVE-135",
+      "canonical_ticket_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-135-fiscal-hybrid-retrieval-and-typed-traversal.md",
+      "repository": "/Users/mfrieson/Developer/exais-vector-store-ovh",
+      "ticket_operation": "create",
+      "dependencies": [
+        "T-003",
+        "T-004",
+        "T-005"
+      ],
+      "expected_output": "WAVE-135 exposes exact_lexical, document_semantic, entity_semantic, hybrid and hybrid_graph through the existing retrieval/answer pipeline. Exact baseline/outage fallback make zero embedding/reranker calls. Canonical scoped hydration precedes bounded directed source-backed traversal and exact upstream-derived numeric answers with native legal/structured citations and explicit gaps. Tests prove mode separation, profile-aware encoding, exact-ID preservation, useful positive paths, provenance/joint-lineage limits, citation correctness and no automatic cross-store expansion or second fiscal arithmetic policy.",
+      "requirements_source": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/tickets.enriched.json#/tickets/5",
+      "verification": {
+        "commands": [
+          "pytest -q tests/test_fiscal_hybrid_retrieval.py tests/test_fiscal_graph.py tests/test_fiscal_graph_routes.py tests/test_fiscal_graph_postgres.py"
+        ],
+        "status": "Proposed implementation verification; not executed by this enrichment wave.",
+        "required_evidence": "Five separate modes, zero provider/reranker calls in exact baseline, outage fallback, real canonical numeric/path/citation correctness and explicit gaps.",
+        "execution_boundary": "StateCivics commands must use scripts/run_gate.sh statewide; no host dependency installs. ExAIS pytest commands run inside its existing configured test/container environment; PostgreSQL proof needs explicitly disposable SVS_FISCAL_GRAPH_TEST_DATABASE_URL and cannot count skipped tests as passed. Real-source product acceptance is separate from synthetic tests."
+      }
+    },
+    {
+      "id": "T-007",
+      "canonical_ticket_id": "WAVE-136",
+      "canonical_ticket_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-136-fiscal-real-source-generalization-evaluation.md",
+      "repository": "/Users/mfrieson/Developer/exais-vector-store-ovh",
+      "ticket_operation": "create",
+      "dependencies": [
+        "T-003",
+        "T-006"
+      ],
+      "expected_output": "WAVE-136 extends the existing recall evaluator to compare all five modes on identical KS-651 frozen cases and produce a reproducible reviewed source-backed report plus separate reviewer-controlled positive heldout report hash. Frozen exact-ID/nontrivial positive/numeric-FY-citation/leakage/material-graph-gain gates apply separately to development and heldout. Report all failures, latency, calls and cost; reject all-refusal, generic keyword, duplicate-evidence, post-hoc exclusion, contaminated holdout and dry-run-as-PASS outcomes. Mechanics tests supplement mandatory real-source evaluation.",
+      "requirements_source": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/tickets.enriched.json#/tickets/6",
+      "verification": {
+        "commands": [
+          "pytest -q tests/test_kansas_fiscal_recall_eval.py tests/test_fiscal_hybrid_retrieval.py"
+        ],
+        "status": "Proposed implementation verification; not executed by this enrichment wave.",
+        "required_evidence": "All-refusal/generic-keyword/duplicate/contaminated/missing-case reports fail; reviewer-run positive heldout and frozen five-mode real-source report are additional mandatory acceptance.",
+        "execution_boundary": "StateCivics commands must use scripts/run_gate.sh statewide; no host dependency installs. ExAIS pytest commands run inside its existing configured test/container environment; PostgreSQL proof needs explicitly disposable SVS_FISCAL_GRAPH_TEST_DATABASE_URL and cannot count skipped tests as passed. Real-source product acceptance is separate from synthetic tests."
+      }
+    },
+    {
+      "id": "T-008",
+      "canonical_ticket_id": "WAVE-132",
+      "canonical_ticket_file": "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-132-fiscal-law-money-graphrag-runtime.md",
+      "repository": "/Users/mfrieson/Developer/exais-vector-store-ovh",
+      "ticket_operation": "amend",
+      "dependencies": [
+        "T-005",
+        "T-007"
+      ],
+      "expected_output": "Reopened WAVE-132 preserves historical mechanics/PASS while linking all eight canonical owners, six new suffixed tickets, actual indexes, aligned artifacts and source/benchmark proof. Planning docs state the corrected v2/eligibility boundary and a Kansas-fiscal-store-only activation package containing complete eligible manifest/profile/source/run identities, frozen passing WAVE-136/heldout hashes and safe prior rollback pointer. Fresh inventory/exclusion and disablement/withdrawal/isolation/rollback drills remain future execution requirements. This turn changes planning only and preserves the running harvest and existing runtime work.",
+      "requirements_source": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/tickets.enriched.json#/tickets/7",
+      "verification": {
+        "commands": [
+          "python -m json.tool .tranche/statecivics-semantic-graph/aligned/build-contract.json"
+        ],
+        "status": "Proposed implementation verification; not executed by this enrichment wave.",
+        "required_evidence": "Root validates ticket indexes/links, gates build/index artifacts, checks activation/rollback package completeness; no runtime operations in planning.",
+        "execution_boundary": "StateCivics commands must use scripts/run_gate.sh statewide; no host dependency installs. ExAIS pytest commands run inside its existing configured test/container environment; PostgreSQL proof needs explicitly disposable SVS_FISCAL_GRAPH_TEST_DATABASE_URL and cannot count skipped tests as passed. Real-source product acceptance is separate from synthetic tests."
+      }
+    }
+  ],
+  "implementation_order": [
+    [
+      "T-001"
+    ],
+    [
+      "T-002",
+      "T-003"
+    ],
+    [
+      "T-004"
+    ],
+    [
+      "T-005"
+    ],
+    [
+      "T-006"
+    ],
+    [
+      "T-007"
+    ],
+    [
+      "T-008"
+    ]
+  ],
+  "order_notes": "T-002 export and T-003 reviewer source/freeze preparation can proceed independently after T-001. T-003 freeze must precede any retrieval/extraction/prompt tuning. Planning materialization of all eight tickets is authorized after gates and does not wait for future implementation acceptance. Runtime activation remains a later WAVE-132 gated action.",
+  "bounded_unresolved_files": [
+    {
+      "owner_ticket": "T-001",
+      "condition": "A database migration is required for new canonical provision/action persistence.",
+      "resolution": "Allocate the actual migration from the then-current upstream Alembic head and add its exact absolute path to this map/index before editing; no guessed revision/path or second lineage table."
+    },
+    {
+      "owner_ticket": "T-002",
+      "condition": "The compatible reviewed fiscal publication/snapshot producer required by selected records is missing.",
+      "resolution": "Coordinate the minimal producer/adapter with existing KS-605 ownership; ground and add any actual bounded owner files to this map/index before editing. Withhold records until their prerequisites exist; never fabricate publication or gate on unrelated whole epics."
+    }
+  ],
+  "signature_policy": "signature is the sole existing or proposed call/class signature for a shared symbol. Existing actual signatures remain verbatim; planned_signature explicitly identifies a future compatible model-field extension and never asserts current implementation. owner_ticket is the tranche integration steward; existing KS-595/597/601/605 service ownership remains authoritative as stated in the notes."
+}

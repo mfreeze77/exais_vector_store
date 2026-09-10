@@ -1,0 +1,6 @@
+{
+  "verdict": "FAIL",
+  "findings": [
+    "Correct T-001 acceptance_checks[1] in tickets.enriched.json: it still attributes {type, id, revision_or_hash} to both native derivation inputs and outputs. The verified schema and updated manager handoff require inputs {type, id, revision_or_hash} and outputs {type, id, hash_sha256}; the schema permits an absent/null output hash, while this reviewed lineage must supply it. Keep any normalized projection reference explicitly lossless and separate from native storage. The correct grounding notes and implementation plan currently conflict with this operative acceptance criterion, allowing downstream materialization to reproduce the wrong contract."
+  ]
+}

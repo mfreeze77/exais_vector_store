@@ -1,0 +1,649 @@
+{
+  "canonical_goal": "Enable the Kansas State Civics cell to answer law-to-money questions across bills and fiscal years by combining semantic and exact retrieval over source-bound entity descriptions and documents with validated structured graph relationships, proven on diverse real sources including an unseen bill.",
+  "authoritative_handoff": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/manager-alignment.md",
+  "artifact_status": "Aligned wave 1 planning draft; no code research or runtime implementation performed. Absolute suspected paths are candidates for wave 2 verification, not assertions of existing files or producer readiness.",
+  "materialization_policy": {
+    "current_turn_scope": "Tickets, documentation, and planning artifacts only; preserve existing runtime changes. Root materializes Markdown and indexes after all gates.",
+    "canonical_id_allocation": "Retain KS-600 and WAVE-132. Recheck allocation before creating KS-650, KS-651, WAVE-133, WAVE-134, WAVE-135, and WAVE-136; these are intended IDs, not proof of current availability.",
+    "upstream_owner": "Statewide StateCivics PostgreSQL is the canonical civic graph under ADR-CII-001 and ADR-CII-011. Existing custody/source-ledger services own retained evidence; ExAIS consumes rebuildable scoped projections.",
+    "dependencies": "Local dependencies express implementation/acceptance order. Existing-owner references are record-level prerequisites and bounded documentation amendments, not new implementation tickets or whole-epic completion gates.",
+    "support_ticket_amendments": [
+      {
+        "canonical_ticket_id": "KS-595",
+        "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-595.md",
+        "operation": "owner_pointer_only",
+        "owner": "Existing SourceSpan/locator infrastructure and retrieval exporter",
+        "pointer_to": [
+          "KS-600",
+          "KS-650"
+        ],
+        "requirement": "Document the provision-identity distinction and exporter second-record extension; retain document-export compatibility and existing implementation history/status (reported in_review at handoff)."
+      },
+      {
+        "canonical_ticket_id": "KS-597",
+        "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-597.md",
+        "operation": "owner_pointer_only",
+        "owner": "Anchoring extracted fiscal fields to exact spans",
+        "pointer_to": [
+          "KS-600",
+          "KS-650"
+        ],
+        "requirement": "Reference the exact field-evidence prerequisites consumed by legal reconciliation and export; preserve implementation history/status (reported in_progress at handoff)."
+      },
+      {
+        "canonical_ticket_id": "KS-601",
+        "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-601.md",
+        "operation": "owner_pointer_only",
+        "owner": "Reviewed effective-dated account crosswalks",
+        "pointer_to": [
+          "KS-600",
+          "KS-650",
+          "KS-651"
+        ],
+        "requirement": "Reference agency/FY/code-system scope, ambiguity, unknown subunit, and reviewed crosswalk prerequisites; do not add a second resolver or change implementation history/status."
+      },
+      {
+        "canonical_ticket_id": "KS-613",
+        "file": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-613.md",
+        "operation": "sibling_pointer_only",
+        "owner": "Existing school-finance acceptance slice",
+        "pointer_to": [
+          "KS-651"
+        ],
+        "requirement": "Add only the generalization sibling pointer. Preserve original FY2026 authority, $4M lapse, calculated adjusted authority, FY2027 authority, crosswalk, separately evidenced payments, explicit forecast absence if applicable, non-causal result, correction path, reproduction bundle, and current history/status. Its broader payment/forecast/outcome deliverables do not gate this narrower GraphRAG milestone."
+      }
+    ],
+    "prohibited_actions": [
+      "Runtime changes in this turn",
+      "Record publication or indexing in this turn",
+      "Deployment or activation in this turn",
+      "Changes to the operational StateCivics checkout or running statute harvest",
+      "New scrape, harvest restart, or pre-harvest canary",
+      "Repository SHA pins or submodules for optional downloaded research sources"
+    ]
+  },
+  "tickets": [
+    {
+      "id": "T-001",
+      "canonical_ticket_id": "KS-600",
+      "repository": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan",
+      "ticket_operation": "amend",
+      "title": "Define provision identity, typed action lineage, and reproducible authority arithmetic",
+      "goal": "Extend the existing legal-reconciliation owner so every law-to-money path starts from a version-specific provision, carries truthful action-to-fact lineage, and uses reproducible fiscal arithmetic.",
+      "acceptance": "KS-600 is amended before implementation with a shared provision-reference definition and checkable reconciliation rules. Source-backed cases demonstrate provision identity independent of numbering/evidence coordinates, existing typed derivation reuse without Cartesian edge inference, reviewed account resolution, allowed fiscal field combinations, and reproducible authority calculations without double counting or invented zero values.",
+      "acceptance_checks": [
+        "Define a version-specific provision reference separating canonical identity, legal instrument/version, displayed section/subsection numbering, source revision/span coordinates, observation dates, and effective dates. Re-extraction does not change legal identity; cross-version continuity requires evidenced lineage; unsupported effective dates remain unknown. State explicitly that the provision ID capability is currently missing and SourceSpan-as-entity-ID is superseded as a requirement, not already fixed runtime behavior.",
+        "Reuse derivation.schema.json typed inputs/outputs {type, id, revision_or_hash}, input/output set hashes, and derivation run context for appropriation-action to fiscal-fact lineage. Do not add appropriation_action_id to fiscal facts or a second lineage table. Demonstrate a multi-input/multi-output case where joint derivation membership does not imply every action maps one-to-one to every fact; stronger edges require explicit supported correspondence.",
+        "Keep appropriation_action.action_type as the legal operation, fiscal_fact.stage as context, metric as measured value, and evidence_class as the assertion character. Preserve existing enums; define allowed/invalid combinations, stage overlap and evidence-class precedence including official publishers of observed, modeled, or calculated values. Allow fiscal facts with no appropriation action when supported.",
+        "Specify exact decimal/null/no-limit semantics, conditions, direction, periods, veto/override and bounded amendment effects. Define reproducible snapshot selection and authority arithmetic through supported fiscal facts/derivations; never total an action amount together with its linked fact. Keep changes, balances, period flows, transfer legs, authority and expenditure separate; declare consolidation boundaries; missing or incomplete sources never imply zero.",
+        "Consume KS-595 source/span registration, KS-597 exact field anchors, and KS-601 reviewed effective-dated account crosswalks. Preserve agency/FY/code-system scope, unknown subunit, ambiguity, and unknown matches; equal labels or normalized codes alone cannot establish identity. Generalization needs source/configuration/review, not bill-specific parser branches.",
+        "Use retained source revisions and exact legal evidence for accepted records, including enacted Session Law provisions where appropriate. Current statutes may establish standing authority, definitions or evidenced lineage; unresolved History references are not resolved edges and cannot replace the uncodified appropriation act."
+      ],
+      "suspected_files": [
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-600.md",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/appropriation-action.schema.json",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/fiscal-fact.schema.json",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/derivation.schema.json",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/source-span.schema.json",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/methodology-enums.yaml",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/models/fiscal_intelligence.py",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/models/source_artifacts.py",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/services/civic_impact/source_artifact_service.py"
+      ],
+      "proposed_contracts_to_ground": [
+        "Version-specific provision-reference definition owned by KS-600; wave 2 must distinguish its proposed path/signature from existing code."
+      ],
+      "dependencies": [],
+      "existing_owner_prerequisites": [
+        "Eligible source revisions/spans from KS-595",
+        "Exact fiscal field evidence from KS-597",
+        "Reviewed account crosswalk records from KS-601"
+      ],
+      "out_of_scope": [
+        "A rival provision/reconciliation ticket",
+        "Replacement enums",
+        "New action ID field on fiscal facts",
+        "A second lineage table",
+        "A second account resolver",
+        "Universal statute history resolution",
+        "Runtime changes in this planning turn"
+      ],
+      "materialization_notes": [
+        "Amend existing KS-600, reported proposed at handoff, retaining its existing responsibility and history. Add bounded support owner pointers to KS-595/597/601; do not promote them into rival packages.",
+        "Actual source-backed implementation verification belongs to the resulting ticket; this artifact does not assert populated provision, action, or arithmetic producers."
+      ]
+    },
+    {
+      "id": "T-002",
+      "canonical_ticket_id": "KS-650",
+      "repository": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan",
+      "ticket_operation": "create",
+      "title": "Extend the retrieval exporter with a versioned canonical entity and relationship record",
+      "goal": "Give the unbuilt canonical semantic/graph projection one upstream owner by extending the existing KS-595 exporter while retaining its document and custody record compatibility.",
+      "acceptance": "The KS-595 exporter gains an explicitly dispatched second versioned record type for canonical entities/relationships and source-derived descriptions. Contract fixtures preserve existing document records and lifecycle fields, identify record-level publication/snapshot/evidence prerequisites, distinguish structured CSV evidence from spans, preserve typed derivation semantics, and deterministically export only records eligible for the declared audience.",
+      "acceptance_checks": [
+        "Extend contracts/civic-impact/retrieval-export-record.schema.json, scripts/operator/export_retrieval_manifest.py and their existing owning service through explicit version/type dispatch. Keep existing document/custody records compatible, including redistribution, license_profile, custody_status, lifecycle current/superseded/corrected/withdrawn and removal_required. Do not create an independent exporter stack or adopt ExAIS statecivics.fiscal-graph-publisher.v1 as the upstream contract.",
+        "Define the second record type with canonical identity and revision, typed relationships, typed derivation references and run context, exact structured fiscal fields, evidence references, eligibility/lifecycle, and deterministic source-derived semantic descriptions. Distinguish entities, descriptions and evidence identities; preserve raw source versus parsed/extraction hashes and coordinates. Multi-input derivation membership must not expand into unsupported Cartesian action/fact edges.",
+        "Support both structured CSV dimension/observation evidence with source/record locators and exact legal/document spans. Reuse existing source/custody/span registration and retained KanView dimensions/observations. Inspect registration and exact-evidence readiness; fill only idempotent missing registration/extraction through existing owner services. No fake PDFs, copied CSV corpus, duplicate source-ledger implementation or second harvest.",
+        "Reuse publication-record.schema.json from KS-605 for entity publication/correction and intelligence-snapshot.schema.json for as-of datasets, budget baselines, geography vintages, methodology and source sets. Specify compatibility and record-level prerequisites without inferring producers/eligible records exist from schemas or gating on unrelated whole epics.",
+        "Derive compact descriptions from retained sourced labels, aliases and context with template/input revisions and deterministic identity. Preserve year/agency-distinct canonical identities even when text matches. Keep exact fiscal numbers structured; do not embed every CSV row or quarterly total, invent summaries as truth, or allow candidate records into ordinary semantic retrieval.",
+        "Define deterministic incremental correction, supersession, withdrawal and removal events that downstream semantic and graph projections can reconcile together. Candidate preview, if any, must be separately authorized and excluded from ordinary eligible output. Export eligibility applies independently of whether graph expansion is enabled.",
+        "Golden compatibility fixtures and repeat export comparisons prove stable record dispatch, unchanged document-record acceptance, deterministic description/delta output, lifecycle transitions, source revision tracking, structured evidence, and rejection/withholding of records missing their own prerequisites."
+      ],
+      "suspected_files": [
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-650.md",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-595.md",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/retrieval-export-record.schema.json",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/scripts/operator/export_retrieval_manifest.py",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/publication-record.schema.json",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/intelligence-snapshot.schema.json",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/derivation.schema.json",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/source-span.schema.json",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/src/kansas_accountability/services/civic_impact/source_artifact_service.py"
+      ],
+      "proposed_contracts_to_ground": [
+        "Second explicitly dispatched canonical entity/relationship record variant and exporter owner service; locate existing service in wave 2 without treating an older guessed retrieval_exporter.py path as verified."
+      ],
+      "dependencies": [
+        "T-001"
+      ],
+      "existing_owner_prerequisites": [
+        "KS-595 exporter, source/custody/span infrastructure",
+        "KS-597 field evidence for exported fiscal records",
+        "KS-601 reviewed crosswalk records",
+        "KS-605 publication contract compatibility and eligible record instances, not whole-ticket completion",
+        "Intelligence-snapshot contract compatibility and reproducible snapshot instances"
+      ],
+      "out_of_scope": [
+        "Independent exporter or canonical graph",
+        "Direct writes to ExAIS databases",
+        "ExAIS provisional publisher envelope as an upstream requirement",
+        "Provider selection or embedding calls upstream",
+        "Embedding all observations",
+        "Payroll/vendor/employee corpus expansion",
+        "Bulk indexing or publication in this turn"
+      ],
+      "materialization_notes": [
+        "Recheck KS-650 availability before creating; reference KS-595 as the exporter infrastructure owner and KS-600/601 as canonical legal/account owners.",
+        "Missing registration/extraction is bounded reuse of existing infrastructure for milestone records, not a replacement harvest or a separate source-registration implementation ticket."
+      ]
+    },
+    {
+      "id": "T-003",
+      "canonical_ticket_id": "KS-651",
+      "repository": "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan",
+      "ticket_operation": "create",
+      "title": "Freeze a reviewed real-source cross-bill generalization benchmark",
+      "goal": "Provide source-backed expected answers and an unseen positive bill/agency case that establish whether the combined retrieval and graph path generalizes beyond the school-finance pilot.",
+      "acceptance": "A reviewed and versioned benchmark freezes coverage, source snapshots, labels, nontrivial denominators and thresholds before tuning for at least three enacted bills, two sessions, two fiscal years, three agencies and multiple legal operations, with positive and no-path/gap cases. A reviewer-controlled held-out positive bill/agency answer set remains unavailable to development/tuning; every numeric expected answer is reproducible from retained sources and derivations.",
+      "acceptance_checks": [
+        "Create a sibling to KS-613; retain that ticket unchanged except its sibling pointer. Do not widen the school-finance slice or require its separately evidenced payments, forecast/outcome deliverables, or entire acceptance epic for this narrower milestone.",
+        "Freeze the coverage matrix, source/snapshot identities, exact-code and natural-language queries, answer labels, train/tune/held-out split, denominators and threshold policy before tuning. Require at least three enacted bills across two sessions/two FYs/three agencies and multiple action types. Include nontrivial positive cases so all-refusal or generic-keyword behavior cannot pass.",
+        "Reserve at least one positive held-back bill/agency case with reviewer-controlled answer labels withheld from prompt, extraction, retrieval and threshold tuning. Do not reuse a tuned bill under a new label or count another Education-account variant as independent generalization. Report held-out results separately and revise the benchmark explicitly if the holdout is contaminated.",
+        "Retained seven 2023-2025 Session Laws books are available source candidates, not mandatory new acquisition or proof of eligibility. Inspect source/custody registration and exact-span readiness; use existing narrative retrieval where suitable. Other retained enacted sources may satisfy diversity if pilot examples do not. Downloaded file counts and source/dimension inventory snapshots do not prove public eligibility.",
+        "Verify each expected legal/account fact through KS-600/601 and retained evidence. Numeric labels require exact retained sources, the relevant snapshot, and reproducible typed derivations; do not inherit the pilot $4M or other bill-specific constants as expected answers without supporting evidence. Benchmark annotations cannot become a second canonical fact store.",
+        "Include source gaps, wrong-year and wrong-agency code/alias lookalikes, unknown subunit, ambiguous crosswalks, recommendation-versus-enacted evidence, cumulative snapshot duplication, transfer consolidation, action/fact double counting, multi-input derivation joint lineage, bounded amendments/vetoes/conditions/no-limit and missing effective dates where source cases permit. Explicit no-path cases must coexist with source-backed successful paths.",
+        "Reviewers can reproduce expected answers from a versioned source/provenance bundle and validate diversity and leakage checks without exposing held-out labels to development. Synthetic fixtures remain mechanics/security proof and cannot satisfy product acceptance."
+      ],
+      "suspected_files": [
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-651.md",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-613.md",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-600.md",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/KS-601.md",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/appropriation-action.schema.json",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/derivation.schema.json",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/contracts/civic-impact/intelligence-snapshot.schema.json",
+        "/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/docs/existinglawexpert/pipeline/manifests/download_manifest_20260301_045737.json"
+      ],
+      "proposed_contracts_to_ground": [
+        "Versioned real-source benchmark manifest and reviewer-controlled answer/reproduction bundle; ground repository location in wave 2."
+      ],
+      "dependencies": [
+        "T-001"
+      ],
+      "existing_owner_prerequisites": [
+        "Actual retained and registered source revisions/exact spans from existing source services",
+        "Reviewed canonical KS-600/601 records for selected cases, not unrelated epic completion"
+      ],
+      "out_of_scope": [
+        "Widening KS-613",
+        "Payment/forecast/outcome deliverables for this milestone",
+        "Synthetic numeric or legal truth",
+        "Using held-out labels during tuning",
+        "Unreviewed source counts as public acceptance",
+        "Starting or changing the statute harvest"
+      ],
+      "materialization_notes": [
+        "Recheck KS-651 availability; create a reviewed-real-source acceptance sibling to KS-613. The four prior bill examples remain source-selection candidates, not a frozen mandatory list or proof that diversity is already achieved.",
+        "Freeze threshold/denominator choices with the ExAIS evaluation owner before tuning; keeping the private held-out answers unavailable is a reviewer custody requirement, not a request to commit them to shared development artifacts."
+      ]
+    },
+    {
+      "id": "T-004",
+      "canonical_ticket_id": "WAVE-133",
+      "repository": "/Users/mfrieson/Developer/exais-vector-store-ovh",
+      "ticket_operation": "create",
+      "title": "Project canonical identities and typed structured evidence into the fiscal graph",
+      "goal": "Replace the current provision identity and document-only evidence constraints with a rebuildable ExAIS projection of the upstream canonical contract.",
+      "acceptance": "A versioned ExAIS projection accepts the upstream second record type, distinguishes canonical provision/entity IDs from evidence spans, supports structured-only CSV evidence and document spans, preserves typed derivation run semantics and lifecycle provenance, and validates complete bounded multi-bill/FY graph manifests without inventing edges or losing another active partition.",
+      "acceptance_checks": [
+        "Supersede SourceSpan-as-enacted-provision-ID in WAVE-130/CELL_GRAPH_PROFILES and the v1 requirement that every entity have a document/chunk binding. Mark these as historical implementation constraints and define migration/compatibility behavior without claiming the existing runtime is already corrected.",
+        "Consume upstream canonical identity/revision and KS-600 provision references. Model structured CSV dimension/observation evidence separately from source/document spans, allowing structured-only entities with valid retained evidence. Preserve raw/parsed revisions, record/section locators, precise source bindings and observation/effective dates without inventing dates or PDFs.",
+        "Preserve typed relationship direction, legal action role, agency/fund/account/FY scope, evidence, eligibility, revision and typed derivation references/run context. Support enacted provision to appropriation action to fiscal-year account to agency/fund with exact legal and supporting budget evidence. Represent joint derivation lineage without automatically materializing every input/output pair as one-to-one correspondence.",
+        "Do not create edges from semantic similarity, section-number equality, unresolved statute History or normalized account labels. Stronger legal lineage or action/fact edges require explicit source-backed upstream correspondence.",
+        "Define bounded partitions/batches and complete manifest accounting for multiple bills, years, and source revisions; reject incomplete/truncated activation. Loading another bill does not silently replace the first. Preserve immutable source/run/snapshot identity and a migration/rollback route for supported prior artifacts.",
+        "Focused contract/persistence tests cover structured-only and document-span evidence, identity stability under re-extraction, separation across legal versions, joint-lineage edge rejection, typed path provenance/direction, multiple coexisting partitions, incomplete manifests, and valid prior document records."
+      ],
+      "suspected_files": [
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-133.md",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-130.md",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_graph.py",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_graph_artifact.py",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/scripts/release/kansas-fiscal-corpus-audit.py"
+      ],
+      "proposed_contracts_to_ground": [
+        "Exact CELL_GRAPH_PROFILES documentation path and canonical projection schema/persistence surfaces require wave 2 grounding."
+      ],
+      "dependencies": [
+        "T-001",
+        "T-002"
+      ],
+      "parent_ticket": "WAVE-132",
+      "out_of_scope": [
+        "Canonical civic graph ownership in ExAIS",
+        "New graph engine or universal ontology",
+        "Unbounded graph limits",
+        "Fabricated document/chunk bindings",
+        "Inferred Cartesian derivation edges",
+        "Global policy changes"
+      ],
+      "materialization_notes": [
+        "Recheck WAVE-133 allocation. Treat WAVE-132 as the reopened parent, not an already-passed prerequisite or a cyclic implementation dependency.",
+        "Amend governing v1 docs as historical constraints plus explicit replacement requirements; runtime implementation belongs to subsequent execution, not this planning turn."
+      ]
+    },
+    {
+      "id": "T-005",
+      "canonical_ticket_id": "WAVE-134",
+      "repository": "/Users/mfrieson/Developer/exais-vector-store-ovh",
+      "ticket_operation": "create",
+      "title": "Ingest scoped projections with consistent eligibility and lifecycle",
+      "goal": "Keep semantic descriptions, exact records and derived graph projections aligned with upstream publication, correction and source lifecycle in the Kansas fiscal scope.",
+      "acceptance": "Existing scoped ExAIS ingestion consumes explicit upstream record dispatch and synchronizes canonical revisions, source snapshots, eligible descriptions and complete graph manifests. Ordinary semantic retrieval excludes candidates independently of graph expansion; corrections, supersession, withdrawal and removal reconcile every index, with configured embedding profiles, isolation, idempotence and rollback verified.",
+      "acceptance_checks": [
+        "Extend existing scoped API/ingestion/provider/source services to consume the upstream KS-650 document and entity/relationship record variants. Preserve document-export compatibility and use a bounded adapter if needed; StateCivics is not required to implement the provisional statecivics.fiscal-graph-publisher.v1 envelope. No direct authoritative StateCivics database writes or second exporter stack.",
+        "Record source/canonical revision, publication/correction state, snapshot/as-of, template and raw/parsed extraction identities, profile/run identity, eligibility and complete graph manifest. Apply explicit record-level prerequisites rather than assuming schema existence means producer/readiness.",
+        "Use a consistent policy for ordinary semantic search, exact retrieval, graph expansion and citation hydration. Candidates and ineligible records must be absent from ordinary semantic results even with graph expansion disabled. If private candidate preview exists, enforce separate explicit authorization. Enforce redistribution, license_profile, custody_status, current/superseded/corrected/withdrawn and removal_required handling.",
+        "Make ingest/replay idempotent and reconcile corrections/supersession/withdrawal/removal across descriptions, exact records, relationships and source citations. Activate only a complete eligible manifest; retain a prior approved snapshot and verify rollback after partial failure. Historical as-of access, if allowed, is explicit and cannot expose withdrawn material contrary to source policy.",
+        "Use each store configured embedding profile and encode queries accordingly. Keep profile compatibility and index separation explicit; canonical-ID joins do not require equal vector dimensions or raw-score comparability across stores. Any cross-store access requires an explicit allowlist and compatible declared source snapshot, with no automatic expansion.",
+        "Focused ingestion and search tests prove idempotent replay, complete-manifest activation, revision correction/removal, ordinary-search candidate exclusion, source/audience isolation, raw/parsed distinction and correctly selected query/profile pairs. Preserve other tenant/source scopes and existing uncommitted runtime work during planning."
+      ],
+      "suspected_files": [
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-134.md",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/retrieval.py",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/qdrant_adapter.py",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_graph.py",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_graph_artifact.py",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/scripts/release/kansas-fiscal-corpus-audit.py"
+      ],
+      "proposed_contracts_to_ground": [
+        "Ground existing scoped ingestion, publication/eligibility and active-manifest services in wave 2; do not assume a new owner or signature."
+      ],
+      "dependencies": [
+        "T-002",
+        "T-004"
+      ],
+      "parent_ticket": "WAVE-132",
+      "out_of_scope": [
+        "New embedding provider",
+        "Global visibility policy changes",
+        "Automatic cross-store expansion",
+        "Bulk paid indexing in this turn",
+        "OpenAI expert overwrite",
+        "Court-corpus migration",
+        "Deployment in this turn"
+      ],
+      "materialization_notes": [
+        "Recheck WAVE-134 allocation and reuse ExAIS provider/scope/lifecycle services.",
+        "The configured-profile requirement is a compatibility contract, not a mandate to select one provider or equalize dimensions across stores."
+      ]
+    },
+    {
+      "id": "T-006",
+      "canonical_ticket_id": "WAVE-135",
+      "repository": "/Users/mfrieson/Developer/exais-vector-store-ovh",
+      "ticket_operation": "create",
+      "title": "Combine exact and semantic retrieval with validated typed traversal",
+      "goal": "Answer scoped law-to-money questions through exact identifiers and semantic candidates that resolve to upstream canonical facts and supported typed paths.",
+      "acceptance": "One existing retrieval pipeline exposes provider-free exact/lexical, document-semantic, entity-description-semantic, hybrid and hybrid-plus-graph modes. Source-backed positives produce cited fiscal answers after canonical validation and bounded typed traversal; wrong-year, ambiguous, incomplete or unsupported paths remain explicit. Money and action semantics come from upstream fiscal facts/derivations, not retrieved passage totals or vector joins.",
+      "acceptance_checks": [
+        "Use existing retrieval/ranking seams for exact bill/chapter/KSA/agency/fund/account identifiers and natural-language aliases. Exact/lexical baseline and outage fallback bypass both embedding and remote reranking calls. Evaluate existing configured providers in ExAIS scope; add no provider or parallel retriever.",
+        "Semantic document and compact entity-description matches only propose candidates. Validate canonical identity, source/audience eligibility, requested FY/as-of, agency/fund/account scope, exact structured values and legal action role before bounded allowlisted typed traversal and citation hydration.",
+        "Traverse the upstream-validated enacted provision to appropriation action to fiscal-year account to agency/fund path and attached evidence with explicit source/snapshot/run provenance. Preserve joint derivation lineage and do not assert one-to-one action/fact correspondence unless explicitly supported. Do not create edges from semantic similarity, statute History references, matching section numbers or account-code normalization.",
+        "Hydrate numeric answers from canonical fiscal records and KS-600 reproducible derivations/snapshot policy. Keep action_type, stage, metric and evidence_class distinct. Never sum snippets, count linked action/fact amounts twice, combine incompatible balances/flows/transfer legs, infer zero from incomplete coverage, or classify upstream facts independently.",
+        "Cite exact legal spans or structured record evidence appropriate to each claim, disclose requested period and source/graph snapshot, and distinguish authority from actual expenditure. Return supported positive paths; disclose ambiguity/gaps and decline unsupported arithmetic rather than treating every unknown as zero or passing by refusing everything.",
+        "Query each store using its configured embedding profile. Federate only explicitly allowed canonical-ID/snapshot paths; no automatic cross-store expansion, equal-dimension requirement, raw-score comparison across profiles, free-form SQL/Cypher or global policy change.",
+        "Focused tests cover provider/reranker bypass, exact-code preservation, natural-language candidate recall, separate retrieval modes, structured validation, typed path direction/provenance, joint-derivation limits, source/ACL isolation, source-backed numeric/citation correctness, and explicit ambiguity/no-path behavior."
+      ],
+      "suspected_files": [
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-135.md",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/retrieval.py",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/qdrant_adapter.py",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_graph.py"
+      ],
+      "dependencies": [
+        "T-003",
+        "T-004",
+        "T-005"
+      ],
+      "dependency_notes": "KS-651 coverage, labels/denominators and thresholds must be frozen before tuning. General retrieval implementation may be prepared without exposure to reviewer-controlled held-out answer labels.",
+      "parent_ticket": "WAVE-132",
+      "out_of_scope": [
+        "New canonical arithmetic/account resolver in ExAIS",
+        "Semantic similarity as graph proof",
+        "Totals from partial retrieval coverage",
+        "Generated unrestricted queries",
+        "Automatic cross-store traversal",
+        "Using held-out labels in development"
+      ],
+      "materialization_notes": [
+        "Recheck WAVE-135 allocation. Ground exact existing retrieval and ranking seams in wave 2; prior draft library/version assertions are not verified facts.",
+        "Keep provider selection and benchmarking in ExAIS while preserving configured profile/query compatibility."
+      ]
+    },
+    {
+      "id": "T-007",
+      "canonical_ticket_id": "WAVE-136",
+      "repository": "/Users/mfrieson/Developer/exais-vector-store-ovh",
+      "ticket_operation": "create",
+      "title": "Evaluate real-source generalization and incremental graph value",
+      "goal": "Measure whether source-derived semantic descriptions and validated graph traversal improve diverse real law-to-money answers while preserving exact retrieval, numeric correctness and isolation.",
+      "acceptance": "A reproducible evaluator compares all five retrieval modes against the frozen KS-651 benchmark with separately reported reviewer-run positive held-out results. Frozen nontrivial thresholds require source-backed successful answers, no exact-identifier regression and material graph value over semantic-only while enforcing numeric/year/evidence accuracy and zero prohibited leakage; synthetic or all-refusal results cannot pass.",
+      "acceptance_checks": [
+        "Freeze metric definitions, mode comparisons, denominators and thresholds before tuning and bind runs to the KS-651 benchmark revision, source/snapshot/graph manifests, description template and configured provider/profile identities. Held-out answer labels remain reviewer-controlled and unavailable to development/tuning.",
+        "Compare provider-free exact/lexical, document semantic, entity-description semantic, hybrid and hybrid-plus-graph modes. Report candidate recall/ranking, complete correct path/answer rate, monetary/FY/source/citation correctness, refusal and no-path quality, audience/eligibility leakage, stale/withdrawn leakage, latency, embedding calls and storage/embedding cost.",
+        "Require positive source-backed answers across the diversity matrix and on the unseen positive bill/agency case. No post-hoc denominator exclusions, inherited pilot numeric constants, generic-keyword passes or all-refusal success. Keep failures visible, deduplicate repeated source/extraction evidence and distinguish retrieval success from answer correctness.",
+        "Set and enforce a predeclared material graph improvement criterion over semantic-only on both development/tuned and held-out groups, alongside no exact-identifier regression and hard correctness/leakage gates. Provider/profile comparisons stay within existing ExAIS provider scope and record their actual configuration/cost.",
+        "Verify that candidate records cannot leak through ordinary semantic retrieval with graph expansion disabled and that lifecycle removals and wrong-scope/source-snapshot cases cannot pass through exact retrieval, expansion or citations. Test multi-input derivation cases without fabricated pairwise edges and arithmetic without action/fact double counting.",
+        "Run reproducibility checks from the same frozen inputs and report legitimate variability. Synthetic tests remain mechanics/security proof. Produce a reviewed/versioned report with reproducible source-backed expected numeric answers/derivations and held-out evaluation evidence suitable for WAVE-132 activation gating."
+      ],
+      "suspected_files": [
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-136.md",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/scripts/release/kansas-fiscal-corpus-audit.py",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/retrieval.py",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/packages/svs_common/svs_common/fiscal_graph.py"
+      ],
+      "proposed_contracts_to_ground": [
+        "Evaluator, immutable evaluation manifest/report and reviewer holdout-run interface locations require wave 2 grounding."
+      ],
+      "dependencies": [
+        "T-003",
+        "T-006"
+      ],
+      "parent_ticket": "WAVE-132",
+      "out_of_scope": [
+        "Post-hoc threshold or label tuning",
+        "Synthetic-only product acceptance",
+        "All-refusal acceptance",
+        "New provider/vector-store migration",
+        "Broad rollout or deployment"
+      ],
+      "materialization_notes": [
+        "Recheck WAVE-136 allocation. Prior WAVE-132 synthetic/runtime PASS is baseline mechanics history, not evidence that this real-source generalization gate has passed.",
+        "A failed or contaminated held-out run remains a failed/new benchmark revision; do not silently change the labels or source population to make it pass."
+      ]
+    },
+    {
+      "id": "T-008",
+      "canonical_ticket_id": "WAVE-132",
+      "repository": "/Users/mfrieson/Developer/exais-vector-store-ovh",
+      "ticket_operation": "amend",
+      "title": "Reopen the parent for real-source acceptance and scoped activation handoff",
+      "goal": "Make WAVE-132 the explicit parent and final acceptance gate for the corrected canonical projection architecture, preserving historical mechanics proof and providing a concrete scoped activation/rollback handoff.",
+      "acceptance": "WAVE-132 is reopened for outstanding real-source product acceptance with linked KS-600/650/651 and WAVE-133 through WAVE-136 deliverables. Governing docs distinguish historical v1 mechanics/PASS from required identity/evidence/export corrections. A scoped activation package requires the passing frozen real-source report, complete eligible manifests and reproducible rollback; no runtime activation, scrape, indexing or deployment occurs in this planning turn.",
+      "acceptance_checks": [
+        "Preserve historical WAVE-132 runtime mechanics and earlier PASS evidence while explicitly reopening product acceptance; record outstanding canonical-identity, typed structured-evidence, exporter-boundary, ingestion, hybrid/traversal and generalization gates. Do not create WAVE-137 as a competing activation ticket.",
+        "Correct WAVE-130/CELL_GRAPH_PROFILES and related parent documentation by marking SourceSpan-as-provision-ID and mandatory document/chunk entity bindings as historical v1 constraints with explicit required replacements. Clarify the provisional publisher envelope is an ExAIS historical boundary, not an upstream contract requirement, and that documentation changes do not mean runtime was fixed.",
+        "Link the aligned base/enriched/build-contract/index artifacts, canonical upstream owners/new tickets, WAVE follow-ups, benchmark/reproduction evidence and operational proof. Explain compact source-derived descriptions plus exact validation and typed relationships, their limits and deferred lanes without requiring adoption of downloaded research repositories or SHA pins/submodules.",
+        "Define activation preconditions only for ks-state-civics/kansas-fiscal-documents: approved record eligibility/source allowlist, source snapshot/as-of, projection/profile/run identities, complete manifest and prior approved rollback pointer plus passing WAVE-136 frozen correctness/leakage/value thresholds. Failure or incomplete evidence prevents activation and leaves the last approved snapshot intact.",
+        "Define an operator preflight and rollback drill covering fresh scoped inventory, duplicate raw/parsed extraction revisions, exclusion of smoke/probe/delete-test artifacts without deleting them, exact-only fallback, semantic/graph disablement, withdrawal/removal, stale-source handling and audience isolation. Activation execution remains separate from this planning/documentation turn.",
+        "Record the K.S.A. harvest as already running outside checkouts; its 2,062/31,085 sections, chapter 9/91 and no failures are a dated manager-handoff report, not live completion proof. Preserve unresolved History references and standing-authority/definition/lineage roles. No scrape restart, pre-harvest canary, capture-history reimplementation or running-harvest changes remain in this tranche.",
+        "Keep the operational StateCivics checkout/data untouched and preserve ExAIS uncommitted runtime changes. Existing source/dimension counts, retained book counts, schemas and synthetic proof are inventories/contracts/mechanics, not public eligibility or real product acceptance. Do not gate this milestone on KS-613 payment/forecast/outcome work or optional full statute completion."
+      ],
+      "suspected_files": [
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-132.md",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/tickets/WAVE-130.md",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/scripts/release/kansas-fiscal-corpus-audit.py",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/build-contract.json",
+        "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/aligned/stack.index.json",
+        "/Users/mfrieson/Dropbox/AI_Projects/exai_projects/exais_vector_store/instances/ks-state-civics/research/law-and-money-backbone.md",
+        "/Users/mfrieson/Dropbox/AI_Projects/exai_projects/exais_vector_store/instances/ks-state-civics/README.md",
+        "/Users/mfrieson/Dropbox/AI_Projects/exai_projects/exais_vector_store/instances/ks-state-civics/vector-stores/kansas-fiscal-documents/README.md"
+      ],
+      "proposed_contracts_to_ground": [
+        "Actual WAVE ticket paths, CELL_GRAPH_PROFILES path, ticket indexes and activation/operator documentation require wave 2 grounding; aligned build/index files are planned wave 3 artifacts."
+      ],
+      "dependencies": [
+        "T-005",
+        "T-007"
+      ],
+      "dependency_notes": "Reopening and documentation correction happen during materialization; final parent acceptance/activation handoff depends on the completed child evidence. Children reference this parent without depending on its final closure.",
+      "out_of_scope": [
+        "New competing activation ticket",
+        "Claiming earlier mechanics PASS is current product acceptance",
+        "Runtime implementation/publication/indexing/deployment in this turn",
+        "New harvest, restart or canary",
+        "Operational StateCivics checkout edits",
+        "Corpus deletion/cleanup",
+        "Broad activation, court migration or OpenAI expert refresh"
+      ],
+      "materialization_notes": [
+        "Amend the existing WAVE-132 parent and relevant governing docs after all tranche gates; keep historical proof intact and identify the current unfulfilled acceptance explicitly.",
+        "Use only the planning worktree for upstream ticket/docs edits. The operational checkout is /Users/mfrieson/Dropbox/AI_Projects/exai_projects/Statecivicsai and is outside edit scope."
+      ]
+    }
+  ],
+  "superseded_draft_disposition": {
+    "T-001": {
+      "old_proposed_ticket_id": "KS-650",
+      "disposition": "Fold source-readiness/registration requirements into existing KS-595/597 ownership and bounded KS-650 export prerequisites, with KS-651 benchmark source inspection; no standalone seven-book source-registration ticket.",
+      "replacement_ticket_ids": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "preserved": [
+        "Retained source identity/raw-versus-parsed provenance",
+        "Exact locator readiness inspection before missing extraction",
+        "Idempotent reuse of retained Session Laws and existing custody infrastructure",
+        "No copied corpus or automatic reprocessing"
+      ],
+      "superseded": [
+        "Mandatory exactly-seven-book adoption as the entire source scope",
+        "A new competing source-registration owner"
+      ]
+    },
+    "T-002": {
+      "old_proposed_ticket_id": "KS-651",
+      "disposition": "Amend KS-600 as the sole provision/legal-reconciliation owner and consume its records through KS-650; real cross-bill acceptance belongs to the new KS-651 sibling.",
+      "replacement_ticket_ids": [
+        "T-001",
+        "T-002",
+        "T-003"
+      ],
+      "preserved": [
+        "Source-backed bill/version/provision/action relationships",
+        "Generalization without bill-specific parser branches",
+        "Conditions, directions, veto/override and bounded amendment evidence",
+        "Unsupported/no-path treatment"
+      ],
+      "superseded": [
+        "New rival legal provision/projection implementation owner",
+        "Treating prior named bill examples as a prevalidated mandatory benchmark"
+      ]
+    },
+    "T-003": {
+      "old_proposed_ticket_id": "KS-652",
+      "disposition": "Reuse KS-595/597 evidence infrastructure and KS-601 reviewed crosswalks; carry structured CSV evidence/export into KS-650 and ExAIS WAVE-133 instead of creating KS-652.",
+      "replacement_ticket_ids": [
+        "T-001",
+        "T-002",
+        "T-003",
+        "T-004"
+      ],
+      "preserved": [
+        "Structured record locators and exact amounts",
+        "Agency/FY/code-system scope, ambiguity, unknown subunit and source gaps",
+        "No fake PDFs or copied CSV corpus",
+        "Crosswalk owner and year-sensitive identity tests"
+      ],
+      "superseded": [
+        "New competing source-locator or account resolver ticket",
+        "Hardcoding the pilot account/year non-match without source review"
+      ]
+    },
+    "T-004": {
+      "old_proposed_ticket_id": "KS-653",
+      "disposition": "Replace the proposed independent semantic exporter with KS-650 extending the existing KS-595 exporter through an explicit second versioned record type.",
+      "replacement_ticket_ids": [
+        "T-002"
+      ],
+      "preserved": [
+        "Deterministic sourced entity descriptions and typed relationships",
+        "Canonical IDs, revisions, raw/parsed evidence, eligibility and lifecycle deltas",
+        "Exact fiscal values remain structured",
+        "No embedding every CSV row or quarterly total"
+      ],
+      "superseded": [
+        "Independent exporter/service stack",
+        "Assuming a guessed service path or provisional ExAIS publisher envelope is upstream authority"
+      ]
+    },
+    "T-005": {
+      "old_proposed_ticket_id": "WAVE-133",
+      "disposition": "Retain the WAVE-133 responsibility with explicit canonical provision identity, structured evidence variants and non-Cartesian typed derivation constraints.",
+      "replacement_ticket_ids": [
+        "T-004"
+      ],
+      "preserved": [
+        "Structured-only and span evidence",
+        "Typed multi-edge provenance and bounded scale",
+        "Multiple coexisting bill/FY partitions and complete-manifest validation"
+      ],
+      "superseded": [
+        "SourceSpan-as-provision identity",
+        "Document/chunk bindings mandatory for all entities",
+        "Treating WAVE-132 previous PASS as a satisfied product prerequisite"
+      ]
+    },
+    "T-006": {
+      "old_proposed_ticket_id": "WAVE-134",
+      "disposition": "Retain lifecycle-safe scoped ingestion as WAVE-134 consuming KS-650 explicit record dispatch and existing ExAIS scope/provider services.",
+      "replacement_ticket_ids": [
+        "T-005"
+      ],
+      "preserved": [
+        "Complete manifest activation and rollback",
+        "Ordinary semantic search candidate exclusion independent of graph expansion",
+        "Publication/correction/supersession/withdrawal/removal consistency",
+        "Configured profile query compatibility and canonical-ID federation"
+      ],
+      "superseded": [
+        "Requiring the StateCivics provisional ExAIS publisher envelope",
+        "Any assumption of equal vector dimensions or automatic cross-store expansion"
+      ]
+    },
+    "T-007": {
+      "old_proposed_ticket_id": "WAVE-135",
+      "disposition": "Retain exact/semantic hybrid and typed traversal as WAVE-135, consuming canonical upstream identity, arithmetic and typed lineage rather than reconstructing them.",
+      "replacement_ticket_ids": [
+        "T-006"
+      ],
+      "preserved": [
+        "Provider-free exact/lexical baseline and outage fallback",
+        "Five separable retrieval modes",
+        "Canonical validation and bounded source-backed traversal",
+        "Cited answers, explicit gaps and no raw-passage totals"
+      ],
+      "superseded": [
+        "Unverified library/version assertions as facts",
+        "Inferring pairwise action/fact edges from multi-input derivation membership"
+      ]
+    },
+    "T-008": {
+      "old_proposed_ticket_id": "KS-654",
+      "disposition": "Reassign the cross-bill benchmark to KS-651 as the reviewed real-source sibling of KS-613.",
+      "replacement_ticket_ids": [
+        "T-003"
+      ],
+      "preserved": [
+        "At least three enacted bills, two sessions, two FYs, three agencies and multiple operations",
+        "Frozen coverage/labels/denominators/thresholds before tuning",
+        "Reviewer-controlled source-backed positive unseen bill/agency case",
+        "Explicit no-path/gap cases without all-refusal success"
+      ],
+      "superseded": [
+        "Inherited numeric pilot constants as expected truth",
+        "Any widening of KS-613 or dependency on its broader payment/forecast/outcome deliverables"
+      ]
+    },
+    "T-009": {
+      "old_proposed_ticket_id": "WAVE-136",
+      "disposition": "Retain evaluation as WAVE-136 against the new KS-651 benchmark and corrected projection/retrieval contracts.",
+      "replacement_ticket_ids": [
+        "T-007"
+      ],
+      "preserved": [
+        "Five-mode comparisons and frozen thresholds",
+        "Source-backed monetary/year/citation accuracy and exact-retrieval non-regression",
+        "Material graph improvement and separately reported positive held-out results",
+        "Leakage, lifecycle, latency, cost and provider-call metrics",
+        "No post-hoc exclusions, duplicate evidence inflation, synthetic-only or all-refusal passes"
+      ],
+      "superseded": [
+        "Prior synthetic/bill-specific proof as current generalized product acceptance"
+      ]
+    },
+    "T-010": {
+      "old_proposed_ticket_id": "WAVE-137",
+      "disposition": "Fold final activation/rollback and research handoff into the reopened existing WAVE-132 parent; do not create WAVE-137.",
+      "replacement_ticket_ids": [
+        "T-008"
+      ],
+      "preserved": [
+        "Scoped complete eligible manifest and frozen benchmark activation gates",
+        "Fresh inventory with probe exclusions and duplicate extraction awareness",
+        "Fallback/disablement/withdrawal/isolation/rollback proof",
+        "Linked research brief, canonical tickets, build contract, index and evidence"
+      ],
+      "superseded": [
+        "A competing new activation ticket",
+        "Any claim planning changes activate runtime capability"
+      ]
+    },
+    "T-011": {
+      "old_proposed_ticket_id": "KS-655",
+      "disposition": "Cancel the pre-harvest canary/start package as obsolete. Preserve useful downstream identity/source-role/history constraints in KS-600, WAVE-133/135 and WAVE-132 documentation without editing the running harvest.",
+      "replacement_ticket_ids": [
+        "T-001",
+        "T-004",
+        "T-006",
+        "T-008"
+      ],
+      "preserved": [
+        "Current statutes as standing authority/definitions/evidenced lineage inputs",
+        "Raw-versus-parsed source provenance and unresolved History reference distinction",
+        "Observation time separate from legal effective time",
+        "Explicit allowlist/snapshot for any later permitted cross-store use",
+        "Dated harvest report without inferred live completion or public eligibility"
+      ],
+      "superseded": [
+        "Canary before a full harvest",
+        "Restarting or modifying the already running K.S.A. acquisition",
+        "Reimplementing existing unresolved History capture",
+        "Statute history as appropriation-to-account proof",
+        "Making optional full statute completion a fiscal milestone dependency"
+      ]
+    }
+  }
+}

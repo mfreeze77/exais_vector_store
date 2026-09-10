@@ -147,6 +147,12 @@ updatePolicy:
   removalFirst: true
 graph:
   enabled: false
+  handlerId: kansas_fiscal_law_money_graph_v1
+  profileId: ks-state-civics.kansas-fiscal-documents.v1
+  profileExample: instances/ks-state-civics/vector-stores/kansas-fiscal-documents/graph/profile.example.yaml
+  runner: scripts/release/kansas-fiscal-graphrag.py
+  searchLens: fiscal_relationships
+  boundary: State Civics fiscal store only; requires reviewed publisher evidence and an explicitly served graph run. No automatic graph expansion for semantic search.
 eval:
   command:
     - python

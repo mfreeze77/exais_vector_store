@@ -1,0 +1,173 @@
+{
+  "canonical_goal": "Enable explicitly selected, citation-preserving fiscal relationship expansion for the Kansas fiscal document store using reviewed, published StateCivics canonical evidence, while preserving ordinary document search and existing court, Topeka, and Grant behavior.",
+  "tickets": [
+    {
+      "id": "T-001",
+      "title": "Reconcile the fiscal graph artifact contract",
+      "goal": "Extend and reconcile WAVE-130 into one versioned contract for StateCivics fiscal graph projections, including entity and relationship identity, exact source spans and citations, ACL and lifecycle state, derivation-run identity, and withdrawal/version semantics without creating a competing contract.",
+      "acceptance": "WAVE-130 is updated in place and docs/CELL_GRAPH_PROFILES.md gains one fiscal v1 contract. The contract defines fiscal-specific file, node, edge, artifact, publication, evidence-class, ACL, citation, derivation-run, replacement, and withdrawal fields; requires one derivation_run_id per artifact; requires every projected assertion to bind a current ExAIS fiscal document carrying its source revision and exact non-null StateCivics source span; normalizes source revision hashes to lowercase hex; treats upstream eligibility fields as trusted exporter assertions that ExAIS validates structurally but cannot independently prove; and explicitly leaves Grant, court, and Topeka contracts unchanged. It defines type-specific eligibility: ontology dimensions require publication_status=published, resolution_status=resolved, lifecycle_status=active, and a source span; positive AccountCrosswalk edges require a positive relationship, status=published, publication_allowed=true, completed review evidence, an effective period, source references, and current revision identity. A published not_same decision is retained upstream as a valid negative decision but never emitted as a positive expansion edge; unknown, candidate, in_review, rejected, superseded, unresolved, ambiguous, or publication-disallowed crosswalks cannot create positive edges. Current ticket states are dependency signals only. Real activation depends on a dated inspection of actual candidate export rows and fields, not ticket status.",
+      "suspected_files": [
+        "tickets/WAVE-130-fiscal-graph-artifact-attribute-contract.md",
+        "docs/CELL_GRAPH_PROFILES.md",
+        "packages/svs_common/svs_common/schemas.py",
+        "packages/svs_common/svs_common/cell_graph.py"
+      ],
+      "code_refs": [
+        {"file": "tickets/WAVE-130-fiscal-graph-artifact-attribute-contract.md", "symbol": "Acceptance Criteria", "note": "Pending proposal already owns the fiscal variant contract; reconcile its stale KS-601 and source-span assumptions here rather than creating another contract."},
+        {"file": "docs/CELL_GRAPH_PROFILES.md", "symbol": "Grant graph artifact contract v1", "note": "Existing documented profile contract establishes the generation binding, accepted/public edge assertions, citation bounds, and no-silent-truncation precedent."},
+        {"file": "packages/svs_common/svs_common/grant_graph.py", "symbol": "validate_grant_graph", "note": "Concrete validation precedent for exact attributes, canonical identifiers, one generation, current cited documents, bounded artifacts, and accepted public relationships; fiscal semantics require a separate validator."},
+        {"file": "packages/svs_common/svs_common/schemas.py", "symbol": "VectorStoreGraphLoadRequest", "note": "Existing graph request envelope is reusable; fiscal provenance belongs in its node and edge attributes rather than a duplicate transport."}
+      ],
+      "proposed_new_files": [],
+      "upstream_dependencies": [
+        {"repo": "Statecivicsai", "file": "src/kansas_accountability/models/source_artifacts.py", "symbol": "SourceArtifactRevision", "proof": "Current model supplies immutable revision identity and content_hash_sha256; WAVE-130 correctly notes the database constraint guarantees length but not lowercase hex."},
+        {"repo": "Statecivicsai", "file": "src/kansas_accountability/models/source_artifacts.py", "symbol": "SourceSpan", "proof": "Current source-span model is the canonical citation identity. Real projection must require a populated span; it may not fabricate one."},
+        {"repo": "Statecivicsai", "file": "src/kansas_accountability/models/source_artifacts.py", "symbol": "DerivationRun", "proof": "Current derivation model supplies run, fingerprint, method/version, input/output hash, commit, and status lineage suitable for one-run-per-artifact binding."},
+        {"repo": "Statecivicsai", "file": "src/kansas_accountability/models/fiscal_intelligence.py", "symbol": "AccountCrosswalk", "proof": "Current implementation separates status from publication_allowed, preserves effective identity/revision fields, and explicitly models not_same as a negative relationship; it does not use the ontology publication/resolution/lifecycle triplet."},
+        {"repo": "Statecivicsai", "file": "tickets/KS-594-lock-civic-impact-intelligence-architecture-and-publication-guardrails.md", "symbol": "Prior Art", "proof": "This current repository ticket is authoritative for the architecture/publication boundary; matching tickets are resolved by present title/path rather than historical package arithmetic."},
+        {"repo": "Statecivicsai", "file": "workbench/ARCHITECTURE_AMENDMENT.md", "symbol": "One repository, explicit service authorities", "proof": "KS-627 moved Workbench into the StateCivics monorepo while preserving separate service database owners, credentials, migrations, custody, and API/event boundaries."}
+      ],
+      "external_claims": [],
+      "patterns": [
+        {"name": "separate-corpus-validator", "source": "packages/svs_common/svs_common/grant_graph.py:validate_grant_graph", "applies_to": "T-001"}
+      ]
+    },
+    {
+      "id": "T-002",
+      "title": "Add a bounded curated fiscal projection path",
+      "goal": "Define the fixture-safe and production-ready projection/derivation path that consumes reviewed StateCivics fiscal relationships, reuses the existing PostgreSQL graph loader and custody checks, and supports bounded one-hop expansion without ingesting transaction rows as narrative documents.",
+      "acceptance": "A fiscal validator and expander accept a deterministic JSONL projection under the existing VectorStoreGraphLoadRequest and PostgreSQL graph tables. The first implementable MVP preserves WAVE-130's fiscal ontology use case with fiscal_document, agency, fund, budget_unit, program, and account nodes and only source-backed describes_dimension and parent_dimension relations. It can be built and tested against fixtures now; real loading requires a new explicit StateCivics structured relationship export with stable source-revision/document/span bindings because the current narrative retrieval exporter exports documents, not canonical relationships. Ontology eligibility uses publication_status=published, resolution_status=resolved, lifecycle_status=active and a non-null source span. Account crosswalk support is additive only when upstream exports it: positive edges require status=published, publication_allowed=true, completed review evidence, effective period, source refs, current revision, and relationship in same_account, payment_reports_against_account, program_contains_account, alias_of, predecessor_of, or successor_of. not_same is a negative assertion and cannot expand positively; unknown, unresolved, candidate, ambiguous, disallowed, rejected, or superseded records cannot create a positive edge. The broader exact bill-version to appropriation/account to reviewed crosswalk to payment/outcome chain remains the product direction, but bill-version/action edges require an explicit cited upstream export and payment, observation, and impact edges remain fixture-only until their own structured cited export exists. Raw transactions never become narrative documents, amounts are never reconstructed by summing search hits, and embeddings never establish joins. Validation also enforces one derivation run, current-document joins, ACL scope, lowercase hashes, no dangling nodes, 1..20 citations per edge, fewer than 10,000 nodes and 20,000 edges, and one-hop expansion capped at 10.",
+      "suspected_files": [
+        "packages/svs_common/svs_common/cell_graph.py",
+        "packages/svs_common/svs_common/grant_graph.py",
+        "packages/svs_common/svs_common/retrieval.py",
+        "scripts/release/kansas-fiscal-document-ingest.py",
+        "instances/ks-state-civics/vector-stores/kansas-fiscal-documents/"
+      ],
+      "code_refs": [
+        {"file": "packages/svs_common/svs_common/grant_graph.py", "symbol": "validate_grant_graph", "note": "Reuse its bounded structural and provenance-validation pattern, while keeping Grant constants and gip_* attributes untouched."},
+        {"file": "packages/svs_common/svs_common/grant_graph.py", "symbol": "expand_grant_graph", "note": "Reuse its ACL-scoped SQL, file hydration, exact generation filter, citation metadata, and 0..10 expansion behavior with fiscal attribute names."},
+        {"file": "apps/api/svs_api/main.py", "symbol": "_load_vector_store_graph", "note": "Existing tenant/business/store-scoped PostgreSQL loader handles dry-run, replace, upsert, and counts; do not add another graph database or direct source-package writes."},
+        {"file": "packages/svs_common/svs_common/retrieval.py", "symbol": "hydrate_authorized_vector_store_chunks", "note": "Existing authorized chunk hydration is the ACL/citation boundary fiscal expansion must retain."},
+        {"file": "scripts/release/kansas-fiscal-document-ingest.py", "symbol": "_record_attributes", "note": "Current fiscal file attributes include logical document and source revision provenance; the fiscal contract must add the matching projection keys here or via one owned helper."}
+      ],
+      "proposed_new_files": [
+        {"file": "packages/svs_common/svs_common/fiscal_graph.py", "purpose": "Own fiscal constants, attribute validation, publication assertions, bounded expansion, and graph coverage without widening Grant vocabulary."},
+        {"file": "scripts/release/kansas-fiscal-graphrag-extract.py", "purpose": "Convert an operator-supplied reviewed/published StateCivics export into the bounded ExAIS graph artifact; fixtures may run without upstream publication but are marked fixture_only."},
+        {"file": "scripts/release/kansas-fiscal-graphrag-load.py", "purpose": "Validate and submit fiscal artifacts through the existing graph API with dry-run as the default release step."}
+      ],
+      "upstream_dependencies": [
+        {"repo": "Statecivicsai", "file": "tickets/KS-598-model-kansas-agencies-funds-programs-budget-units-and-account-codes.md", "symbol": "Prior Art", "proof": "The current repository implementation and ticket document the fiscal ontology and loader. Whether any row is export-eligible must be established from its actual publication_status, resolution_status, lifecycle_status, source span, and custody fields."},
+        {"repo": "Statecivicsai", "file": "tickets/KS-601-build-kansas-budget-account-crosswalk-and-actual-payment-bridge.md", "symbol": "BLOCKER: civic_fiscal_dimension_aliases is empty", "proof": "The heading is stale relative to the same ticket's implementation log: 229,591 candidate aliases now exist. They remain publication_status=candidate, so they unblock fixture shape work but do not unblock public crosswalk edges."},
+        {"repo": "Statecivicsai", "file": "tickets/KS-612-ingest-recipient-payments-and-observed-outcome-datasets.md", "symbol": "Acceptance Criteria Status — unchanged", "proof": "Acquisition/custody work exists, but the narrative exporter excludes raw transaction records and no verified structured relationship export currently binds payment/outcome rows to ExAIS documents and spans."},
+        {"repo": "Statecivicsai", "file": "src/kansas_accountability/services/civic_impact/retrieval_exporter.py", "symbol": "export_record_id", "proof": "Current exporter produces narrative retrieval records keyed to source revisions; no current symbol exports the proposed graph relationship envelope."},
+        {"repo": "Statecivicsai", "file": "contracts/civic-impact/account-crosswalk.schema.json", "symbol": "StateCivics Budget Account Crosswalk", "proof": "Current repository contract defines typed positive and negative relationships, effective period, source refs, status, publication_allowed, revision, and review; eligibility must follow these fields rather than the ontology triplet."},
+        {"repo": "Statecivicsai", "file": "tickets/KS-613-deliver-kansas-school-finance-civic-impact-vertical-slice.md", "symbol": "Prior Art", "proof": "The current repository ticket carries the SB 125 product direction and implementation corrections. Payment/outcome graph edges remain dependent on its structured canonical evidence, not the historical package fixture alone."}
+      ],
+      "external_claims": [],
+      "patterns": [
+        {"name": "api-routed-postgres-graph-load", "source": "apps/api/svs_api/main.py:_load_vector_store_graph", "applies_to": "T-002"},
+        {"name": "authorized-citation-hydration", "source": "packages/svs_common/svs_common/grant_graph.py:expand_grant_graph", "applies_to": "T-002"}
+      ]
+    },
+    {
+      "id": "T-003",
+      "title": "Bind fiscal graph search and API routing safely",
+      "goal": "Register the fiscal graph profile and explicit search lens using the existing profile binding, loader, ACL, and citation checks, while keeping ordinary fiscal document search and existing court, Topeka, and Grant routing unchanged.",
+      "acceptance": "A kansas_fiscal_documents handler/profile and explicit fiscal_relationships lens are registered without changing Grant constants or the separate court/Topeka branches. The initial lens exposes only describes_dimension and parent_dimension for an eligible cited ontology artifact and applies one-hop expansion with a 0..10 limit. Later relation types are not advertised as available until an explicit upstream structured export and fixtures exist for their type-specific eligibility. The API dispatches fiscal validation and expansion only for a store whose corpus, profile binding, resolved store identity, non-fixture artifact metadata, and derivation filter match. Semantic search never auto-expands; unavailable, empty, unpublished, withdrawn, fixture-only, or mismatched configurations fail closed. The route validates exporter assertions and citation/document consistency but does not claim to independently verify StateCivics review decisions. Existing Grant, court, and Topeka route tests remain green.",
+      "suspected_files": [
+        "docs/CELL_GRAPH_PROFILES.md",
+        "packages/svs_common/svs_common/cell_graph.py",
+        "packages/svs_common/svs_common/search_lenses.py",
+        "packages/svs_common/svs_common/retrieval.py",
+        "apps/api/svs_api/main.py"
+      ],
+      "code_refs": [
+        {"file": "packages/svs_common/svs_common/cell_graph.py", "symbol": "GRAPH_HANDLERS", "note": "Current allowlist contains only the Grant handler; add the fiscal handler/corpus pair while retaining exact store/profile binding."},
+        {"file": "packages/svs_common/svs_common/cell_graph.py", "symbol": "cell_graph_profile_for_store", "note": "Existing binding checks instance slug, tenant, business instance, store id, corpus, and profile id and fails closed."},
+        {"file": "packages/svs_common/svs_common/search_lenses.py", "symbol": "SEARCH_LENS_REGISTRY", "note": "Typed registry owns explicit graph lenses; add one fiscal entry and leave semantic, Grant, court, and municipal entries intact."},
+        {"file": "packages/svs_common/svs_common/search_lenses.py", "symbol": "resolve_search_lens", "note": "Existing lens availability logic already rejects disabled, empty, planned, and unsupported lenses."},
+        {"file": "apps/api/svs_api/main.py", "symbol": "_cell_graph_profile_or_503", "note": "Current early corpus gate admits only reviewed_public_grant_evidence. Generalize narrowly to registered cell-profile corpora rather than affecting court/Topeka env routing."},
+        {"file": "apps/api/svs_api/main.py", "symbol": "load_vector_store_graph", "note": "Current route invokes Grant validation only for Grant corpus; add explicit fiscal dispatch before the shared loader."}
+      ],
+      "proposed_new_files": [],
+      "upstream_dependencies": [
+        {"repo": "Statecivicsai", "file": "tickets/KS-601-build-kansas-budget-account-crosswalk-and-actual-payment-bridge.md", "symbol": "AC1", "proof": "Public bridge relationships must resolve through reviewed decisions and source evidence; ExAIS validates the exported assertion fields but does not manufacture or independently certify the review."},
+        {"repo": "Statecivicsai", "file": "docs/specs/civic-impact-intelligence/05_FISCAL_IMPACT_AND_OUTCOME_ENGINE.md", "symbol": "Fiscal lifecycle", "proof": "The broader exact-version through fiscal authority to actuals/outcomes chain guides future relations, while the initial ExAIS lens can ship independently for the smaller cited ontology projection."}
+      ],
+      "external_claims": [],
+      "patterns": [
+        {"name": "explicit-lens-only-expansion", "source": "packages/svs_common/svs_common/search_lenses.py:resolve_search_lens", "applies_to": "T-003"},
+        {"name": "exact-cell-profile-binding", "source": "packages/svs_common/svs_common/cell_graph.py:cell_graph_profile_for_store", "applies_to": "T-003"}
+      ]
+    },
+    {
+      "id": "T-004",
+      "title": "Gate fiscal source identity and activation",
+      "goal": "Resolve the actual Kansas fiscal document store identity and define release gates that separate safe fixture evaluation from real-corpus publication and activation, including the current upstream KS-601 review dependency.",
+      "acceptance": "A read-only identity check resolves the actual runtime store by ID, tenant/business scope, corpus attribute, source-package identity, and current document-attribute consistency; document/chunk counts are recorded only as a dated diagnostic snapshot and never become activation constants. The placeholder and any same-named store that fails those checks are rejected. Activation requires a non-fixture artifact under hard graph bounds, matching file attributes, one derivation run, and a dated inspection of the actual exported rows proving the relevant type-specific eligibility, custody, lifecycle, source-revision, and span fields. The first activation may cover only eligible agency/account ontology relationships; it does not wait for the future impact engine. Crosswalk, payment, observation, and impact relations remain unavailable until their explicit structured exports and eligibility proofs exist. ExAIS structurally validates those exported assertions and fails closed but does not independently prove upstream human review. Dry-run and fixture evaluation can proceed earlier; profile enabled remains false until the applicable gates pass. Existing document ingestion, Marker handoff, and recall proof remain intact.",
+      "suspected_files": [
+        "scripts/release/kansas-fiscal-document-ingest.py",
+        "instances/ks-state-civics/vector-stores/kansas-fiscal-documents/",
+        "packages/svs_common/svs_common/expert_profiles.py",
+        "docs/CELL_GRAPH_PROFILES.md"
+      ],
+      "code_refs": [
+        {"file": "instances/ks-state-civics/vector-stores/kansas-fiscal-documents/store.yaml", "symbol": "vectorStore.id", "note": "Still contains vs_kansas_fiscal_documents_pending and graph.enabled=false; replace the placeholder only through an identity-proofed release change."},
+        {"file": "instances/ks-state-civics/vector-stores/kansas-fiscal-documents/sources/statecivics-fiscal-ledger/source.yaml", "symbol": "graph.enabled", "note": "Current source package deliberately disables GraphRAG and has no graph extract/load/eval commands."},
+        {"file": "scripts/release/kansas-fiscal-document-ingest.py", "symbol": "main", "note": "Current fallback selects the placeholder when no vector-store id is supplied; activation must require an explicit resolved ID."},
+        {"file": "scripts/release/instance_source_packages.py", "symbol": "validate_source_package", "note": "Existing package validator requires commands and proof artifacts when graph.enabled is true; extend package fields only after release gates are concrete."},
+        {"file": "instances/ks-state-civics/graph/profile.yaml", "symbol": "spec.enabled", "note": "Checked-in cell profile is disabled, Grant-bound, and intentionally leaves the fiscal store unresolved; fiscal binding must be separate and disabled by default."}
+      ],
+      "proposed_new_files": [
+        {"file": "scripts/release/kansas-fiscal-graphrag-eval.py", "purpose": "Emit fixture or real-corpus proof with explicit artifact class, graph bounds, publication assertion, store identity, derivation identity, citations, and lifecycle checks."}
+      ],
+      "upstream_dependencies": [
+        {"repo": "Statecivicsai", "file": "tickets/KS-595-create-immutable-source-artifact-and-derivation-ledger.md", "symbol": "Prior Art", "proof": "Current repository custody implementation is the source for revision, derivation, and span checks; ticket status is only a planning signal."},
+        {"repo": "Statecivicsai", "file": "src/kansas_accountability/services/civic_impact/source_evidence_service.py", "symbol": "SourceEvidenceService", "proof": "Current code explicitly handles absent source spans; real activation must inspect actual span resolution rather than infer readiness from ticket state."},
+        {"repo": "Statecivicsai", "file": "src/kansas_accountability/models/fiscal_intelligence.py", "symbol": "FiscalDimension", "proof": "Current ontology rows expose the publication, resolution, lifecycle, custody, span, and derivation fields needed for a dated eligibility query."},
+        {"repo": "Statecivicsai", "file": "src/kansas_accountability/models/fiscal_intelligence.py", "symbol": "AccountCrosswalk", "proof": "Current crosswalk eligibility is separately queryable through status, publication_allowed, relationship, effective period, review lineage, source refs, and revision; no ticket status substitutes for this proof."}
+      ],
+      "external_claims": [],
+      "patterns": [
+        {"name": "disabled-until-proofed-source-package", "source": "instances/ks-state-civics/vector-stores/kansas-fiscal-documents/sources/statecivics-fiscal-ledger/source.yaml:graph.enabled", "applies_to": "T-004"}
+      ]
+    },
+    {
+      "id": "T-005",
+      "title": "Prove fiscal graph lifecycle and domain isolation",
+      "goal": "Provide fixture-based characterization and release evidence for citation fidelity, ACL isolation, version and withdrawal behavior, bounded expansion, and preservation of ordinary search plus the court, Topeka, and Grant graph domains.",
+      "acceptance": "Tests prove valid synthetic agency/account ontology artifacts, malformed or ineligible assertion rejection, exact derivation equality, lowercase hashes, non-null node citations and 1..20 edge citations, current-document/file joins, ACL isolation, no cross-tenant or cross-store reads, hard artifact bounds, one-hop and 0..10 result bounds, replacement, withdrawal, fixture-only activation rejection, and semantic search never auto-expanding. Crosswalk fixtures separately prove that eligible positive relations may expand, published not_same remains a negative decision with no positive expansion, and candidate, ambiguous, unknown, unresolved, publication-disallowed, unreviewed, rejected, or superseded decisions cannot create positive edges. An SB 125 fixture may characterize the future exact-version/account/payment direction, but candidate crosswalk, payment, observation, and impact portions remain fixture-only and are not advertised as real-corpus support. Regression tests retain Grant binding/validation, court and Topeka routes, and ordinary fiscal document search. The eval separates fixture proof from real-corpus proof; real proof requires resolved store scope, an explicit current structured relationship export, derivation/artifact identity, type-specific eligibility results, and citation coverage. It reports what ExAIS validated and does not claim independent verification of upstream review.",
+      "suspected_files": [
+        "packages/svs_common/svs_common/kscourts_graphrag.py",
+        "packages/svs_common/svs_common/cell_graph.py",
+        "packages/svs_common/svs_common/retrieval.py",
+        "apps/api/svs_api/main.py",
+        "tests/"
+      ],
+      "code_refs": [
+        {"file": "tests/test_grant_cell_graph.py", "symbol": "test_graph_structural_contract_accepts_bound_synthetic_artifact", "note": "Existing synthetic artifact proof is the closest fixture pattern for fiscal validation."},
+        {"file": "tests/test_grant_cell_graph.py", "symbol": "test_expansion_reuses_acl_hydration_filters_bounds_and_citations", "note": "Existing proof covers authorized hydration, filters, caps, and citation metadata."},
+        {"file": "tests/test_grant_cell_graph.py", "symbol": "test_semantic_default_never_auto_expands_grant", "note": "Preserve the default semantic-search isolation invariant for fiscal routing."},
+        {"file": "tests/test_openai_responses_routes.py", "symbol": "test_openai_vector_store_search_page_explicit_court_lens_forces_graphrag", "note": "Existing court explicit-lens routing regression boundary."},
+        {"file": "tests/test_openai_responses_routes.py", "symbol": "test_openai_vector_store_search_page_explicit_topeka_history_lens_expands_ordinance_pdf", "note": "Existing separate Topeka graph route regression boundary."},
+        {"file": "tests/test_instance_source_packages.py", "symbol": "test_ks_civics_source_package_validates_in_production", "note": "Existing source-package validation proof must remain green as graph fields are added."}
+      ],
+      "proposed_new_files": [
+        {"file": "tests/test_fiscal_cell_graph.py", "purpose": "Own fiscal validator, fixture, routing, lifecycle, ACL, citation, bound, and domain-isolation regression tests."},
+        {"file": "instances/ks-state-civics/vector-stores/kansas-fiscal-documents/graph/fixture-v1.json", "purpose": "Small synthetic, explicitly fixture_only fiscal artifact with no production eligibility."}
+      ],
+      "upstream_dependencies": [
+        {"repo": "Statecivicsai", "file": "contracts/civic-impact/retrieval-export-record.schema.json", "symbol": "Retrieval export record JSON Schema", "proof": "Current exporter contract establishes document records and provenance but has no relationship publication envelope; tests must use a proposed fixture schema until StateCivics publishes the real graph export contract."},
+        {"repo": "Statecivicsai", "file": "tickets/KS-601-build-kansas-budget-account-crosswalk-and-actual-payment-bridge.md", "symbol": "AC1", "proof": "Real-corpus crosswalk proof remains gated on reviewed decision plus source evidence; fixture proof is unblocked and must be labeled non-public."}
+        ,{"repo": "Statecivicsai", "file": "tickets/KS-613-deliver-kansas-school-finance-civic-impact-vertical-slice.md", "symbol": "Prior Art", "proof": "Current repository ticket, not the historical package numbering, governs the SB 125 direction; until its cited structured records are exported, those graph portions remain fixture-only."}
+        ,{"repo": "Statecivicsai", "file": "tickets/KS-624-prove-closed-loop-statecivics-workbench-kansas-reference-vertical.md", "symbol": "Prior Art", "proof": "Current closed-loop roadmap is not a prerequisite for the basic agency/account GraphRAG projection."}
+      ],
+      "external_claims": [],
+      "patterns": [
+        {"name": "synthetic-contract-characterization", "source": "tests/test_grant_cell_graph.py:test_graph_structural_contract_accepts_bound_synthetic_artifact", "applies_to": "T-005"},
+        {"name": "cross-domain-route-regression", "source": "tests/test_openai_responses_routes.py:test_openai_vector_store_search_page_explicit_topeka_history_lens_expands_ordinance_pdf", "applies_to": "T-005"}
+      ]
+    }
+  ]
+}

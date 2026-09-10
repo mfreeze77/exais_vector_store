@@ -1,0 +1,67 @@
+{
+  "canonical_goal": "Enable explicitly selected, citation-preserving fiscal relationship expansion for the Kansas fiscal document store using reviewed, published StateCivics canonical evidence, while preserving ordinary document search and existing court, Topeka, and Grant behavior.",
+  "tickets": [
+    {
+      "id": "T-001",
+      "title": "Reconcile the fiscal graph artifact contract",
+      "goal": "Extend and reconcile WAVE-130 into one versioned contract for StateCivics fiscal graph projections, including entity and relationship identity, exact source spans and citations, ACL and lifecycle state, derivation-run identity, and withdrawal/version semantics without creating a competing contract.",
+      "acceptance": "WAVE-130 is updated or explicitly superseded in place with a versioned, reviewable contract that represents the required fiscal node/edge provenance, ACL, publication/review state, source spans, derivation run, withdrawal, and version fields; the contract states that fixture artifacts may be used only for isolated evaluation and that production/publication requires reviewed upstream StateCivics evidence and an approved publication decision; no contract changes alter court, Topeka, or Grant graph domains.",
+      "suspected_files": [
+        "tickets/WAVE-130-fiscal-graph-artifact-attribute-contract.md",
+        "packages/svs_common/svs_common/schemas.py",
+        "packages/svs_common/svs_common/cell_graph.py"
+      ]
+    },
+    {
+      "id": "T-002",
+      "title": "Add a bounded curated fiscal projection path",
+      "goal": "Define the fixture-safe and production-ready projection/derivation path that consumes reviewed StateCivics fiscal relationships, reuses the existing PostgreSQL graph loader and custody checks, and supports bounded one-hop expansion without ingesting transaction rows as narrative documents.",
+      "acceptance": "A deterministic derivation path is specified for one curated projection per artifact and one derivation run per artifact, with exact citations/source spans, ACL-preserving nodes and edges, lifecycle withdrawal and version handling, and limits below 10,000 nodes and 20,000 edges; fixture execution is isolated and cannot publish or activate data, while production execution is blocked unless the upstream artifact is reviewed and published; no new graph database, duplicate graph engine, embedding-inferred join, unrestricted traversal, or narrative transaction ingestion is introduced.",
+      "suspected_files": [
+        "packages/svs_common/svs_common/cell_graph.py",
+        "packages/svs_common/svs_common/grant_graph.py",
+        "packages/svs_common/svs_common/retrieval.py",
+        "scripts/release/kansas-fiscal-document-ingest.py",
+        "instances/ks-state-civics/vector-stores/kansas-fiscal-documents/"
+      ]
+    },
+    {
+      "id": "T-003",
+      "title": "Bind fiscal graph search and API routing safely",
+      "goal": "Register the fiscal graph profile and explicit search lens using the existing profile binding, loader, ACL, and citation checks, while keeping ordinary fiscal document search and existing court, Topeka, and Grant routing unchanged.",
+      "acceptance": "A fiscal profile/lens is addressable only when its reviewed published artifact and runtime store identity are present; selected fiscal relationship expansion performs bounded one-hop traversal with citation and ACL checks, ordinary document search remains available, and requests for unpublished, withdrawn, fixture-only, or unresolved-store fiscal data fail closed; existing court, Topeka, and Grant profiles and routes continue to resolve and behave as before.",
+      "suspected_files": [
+        "docs/CELL_GRAPH_PROFILES.md",
+        "packages/svs_common/svs_common/cell_graph.py",
+        "packages/svs_common/svs_common/search_lenses.py",
+        "packages/svs_common/svs_common/retrieval.py",
+        "apps/api/svs_api/main.py"
+      ]
+    },
+    {
+      "id": "T-004",
+      "title": "Gate fiscal source identity and activation",
+      "goal": "Resolve the actual Kansas fiscal document store identity and define release gates that separate safe fixture evaluation from real-corpus publication and activation, including the current upstream KS-601 review dependency.",
+      "acceptance": "The fiscal source package records or resolves the actual runtime store ID before activation and rejects a guessed or placeholder ID; release checks distinguish fixture-only evaluation from production activation, require a current StateCivics publication/review decision for the fiscal artifact (including rechecking KS-601 rather than assuming its status), and prevent unreviewed or unpublished relationships from becoming public; existing fiscal ingestion, embeddings, source revision provenance, and Marker Markdown handoff remain intact.",
+      "suspected_files": [
+        "scripts/release/kansas-fiscal-document-ingest.py",
+        "instances/ks-state-civics/vector-stores/kansas-fiscal-documents/",
+        "packages/svs_common/svs_common/expert_profiles.py",
+        "docs/CELL_GRAPH_PROFILES.md"
+      ]
+    },
+    {
+      "id": "T-005",
+      "title": "Prove fiscal graph lifecycle and domain isolation",
+      "goal": "Provide fixture-based characterization and release evidence for citation fidelity, ACL isolation, version and withdrawal behavior, bounded expansion, and preservation of ordinary search plus the court, Topeka, and Grant graph domains.",
+      "acceptance": "An executable fixture evaluation proves exact source citations/spans, ACL isolation, one-hop and size bounds, artifact version replacement, lifecycle withdrawal, and fail-closed behavior for unpublished or fixture-only data; a separate production-release checklist records upstream review/publication evidence and the resolved store identity before activation; regression checks demonstrate ordinary document search and existing court, Topeka, and Grant behavior remain unchanged, and fixture results are clearly marked as non-public proof.",
+      "suspected_files": [
+        "packages/svs_common/svs_common/kscourts_graphrag.py",
+        "packages/svs_common/svs_common/cell_graph.py",
+        "packages/svs_common/svs_common/retrieval.py",
+        "apps/api/svs_api/main.py",
+        "tests/"
+      ]
+    }
+  ]
+}
