@@ -289,6 +289,160 @@ def api_json_via_direct_http(
         raise RuntimeError(f"{method} {url} failed with HTTP {exc.code}: {raw[:1200]}") from exc
 
 
+def api_bytes(
+    method: str,
+    api_base: str,
+    path: str,
+    *,
+    headers: dict[str, str],
+    timeout: int = 120,
+    cell: str = DEFAULT_CELL,
+    transport: str = "auto",
+) -> bytes:
+    """Fetch bytes without logging response content.
+
+    Extraction artifacts can contain an entire source document. Logging even a
+    truncated body would bypass normal document access controls and make
+    operator logs an accidental content store.
+    """
+    url = f"{api_base.rstrip('/')}{path}"
+    if transport == "host-curl":
+        return _api_bytes_via_curl(
+            _host_curl_args(), method, url, headers=headers, timeout=timeout
+        )
+    if transport == "api-container":
+        parts = urlsplit(url)
+        container_url = urlunsplit(
+            (parts.scheme, "127.0.0.1:8080", parts.path, parts.query, parts.fragment)
+        )
+        return _api_bytes_via_curl(
+            ["docker", "exec", "-i", f"{project_name(cell)}-api-1", "curl"],
+            method,
+            container_url,
+            headers=headers,
+            timeout=timeout,
+        )
+    if transport == "docker-network":
+        parts = urlsplit(url)
+        network_url = urlunsplit(
+            (parts.scheme, "api:8080", parts.path, parts.query, parts.fragment)
+        )
+        if not shutil.which("docker"):
+            return _api_bytes_via_direct_http(
+                method, network_url, headers=headers, timeout=timeout
+            )
+        return _api_bytes_via_curl(
+            [
+                "docker",
+                "run",
+                "--rm",
+                "-i",
+                "--network",
+                compose_network_name(cell),
+                "curlimages/curl:8.10.1",
+            ],
+            method,
+            network_url,
+            headers=headers,
+            timeout=timeout,
+        )
+    if transport != "auto":
+        raise ValueError(f"Unsupported API transport: {transport}")
+    try:
+        return _api_bytes_via_direct_http(method, url, headers=headers, timeout=timeout)
+    except error.URLError:
+        try:
+            return _api_bytes_via_curl(
+                _host_curl_args(), method, url, headers=headers, timeout=timeout
+            )
+        except Exception:
+            parts = urlsplit(url)
+            container_url = urlunsplit(
+                (
+                    parts.scheme,
+                    "127.0.0.1:8080",
+                    parts.path,
+                    parts.query,
+                    parts.fragment,
+                )
+            )
+            return _api_bytes_via_curl(
+                [
+                    "docker",
+                    "exec",
+                    "-i",
+                    f"{project_name(cell)}-api-1",
+                    "curl",
+                ],
+                method,
+                container_url,
+                headers=headers,
+                timeout=timeout,
+            )
+
+
+def _host_curl_args() -> list[str]:
+    curl = shutil.which("curl.exe") or shutil.which("curl")
+    if not curl:
+        raise RuntimeError("curl executable was not found")
+    return [curl]
+
+
+def _api_bytes_via_direct_http(
+    method: str,
+    url: str,
+    *,
+    headers: dict[str, str],
+    timeout: int,
+) -> bytes:
+    req = request.Request(url, headers=headers, method=method)
+    try:
+        with request.urlopen(req, timeout=timeout) as resp:
+            raw = resp.read()
+            print(
+                f"{method} {url} -> {resp.status} bytes={len(raw)} "
+                f"sha256={hashlib.sha256(raw).hexdigest()}"
+            )
+            return raw
+    except error.HTTPError as exc:
+        exc.read()
+        raise RuntimeError(f"{method} {url} failed with HTTP {exc.code}") from exc
+
+
+def _api_bytes_via_curl(
+    prefix: list[str],
+    method: str,
+    url: str,
+    *,
+    headers: dict[str, str],
+    timeout: int,
+) -> bytes:
+    marker = b"\n__SVS_HTTP_STATUS__:"
+    args = [*prefix, "-sS", "-w", marker.decode() + "%{http_code}", "-X", method]
+    for key, value in headers.items():
+        args += ["-H", f"{key}: {value}"]
+    args.append(url)
+    print("$ " + redact_command(args))
+    proc = subprocess.run(
+        args,
+        capture_output=True,
+        timeout=timeout,
+        check=False,
+    )
+    output = proc.stdout or b""
+    body, separator, raw_status = output.rpartition(marker)
+    if proc.returncode != 0 or not separator or not raw_status.isdigit():
+        raise RuntimeError(f"{method} {url} content fetch failed")
+    status = int(raw_status)
+    print(
+        f"{method} {url} -> {status} bytes={len(body)} "
+        f"sha256={hashlib.sha256(body).hexdigest()}"
+    )
+    if status >= 400:
+        raise RuntimeError(f"{method} {url} failed with HTTP {status}")
+    return body
+
+
 def _run_curl_json(
     args: list[str],
     body: bytes | None,
@@ -347,9 +501,8 @@ def ensure_vector_store(
     timeout: int,
     cell: str = DEFAULT_CELL,
     transport: str = "auto",
+    attributes: dict[str, Any] | None = None,
 ) -> str:
-    if vector_store_id and vector_store_id != DEFAULT_VECTOR_STORE_ID:
-        return vector_store_id
     page = api_json(
         "GET",
         api_base,
@@ -360,7 +513,19 @@ def ensure_vector_store(
         cell=cell,
         transport=transport,
     )
-    for item in page.get("data", []):
+    items = page.get("data", [])
+    if vector_store_id and vector_store_id != DEFAULT_VECTOR_STORE_ID:
+        # Verify rather than trust. Returning an unchecked id defers the failure
+        # to the ingest call, and on the PDF route that means discovering a bad
+        # id only after a billed Marker extraction has already run.
+        if any(item.get("id") == vector_store_id for item in items):
+            return vector_store_id
+        raise RuntimeError(
+            f"Vector store id {vector_store_id!r} does not exist or is not visible to this caller. "
+            "Note that a source-package placeholder such as 'vs_<slug>_pending' is a name, not an id; "
+            "omit --vector-store-id to resolve the store by name instead."
+        )
+    for item in items:
         if item.get("name") == vector_store_name:
             return str(item["id"])
     if not allow_create:
@@ -370,7 +535,11 @@ def ensure_vector_store(
     payload = {
         "name": vector_store_name,
         "knowledge_base_id": knowledge_base_id,
-        "attributes": {
+        # Corpus identity belongs to the calling adapter. The Topeka defaults are
+        # kept only so existing Topeka callers are unchanged; any other corpus
+        # must pass its own, or the store is created carrying the wrong
+        # provenance.
+        "attributes": dict(attributes) if attributes else {
             "corpus": "topeka_municipal_code",
             "source_collection": "topeka-municipal-code",
             "created_by": "scripts/release/topeka_pipeline_common.py",

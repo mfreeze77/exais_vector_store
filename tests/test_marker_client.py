@@ -7,17 +7,17 @@ from types import SimpleNamespace
 
 import httpx
 import pytest
-
 from svs_common.marker_client import (
+    FISCAL_TABLES_PAGE_AWARE_PROFILE,
     MarkerRunpodClient,
     MarkerRunpodError,
     extract_markdown,
     is_marker_pdf_upload,
     is_retryable_marker_error,
     markdown_filename_for_pdf,
+    marker_options_for_profile,
     resolve_image,
 )
-
 
 API_KEY = "rp-test-secret"
 ENDPOINT_ID = "ep-test"
@@ -75,6 +75,7 @@ def test_marker_client_happy_path_returns_output_and_keeps_secret_out_of_logs():
         client_with_handler(handler).process_pdf_bytes(
             filename="source.pdf",
             pdf_bytes=raw_pdf,
+            **marker_options_for_profile(FISCAL_TABLES_PAGE_AWARE_PROFILE),
             log_callback=logs.append,
             job_id_callback=jobs.append,
         )
@@ -91,6 +92,19 @@ def test_marker_client_happy_path_returns_output_and_keeps_secret_out_of_logs():
     body = json.loads(submit.read().decode("utf-8"))
     assert body["input"]["filename"] == "source.pdf"
     assert base64.b64decode(body["input"]["pdf_base64"]) == raw_pdf
+    assert body["input"] | {"pdf_base64": "<omitted>"} == {
+        "pdf_base64": "<omitted>",
+        "filename": "source.pdf",
+        "output_format": "markdown",
+        "paginate_output": True,
+        "html_tables_in_markdown": True,
+        "disable_image_extraction": False,
+    }
+
+
+def test_marker_profile_refuses_unbounded_request_options() -> None:
+    with pytest.raises(ValueError, match="unsupported Marker extraction profile"):
+        marker_options_for_profile("operator_supplied_arbitrary_options")
 
 
 def test_marker_client_rejects_non_remote_mode():
@@ -133,6 +147,50 @@ def test_marker_client_uses_runpod_alias_when_marker_config_absent(monkeypatch: 
 
     assert client.api_key == "alias-key"
     assert client.endpoint_id == "alias-endpoint"
+
+
+def test_marker_client_accepts_statecivics_marker_endpoint_alias(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    from svs_common import config as svs_config
+
+    monkeypatch.delenv("MARKER_RUNPOD_API_KEY", raising=False)
+    monkeypatch.delenv("MARKER_RUNPOD_ENDPOINT_ID", raising=False)
+    monkeypatch.delenv("RUNPOD_ENDPOINT_ID", raising=False)
+    monkeypatch.setenv("RUNPOD_API_KEY", "statecivics-key")
+    monkeypatch.setenv("RUNPOD_MARKER_ENDPOINT_ID", "statecivics-marker-endpoint")
+    monkeypatch.setattr(
+        svs_config,
+        "get_settings",
+        lambda: SimpleNamespace(
+            marker_runpod_api_key=None,
+            marker_runpod_endpoint_id=None,
+            runpod_api_key=None,
+            runpod_endpoint_id=None,
+            marker_mode="remote",
+            marker_timeout_sec=30,
+            marker_poll_interval_sec=1,
+            marker_max_attempts=1,
+            marker_retry_backoff_sec=0,
+        ),
+    )
+
+    client = MarkerRunpodClient()
+
+    assert client.api_key == "statecivics-key"
+    assert client.endpoint_id == "statecivics-marker-endpoint"
+
+
+def test_marker_specific_endpoint_precedes_legacy_and_generic_aliases(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("MARKER_RUNPOD_ENDPOINT_ID", "preferred-marker-endpoint")
+    monkeypatch.setenv("RUNPOD_MARKER_ENDPOINT_ID", "legacy-marker-endpoint")
+    monkeypatch.setenv("RUNPOD_ENDPOINT_ID", "generic-endpoint")
+
+    client = MarkerRunpodClient(api_key="key")
+
+    assert client.endpoint_id == "preferred-marker-endpoint"
 
 
 def test_marker_client_uses_runpod_alias_when_settings_unavailable(monkeypatch: pytest.MonkeyPatch):

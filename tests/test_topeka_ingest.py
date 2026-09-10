@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import importlib.util
 import json
 import subprocess
@@ -8,7 +9,6 @@ import sys
 from pathlib import Path
 
 import pytest
-
 
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = ROOT / "scripts" / "release"
@@ -398,3 +398,44 @@ def test_common_docker_network_transport_uses_direct_http_without_docker_cli(mon
         "timeout": 7,
         "url": "http://api:8080/api/v1/documents/ingest",
     }
+
+
+def test_common_byte_transport_preserves_content_without_logging_it(monkeypatch, capsys):
+    common = load_script("topeka_pipeline_common_bytes", "topeka_pipeline_common.py")
+    captured = {}
+    markdown = b"# Confidential extraction\n\nvalue table\n"
+
+    def fake_run(args, *, capture_output, timeout, check):
+        captured["args"] = args
+        captured["capture_output"] = capture_output
+        captured["timeout"] = timeout
+        captured["check"] = check
+        return subprocess.CompletedProcess(
+            args=args,
+            returncode=0,
+            stdout=markdown + b"\n__SVS_HTTP_STATUS__:200",
+            stderr=b"",
+        )
+
+    monkeypatch.setattr(common.shutil, "which", lambda name: "/usr/bin/curl")
+    monkeypatch.setattr(common.subprocess, "run", fake_run)
+
+    result = common.api_bytes(
+        "GET",
+        "https://exais.invalid",
+        "/v1/files/doc-1/content",
+        headers={"Authorization": "Bearer secret"},
+        timeout=7,
+        transport="host-curl",
+    )
+
+    assert result == markdown
+    assert captured["capture_output"] is True
+    assert captured["check"] is False
+    assert captured["timeout"] == 7
+    assert captured["args"][-1] == "https://exais.invalid/v1/files/doc-1/content"
+    output = capsys.readouterr().out
+    assert "Confidential extraction" not in output
+    assert "secret" not in output
+    assert f"bytes={len(markdown)}" in output
+    assert hashlib.sha256(markdown).hexdigest() in output

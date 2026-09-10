@@ -6,10 +6,13 @@ import logging
 import os
 import re
 import time
+from collections.abc import Awaitable, Callable
 from pathlib import Path
-from typing import Any, Awaitable, Callable
+from typing import Any
 
 import httpx
+
+from .marker_quality import summarize_markdown
 
 logger = logging.getLogger(__name__)
 
@@ -19,16 +22,37 @@ DEFAULT_MARKER_MAX_ATTEMPTS = 2
 DEFAULT_MARKER_RETRY_BACKOFF_SEC = 5
 DEFAULT_HTTP_TIMEOUT_SEC = 30
 RUNPOD_BASE_URL = "https://api.runpod.ai/v2"
+FISCAL_TABLES_PAGE_AWARE_PROFILE = "fiscal_tables_page_aware_v1"
+FISCAL_TABLES_PAGE_AWARE_OPTIONS: dict[str, str | bool] = {
+    "output_format": "markdown",
+    "paginate_output": True,
+    "html_tables_in_markdown": True,
+    "disable_image_extraction": False,
+}
 
 
 class MarkerRunpodError(RuntimeError):
     pass
 
 
+def marker_options_for_profile(profile: Any) -> dict[str, str | bool]:
+    """Resolve a named, bounded Marker request profile.
+
+    Profiles are chosen by the source adapter. Arbitrary request attributes
+    must never become unchecked RunPod options.
+    """
+    if profile is None:
+        return {}
+    if profile == FISCAL_TABLES_PAGE_AWARE_PROFILE:
+        return dict(FISCAL_TABLES_PAGE_AWARE_OPTIONS)
+    raise ValueError(f"unsupported Marker extraction profile {profile!r}")
+
+
 def _read_config() -> dict[str, str | None]:
     env = {
         "api_key": os.getenv("MARKER_RUNPOD_API_KEY") or None,
         "endpoint_id": os.getenv("MARKER_RUNPOD_ENDPOINT_ID") or None,
+        "legacy_marker_endpoint_id": os.getenv("RUNPOD_MARKER_ENDPOINT_ID") or None,
         "fallback_api_key": os.getenv("RUNPOD_API_KEY") or None,
         "fallback_endpoint_id": os.getenv("RUNPOD_ENDPOINT_ID") or None,
         "mode": (os.getenv("MARKER_MODE") or "").strip().lower() or None,
@@ -44,7 +68,9 @@ def _read_config() -> dict[str, str | None]:
     except Exception:
         return {
             "api_key": env["api_key"] or env["fallback_api_key"],
-            "endpoint_id": env["endpoint_id"] or env["fallback_endpoint_id"],
+            "endpoint_id": env["endpoint_id"]
+            or env["legacy_marker_endpoint_id"]
+            or env["fallback_endpoint_id"],
             "mode": env["mode"] or "remote",
             "timeout_sec": env["timeout_sec"],
             "poll_interval_sec": env["poll_interval_sec"],
@@ -53,7 +79,11 @@ def _read_config() -> dict[str, str | None]:
         }
     return {
         "api_key": env["api_key"] or settings.marker_runpod_api_key or env["fallback_api_key"] or settings.runpod_api_key,
-        "endpoint_id": env["endpoint_id"] or settings.marker_runpod_endpoint_id or env["fallback_endpoint_id"] or settings.runpod_endpoint_id,
+        "endpoint_id": env["endpoint_id"]
+        or settings.marker_runpod_endpoint_id
+        or env["legacy_marker_endpoint_id"]
+        or env["fallback_endpoint_id"]
+        or settings.runpod_endpoint_id,
         "mode": env["mode"] or settings.marker_mode,
         "timeout_sec": env["timeout_sec"] or str(settings.marker_timeout_sec),
         "poll_interval_sec": env["poll_interval_sec"] or str(settings.marker_poll_interval_sec),
@@ -121,6 +151,29 @@ def is_retryable_marker_error(error: str | None) -> bool:
     return any(marker in normalized for marker in retryable_markers)
 
 
+def _job_metrics(poll_data: dict[str, Any], *, observed_sec: float) -> dict[str, Any]:
+    """Normalise RunPod's job timing into seconds.
+
+    ``delayTime`` is time spent queued, which includes serverless cold start.
+    ``executionTime`` is time actually spent running. Both arrive in
+    milliseconds. ``observed_sec`` is our own wall clock from submit to
+    COMPLETED, which brackets the two and stays meaningful when the endpoint
+    omits either field.
+    """
+    metrics: dict[str, Any] = {"marker_observed_seconds": round(observed_sec, 3)}
+    for source_key, attr_key in (
+        ("delayTime", "marker_queue_seconds"),
+        ("executionTime", "marker_execution_seconds"),
+    ):
+        value = poll_data.get(source_key)
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            metrics[attr_key] = round(float(value) / 1000.0, 3)
+    worker = poll_data.get("workerId")
+    if isinstance(worker, str) and worker:
+        metrics["marker_worker_id"] = worker
+    return metrics
+
+
 def marker_attribute_summary(
     *,
     original_filename: str | None,
@@ -128,6 +181,9 @@ def marker_attribute_summary(
     output: dict[str, Any],
     job_id: str | None = None,
     source_object_key: str | None = None,
+    extraction_profile: str | None = None,
+    request_options: dict[str, str | bool] | None = None,
+    job_metrics: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     attrs: dict[str, Any] = {
         "source_pdf_id": pdf_source_id(pdf_bytes),
@@ -138,6 +194,13 @@ def marker_attribute_summary(
         attrs["marker_job_id"] = job_id
     if source_object_key:
         attrs["source_pdf_object_key"] = source_object_key
+    if extraction_profile:
+        attrs["marker_profile"] = extraction_profile
+        attrs["marker_options"] = dict(request_options or {})
+    if job_metrics:
+        attrs.update(job_metrics)
+    images = output.get("images")
+    attrs["marker_image_count"] = len(images) if isinstance(images, dict | list) else 0
     for source_key, attr_key in (
         ("pages", "marker_pages"),
         ("processing_time_seconds", "marker_processing_time_seconds"),
@@ -155,11 +218,18 @@ def marker_attribute_summary(
         }
         if safe_metadata:
             attrs["marker_metadata"] = safe_metadata
+    # Derived from the same Marker response that is about to be ingested. This
+    # records structural table coverage without another extraction or network call.
+    attrs.update(summarize_markdown(extract_markdown(output)))
     return attrs
 
 
 class MarkerRunpodClient:
     """Async client for an external RunPod Marker serverless endpoint."""
+
+    #: Timing for the most recent COMPLETED job, populated by ``_run_once``.
+    #: Empty until a job completes, so callers can pass it unconditionally.
+    last_job_metrics: dict[str, Any]
 
     def __init__(
         self,
@@ -174,6 +244,7 @@ class MarkerRunpodClient:
         transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
         env = _read_config()
+        self.last_job_metrics = {}
         self.api_key = api_key if api_key is not None else env["api_key"]
         self.endpoint_id = endpoint_id if endpoint_id is not None else env["endpoint_id"]
         resolved_mode = (mode if mode is not None else env["mode"]) or "remote"
@@ -210,7 +281,8 @@ class MarkerRunpodClient:
         if not self.api_key or not self.endpoint_id:
             raise MarkerRunpodError(
                 "Marker RunPod transport is not configured: set MARKER_RUNPOD_API_KEY and "
-                "MARKER_RUNPOD_ENDPOINT_ID, or fallback RUNPOD_API_KEY and RUNPOD_ENDPOINT_ID."
+                "MARKER_RUNPOD_ENDPOINT_ID, or use RUNPOD_API_KEY with the compatible "
+                "RUNPOD_MARKER_ENDPOINT_ID/RUNPOD_ENDPOINT_ID alias."
             )
 
     def _auth_headers(self) -> dict[str, str]:
@@ -230,6 +302,10 @@ class MarkerRunpodClient:
         poll_interval_sec: int | None = None,
         max_poll_sec: int | None = None,
         max_attempts: int | None = None,
+        output_format: str | None = None,
+        paginate_output: bool | None = None,
+        html_tables_in_markdown: bool | None = None,
+        disable_image_extraction: bool | None = None,
         log_callback: Callable[[str], None] | Callable[[str], Awaitable[None]] | None = None,
         job_id_callback: Callable[[str], None] | Callable[[str], Awaitable[None]] | None = None,
     ) -> dict[str, Any] | None:
@@ -261,6 +337,15 @@ class MarkerRunpodClient:
                 "filename": filename,
             }
         }
+        marker_input = payload["input"]
+        for key, value in (
+            ("output_format", output_format),
+            ("paginate_output", paginate_output),
+            ("html_tables_in_markdown", html_tables_in_markdown),
+            ("disable_image_extraction", disable_image_extraction),
+        ):
+            if value is not None:
+                marker_input[key] = value
 
         for attempt in range(1, attempts + 1):
             await emit(f"attempt start attempt={attempt} max_attempts={attempts}")
@@ -339,7 +424,20 @@ class MarkerRunpodClient:
                     last_status = status
                 if status == "COMPLETED":
                     output = poll_data.get("output") or {}
-                    await emit("completed status=COMPLETED")
+                    # RunPod reports queue time and GPU time on this same
+                    # response. Keep them: without the split there is no way to
+                    # tell a GPU-bound corpus from a queue-bound one, and so no
+                    # evidence for whether concurrency would help.
+                    self.last_job_metrics = _job_metrics(
+                        poll_data, observed_sec=time.monotonic() - started
+                    )
+                    await emit(
+                        "completed status=COMPLETED "
+                        + " ".join(
+                            f"{key}={value}"
+                            for key, value in sorted(self.last_job_metrics.items())
+                        )
+                    )
                     return (output if isinstance(output, dict) else {}), False
                 if status in {"FAILED", "CANCELLED"}:
                     error = poll_data.get("error") or "unknown"

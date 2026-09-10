@@ -1,5 +1,7 @@
 from __future__ import annotations
 from hashlib import sha256
+import json
+import logging
 import os
 import re
 import time
@@ -164,6 +166,7 @@ from svs_common.marker_client import (
     is_marker_pdf_upload,
     markdown_filename_for_pdf,
     marker_attribute_summary,
+    marker_options_for_profile,
     pdf_source_id,
     sanitize_stem,
 )
@@ -195,6 +198,13 @@ def db_for_principal(db: Session = Depends(get_session), principal: Principal = 
     set_rls_context(db, principal)
     return db
 
+
+# uvicorn configures handlers only for its own loggers, so INFO records emitted
+# by library modules fall through to logging.lastResort at WARNING and are
+# silently dropped. That is why Marker job progress and timing produced no log
+# lines at all. basicConfig is a no-op when the root logger already has
+# handlers, so this stays inert wherever logging is configured elsewhere.
+logging.basicConfig(level=os.getenv('SVS_LOG_LEVEL', 'INFO').upper())
 
 app = FastAPI(title='exai_vector_store API', version=settings.svs_product_version)
 
@@ -320,13 +330,24 @@ async def marker_pdf_upload_request(
     knowledge_base_id: str | None,
     security_level: int,
     principal: Principal,
+    source_uri: str | None = None,
+    source_identity: str | None = None,
+    attributes: dict[str, Any] | None = None,
+    classification: str = 'tenant_private',
 ) -> DocumentIngestRequest:
     job_ids: list[str] = []
+    extraction_profile = (attributes or {}).get('marker_profile')
     try:
-        output = await MarkerRunpodClient().process_pdf_bytes(
+        marker_options = marker_options_for_profile(extraction_profile)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    marker_client = MarkerRunpodClient()
+    try:
+        output = await marker_client.process_pdf_bytes(
             filename=file.filename or 'uploaded.pdf',
             pdf_bytes=content_bytes,
             job_id_callback=job_ids.append,
+            **marker_options,
         )
     except MarkerRunpodError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
@@ -343,13 +364,21 @@ async def marker_pdf_upload_request(
     except ObjectStoreError as exc:
         raise HTTPException(status_code=503, detail='Source PDF object-store write failed') from exc
 
-    attrs = marker_attribute_summary(
+    attrs = dict(attributes or {})
+    attrs.update(marker_attribute_summary(
         original_filename=file.filename,
         pdf_bytes=content_bytes,
         output=output,
         job_id=job_ids[-1] if job_ids else None,
         source_object_key=source_key,
-    )
+        extraction_profile=(
+            extraction_profile if isinstance(extraction_profile, str) else None
+        ),
+        request_options=marker_options,
+        # getattr keeps this tolerant of injected clients and test doubles that
+        # predate job metrics; absent telemetry simply adds no attributes.
+        job_metrics=getattr(marker_client, 'last_job_metrics', None),
+    ))
     return DocumentIngestRequest(
         vector_store_id=vector_store_id,
         knowledge_base_id=knowledge_base_id,
@@ -358,11 +387,25 @@ async def marker_pdf_upload_request(
         mime_type='text/markdown',
         content=markdown,
         mode='pdf_markdown_external_v1',
-        source_uri=f'object://{source_key}',
+        source_uri=source_uri or f'object://{source_key}',
+        source_identity=source_identity,
         attributes=attrs,
         security_level=security_level,
+        classification=classification,
         source_trust='external_pdf_parser',
     )
+
+
+def _document_upload_attributes(attributes_json: str | None) -> dict[str, Any]:
+    if attributes_json is None or not attributes_json.strip():
+        return {}
+    try:
+        value = json.loads(attributes_json)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=422, detail='attributes_json must be valid JSON') from exc
+    if not isinstance(value, dict):
+        raise HTTPException(status_code=422, detail='attributes_json must contain a JSON object')
+    return value
 
 
 def _vector_store_unavailable_http_exception(exc: VectorStoreUnavailableError) -> HTTPException:
@@ -1818,13 +1861,44 @@ async def ingest_document(req: DocumentIngestRequest, idempotency_key: str | Non
 
 
 @app.post('/api/v1/documents/upload', response_model=IngestionJobResponse)
-async def upload_document(file: UploadFile = File(...), title: str | None = Form(default=None), mode: str = Form(default='auto_detect_v1'), vector_store_id: str | None = Form(default=None), knowledge_base_id: str | None = Form(default=None), security_level: int = Form(default=1), principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
+async def upload_document(file: UploadFile = File(...), title: str | None = Form(default=None), mode: str = Form(default='auto_detect_v1'), vector_store_id: str | None = Form(default=None), knowledge_base_id: str | None = Form(default=None), security_level: int = Form(default=1), classification: str = Form(default='tenant_private'), source_uri: str | None = Form(default=None), source_identity: str | None = Form(default=None), attributes_json: str | None = Form(default=None), idempotency_key: str | None = Header(default=None, alias='Idempotency-Key'), principal: Principal = Depends(get_request_principal), db: Session = Depends(db_for_principal)):
     ensure_scope(principal, 'documents:write')
     enforce_rate_limit(db, principal, 'documents.upload')
     content_bytes = await file.read()
     if len(content_bytes) > settings.svs_request_body_limit_bytes:
         raise HTTPException(status_code=413, detail='Uploaded document exceeds configured body limit')
+    attributes = _document_upload_attributes(attributes_json)
+    fingerprint = stable_hash({
+        'filename': file.filename,
+        'content_type': file.content_type,
+        'content_sha256': sha256(content_bytes).hexdigest(),
+        'title': title,
+        'mode': mode,
+        'vector_store_id': vector_store_id,
+        'knowledge_base_id': knowledge_base_id,
+        'security_level': security_level,
+        'classification': classification,
+        'source_uri': source_uri,
+        'source_identity': source_identity,
+        'attributes': attributes,
+    })
+    if cached := check_idempotency(db, principal, idempotency_key, fingerprint):
+        return cached
     if is_marker_pdf_upload(file.filename, file.content_type, mode):
+        # Validate the destination before paying for extraction. Marker is a
+        # billed external job, so a store that is missing, deleted, expired or
+        # invisible under RLS must cost a fast 404 rather than a completed
+        # conversion that is then thrown away.
+        #
+        # Read-only on purpose. The activity-refresh UPDATE would hold a row
+        # lock on vector_stores for the entire Marker call (WAVE-128), and its
+        # statement is byte-identical to the post-extraction refresh below, so
+        # an operator reading pg_stat_activity could not tell which phase a
+        # backend was in -- precisely when that matters, because it decides
+        # whether terminating it destroys a paid extraction. A SELECT is
+        # distinguishable and locks nothing.
+        if vector_store_id:
+            _ensure_vector_store_available_or_404(db, principal, vector_store_id)
         req = await marker_pdf_upload_request(
             file=file,
             content_bytes=content_bytes,
@@ -1834,11 +1908,28 @@ async def upload_document(file: UploadFile = File(...), title: str | None = Form
             knowledge_base_id=knowledge_base_id,
             security_level=security_level,
             principal=principal,
+            source_uri=source_uri,
+            source_identity=source_identity,
+            attributes=attributes,
+            classification=classification,
         )
+        # Marker can run for many minutes. RLS context is established once per
+        # request by db_for_principal using set_config(..., true), which is
+        # transaction-local, so it does not survive that wait. Re-establish it
+        # before any further read or write, exactly as this handler already does
+        # before store_idempotency below; otherwise the vector-store lookup in
+        # ingest_or_enqueue matches no rows under RLS and 404s away a completed
+        # extraction.
+        set_rls_context(db, principal)
     else:
         content = content_bytes.decode('utf-8', errors='replace')
-        req = DocumentIngestRequest(vector_store_id=vector_store_id, knowledge_base_id=knowledge_base_id, title=title or file.filename or 'uploaded document', filename=file.filename, mime_type=file.content_type, content=content, mode=mode, security_level=security_level)
-    return await ingest_or_enqueue(req, principal, db)
+        req = DocumentIngestRequest(vector_store_id=vector_store_id, knowledge_base_id=knowledge_base_id, title=title or file.filename or 'uploaded document', filename=file.filename, mime_type=file.content_type, content=content, mode=mode, source_uri=source_uri, source_identity=source_identity, attributes=attributes, security_level=security_level, classification=classification)
+    result = await ingest_or_enqueue(req, principal, db)
+    payload = result.model_dump()
+    set_rls_context(db, principal)
+    store_idempotency(db, principal, idempotency_key, fingerprint, payload)
+    db.commit()
+    return payload
 
 
 @app.get('/api/v1/jobs', response_model=IngestionJobListResponse, response_model_exclude_unset=True)
@@ -4964,6 +5055,12 @@ def delete_vector_store_file(
     if not row:
         raise HTTPException(status_code=404, detail='Vector store file not found')
     if row['document_id']:
+        # Marking chunks inactive is tenant-scoped system maintenance, which the
+        # chunk RLS policy allows only under svs.system_worker. WAVE-012 set this
+        # flag on the vector-store delete and OpenAI file delete paths but not
+        # here, so per-file removal failed closed with an RLS violation. The flag
+        # is transaction-local and does not widen tenant or business scope.
+        db.execute(text("SELECT set_config('svs.system_worker', 'true', true)"))
         db.execute(text('''
             UPDATE chunks
             SET active=false, deleted_at=now(), dense_index_status='delete_queued', sparse_index_status='delete_queued'

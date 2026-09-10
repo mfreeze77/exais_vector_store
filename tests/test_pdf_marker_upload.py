@@ -4,9 +4,13 @@ import asyncio
 
 import pytest
 from fastapi import HTTPException
-
 from svs_api import main as api_main
-from svs_common.marker_client import MarkerRunpodError, pdf_source_id
+from svs_common.marker_client import (
+    FISCAL_TABLES_PAGE_AWARE_OPTIONS,
+    FISCAL_TABLES_PAGE_AWARE_PROFILE,
+    MarkerRunpodError,
+    pdf_source_id,
+)
 from svs_common.schemas import Principal
 
 
@@ -43,13 +47,17 @@ def test_marker_pdf_upload_request_builds_pdf_markdown_ingest(monkeypatch: pytes
     fake_store = FakeObjectStore()
 
     class FakeMarkerClient:
-        async def process_pdf_bytes(self, *, filename, pdf_bytes, job_id_callback=None):
+        async def process_pdf_bytes(
+            self, *, filename, pdf_bytes, job_id_callback=None, **options
+        ):
             assert filename == "Panel Schedule.pdf"
             assert pdf_bytes == raw_pdf
+            assert options == FISCAL_TABLES_PAGE_AWARE_OPTIONS
             if job_id_callback:
                 job_id_callback("job-xyz")
             return {
-                "text": "<!-- page: 7 -->\n# Panel Schedule\nCircuit rows",
+                "text": "{0}" + "-" * 48 + "\n# Panel Schedule\nCircuit rows",
+                "images": [{"filename": "page-0.jpeg"}],
                 "pages": 7,
                 "output_format": "markdown",
                 "metadata": {
@@ -72,6 +80,13 @@ def test_marker_pdf_upload_request_builds_pdf_markdown_ingest(monkeypatch: pytes
             knowledge_base_id="kb_test",
             security_level=2,
             principal=principal(),
+            source_uri="https://budget.kansas.gov/fy2027.pdf",
+            source_identity="statecivics:logical-document",
+            attributes={
+                "source_revision_id": "revision-1",
+                "marker_profile": FISCAL_TABLES_PAGE_AWARE_PROFILE,
+            },
+            classification="public",
         )
     )
 
@@ -81,13 +96,31 @@ def test_marker_pdf_upload_request_builds_pdf_markdown_ingest(monkeypatch: pytes
     assert req.mime_type == "text/markdown"
     assert req.mode == "pdf_markdown_external_v1"
     assert req.source_trust == "external_pdf_parser"
-    assert "<!-- page: 7 -->" in req.content
+    assert req.source_uri == "https://budget.kansas.gov/fy2027.pdf"
+    assert req.source_identity == "statecivics:logical-document"
+    assert req.classification == "public"
+    assert "{0}" + "-" * 48 in req.content
+    assert req.attributes["source_revision_id"] == "revision-1"
     assert req.attributes["source_pdf_id"] == pdf_source_id(raw_pdf)
     assert req.attributes["source_pdf_filename"] == "Panel Schedule.pdf"
     assert req.attributes["pdf_parser"] == "runpod_marker"
     assert req.attributes["marker_job_id"] == "job-xyz"
     assert req.attributes["marker_pages"] == 7
+    assert req.attributes["marker_profile"] == FISCAL_TABLES_PAGE_AWARE_PROFILE
+    assert req.attributes["marker_options"] == FISCAL_TABLES_PAGE_AWARE_OPTIONS
+    assert req.attributes["marker_image_count"] == 1
     assert req.attributes["marker_metadata"] == {"marker_version": "test"}
+    assert req.attributes["marker_markdown_chars"] == len(
+        "{0}" + "-" * 48 + "\n# Panel Schedule\nCircuit rows"
+    )
+    assert len(req.attributes["marker_markdown_sha256"]) == 64
+    assert req.attributes["marker_table_count"] == 0
+    assert req.attributes["marker_table_row_count"] == 0
+    assert req.attributes["marker_table_cell_count"] == 0
+    assert req.attributes["marker_page_marker_count"] == 1
+    assert req.attributes["marker_page_marker_first"] == 0
+    assert req.attributes["marker_page_marker_last"] == 0
+    assert req.attributes["marker_page_marker_sequence_complete"] is True
     assert "api_key" not in req.attributes["marker_metadata"]
     assert "secret_note" not in req.attributes["marker_metadata"]
 
@@ -95,9 +128,44 @@ def test_marker_pdf_upload_request_builds_pdf_markdown_ingest(monkeypatch: pytes
     source_key, body, content_type = fake_store.writes[0]
     assert source_key.startswith("tenants/ten_test/business/biz_test/source-pdfs/")
     assert source_key.endswith("/Panel-Schedule.pdf")
-    assert req.source_uri == f"object://{source_key}"
     assert body == raw_pdf
     assert content_type == "application/pdf"
+
+
+def test_upload_attributes_require_a_json_object():
+    assert api_main._document_upload_attributes(None) == {}
+    assert api_main._document_upload_attributes('{"source_revision_id":"revision-1"}') == {
+        "source_revision_id": "revision-1"
+    }
+    for value in ("not-json", "[]"):
+        with pytest.raises(HTTPException) as exc_info:
+            api_main._document_upload_attributes(value)
+        assert exc_info.value.status_code == 422
+
+
+def test_marker_pdf_upload_request_refuses_unknown_profile_before_marker(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    class ShouldNotRunMarkerClient:
+        async def process_pdf_bytes(self, **kwargs):
+            raise AssertionError("unknown profile reached Marker")
+
+    monkeypatch.setattr(api_main, "MarkerRunpodClient", ShouldNotRunMarkerClient)
+    with pytest.raises(HTTPException) as exc_info:
+        run(
+            api_main.marker_pdf_upload_request(
+                file=FakeUpload(),
+                content_bytes=b"%PDF",
+                title=None,
+                mode="auto_detect_v1",
+                vector_store_id=None,
+                knowledge_base_id=None,
+                security_level=1,
+                principal=principal(),
+                attributes={"marker_profile": "arbitrary_operator_options"},
+            )
+        )
+    assert exc_info.value.status_code == 422
 
 
 def test_marker_pdf_upload_request_reports_missing_config(monkeypatch: pytest.MonkeyPatch):
@@ -123,3 +191,73 @@ def test_marker_pdf_upload_request_reports_missing_config(monkeypatch: pytest.Mo
 
     assert exc_info.value.status_code == 503
     assert "not configured" in str(exc_info.value.detail)
+
+
+def test_upload_document_rejects_unknown_vector_store_before_calling_marker(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """A bad destination must cost a 404, never a billed extraction.
+
+    Marker is an external paid job. Before this guard the vector store was only
+    checked inside ingest_or_enqueue, which runs after extraction, so a missing
+    or RLS-invisible store discarded a completed conversion. The fake client
+    fails the test if it is reached at all.
+    """
+    called: list[str] = []
+
+    class ForbiddenMarkerClient:
+        async def process_pdf_bytes(self, **_kwargs):
+            called.append("marker")
+            raise AssertionError("Marker must not run before the vector store is validated")
+
+    monkeypatch.setattr(api_main, "MarkerRunpodClient", ForbiddenMarkerClient)
+
+    def deny(_db, _principal, _vector_store_id, **_kwargs):
+        raise HTTPException(status_code=404, detail="Vector store not found or expired")
+
+    monkeypatch.setattr(api_main, "_ensure_vector_store_available_or_404", deny)
+
+    # The pre-extraction guard must stay read-only: the activity-refresh UPDATE
+    # would hold a vector_stores row lock for the whole Marker call (WAVE-128)
+    # and is indistinguishable in pg_stat_activity from the post-extraction
+    # refresh. Fail loudly if the guard regresses to the writing variant.
+    def forbidden_refresh(*_args, **_kwargs):
+        raise AssertionError(
+            "pre-extraction guard must not take the activity-refresh write lock"
+        )
+
+    monkeypatch.setattr(
+        api_main, "_refresh_vector_store_activity_or_404", forbidden_refresh
+    )
+    monkeypatch.setattr(api_main, "ensure_scope", lambda *a, **k: None)
+    monkeypatch.setattr(api_main, "enforce_rate_limit", lambda *a, **k: None)
+    monkeypatch.setattr(api_main, "check_idempotency", lambda *a, **k: None)
+
+    class Upload:
+        filename = "budget.pdf"
+        content_type = "application/pdf"
+
+        async def read(self):
+            return b"%PDF-1.4 budget"
+
+    with pytest.raises(HTTPException) as exc:
+        run(
+            api_main.upload_document(
+                file=Upload(),
+                title="budget",
+                mode="auto_detect_v1",
+                vector_store_id="vs_does_not_exist",
+                knowledge_base_id="kb_test",
+                security_level=0,
+                classification="public",
+                source_uri=None,
+                source_identity=None,
+                attributes_json=None,
+                idempotency_key=None,
+                principal=principal(),
+                db=object(),
+            )
+        )
+
+    assert exc.value.status_code == 404
+    assert called == [], "Marker was invoked despite an invalid vector store"

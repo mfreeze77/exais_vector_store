@@ -1,0 +1,43 @@
+# Operator-owned deployment configuration, never accepted from API requests.
+# Mount read-only and set SVS_CELL_GRAPH_PROFILE_PATH to its absolute container path.
+#
+# STATE: declaration only. This manifest is NOT mounted anywhere today and it
+# cannot be loaded by the current code. `svs_common.cell_graph.GRAPH_HANDLERS`
+# registers only the Grant handler, so `configured_cell_graph_profile()` would
+# reject this handler/corpus pair, and `_cell_graph_profile_or_503()` in the API
+# returns before reading any manifest unless the store's corpus is
+# `reviewed_public_grant_evidence`. Registering
+# `kscourts_postgres_graph_v1`/`kansas_court_decisions` in that allowlist and
+# widening that corpus gate are reviewed code changes, not config edits.
+#
+# The live Kansas court GraphRAG path is unaffected by this file. It is selected
+# by corpus/query-planner detection in `svs_common.search_lenses` and gated by
+# `SVS_KSCOURTS_GRAPHRAG_ENABLED` plus `SVS_QUERY_PLANNER_PROFILE_ID`
+# (`ks_civics_legal_v1`), exactly as proven in WAVE-115. This manifest records
+# the same binding in the WAVE-126 format; it does not migrate that routing and
+# it does not impose the Grant artifact contract on the loaded court graph,
+# whose `cites_case`/`same_docket` edges and `provenance` payloads predate it.
+#
+# Scope note: one manifest carries one `corpus_kind`, and the resolver requires
+# the store attribute `corpus` to equal it. The Topeka store
+# (`vs_d4185d1004604f08a55299fa`, corpus `topeka_municipal_code`) therefore
+# needs its own profile, not another entry here. The Kansas fiscal store is
+# deliberately absent: `instances/.../kansas-fiscal-documents/store.yaml` still
+# carries the source-package placeholder `vs_kansas_fiscal_documents_pending`,
+# which is not a real store identity, and the fiscal attribute contract itself
+# is unresolved (WAVE-130).
+schema_version: svs.cell-graph.v1
+profile_id: ks-state-civics.kansas-court-decisions.v1
+handler_id: kscourts_postgres_graph_v1
+corpus_kind: kansas_court_decisions
+binding:
+  tenant_id: ten_ks_state_civics
+  business_instance_id: biz_ks_state_civics
+  vector_store_ids: [vs_a0d3ac76893e4f6f83bf2992]
+# Enable only after the matching artifact and runtime have been verified.
+# Activation-checklist step 3 requires shipping disabled; activation is not
+# authorised and would additionally require the handler registration above and
+# a `graph_profile_id` store attribute added through the vector-store API.
+enabled: false
+max_expansions: 3
+max_hops: 1
