@@ -1889,8 +1889,16 @@ async def upload_document(file: UploadFile = File(...), title: str | None = Form
         # billed external job, so a store that is missing, deleted, expired or
         # invisible under RLS must cost a fast 404 rather than a completed
         # conversion that is then thrown away.
+        #
+        # Read-only on purpose. The activity-refresh UPDATE would hold a row
+        # lock on vector_stores for the entire Marker call (WAVE-128), and its
+        # statement is byte-identical to the post-extraction refresh below, so
+        # an operator reading pg_stat_activity could not tell which phase a
+        # backend was in -- precisely when that matters, because it decides
+        # whether terminating it destroys a paid extraction. A SELECT is
+        # distinguishable and locks nothing.
         if vector_store_id:
-            _refresh_vector_store_activity_or_404(db, principal, vector_store_id)
+            _ensure_vector_store_available_or_404(db, principal, vector_store_id)
         req = await marker_pdf_upload_request(
             file=file,
             content_bytes=content_bytes,

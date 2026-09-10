@@ -215,7 +215,20 @@ def test_upload_document_rejects_unknown_vector_store_before_calling_marker(
     def deny(_db, _principal, _vector_store_id, **_kwargs):
         raise HTTPException(status_code=404, detail="Vector store not found or expired")
 
-    monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", deny)
+    monkeypatch.setattr(api_main, "_ensure_vector_store_available_or_404", deny)
+
+    # The pre-extraction guard must stay read-only: the activity-refresh UPDATE
+    # would hold a vector_stores row lock for the whole Marker call (WAVE-128)
+    # and is indistinguishable in pg_stat_activity from the post-extraction
+    # refresh. Fail loudly if the guard regresses to the writing variant.
+    def forbidden_refresh(*_args, **_kwargs):
+        raise AssertionError(
+            "pre-extraction guard must not take the activity-refresh write lock"
+        )
+
+    monkeypatch.setattr(
+        api_main, "_refresh_vector_store_activity_or_404", forbidden_refresh
+    )
     monkeypatch.setattr(api_main, "ensure_scope", lambda *a, **k: None)
     monkeypatch.setattr(api_main, "enforce_rate_limit", lambda *a, **k: None)
     monkeypatch.setattr(api_main, "check_idempotency", lambda *a, **k: None)

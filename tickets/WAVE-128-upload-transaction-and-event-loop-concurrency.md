@@ -65,19 +65,40 @@ Corroborating symptoms, all resolved by clearing the blocked backend:
    `async def` but reaches Postgres through a blocking `Session`. A blocked
    `INSERT` therefore stalls every other task on the loop rather than just its
    own request. This is what turns "slow" into "wedged".
-3. **Widened by WAVE-127's ordering fix, though not caused by it.** Moving
-   `_refresh_vector_store_activity_or_404` ahead of the Marker call — correct,
-   and necessary to stop paying for doomed extractions — added `vector_stores`
-   to the set of rows locked across extraction. With `rate_limit_counters`
-   already locked there, this does not change the outcome, but it does mean the
-   fix would serialise on its own even if rate limiting were removed. Both need
-   to move out of the long transaction, not just one.
+3. **Widened by WAVE-127's ordering fix, though not caused by it — now
+   repaired.** The first version of that fix called
+   `_refresh_vector_store_activity_or_404` ahead of the Marker call, which added
+   `vector_stores` to the rows locked across extraction. With
+   `rate_limit_counters` already locked there this did not change the deadlock
+   outcome, but it did mean the guard would serialise on its own even if rate
+   limiting were removed.
+
+   It also caused a **diagnostic regression** that made the incident far harder
+   to resolve safely. Before the change, only the post-extraction path touched
+   `vector_stores`; afterwards two different phases issued a byte-identical
+   `UPDATE vector_stores SET last_active_at=now(), ...`. An operator reading
+   `pg_stat_activity` therefore could not tell whether a backend was in the
+   cheap pre-check or holding a completed, paid extraction — which is exactly
+   the fact that decides whether terminating it is safe. During this incident
+   that ambiguity led to terminating the wrong backend and losing roughly 100
+   seconds of completed GPU work.
+
+   The guard now calls the pre-existing read-only
+   `_ensure_vector_store_available_or_404` instead, which validates the same
+   conditions via `SELECT` and returns the same 404. That takes no row lock
+   across the external call and is trivially distinguishable from the
+   post-extraction refresh in `pg_stat_activity`. A regression test asserts the
+   guard does not call the writing variant. `rate_limit_counters` remains the
+   outstanding lock and is the substance of this ticket.
 
 ## Scope
 
 - Commit, or otherwise release, before the Marker call, and re-acquire after.
   WAVE-127 already re-establishes RLS context post-extraction, so the shape for
   resuming work after the external call exists.
+- Keep every phase of the handler distinguishable in `pg_stat_activity`. An
+  operator clearing a wedge must be able to read off whether a backend holds
+  paid work before terminating it.
 - Keep the pre-extraction vector-store validation, but do not hold its lock
   across the call.
 - Move synchronous database work off the event loop, or make the handler's
