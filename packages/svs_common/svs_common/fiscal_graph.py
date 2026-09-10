@@ -10,13 +10,20 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
+from itertools import chain
 from typing import Any
 from uuid import UUID
 
 from sqlalchemy import text
 
 from .schemas import ChunkRecord, Principal, VectorStoreGraphLoadRequest
+
+# These internal types/helpers are deliberately not dispatched by the v1 API.
+from .schemas import (
+    FiscalCanonicalReference, FiscalProjectionBatch, FiscalProjectionCounts,
+    FiscalProjectionManifest, FiscalProjectionPartition, FiscalProjectionScope,
+)
 
 FISCAL_CORPUS_KIND = "kansas_fiscal_documents"
 FISCAL_GRAPH_HANDLER_ID = "kansas_fiscal_law_money_graph_v1"
@@ -421,3 +428,209 @@ def expand_fiscal_graph(db: Any, principal: Principal, vector_store_id: str, chu
             break
     return additions, metadata, {**summary, "applied": bool(additions or metadata),
                                   "candidate_count": len(hydrated_by_id), "inserted_chunk_count": len(additions)}
+
+
+# WAVE-133 independent foundation. These limits describe a selected projection,
+# not a claim to project all 109,424 dimensions plus 410,814 source observations.
+# Raising them or adding runtime support requires separately reviewed sizing.
+MAX_FISCAL_PROJECTION_PARTITIONS = 256
+MAX_FISCAL_PROJECTION_NODES = 256000
+MAX_FISCAL_PROJECTION_EDGES = 512000
+MAX_FISCAL_PROJECTION_BATCH_BYTES = 4 * 1024 * 1024
+MAX_FISCAL_PROJECTION_TOTAL_BYTES = 128 * 1024 * 1024
+
+
+def _offline_model(model_type, value):
+    """Revalidate even preconstructed/copied Pydantic instances at each boundary."""
+    if type(value) not in (dict, model_type):
+        raise ValueError('offline fiscal input must be a typed model or object')
+    return model_type.model_validate(value)
+
+
+def _offline_bytes(value: dict, *, limit: int) -> bytes:
+    # Models have already bounded depth, strings and collection sizes. Incremental
+    # encoding stops before accumulating an oversized serialized partition.
+    output = bytearray()
+    encoder = json.JSONEncoder(ensure_ascii=False, sort_keys=True, separators=(',', ':'), allow_nan=False)
+    for part in encoder.iterencode(value):
+        output.extend(part.encode('utf-8'))
+        if len(output) > limit:
+            raise ValueError('offline fiscal payload exceeds byte limit')
+    return bytes(output)
+
+
+def fiscal_projection_node_id(scope: FiscalProjectionScope, reference: FiscalCanonicalReference) -> str:
+    """Scoped projection identity from supplied canonical identity, not evidence."""
+    scope = _offline_model(FiscalProjectionScope, scope)
+    reference = _offline_model(FiscalCanonicalReference, reference)
+    body = {'scope': scope.model_dump(mode='json'), 'canonical_reference': reference.model_dump(mode='json')}
+    return 'fiscal2:node:' + hashlib.sha256(_offline_bytes(body, limit=8192)).hexdigest()
+
+
+def fiscal_projection_edge_id(scope: FiscalProjectionScope, reference: FiscalCanonicalReference) -> str:
+    """Reference an explicit upstream assertion; this function creates no join."""
+    return fiscal_projection_node_id(scope, reference).replace('fiscal2:node:', 'fiscal2:edge:', 1)
+
+
+def fiscal_projection_content_hash(record: FiscalProjectionBatch | FiscalProjectionManifest) -> str:
+    """Digest the validated internal content excluding its own content_hash."""
+    if isinstance(record, FiscalProjectionBatch):
+        model = _offline_model(FiscalProjectionBatch, record)
+    elif isinstance(record, FiscalProjectionManifest):
+        model = _offline_model(FiscalProjectionManifest, record)
+    else:
+        raise ValueError('fiscal digest requires a typed offline batch or manifest')
+    body = model.model_dump(mode='json', exclude={'content_hash'})
+    return hashlib.sha256(_offline_bytes(body, limit=MAX_FISCAL_PROJECTION_BATCH_BYTES)).hexdigest()
+
+
+def validate_fiscal_partition_replay(
+    manifest: FiscalProjectionManifest,
+    *,
+    retained_partitions: tuple[FiscalProjectionPartition, ...],
+) -> None:
+    """Require every caller-designated retained partition with identical content.
+
+    Callers must obtain the required retained set from the authoritative scoped
+    prior state. Empty means an explicitly new baseline; it is not a removal
+    authorization. WAVE-134 owns that state, eligibility and removal decisions.
+    """
+    manifest = _offline_model(FiscalProjectionManifest, manifest)
+    if type(retained_partitions) is not tuple or len(retained_partitions) > MAX_FISCAL_PROJECTION_PARTITIONS:
+        raise ValueError('retained partitions must be a bounded tuple')
+    incoming = {}
+    for partition in manifest.partitions:
+        if partition.partition_id in incoming:
+            raise ValueError('manifest repeats a partition identity')
+        incoming[partition.partition_id] = partition
+    seen = set()
+    for candidate in retained_partitions:
+        prior = _offline_model(FiscalProjectionPartition, candidate)
+        if prior.partition_id in seen:
+            raise ValueError('retained set repeats a partition identity')
+        seen.add(prior.partition_id)
+        replacement = incoming.get(prior.partition_id)
+        if replacement is None:
+            raise ValueError('manifest omits a required retained partition')
+        if replacement != prior:
+            raise ValueError('immutable retained partition replay conflicts')
+
+
+def validate_fiscal_projection_manifest(
+    manifest: FiscalProjectionManifest,
+    batches: Iterable[FiscalProjectionBatch],
+    *,
+    expected_scope: FiscalProjectionScope,
+    retained_partitions: tuple[FiscalProjectionPartition, ...],
+) -> dict[str, Any]:
+    """Validate complete offline structural accounting, with no I/O or activation.
+
+    Consumes at most the declared partition count plus one extra sentinel batch.
+    Retains bounded identity/hash/endpoint indexes, not all source payloads.
+    This proves neither custody, publication, canonical joins, source coverage,
+    legal direction/lineage semantics, nor current document/chunk accessibility.
+    The KS-600/650 adapter and runtime gates are intentionally still absent.
+    """
+    manifest = _offline_model(FiscalProjectionManifest, manifest)
+    expected_scope = _offline_model(FiscalProjectionScope, expected_scope)
+    if manifest.scope != expected_scope:
+        raise ValueError('fiscal manifest scope does not match caller scope')
+    if fiscal_projection_content_hash(manifest) != manifest.content_hash:
+        raise ValueError('fiscal manifest content digest mismatch')
+    validate_fiscal_partition_replay(manifest, retained_partitions=retained_partitions)
+    declared = manifest.total_expected_counts
+    sums = {field: sum(getattr(part.expected_counts, field) for part in manifest.partitions)
+            for field in ('nodes', 'edges', 'descriptions')}
+    if sums != declared.model_dump():
+        raise ValueError('manifest total counts do not equal partition counts')
+    if declared.nodes > MAX_FISCAL_PROJECTION_NODES or declared.edges > MAX_FISCAL_PROJECTION_EDGES:
+        raise ValueError('manifest exceeds total projection limits')
+    iterator = iter(batches)
+    node_ids: set[str] = set()
+    edge_ids: set[str] = set()
+    canonical_nodes: set[tuple[str, str, str]] = set()
+    canonical_edges: set[tuple[str, str, str]] = set()
+    endpoints: set[str] = set()
+    span_bindings: dict[str, str] = {}
+    row_bindings: dict[tuple[str, int, int], tuple[str, str]] = {}
+    row_line_diagnostics: dict[tuple[str, int, int], int] = {}
+    source_revisions: dict[str, str] = {}
+    extraction_revisions: dict[str, str] = {}
+    total_bytes = 0
+    for partition in manifest.partitions:
+        try:
+            raw_batch = next(iterator)
+        except StopIteration as exc:
+            raise ValueError('fiscal manifest is incomplete: missing partition') from exc
+        batch = _offline_model(FiscalProjectionBatch, raw_batch)
+        if batch.scope != expected_scope:
+            raise ValueError('fiscal partition scope does not match caller scope')
+        if batch.partition_id != partition.partition_id:
+            raise ValueError('fiscal partition order or identity mismatch')
+        actual = FiscalProjectionCounts(nodes=len(batch.nodes), edges=len(batch.edges),
+                                        descriptions=sum(node.description is not None for node in batch.nodes))
+        if actual != batch.expected_counts or actual != partition.expected_counts:
+            raise ValueError('fiscal partition counts mismatch')
+        encoded = _offline_bytes(batch.model_dump(mode='json', exclude={'content_hash'}),
+                                 limit=MAX_FISCAL_PROJECTION_BATCH_BYTES)
+        total_bytes += len(encoded)
+        if total_bytes > MAX_FISCAL_PROJECTION_TOTAL_BYTES:
+            raise ValueError('fiscal projection exceeds total byte limit')
+        digest = hashlib.sha256(encoded).hexdigest()
+        if digest != batch.content_hash or digest != partition.content_hash:
+            raise ValueError('fiscal partition content digest mismatch')
+        for record, ids, canonical_ids, identity_function in chain(
+            ((node, node_ids, canonical_nodes, fiscal_projection_node_id) for node in batch.nodes),
+            ((edge, edge_ids, canonical_edges, fiscal_projection_edge_id) for edge in batch.edges),
+        ):
+            ref = record.canonical_reference
+            canonical_key = (ref.type, ref.id, ref.revision_or_hash)
+            if record.projection_id in ids or canonical_key in canonical_ids:
+                raise ValueError('duplicate or conflicting fiscal identity across partitions')
+            if record.projection_id != identity_function(expected_scope, ref):
+                raise ValueError('fiscal projection identity does not match scoped canonical reference')
+            ids.add(record.projection_id)
+            canonical_ids.add(canonical_key)
+            for evidence in record.evidence:
+                if source_revisions.setdefault(evidence.source_revision_id, evidence.source_content_hash_sha256) != evidence.source_content_hash_sha256:
+                    raise ValueError('conflicting raw content hashes for one source revision')
+                if evidence.extraction_revision_id is not None:
+                    if extraction_revisions.setdefault(evidence.extraction_revision_id, evidence.extraction_content_hash_sha256) != evidence.extraction_content_hash_sha256:
+                        raise ValueError('conflicting content hashes for one extraction revision')
+                if evidence.evidence_kind == 'document_span':
+                    key = evidence.source_span_id
+                    binding = hashlib.sha256(_offline_bytes({
+                        'source_revision_id': evidence.source_revision_id,
+                        'source_hash': evidence.source_content_hash_sha256,
+                        'span_type': evidence.span_type, 'locator_json': evidence.locator_json,
+                        'content_hash': evidence.content_hash_sha256,
+                    }, limit=32768)).hexdigest()
+                    if span_bindings.setdefault(key, binding) != binding:
+                        raise ValueError('conflicting fiscal source span evidence binding')
+                else:
+                    key = (evidence.source_revision_id, evidence.locator.header_records,
+                           evidence.locator.data_record_1based)
+                    binding = (evidence.source_content_hash_sha256, evidence.raw_record_sha256)
+                    if row_bindings.setdefault(key, binding) != binding:
+                        raise ValueError('conflicting fiscal structured row evidence binding')
+                    line_end = evidence.locator.physical_line_end_1based
+                    if line_end is not None and row_line_diagnostics.setdefault(key, line_end) != line_end:
+                        raise ValueError('conflicting physical line diagnostics for one structured row')
+        for edge in batch.edges:
+            endpoints.update((edge.source_node_id, edge.target_node_id))
+    sentinel = object()
+    if next(iterator, sentinel) is not sentinel:
+        raise ValueError('fiscal stream has undeclared extra partitions')
+    if endpoints - node_ids:
+        raise ValueError('fiscal projection has unresolved cross-partition endpoints')
+    return {
+        'validation_kind': 'offline_structure_only',
+        'publication_eligibility': 'not_checked',
+        'source_coverage': 'not_checked',
+        'canonical_relationship_semantics': 'not_checked',
+        'manifest_id': manifest.manifest_id,
+        'manifest_content_hash': manifest.content_hash,
+        'partitions': len(manifest.partitions),
+        'nodes': len(node_ids), 'edges': len(edge_ids),
+        'descriptions': declared.descriptions, 'content_bytes': total_bytes,
+    }

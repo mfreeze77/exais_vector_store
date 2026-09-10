@@ -13,9 +13,11 @@ from urllib.parse import urlsplit
 
 from svs_common.fiscal_graph_artifact import (
     MAX_INPUT_FILE_BYTES,
+    MAX_STRUCTURED_SOURCE_BYTES,
     build_fiscal_graph_artifact,
     validate_built_artifact,
     validate_vector_store_id,
+    verify_structured_csv_evidence,
 )
 
 
@@ -36,6 +38,16 @@ def _read(path: Path) -> Any:
 def _write(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _read_csv_bytes(path: Path) -> bytes:
+    if not path.is_file() or path.stat().st_size > MAX_STRUCTURED_SOURCE_BYTES:
+        raise ValueError("CSV source must be a regular file no larger than 16 MiB")
+    with path.open("rb") as handle:
+        raw = handle.read(MAX_STRUCTURED_SOURCE_BYTES + 1)
+    if len(raw) > MAX_STRUCTURED_SOURCE_BYTES:
+        raise ValueError("CSV source exceeds 16 MiB")
+    return raw
 
 
 def _safe_api(value: str) -> str:
@@ -82,6 +94,11 @@ def _relationship_ids(value: Any) -> set[str]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
+    verify_csv = sub.add_parser("verify-structured-evidence", help="verify local CSV bytes and exact record hashes offline")
+    verify_csv.add_argument("--source-csv", type=Path, required=True)
+    verify_csv.add_argument("--source-sha256", required=True)
+    verify_csv.add_argument("--records", type=Path, required=True,
+                            help="JSON array of data_record_1based/raw_record_sha256 references")
     build = sub.add_parser("build")
     build.add_argument("--publisher", type=Path, required=True); build.add_argument("--chunks", type=Path, required=True)
     build.add_argument("--vector-store-id", required=True); build.add_argument("--output", type=Path, required=True)
@@ -98,6 +115,12 @@ def main() -> int:
     evaluate.add_argument("--query", required=True); evaluate.add_argument("--expected-relation-id", action="append", required=True)
     args = parser.parse_args()
 
+    if args.command == "verify-structured-evidence":
+        result = verify_structured_csv_evidence(
+            source_bytes=_read_csv_bytes(args.source_csv), expected_source_sha256=args.source_sha256,
+            records=_read(args.records),
+        )
+        print(json.dumps(result, sort_keys=True)); return 0
     if args.command == "build":
         chunks = _read(args.chunks)
         if not isinstance(chunks, list):

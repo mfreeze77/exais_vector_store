@@ -1,6 +1,6 @@
 # WAVE-133: Project canonical identities and typed structured evidence into the fiscal graph
 
-Status: proposed. Parent: WAVE-132 (reopened). Filed 2026-09-10.
+Status: in progress — independent offline foundation; upstream integration pending. Parent: WAVE-132 (reopened). Filed 2026-09-10.
 
 ## Summary
 
@@ -107,4 +107,35 @@ Disable the fiscal projection/profile if validation fails. Preserve canonical so
 
 ## Implementation Log
 
-Implementation has not started under this ticket. Planning only: corrected against the 2026-09-10 developer-manager handoff and independently gated ticket stack. Record actual changed code and verification results here during execution.
+2026-09-10: the owner authorized coder workers and independent quality review,
+and confirmed that the StateCivics developer manager owns the KS tickets.
+ExAIS implementation runs in the separate feature worktree
+`/Users/mfrieson/Developer/exais-vector-store-law-money` on
+`feat/statecivics-law-money-projection`, based on the preserved `3230b74` handoff.
+
+The initial increment implements only independent offline typed evidence,
+partition/manifest validation, and retained CSV evidence verification. It does
+not define the KS-650 wire schema or a canonical provision identifier. The
+existing runtime remains unchanged while these components are built and tested.
+
+Read-only upstream inspection found no provision-reference contract or second
+entity/relationship export implementation at planning `3650b8c5` or operational
+`8ffabad9`. KS-600/650 remain integration prerequisites. The existing KanView
+loader retains canonical observation identities but leaves source locators empty;
+the ExAIS byte/record verifier cannot repair or publish those canonical records.
+
+Full acceptance still requires the actual upstream contract and reviewed export,
+adapter/API and disposable PostgreSQL integration, and the remaining acceptance
+criteria above. WAVE-134 through WAVE-136 have not started.
+
+The independent foundation is implemented: internal typed evidence/citations,
+complete bounded manifests and retained-partition replay, source/extraction
+revision hash consistency, and the offline CSV byte/record verifier. Root's
+combined container check returned **272 passed, zero skipped**, including the
+real source tests and existing API contracts. See
+[the implementation proof](../.tranche/statecivics-semantic-graph/aligned/wave-133-offline-proof.md)
+for commands, source coverage and deferred acceptance. Independent review found
+and then verified the fix for a verifier/typed-locator composition defect;
+[review 2](../.tranche/statecivics-semantic-graph/aligned/wave-133-offline-qc-2.md)
+returned **PASS WITH NOTES** for this increment. No full-ticket completion or
+activation is claimed.

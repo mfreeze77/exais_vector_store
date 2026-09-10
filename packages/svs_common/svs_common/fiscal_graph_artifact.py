@@ -7,10 +7,12 @@ quote-to-current-chunk bindings.  It never infers relationships from text.
 
 from __future__ import annotations
 
+import csv
 import hashlib
+import io
 import json
 import re
-from typing import Any
+from typing import Any, TypedDict
 from uuid import UUID
 
 from .fiscal_graph import (
@@ -28,6 +30,11 @@ MAX_PUBLISHER_NODES = 1000
 MAX_PUBLISHER_EDGES = 2000
 MAX_CHUNK_INVENTORY = 5000
 MAX_INPUT_FILE_BYTES = 16 * 1024 * 1024
+MAX_STRUCTURED_SOURCE_BYTES = 16 * 1024 * 1024
+MAX_STRUCTURED_SOURCE_RECORDS = 100_000
+MAX_STRUCTURED_RECORD_REFERENCES = 1000
+MAX_STRUCTURED_COLUMNS = 256
+MAX_STRUCTURED_FIELD_CHARACTERS = 64 * 1024
 _HEX = re.compile(r"^[0-9a-f]{64}$")
 _COMMIT = re.compile(r"^[0-9a-f]{40}$")
 _STORE = re.compile(r"^vs_[A-Za-z0-9_-]{1,124}$")
@@ -52,6 +59,98 @@ def _sha(value: Any, field: str) -> str:
     if not isinstance(value, str) or not _HEX.fullmatch(value):
         raise FiscalGraphArtifactError(f"{field} must be a lowercase SHA-256")
     return value
+
+
+class StructuredCSVRecordReference(TypedDict):
+    """An offline verification request, not an upstream publication record."""
+
+    data_record_1based: int
+    raw_record_sha256: str
+
+
+def verify_structured_csv_evidence(
+    *, source_bytes: bytes, expected_source_sha256: str,
+    records: list[StructuredCSVRecordReference],
+) -> dict[str, Any]:
+    """Verify exact CSV records in retained bytes without inferring identities.
+
+    A record is a one-based *data* record, excluding the single header record;
+    quoted newlines do not create extra records. Hashes cover canonical JSON
+    ``{"headers": [...], "values": [...]}``, preserving all parsed strings,
+    including leading zeroes, whitespace, empty fields, and quoted newlines.
+    The source digest covers the original bytes, including a possible UTF-8 BOM.
+
+    This proves only a byte/locator match. The caller must independently establish
+    source selection, custody, canonical revision, and publication eligibility.
+    No source text, canonical IDs, legal relationships, or loadable artifact is
+    returned. Identical rows at distinct locators remain distinct observations.
+    """
+    expected_source_sha256 = _sha(expected_source_sha256, "expected_source_sha256")
+    if not isinstance(source_bytes, bytes) or len(source_bytes) > MAX_STRUCTURED_SOURCE_BYTES:
+        raise FiscalGraphArtifactError("CSV source must be bounded bytes (maximum 16 MiB)")
+    if (not isinstance(records, list) or not records
+            or len(records) > MAX_STRUCTURED_RECORD_REFERENCES):
+        raise FiscalGraphArtifactError("CSV evidence requires 1..1000 record references")
+    requested: dict[int, str] = {}
+    for reference in records:
+        if not isinstance(reference, dict) or set(reference) != {"data_record_1based", "raw_record_sha256"}:
+            raise FiscalGraphArtifactError("CSV reference requires only data_record_1based and raw_record_sha256")
+        number = reference["data_record_1based"]
+        if type(number) is not int or not 1 <= number <= MAX_STRUCTURED_SOURCE_RECORDS:
+            raise FiscalGraphArtifactError("CSV data_record_1based must be an integer in 1..100000")
+        if number in requested:
+            raise FiscalGraphArtifactError("duplicate CSV data-record reference")
+        requested[number] = _sha(reference["raw_record_sha256"], "raw_record_sha256")
+    source_hash = hashlib.sha256(source_bytes).hexdigest()
+    if source_hash != expected_source_sha256:
+        raise FiscalGraphArtifactError("CSV source hash mismatch")
+
+    def check_fields(values: list[str]) -> None:
+        if len(values) > MAX_STRUCTURED_COLUMNS:
+            raise FiscalGraphArtifactError("CSV exceeds 256 columns")
+        if any(len(value) > MAX_STRUCTURED_FIELD_CHARACTERS for value in values):
+            raise FiscalGraphArtifactError("CSV field exceeds 65536 characters")
+
+    matches: list[dict[str, Any]] = []
+    records_read = 0
+    try:
+        reader = csv.reader(io.StringIO(source_bytes.decode("utf-8-sig"), newline=""), strict=True)
+        headers = next(reader, None)
+        if not headers or not any(headers):
+            raise FiscalGraphArtifactError("CSV requires a header record")
+        check_fields(headers)
+        if len(headers) != len(set(headers)):
+            raise FiscalGraphArtifactError("CSV has duplicate headers")
+        # A single empty header is retained: the real KanView extracts have a
+        # trailing empty column. It participates in each exact row digest.
+        for number, values in enumerate(reader, 1):
+            if number > MAX_STRUCTURED_SOURCE_RECORDS:
+                raise FiscalGraphArtifactError("CSV source exceeds 100000 data records")
+            check_fields(values)
+            if len(values) != len(headers):
+                raise FiscalGraphArtifactError(f"CSV data record {number} has an unexpected column count")
+            records_read = number
+            if number not in requested:
+                continue
+            row_hash = sha256_json({"headers": headers, "values": values})
+            if row_hash != requested[number]:
+                raise FiscalGraphArtifactError(f"CSV data record {number} hash mismatch")
+            matches.append({
+                "locator": {"kind": "csv_record", "data_record_1based": number,
+                            "header_records": 1, "physical_line_end_1based": reader.line_num},
+                "raw_record_sha256": row_hash,
+            })
+    except (UnicodeError, csv.Error) as exc:
+        raise FiscalGraphArtifactError("CSV must be valid UTF-8 with bounded, well-formed fields") from exc
+    if len(matches) != len(requested):
+        raise FiscalGraphArtifactError("CSV source is missing requested data records")
+    return {
+        "purpose": "offline structured evidence verification only; not a publishable graph",
+        "evidence_kind": "structured_record", "evidence_only": True,
+        "publication_allowed": False,
+        "source_content_hash_sha256": source_hash, "source_byte_size": len(source_bytes),
+        "source_records_read": records_read, "verified_records": len(matches), "records": matches,
+    }
 
 
 def _uuid(value: Any, field: str) -> str:

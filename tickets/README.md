@@ -138,7 +138,7 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-130 Fiscal Law-and-Money Graph Artifact Contract — historical v1](./WAVE-130-fiscal-graph-artifact-attribute-contract.md)
 - [WAVE-131 Embedding Request Batching](./WAVE-131-embedding-request-batching.md)
 - [WAVE-132 Fiscal Law-and-Money GraphRAG Runtime — reopened parent](./WAVE-132-fiscal-law-money-graphrag-runtime.md)
-- [WAVE-133 Fiscal Canonical Projection Contract](./WAVE-133-fiscal-canonical-projection-contract.md)
+- [WAVE-133 Fiscal Canonical Projection Contract — offline foundation in progress](./WAVE-133-fiscal-canonical-projection-contract.md)
 - [WAVE-134 Fiscal Projection Ingestion and Lifecycle](./WAVE-134-fiscal-projection-ingestion-lifecycle.md)
 - [WAVE-135 Fiscal Hybrid Retrieval and Typed Traversal](./WAVE-135-fiscal-hybrid-retrieval-and-typed-traversal.md)
 - [WAVE-136 Fiscal Real-Source Generalization Evaluation](./WAVE-136-fiscal-real-source-generalization-evaluation.md)

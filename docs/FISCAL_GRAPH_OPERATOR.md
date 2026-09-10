@@ -5,7 +5,7 @@ below assumes PDF-backed evidence for every entity. The retained KanView corpus
 shows that assumption is wrong for account/agency/fund observations, and the
 current narrative chunks lack the assumed page fields. See
 [the real-data correction and reproducible audit](FISCAL_GRAPH_REAL_DATA.md).
-The commands below describe the implemented v1 mechanics; they are not a ready
+The legacy build/load/evaluate commands describe the implemented v1 mechanics; they are not a ready
 activation path for the real State Civics fiscal graph.
 
 The [agreed StateCivics handoff](STATECIVICS_LAW_MONEY_ALIGNMENT.md) supersedes
@@ -13,8 +13,39 @@ those design assumptions. WAVE-133/134 must consume KS-650's extension of the
 existing upstream exporter, including typed structured evidence, provision
 references from KS-600, and action/fact lineage through derivation records.
 WAVE-135/136 must prove useful real-source paths and answers before WAVE-132's
-integrated activation gate can pass. The commands below remain legacy v1
+integrated activation gate can pass. Legacy build/load/evaluate remain v1
 mechanics, not the corrected contract or a request to activate it.
+
+## Offline structured evidence verification
+
+WAVE-133's independent foundation adds `verify-structured-evidence` to the
+existing CLI. It verifies local UTF-8 CSV bytes against an expected source hash
+and exact one-based data-record hashes. Run it inside the existing ExAIS test or
+operator container with the source and reference files mounted read-only:
+
+```console
+python scripts/release/kansas-fiscal-graphrag.py verify-structured-evidence \
+  --source-csv /corpus/data/kanview/FY2026/ExpData_652_2026.csv \
+  --source-sha256 ea386136d6135334aa71f84331ec8ab68b2d5c83d9b992efe72b41e1a569eaed \
+  --records /evidence/record-references.json
+```
+
+The reference file is a JSON array of `data_record_1based` and
+`raw_record_sha256` pairs from the retained-source audit or upstream evidence.
+The record digest covers canonical JSON `{"headers": [...], "values": [...]}`,
+preserving parsed strings, leading zeroes, empty fields, and quoted newlines.
+The source digest covers the original bytes. A data-record number excludes the
+header and is not a PDF page or physical line number.
+
+The command checks the whole CSV structure and all requested records, returns
+only hashes, locators and counts, and makes no API/provider calls. It requires
+no graph profile or authentication token. It explicitly returns
+`evidence_only: true` and `publication_allowed: false`. A matching byte/record
+digest establishes neither canonical source selection, custody, reviewed account
+identity nor publication eligibility; those remain upstream responsibilities.
+Its output is not accepted as a graph artifact by the legacy load path.
+
+## Legacy v1 build, load and evaluation
 
 This path activates only the Kansas StateCivics fiscal document store. It does
 not enable graph expansion for other projects or stores.
