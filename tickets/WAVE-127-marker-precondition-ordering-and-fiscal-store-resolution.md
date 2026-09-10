@@ -112,6 +112,22 @@ withdrawn, unavailable, corrected, and superseded records remove a previously
 indexed file *before* any additions are applied. That convergence path runs
 through this route.
 
+### 5. No per-job Marker cost telemetry
+
+`MarkerRunpodClient` polls `/status/{job_id}` and reads only `status` and
+`output`. RunPod returns `delayTime` (time spent queued, including cold start)
+and `executionTime` (actual GPU time) on that same response, and both are
+discarded. The client's `emit` progress callback is also not wired to logging on
+the `upload_document` path, so a completed job leaves no record of how long it
+queued versus how long it ran.
+
+The consequence is operational, not cosmetic: with only end-to-end wall clock,
+there is no way to tell whether a slow corpus is GPU-bound or queue-bound, and
+therefore no way to decide whether adding concurrency would help or would merely
+parallelise a queue. Capturing `delayTime` and `executionTime` into the persisted
+Marker attributes would make that decision evidence-based and would also give
+WAVE-126 a real per-document cost figure.
+
 ## Deliverables
 
 - Vector-store resolution moved ahead of Marker extraction in `upload_document`.
