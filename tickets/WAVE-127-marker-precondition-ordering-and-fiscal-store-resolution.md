@@ -2,7 +2,7 @@
 
 ## Summary
 
-Five defects found while running the WAVE-126 Kansas fiscal pipeline end to end
+Seven defects found while running the WAVE-126 Kansas fiscal pipeline end to end
 for the first time against a real RunPod Marker endpoint. The most expensive one
 checks the target vector store only after the extraction is complete, and by
 then the request's transaction-local RLS context is gone, so the lookup finds
@@ -170,6 +170,54 @@ parallelise a queue. Capturing `delayTime` and `executionTime` into the persiste
 Marker attributes would make that decision evidence-based and would also give
 WAVE-126 a real per-document cost figure.
 
+### 6. Caller identity depends on whether `.release/` happens to be visible
+
+`default_headers` in `scripts/release/topeka_pipeline_common.py` resolves the
+tenant, business instance and user from `maybe_read_env(cell)`, which reads
+`ROOT/.release/cells/<cell>/.env.cell` and otherwise falls back to
+`DEFAULT_TENANT_ID` and friends.
+
+`ROOT` is derived from the script's own location, so the same command run against
+the same cell sends a different principal depending on which copy of the tree the
+process sees. In this run the ingest executed from the API image, where `/app`
+has no `.release`, and sent `ten_ks_state_civics`. The handoff executed with the
+worktree mounted, where `.release/cells/ks-fiscal-local/.env.cell` does exist, and
+so sent that file's `SVS_DEV_TENANT_ID` of `ten_dev`. The handoff then failed with
+`404 Vector store file not found` on a file that was present and healthy, because
+RLS correctly hid another tenant's row.
+
+Two commands in the same pipeline, pointed at the same cell, disagreeing about who
+they are is a latent correctness problem well beyond this run. The fallback should
+be explicit rather than filesystem-dependent, and the resolved principal should be
+logged.
+
+### 7. The endpoint no longer honours two of the three fiscal profile options
+
+This one is endpoint-side, not client-side. The client builds the request
+correctly: `paginate_output`, `html_tables_in_markdown` and
+`disable_image_extraction` are all placed inside `payload["input"]`, and the
+persisted `marker_options` confirms all three were sent.
+
+The returned Markdown does not reflect two of them. Measured on the 139-page
+FY2005 comparison report (937,624 characters):
+
+- `paginate_output: true` produced **zero** `{N}` page delimiters.
+- `html_tables_in_markdown: true` produced **zero** `<table>` elements; all 106
+  detected tables are GFM pipe tables, 4,047 pipe lines.
+- The same is true of the 1-page allotment letter, so this is systemic rather
+  than a property of one document.
+
+The 2026-09-04 bounded proof recorded 31 consecutive page delimiters and 6
+HTML-preserved tables from the same profile, so the endpoint's behaviour has
+changed since. The consequence is that the handoff refuses with
+`persisted Marker artifact has no page delimiters`, and WAVE-126's requirement
+for HTML-preserved table geometry (rowspan/colspan) cannot be satisfied from this
+output either.
+
+This blocks KS-599 regardless of the fixes in this ticket: extraction now
+succeeds and persists, but produces output the contract cannot accept. Confirm
+the deployed Marker image and option names before spending further GPU.
+
 ## Deliverables
 
 - Vector-store resolution moved ahead of Marker extraction in `upload_document`.
@@ -204,7 +252,7 @@ WAVE-126 a real per-document cost figure.
 ## Dependencies
 
 - WAVE-012, whose system-worker fix this extends to the third delete route.
-- WAVE-126, whose live run surfaced all five defects.
+- WAVE-126, whose live run surfaced all seven defects.
 
 ## Verification
 
