@@ -796,6 +796,12 @@ def main() -> int:
             timeout=args.api_timeout_seconds,
             cell=args.cell,
             transport=args.api_transport,
+            attributes={
+                "corpus": "kansas_fiscal_documents",
+                "source_collection": "statecivics-fiscal-ledger",
+                "production_ready": "false",
+                "created_by": "scripts/release/kansas-fiscal-document-ingest.py",
+            },
         )
     else:
         headers = {}

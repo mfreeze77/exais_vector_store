@@ -191,3 +191,60 @@ def test_marker_pdf_upload_request_reports_missing_config(monkeypatch: pytest.Mo
 
     assert exc_info.value.status_code == 503
     assert "not configured" in str(exc_info.value.detail)
+
+
+def test_upload_document_rejects_unknown_vector_store_before_calling_marker(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """A bad destination must cost a 404, never a billed extraction.
+
+    Marker is an external paid job. Before this guard the vector store was only
+    checked inside ingest_or_enqueue, which runs after extraction, so a missing
+    or RLS-invisible store discarded a completed conversion. The fake client
+    fails the test if it is reached at all.
+    """
+    called: list[str] = []
+
+    class ForbiddenMarkerClient:
+        async def process_pdf_bytes(self, **_kwargs):
+            called.append("marker")
+            raise AssertionError("Marker must not run before the vector store is validated")
+
+    monkeypatch.setattr(api_main, "MarkerRunpodClient", ForbiddenMarkerClient)
+
+    def deny(_db, _principal, _vector_store_id, **_kwargs):
+        raise HTTPException(status_code=404, detail="Vector store not found or expired")
+
+    monkeypatch.setattr(api_main, "_refresh_vector_store_activity_or_404", deny)
+    monkeypatch.setattr(api_main, "ensure_scope", lambda *a, **k: None)
+    monkeypatch.setattr(api_main, "enforce_rate_limit", lambda *a, **k: None)
+    monkeypatch.setattr(api_main, "check_idempotency", lambda *a, **k: None)
+
+    class Upload:
+        filename = "budget.pdf"
+        content_type = "application/pdf"
+
+        async def read(self):
+            return b"%PDF-1.4 budget"
+
+    with pytest.raises(HTTPException) as exc:
+        run(
+            api_main.upload_document(
+                file=Upload(),
+                title="budget",
+                mode="auto_detect_v1",
+                vector_store_id="vs_does_not_exist",
+                knowledge_base_id="kb_test",
+                security_level=0,
+                classification="public",
+                source_uri=None,
+                source_identity=None,
+                attributes_json=None,
+                idempotency_key=None,
+                principal=principal(),
+                db=object(),
+            )
+        )
+
+    assert exc.value.status_code == 404
+    assert called == [], "Marker was invoked despite an invalid vector store"

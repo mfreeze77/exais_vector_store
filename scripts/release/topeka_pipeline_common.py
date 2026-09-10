@@ -501,9 +501,8 @@ def ensure_vector_store(
     timeout: int,
     cell: str = DEFAULT_CELL,
     transport: str = "auto",
+    attributes: dict[str, Any] | None = None,
 ) -> str:
-    if vector_store_id and vector_store_id != DEFAULT_VECTOR_STORE_ID:
-        return vector_store_id
     page = api_json(
         "GET",
         api_base,
@@ -514,7 +513,19 @@ def ensure_vector_store(
         cell=cell,
         transport=transport,
     )
-    for item in page.get("data", []):
+    items = page.get("data", [])
+    if vector_store_id and vector_store_id != DEFAULT_VECTOR_STORE_ID:
+        # Verify rather than trust. Returning an unchecked id defers the failure
+        # to the ingest call, and on the PDF route that means discovering a bad
+        # id only after a billed Marker extraction has already run.
+        if any(item.get("id") == vector_store_id for item in items):
+            return vector_store_id
+        raise RuntimeError(
+            f"Vector store id {vector_store_id!r} does not exist or is not visible to this caller. "
+            "Note that a source-package placeholder such as 'vs_<slug>_pending' is a name, not an id; "
+            "omit --vector-store-id to resolve the store by name instead."
+        )
+    for item in items:
         if item.get("name") == vector_store_name:
             return str(item["id"])
     if not allow_create:
@@ -524,7 +535,11 @@ def ensure_vector_store(
     payload = {
         "name": vector_store_name,
         "knowledge_base_id": knowledge_base_id,
-        "attributes": {
+        # Corpus identity belongs to the calling adapter. The Topeka defaults are
+        # kept only so existing Topeka callers are unchanged; any other corpus
+        # must pass its own, or the store is created carrying the wrong
+        # provenance.
+        "attributes": dict(attributes) if attributes else {
             "corpus": "topeka_municipal_code",
             "source_collection": "topeka-municipal-code",
             "created_by": "scripts/release/topeka_pipeline_common.py",

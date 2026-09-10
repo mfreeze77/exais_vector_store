@@ -151,6 +151,29 @@ def is_retryable_marker_error(error: str | None) -> bool:
     return any(marker in normalized for marker in retryable_markers)
 
 
+def _job_metrics(poll_data: dict[str, Any], *, observed_sec: float) -> dict[str, Any]:
+    """Normalise RunPod's job timing into seconds.
+
+    ``delayTime`` is time spent queued, which includes serverless cold start.
+    ``executionTime`` is time actually spent running. Both arrive in
+    milliseconds. ``observed_sec`` is our own wall clock from submit to
+    COMPLETED, which brackets the two and stays meaningful when the endpoint
+    omits either field.
+    """
+    metrics: dict[str, Any] = {"marker_observed_seconds": round(observed_sec, 3)}
+    for source_key, attr_key in (
+        ("delayTime", "marker_queue_seconds"),
+        ("executionTime", "marker_execution_seconds"),
+    ):
+        value = poll_data.get(source_key)
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            metrics[attr_key] = round(float(value) / 1000.0, 3)
+    worker = poll_data.get("workerId")
+    if isinstance(worker, str) and worker:
+        metrics["marker_worker_id"] = worker
+    return metrics
+
+
 def marker_attribute_summary(
     *,
     original_filename: str | None,
@@ -160,6 +183,7 @@ def marker_attribute_summary(
     source_object_key: str | None = None,
     extraction_profile: str | None = None,
     request_options: dict[str, str | bool] | None = None,
+    job_metrics: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     attrs: dict[str, Any] = {
         "source_pdf_id": pdf_source_id(pdf_bytes),
@@ -173,6 +197,8 @@ def marker_attribute_summary(
     if extraction_profile:
         attrs["marker_profile"] = extraction_profile
         attrs["marker_options"] = dict(request_options or {})
+    if job_metrics:
+        attrs.update(job_metrics)
     images = output.get("images")
     attrs["marker_image_count"] = len(images) if isinstance(images, dict | list) else 0
     for source_key, attr_key in (
@@ -201,6 +227,10 @@ def marker_attribute_summary(
 class MarkerRunpodClient:
     """Async client for an external RunPod Marker serverless endpoint."""
 
+    #: Timing for the most recent COMPLETED job, populated by ``_run_once``.
+    #: Empty until a job completes, so callers can pass it unconditionally.
+    last_job_metrics: dict[str, Any]
+
     def __init__(
         self,
         *,
@@ -214,6 +244,7 @@ class MarkerRunpodClient:
         transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
         env = _read_config()
+        self.last_job_metrics = {}
         self.api_key = api_key if api_key is not None else env["api_key"]
         self.endpoint_id = endpoint_id if endpoint_id is not None else env["endpoint_id"]
         resolved_mode = (mode if mode is not None else env["mode"]) or "remote"
@@ -393,7 +424,20 @@ class MarkerRunpodClient:
                     last_status = status
                 if status == "COMPLETED":
                     output = poll_data.get("output") or {}
-                    await emit("completed status=COMPLETED")
+                    # RunPod reports queue time and GPU time on this same
+                    # response. Keep them: without the split there is no way to
+                    # tell a GPU-bound corpus from a queue-bound one, and so no
+                    # evidence for whether concurrency would help.
+                    self.last_job_metrics = _job_metrics(
+                        poll_data, observed_sec=time.monotonic() - started
+                    )
+                    await emit(
+                        "completed status=COMPLETED "
+                        + " ".join(
+                            f"{key}={value}"
+                            for key, value in sorted(self.last_job_metrics.items())
+                        )
+                    )
                     return (output if isinstance(output, dict) else {}), False
                 if status in {"FAILED", "CANCELLED"}:
                     error = poll_data.get("error") or "unknown"

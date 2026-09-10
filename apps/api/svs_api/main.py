@@ -1,6 +1,7 @@
 from __future__ import annotations
 from hashlib import sha256
 import json
+import logging
 import os
 import re
 import time
@@ -198,6 +199,13 @@ def db_for_principal(db: Session = Depends(get_session), principal: Principal = 
     return db
 
 
+# uvicorn configures handlers only for its own loggers, so INFO records emitted
+# by library modules fall through to logging.lastResort at WARNING and are
+# silently dropped. That is why Marker job progress and timing produced no log
+# lines at all. basicConfig is a no-op when the root logger already has
+# handlers, so this stays inert wherever logging is configured elsewhere.
+logging.basicConfig(level=os.getenv('SVS_LOG_LEVEL', 'INFO').upper())
+
 app = FastAPI(title='exai_vector_store API', version=settings.svs_product_version)
 
 
@@ -333,8 +341,9 @@ async def marker_pdf_upload_request(
         marker_options = marker_options_for_profile(extraction_profile)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    marker_client = MarkerRunpodClient()
     try:
-        output = await MarkerRunpodClient().process_pdf_bytes(
+        output = await marker_client.process_pdf_bytes(
             filename=file.filename or 'uploaded.pdf',
             pdf_bytes=content_bytes,
             job_id_callback=job_ids.append,
@@ -366,6 +375,9 @@ async def marker_pdf_upload_request(
             extraction_profile if isinstance(extraction_profile, str) else None
         ),
         request_options=marker_options,
+        # getattr keeps this tolerant of injected clients and test doubles that
+        # predate job metrics; absent telemetry simply adds no attributes.
+        job_metrics=getattr(marker_client, 'last_job_metrics', None),
     ))
     return DocumentIngestRequest(
         vector_store_id=vector_store_id,
@@ -1873,6 +1885,12 @@ async def upload_document(file: UploadFile = File(...), title: str | None = Form
     if cached := check_idempotency(db, principal, idempotency_key, fingerprint):
         return cached
     if is_marker_pdf_upload(file.filename, file.content_type, mode):
+        # Validate the destination before paying for extraction. Marker is a
+        # billed external job, so a store that is missing, deleted, expired or
+        # invisible under RLS must cost a fast 404 rather than a completed
+        # conversion that is then thrown away.
+        if vector_store_id:
+            _refresh_vector_store_activity_or_404(db, principal, vector_store_id)
         req = await marker_pdf_upload_request(
             file=file,
             content_bytes=content_bytes,
@@ -1887,6 +1905,14 @@ async def upload_document(file: UploadFile = File(...), title: str | None = Form
             attributes=attributes,
             classification=classification,
         )
+        # Marker can run for many minutes. RLS context is established once per
+        # request by db_for_principal using set_config(..., true), which is
+        # transaction-local, so it does not survive that wait. Re-establish it
+        # before any further read or write, exactly as this handler already does
+        # before store_idempotency below; otherwise the vector-store lookup in
+        # ingest_or_enqueue matches no rows under RLS and 404s away a completed
+        # extraction.
+        set_rls_context(db, principal)
     else:
         content = content_bytes.decode('utf-8', errors='replace')
         req = DocumentIngestRequest(vector_store_id=vector_store_id, knowledge_base_id=knowledge_base_id, title=title or file.filename or 'uploaded document', filename=file.filename, mime_type=file.content_type, content=content, mode=mode, source_uri=source_uri, source_identity=source_identity, attributes=attributes, security_level=security_level, classification=classification)
@@ -5021,6 +5047,12 @@ def delete_vector_store_file(
     if not row:
         raise HTTPException(status_code=404, detail='Vector store file not found')
     if row['document_id']:
+        # Marking chunks inactive is tenant-scoped system maintenance, which the
+        # chunk RLS policy allows only under svs.system_worker. WAVE-012 set this
+        # flag on the vector-store delete and OpenAI file delete paths but not
+        # here, so per-file removal failed closed with an RLS violation. The flag
+        # is transaction-local and does not widen tenant or business scope.
+        db.execute(text("SELECT set_config('svs.system_worker', 'true', true)"))
         db.execute(text('''
             UPDATE chunks
             SET active=false, deleted_at=now(), dense_index_status='delete_queued', sparse_index_status='delete_queued'
