@@ -31,6 +31,20 @@ appropriation-action contract without a backing model/table/migration. That
 is the minimum data-path work; a new statute corpus is not its prerequisite.
 These are reported data states, not fresh ExAIS queries of the operational DB.
 
+The manager has now located the retained SB 125 provision and started the
+KS-600 provision-reference contract. This is active upstream implementation,
+not a harvest wait. The action and span can be recorded with the legal account
+reference unresolved; a positive crosswalk is not required to preserve the
+source-backed lapse. The existing candidate KanView account `652-1000-840`
+does not resolve the full legal reference `652-00-1000-0840`: missing subunit
+must remain unknown. See the [retained-source handoff review](../instances/ks-state-civics/research/sb125-provision-handoff.md)
+for exact page coordinates and the chapter-amendment check.
+
+KS-600 still owns the allowed `stage` / `metric` / `action_type` combinations
+and the treatment of observed values from official sources. Those rules gate
+reviewed fiscal classification and reconciliation, not writing the schemas or
+retaining the legal evidence. ExAIS will consume the upstream interpretation.
+
 ExAIS could already read the planning branch. The agreed planning documents are
 now merged and pushed to StateCivics `main` at `1649b8ad` (2026-09-10), making
 KS-650 and KS-651 visible in the shared repository. The merge changes only 12
@@ -86,6 +100,14 @@ KS-600 defines provision identity separately from section numbering, source-span
 coordinates and legal effective time. A source span locates evidence; its ID is
 not a provision ID. Re-extraction need not change legal identity, and matching
 section labels across editions do not prove continuity. Preserve unknown dates.
+For the worked case, the citation must include Kansas, the 2025 Session Laws,
+Chapter 117 and section 96(j), bound to the actual legal instrument/version.
+That citation identifies the provision in context; it is not, by itself, the
+canonical identifier. Re-extraction preserves legal identity. A different legal
+version or renumbering requires explicit lineage rather than blindly reusing a
+version-specific reference. Required bill/version references must resolve to
+retained canonical records; the manager-reported absence of an SB 125 bill
+version is not permission to fabricate one in the ExAIS adapter.
 
 Use `derivation.schema.json` typed `inputs` and `outputs` and input/output set
 hashes for action-to-fact lineage. Inputs require `{type, id, revision_or_hash}`;
@@ -145,6 +167,10 @@ three agencies and multiple operations, with a reviewer-controlled positive
 held-back bill/agency case. Freeze answer labels, coverage, denominators and
 thresholds before tuning. Numerical answers require retained-source derivations;
 the older pilot's constants alone do not qualify as ground truth.
+The parallel lapse is section **95(c)**, correcting the manager's section 96(d)
+reference after retained-source review. It is a useful second account/fiscal-year
+example in the same bill; it does not replace KS-651's distinct-bill/session/
+agency coverage or reviewer-controlled held-back case.
 
 Compare exact/lexical, document semantic, entity semantic, hybrid and hybrid with
 graph. Record path and amount/year/source correctness, useful positive answers,

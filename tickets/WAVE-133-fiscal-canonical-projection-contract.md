@@ -148,3 +148,13 @@ contract/records. Existing accounting identities and observations are reusable,
 but neither ticket visibility nor K.S.A. harvest completion fills these gaps.
 The [current handoff](../docs/STATECIVICS_LAW_MONEY_ALIGNMENT.md#current-implementation-handoff)
 records the sequence and preserves StateCivics ownership of that work.
+
+The manager subsequently located retained section 96(j) evidence and reported
+starting KS-600's provision-reference contract. Consume the resulting upstream
+identities/records when delivered; do not invent its wire schema. An unresolved
+legal-account crosswalk does not prevent preserving or citing the lapse action,
+but it must prevent asserting a reviewed composite join. The [retained-source
+review](../instances/ks-state-civics/research/sb125-provision-handoff.md) supplies
+the evidence locator and distinguishes the Chapter 128 amendment marker from
+the scope actually checked. This update does not complete upstream persistence
+or WAVE-133 integration.
