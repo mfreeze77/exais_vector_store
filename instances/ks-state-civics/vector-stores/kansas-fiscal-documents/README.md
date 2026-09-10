@@ -9,6 +9,10 @@ resolution status, and publication decisions remain in StateCivics canonical
 tables. Retrieval may locate a passage and return its official citation; it
 must never decide that two fiscal dimensions are the same.
 
+Related instance research: [law-and-money backbone](../../research/law-and-money-backbone.md)
+records the open-source comparison and the classification, aggregation, and
+provision-evidence responsibilities agreed with the StateCivics developer manager.
+
 ## Extraction boundary
 
 Every retained `application/pdf` is submitted to
