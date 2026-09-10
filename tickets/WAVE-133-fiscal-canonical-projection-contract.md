@@ -158,3 +158,11 @@ review](../instances/ks-state-civics/research/sb125-provision-handoff.md) suppli
 the evidence locator and distinguishes the Chapter 128 amendment marker from
 the scope actually checked. This update does not complete upstream persistence
 or WAVE-133 integration.
+
+Seven-book extraction follow-up: verified retained source/output hashes and
+unique ordered page markers across 6,587 declared pages. The [readiness
+audit](../instances/ks-state-civics/research/session-law-extraction-readiness.md)
+corrects section 96(j)'s proposed character endpoint, documents producer-side
+QA/registration exclusions and preserves the same owner boundary. These
+machine-readable bytes are now available for evidence review; the canonical
+schemas, reviewed derivation/records and adapter/API acceptance remain separate.

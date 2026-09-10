@@ -5,6 +5,11 @@ law-and-money handoff. This records retained-source findings for the upstream
 KS-600/597/650 implementation; it creates no canonical IDs, SourceSpans, ledger
 actions, account crosswalks or published graph records.
 
+Follow-up: all seven books now have retained machine-readable extractions.
+The [extraction readiness audit](session-law-extraction-readiness.md) verifies
+their hashes/page markers, corrects the proposed subsection endpoint to include
+the lapse amount, and records the remaining quality/registration work.
+
 ## Retained source and verification
 
 Source: [2025 Session Laws of Kansas, Book 2](https://www.sos.ks.gov/publications/sessionlaws/2025/2025-Session-Laws-Book-2.pdf).

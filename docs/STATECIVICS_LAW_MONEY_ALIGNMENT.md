@@ -40,6 +40,16 @@ does not resolve the full legal reference `652-00-1000-0840`: missing subunit
 must remain unknown. See the [retained-source handoff review](../instances/ks-state-civics/research/sb125-provision-handoff.md)
 for exact page coordinates and the chapter-amendment check.
 
+The subsequent seven-book Session Laws extraction is present and hash-verified
+(6,587 declared pages with matching unique ordered Markdown page markers).
+Its proposed section 96(j) character range omitted the lapse phrase; the exact
+complete range and producer QA/registration gaps are recorded in the
+[extraction readiness audit](../instances/ks-state-civics/research/session-law-extraction-readiness.md).
+Existing probe, numeric validation and raw fiscal registration exclude Session
+Laws, so they need explicit bounded support before being used for this handoff.
+This is upstream QA/registration work alongside the schemas, not a reason to
+wait for the K.S.A. harvest or to rerun a hash-verified extraction by default.
+
 KS-600 still owns the allowed `stage` / `metric` / `action_type` combinations
 and the treatment of observed values from official sources. Those rules gate
 reviewed fiscal classification and reconciliation, not writing the schemas or
