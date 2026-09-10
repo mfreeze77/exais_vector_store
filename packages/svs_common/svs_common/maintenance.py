@@ -7,7 +7,7 @@ from .sql import jsonb_text
 from .db import jsonb_param
 
 from .schemas import MaintenanceResult, Principal, ReindexRequest
-from .providers import ProviderConfigurationError, provider_for
+from .providers import EmbeddingBatchError, ProviderConfigurationError, provider_for
 from .model_registry import model_registry
 from .qdrant_adapter import QdrantAdapter
 from .opensearch_adapter import OpenSearchAdapter
@@ -184,6 +184,12 @@ class MaintenanceService:
             model = profile.get('model') or group[0]['model_name']
             dimensions = int(profile.get('dimensions') or group[0]['dimensions'])
             emb = await provider.embed([r['text'] for r in group], model, dimensions, input_type="document")
+            # Positional match to chunk rows below; a short result would reindex
+            # only a prefix of the group while marking every row indexed.
+            if len(emb.data) != len(group):
+                raise EmbeddingBatchError(
+                    f"{emb.provider} returned {len(emb.data)} embeddings for {len(group)} chunks"
+                )
             collection = self.qdrant.collection_name(principal.business_instance_id, profile_id)
             points = []
             point_ids_by_chunk: dict[str, str] = {}

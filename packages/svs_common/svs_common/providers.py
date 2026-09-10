@@ -1,5 +1,6 @@
 from __future__ import annotations
 import hashlib, json, math
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Any
 from typing import Protocol
@@ -132,25 +133,239 @@ class HashEmbeddingProvider:
         norm = math.sqrt(sum(v * v for v in vals)) or 1.0
         return [v / norm for v in vals]
 
+# --- Embedding request batching ------------------------------------------------
+#
+# Remote embedding endpoints cap the size of a single request. OpenAI rejects an
+# embeddings request whose inputs exceed 300,000 tokens with HTTP 400 and code
+# "max_tokens_per_request" -- verified live against text-embedding-3-small on
+# 2026-09-10, where 296,755 tokens returned 200 and 302,822 tokens returned
+# "Requested 302822 tokens, max 300000 tokens per request". Posting every chunk
+# of a document in a single request therefore makes large documents
+# un-indexable, so providers split their inputs into ordered batches.
+#
+# Callers match vectors to chunk text positionally, so the batching contract is
+# strict: embed() returns exactly one vector per input, in input order, or it
+# raises. A short or reordered result would misalign vectors with text and
+# corrupt retrieval silently, which is worse than a failed ingest, so every
+# batch is checked rather than truncated.
+
+OPENAI_MAX_TOKENS_PER_REQUEST = 300_000
+OPENAI_MAX_INPUTS_PER_REQUEST = 2048
+
+# Voyage and Cohere publish smaller per-request caps than OpenAI. These are
+# applied conservatively -- a batch smaller than the vendor cap is always
+# accepted where a larger one would be -- and have NOT been confirmed against
+# the live vendor APIs, unlike the OpenAI cap above.
+VOYAGE_MAX_TOKENS_PER_REQUEST = 100_000
+VOYAGE_MAX_INPUTS_PER_REQUEST = 1000
+COHERE_MAX_INPUTS_PER_REQUEST = 96
+
+# Tokens are estimated from character length because the runtime images carry no
+# tokenizer. Measured with cl100k_base over the 12,577 chunks of the Kansas
+# fiscal corpus, the true ratio is 3.08 chars/token at the median and 1.58 at
+# the minimum, so a divisor of 2.0 over-counts for realistic text; the batch
+# budget then leaves further headroom under the hard cap. Content that still
+# defeats the estimate is handled rather than failed: a request rejected for
+# exceeding the token cap is bisected and re-sent.
+EMBEDDING_CHARS_PER_TOKEN = 2.0
+DEFAULT_EMBEDDING_BATCH_TOKEN_BUDGET = 200_000
+
+
+class EmbeddingBatchError(RuntimeError):
+    """Raised when a provider cannot return one vector per input, in input order."""
+
+
+class _EmbeddingRequestTooLarge(RuntimeError):
+    """An endpoint rejected a batch for exceeding its per-request token cap."""
+
+
+def estimate_embedding_tokens(text: str) -> int:
+    """Return a deliberately high token estimate for one input."""
+    return max(1, math.ceil(len(text) / EMBEDDING_CHARS_PER_TOKEN))
+
+
+def plan_embedding_batches(
+    texts: list[str],
+    *,
+    token_budget: int,
+    max_inputs: int | None = None,
+) -> list[tuple[int, int]]:
+    """Split inputs into contiguous [start, end) spans that preserve input order.
+
+    Every input falls in exactly one span and the spans are returned in input
+    order, so concatenating per-span results rebuilds the caller's ordering. An
+    input whose own estimate already exceeds the budget still gets its own span:
+    it is sent and allowed to fail loudly rather than being dropped or split.
+    """
+    if not texts:
+        return []
+    budget = max(1, int(token_budget))
+    limit = max(1, int(max_inputs)) if max_inputs else None
+    spans: list[tuple[int, int]] = []
+    start = 0
+    used = 0
+    for index, text in enumerate(texts):
+        cost = estimate_embedding_tokens(text)
+        batched = index - start
+        if batched and (used + cost > budget or (limit is not None and batched >= limit)):
+            spans.append((start, index))
+            start, used = index, 0
+        used += cost
+    spans.append((start, len(texts)))
+    return spans
+
+
+def ordered_batch_vectors(items: Any, *, expected: int, provider: str) -> list[list[float]]:
+    """Order one batch's vectors by the index the endpoint reported, not arrival order."""
+    if not isinstance(items, list) or len(items) != expected:
+        found = len(items) if isinstance(items, list) else "no"
+        raise EmbeddingBatchError(
+            f"{provider} returned {found} embeddings for a batch of {expected} inputs"
+        )
+    slots: list[list[float] | None] = [None] * expected
+    for position, item in enumerate(items):
+        if isinstance(item, dict):
+            index = int(item.get("index", position))
+            vector = item.get("embedding")
+        else:
+            index = position
+            vector = item
+        if vector is None:
+            raise EmbeddingBatchError(f"{provider} returned a batch item without an embedding")
+        if not 0 <= index < expected:
+            raise EmbeddingBatchError(
+                f"{provider} returned embedding index {index} outside a batch of {expected} inputs"
+            )
+        if slots[index] is not None:
+            raise EmbeddingBatchError(f"{provider} returned duplicate embedding index {index}")
+        slots[index] = list(vector)
+    ordered = [slot for slot in slots if slot is not None]
+    if len(ordered) != expected:
+        raise EmbeddingBatchError(
+            f"{provider} did not return an embedding for every input in a batch of {expected}"
+        )
+    return ordered
+
+
+def accumulate_embedding_usage(totals: dict[str, int], usage: Any) -> None:
+    """Sum numeric usage counters across the batches of one embed() call."""
+    if not isinstance(usage, dict):
+        return
+    for key, value in usage.items():
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            continue
+        totals[key] = int(totals.get(key, 0) + value)
+
+
+def _is_token_cap_rejection(response: httpx.Response) -> bool:
+    """True when a 400 says the batch exceeded the endpoint's per-request token cap."""
+    try:
+        body = response.json()
+    except (TypeError, ValueError):
+        return False
+    error = body.get("error") if isinstance(body, dict) else None
+    if not isinstance(error, dict):
+        return False
+    marker = " ".join(
+        str(error.get(field) or "") for field in ("code", "type", "message")
+    ).lower()
+    return "max_tokens_per_request" in marker or "tokens per request" in marker
+
+
+async def _send_embedding_batch(
+    send: Callable[[list[str]], Awaitable[list[list[float]]]],
+    batch: list[str],
+    *,
+    provider: str,
+) -> list[list[float]]:
+    """Send one batch, bisecting it if the endpoint says it exceeded the token cap.
+
+    Bisection is a correctness backstop for content the character-based estimate
+    under-counts, not a retry policy: it reacts only to the endpoint's explicit
+    token-cap rejection, adds no delay, and terminates because each step halves
+    the batch. A single input that is still too large is a chunking fault and is
+    raised rather than dropped.
+    """
+    try:
+        return await send(batch)
+    except _EmbeddingRequestTooLarge:
+        if len(batch) <= 1:
+            size = len(batch[0]) if batch else 0
+            raise EmbeddingBatchError(
+                f"{provider} rejected a single {size}-character input for exceeding its "
+                "per-request token cap; the chunking profile must emit smaller chunks"
+            ) from None
+        middle = len(batch) // 2
+        head = await _send_embedding_batch(send, batch[:middle], provider=provider)
+        tail = await _send_embedding_batch(send, batch[middle:], provider=provider)
+        return head + tail
+
+
+async def embed_in_order(
+    texts: list[str],
+    *,
+    provider: str,
+    token_budget: int,
+    max_inputs: int | None,
+    send: Callable[[list[str]], Awaitable[list[list[float]]]],
+) -> list[list[float]]:
+    """Embed every input across as many requests as needed, preserving input order."""
+    vectors: list[list[float]] = []
+    for start, end in plan_embedding_batches(texts, token_budget=token_budget, max_inputs=max_inputs):
+        batch = texts[start:end]
+        batch_vectors = await _send_embedding_batch(send, batch, provider=provider)
+        if len(batch_vectors) != len(batch):
+            raise EmbeddingBatchError(
+                f"{provider} returned {len(batch_vectors)} embeddings for inputs "
+                f"{start}..{end - 1} of {len(texts)}"
+            )
+        vectors.extend(batch_vectors)
+    if len(vectors) != len(texts):
+        raise EmbeddingBatchError(
+            f"{provider} returned {len(vectors)} embeddings for {len(texts)} inputs"
+        )
+    return vectors
+
+
 class OpenAIEmbeddingProvider:
     provider = 'openai'
-    def __init__(self, api_key: str | None = None):
+    def __init__(self, api_key: str | None = None, *, batch_token_budget: int | None = None):
         self.api_key = api_key
+        self.batch_token_budget = int(batch_token_budget or DEFAULT_EMBEDDING_BATCH_TOKEN_BUDGET)
 
     async def embed(self, texts: list[str], model: str, dimensions: int, input_type: str | None = None) -> EmbeddingResponse:
         api_key = self.api_key or get_settings().openai_api_key
         if not api_key:
             raise ProviderConfigurationError("openai embedding provider requires OPENAI_API_KEY")
+        if not texts:
+            return EmbeddingResponse(data=[], model=model, provider=self.provider, dimensions=dimensions, usage={})
+        usage: dict[str, int] = {}
+        response_model = model
         async with httpx.AsyncClient(timeout=120) as client:
-            resp = await client.post(
-                'https://api.openai.com/v1/embeddings',
-                headers={'Authorization': f'Bearer {api_key}'},
-                json={'model': model, 'input': texts, 'dimensions': dimensions},
+            async def send(batch: list[str]) -> list[list[float]]:
+                nonlocal response_model
+                resp = await client.post(
+                    'https://api.openai.com/v1/embeddings',
+                    headers={'Authorization': f'Bearer {api_key}'},
+                    json={'model': model, 'input': batch, 'dimensions': dimensions},
+                )
+                if resp.status_code == 400 and _is_token_cap_rejection(resp):
+                    raise _EmbeddingRequestTooLarge()
+                resp.raise_for_status()
+                body = resp.json()
+                response_model = body.get('model', response_model)
+                accumulate_embedding_usage(usage, body.get('usage'))
+                return ordered_batch_vectors(body.get('data', []), expected=len(batch), provider=self.provider)
+
+            vectors = await embed_in_order(
+                texts,
+                provider=self.provider,
+                token_budget=self.batch_token_budget,
+                max_inputs=OPENAI_MAX_INPUTS_PER_REQUEST,
+                send=send,
             )
-            resp.raise_for_status()
-            body = resp.json()
-        data = [EmbeddingData(embedding=item['embedding'], index=item['index']) for item in body.get('data', [])]
-        return EmbeddingResponse(data=data, model=body.get('model', model), provider=self.provider, dimensions=dimensions, usage=body.get('usage', {}))
+        data = [EmbeddingData(embedding=vector, index=index) for index, vector in enumerate(vectors)]
+        return EmbeddingResponse(data=data, model=response_model, provider=self.provider, dimensions=dimensions, usage=usage)
 
 class VoyageEmbeddingProvider:
     provider = 'voyage'
@@ -161,19 +376,35 @@ class VoyageEmbeddingProvider:
         api_key = self.api_key or get_settings().voyage_api_key
         if not api_key:
             raise ProviderConfigurationError("voyage embedding provider requires VOYAGE_API_KEY")
-        payload = {'model': model, 'input': texts, 'output_dimension': dimensions}
-        if input_type:
-            payload['input_type'] = input_type
+        if not texts:
+            return EmbeddingResponse(data=[], model=model, provider=self.provider, dimensions=dimensions, usage={})
+        usage: dict[str, int] = {}
         async with httpx.AsyncClient(timeout=120) as client:
-            resp = await client.post(
-                'https://api.voyageai.com/v1/embeddings',
-                headers={'Authorization': f'Bearer {api_key}'},
-                json=payload,
+            async def send(batch: list[str]) -> list[list[float]]:
+                payload: dict[str, Any] = {'model': model, 'input': batch, 'output_dimension': dimensions}
+                if input_type:
+                    payload['input_type'] = input_type
+                resp = await client.post(
+                    'https://api.voyageai.com/v1/embeddings',
+                    headers={'Authorization': f'Bearer {api_key}'},
+                    json=payload,
+                )
+                if resp.status_code == 400 and _is_token_cap_rejection(resp):
+                    raise _EmbeddingRequestTooLarge()
+                resp.raise_for_status()
+                body = resp.json()
+                accumulate_embedding_usage(usage, body.get('usage'))
+                return ordered_batch_vectors(body.get('data', []), expected=len(batch), provider=self.provider)
+
+            vectors = await embed_in_order(
+                texts,
+                provider=self.provider,
+                token_budget=VOYAGE_MAX_TOKENS_PER_REQUEST,
+                max_inputs=VOYAGE_MAX_INPUTS_PER_REQUEST,
+                send=send,
             )
-            resp.raise_for_status()
-            body = resp.json()
-        data = [EmbeddingData(embedding=item['embedding'], index=i) for i, item in enumerate(body.get('data', []))]
-        return EmbeddingResponse(data=data, model=model, provider=self.provider, dimensions=dimensions, usage=body.get('usage', {}))
+        data = [EmbeddingData(embedding=vector, index=index) for index, vector in enumerate(vectors)]
+        return EmbeddingResponse(data=data, model=model, provider=self.provider, dimensions=dimensions, usage=usage)
 
 class CohereEmbeddingProvider:
     provider = 'cohere'
@@ -184,18 +415,34 @@ class CohereEmbeddingProvider:
         api_key = self.api_key or get_settings().cohere_api_key
         if not api_key:
             raise ProviderConfigurationError("cohere embedding provider requires COHERE_API_KEY")
+        if not texts:
+            return EmbeddingResponse(data=[], model=model, provider=self.provider, dimensions=dimensions, usage={})
         cohere_input_type = 'search_query' if input_type == 'query' else 'search_document'
+        usage: dict[str, int] = {}
         async with httpx.AsyncClient(timeout=120) as client:
-            resp = await client.post(
-                'https://api.cohere.com/v2/embed',
-                headers={'Authorization': f'Bearer {api_key}'},
-                json={'model': model, 'texts': texts, 'input_type': cohere_input_type, 'embedding_types': ['float']},
+            async def send(batch: list[str]) -> list[list[float]]:
+                resp = await client.post(
+                    'https://api.cohere.com/v2/embed',
+                    headers={'Authorization': f'Bearer {api_key}'},
+                    json={'model': model, 'texts': batch, 'input_type': cohere_input_type, 'embedding_types': ['float']},
+                )
+                if resp.status_code == 400 and _is_token_cap_rejection(resp):
+                    raise _EmbeddingRequestTooLarge()
+                resp.raise_for_status()
+                body = resp.json()
+                accumulate_embedding_usage(usage, body.get('meta', {}).get('billed_units'))
+                raw = body.get('embeddings', {}).get('float') or body.get('embeddings') or []
+                return ordered_batch_vectors(raw, expected=len(batch), provider=self.provider)
+
+            vectors = await embed_in_order(
+                texts,
+                provider=self.provider,
+                token_budget=DEFAULT_EMBEDDING_BATCH_TOKEN_BUDGET,
+                max_inputs=COHERE_MAX_INPUTS_PER_REQUEST,
+                send=send,
             )
-            resp.raise_for_status()
-            body = resp.json()
-        vectors = body.get('embeddings', {}).get('float') or body.get('embeddings') or []
-        data = [EmbeddingData(embedding=v[:dimensions], index=i) for i, v in enumerate(vectors)]
-        return EmbeddingResponse(data=data, model=model, provider=self.provider, dimensions=dimensions, usage=body.get('meta', {}).get('billed_units', {}))
+        data = [EmbeddingData(embedding=vector[:dimensions], index=index) for index, vector in enumerate(vectors)]
+        return EmbeddingResponse(data=data, model=model, provider=self.provider, dimensions=dimensions, usage=usage)
 
 RUNPOD_PROVIDERS = {"runpod", "runpod_serverless", "runpod_serverless_or_local"}
 OPENAI_COMPATIBLE_PROVIDERS = {"tei", "huggingface_tei", "infinity", "jina", "self_hosted", "openai_compatible_private"}
@@ -322,6 +569,12 @@ class GenericEndpointEmbeddingProvider:
     async def embed(self, texts: list[str], model: str, dimensions: int, input_type: str | None = None) -> EmbeddingResponse:
         if not health_allows_routing(self.health_status):
             raise ProviderConfigurationError(f"{self.provider} embedding endpoint health is {self.health_status}; routing disabled")
+        # NOT batched. This adapter fronts TEI / Infinity / RunPod / self-hosted
+        # endpoints whose per-request caps are deployment-specific and unknown
+        # here, so imposing a batch size could only be a guess. The request shape
+        # is left exactly as deployed; the ordering and count guards this module
+        # applies to the vendor providers should be extended here once a real
+        # endpoint's limits are measured. See WAVE-131.
         path = None if self.provider in RUNPOD_PROVIDERS else (self.embedding_path or "embeddings")
         payload = _embedding_payload(self.provider, texts, model, dimensions, input_type)
         async with httpx.AsyncClient(timeout=300) as client:

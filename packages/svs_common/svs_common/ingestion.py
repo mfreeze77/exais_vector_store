@@ -9,7 +9,7 @@ from .hashing import sha256_text
 from .chunking import choose_chunker
 from .model_registry import resolve_vectorization_profile, model_registry
 from .vectorization_router import build_ingestion_plan
-from .providers import ProviderConfigurationError, provider_for
+from .providers import EmbeddingBatchError, ProviderConfigurationError, provider_for
 from .qdrant_adapter import QdrantAdapter
 from .opensearch_adapter import OpenSearchAdapter
 from .object_store import ObjectStore
@@ -348,6 +348,13 @@ class IngestionService:
             raise ValueError("No chunks produced from document content")
         embeddings = await provider.embed([c.text for c in parsed_chunks], model_name, dimensions, input_type="document")
         validate_embedding_provider_response(embedding_profile_id, expected_provider, embeddings.provider)
+        # Vectors are matched to chunk text positionally below, so a short result
+        # would silently drop the tail chunks instead of failing the document.
+        if len(embeddings.data) != len(parsed_chunks):
+            raise EmbeddingBatchError(
+                f"{embeddings.provider} returned {len(embeddings.data)} embeddings "
+                f"for {len(parsed_chunks)} chunks"
+            )
         collection = self.qdrant.collection_name(principal.business_instance_id, embedding_profile_id)
         os_index = self.opensearch.index_name(principal.business_instance_id)
         acl_bucket = sha256_text("|".join(sorted(req.allowed_groups + req.allowed_roles)) or "default")[:16]
