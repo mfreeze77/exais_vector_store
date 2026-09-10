@@ -139,3 +139,12 @@ and then verified the fix for a verifier/typed-locator composition defect;
 [review 2](../.tranche/statecivics-semantic-graph/aligned/wave-133-offline-qc-2.md)
 returned **PASS WITH NOTES** for this increment. No full-ticket completion or
 activation is claimed.
+
+Follow-up manager clarification: the next retained-source sample is KS-613's
+SB 125 section 96(j) provision and lapse action. KS-600 must supply its legal
+identity and persisted action; KS-597 supplies exact spans and KS-601 reviewed
+crosswalks (or an explicit unresolved gap). KS-650 supplies the actual export
+contract/records. Existing accounting identities and observations are reusable,
+but neither ticket visibility nor K.S.A. harvest completion fills these gaps.
+The [current handoff](../docs/STATECIVICS_LAW_MONEY_ALIGNMENT.md#current-implementation-handoff)
+records the sequence and preserves StateCivics ownership of that work.

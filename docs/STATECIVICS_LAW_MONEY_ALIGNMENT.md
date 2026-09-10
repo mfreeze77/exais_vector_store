@@ -4,6 +4,45 @@ Agreed with the StateCivics developer manager through the owner on 2026-09-10.
 Scope: Kansas State Civics fiscal retrieval. This is the corrected implementation
 direction, not evidence that the revised runtime or public graph is complete.
 
+## Current implementation handoff
+
+The K.S.A. harvest is independent of this milestone. The first appropriation
+sample uses retained bill/Session Laws evidence; current codified statutes
+supply supporting definitions and authority. Finishing that harvest supplies
+none of the missing contracts, legal spans or appropriation-action persistence.
+
+The StateCivics manager owns the upstream KS implementation. The next handoff is:
+
+1. KS-600's provision-reference contract and KS-650's versioned entity/relationship
+   export contract, including the existing publication-subject compatibility
+   decision. Planning tickets alone do not provide those schemas.
+2. A first retained-source slice from KS-613: SB 125 section 96(j), its exact
+   provision/span evidence and the specified $4 million lapse action, persisted
+   through the KS-600 ledger. Verify the values and locator against retained
+   evidence before producing the reviewed export.
+3. Existing account/agency/fund identities and recovered exact CSV record
+   evidence attached through supported upstream references. KS-601 must review
+   any legal-account crosswalk before a positive join is published; if still
+   unresolved, export that gap explicitly. Loaded observations alone do not
+   establish that join, and missing subunit must remain unknown.
+
+The manager reports legal spans and account crosswalks unpopulated, and the
+appropriation-action contract without a backing model/table/migration. That
+is the minimum data-path work; a new statute corpus is not its prerequisite.
+These are reported data states, not fresh ExAIS queries of the operational DB.
+
+ExAIS could already read the planning branch. The agreed planning documents are
+now merged and pushed to StateCivics `main` at `1649b8ad` (2026-09-10), making
+KS-650 and KS-651 visible in the shared repository. The merge changes only 12
+Markdown files and preserves main's later inventory correction; it adds no
+contracts or runtime implementation. Independent review passed, as did all 19
+checks in `tests/ops/test_civic_spec_ticket_dependencies.py`, run through
+`KS_GATE_NO_LEDGER=1 ./scripts/run_gate.sh statewide` with `-q -p no:cacheprovider`.
+
+The completed ExAIS work at `e9a713b` is the independent offline foundation;
+WAVE-133 remains in progress until the actual upstream handoff and adapter/API
+acceptance arrive. See [its proof](../.tranche/statecivics-semantic-graph/aligned/wave-133-offline-proof.md).
+
 ## Backbone and authority
 
 **Enacted provision → appropriation action → fiscal-year account → agency/fund**,
@@ -29,9 +68,10 @@ source ledger retain evidence and derivations. ExAIS indexes scoped projections.
 | Integrated acceptance and activation | WAVE-132 | Remains reopened until real evidence and revised runtime pass; activation is a separately evidenced operator action. |
 
 KS tickets are authored in the StateCivics repository; WAVE tickets are authored
-here. The local planning handoff uses
-`/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/` for upstream
-edits. Its canonical operational repository is `operator-source://statecivics-ai`.
+here. The planning handoff originated at
+`/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/`; its canonical
+operational repository is `operator-source://statecivics-ai` at
+`/Users/mfrieson/Dropbox/AI_Projects/exai_projects/Statecivicsai`.
 New tickets are planned work, not claims of implementation completion.
 
 ## Contract decisions
@@ -112,10 +152,9 @@ gap/ambiguity refusals, isolation/lifecycle leakage, latency and cost. A run tha
 only refuses cannot establish success. Synthetic tests remain useful mechanics
 and security checks, independently labeled from real-source acceptance.
 
-The separate K.S.A. harvest is already underway. The latest manager handoff
-reported 2,062 of 31,085 sections, chapter 9 of 91, with no failures; this is a
-dated inventory report, not a completion or custody-registration check. Do not
-restart it or add a pre-harvest canary. Current statutes supply standing authority,
+The separate K.S.A. harvest continues on its own track; its completion is not a
+gate for this handoff. Do not restart it or add a pre-harvest canary. Current
+statutes supply standing authority,
 definitions and unresolved history references. Retained Session Laws supply the
 uncodified appropriation provisions; full statute completion does not block them.
 
