@@ -2,12 +2,13 @@
 
 ## Summary
 
-Four defects found while running the WAVE-126 Kansas fiscal pipeline end to end
+Five defects found while running the WAVE-126 Kansas fiscal pipeline end to end
 for the first time against a real RunPod Marker endpoint. The most expensive one
 runs a complete Marker extraction before checking whether the target vector store
-exists, so any store misconfiguration costs a full GPU job to discover. The other
-three explain how a caller reaches that state, mislabel the store if it is ever
-created, and block the removal path WAVE-126 depends on.
+exists, so any store misconfiguration costs a full GPU job to discover. Three
+more explain how a caller reaches that state, mislabel the store if it is ever
+created, and block the removal path WAVE-126 depends on. The fifth is why none of
+this can currently be costed: the client discards RunPod's own timing fields.
 
 ## Background
 
@@ -136,6 +137,8 @@ WAVE-126 a real per-document cost figure.
 - Corpus-neutral store-creation attributes supplied by the calling adapter.
 - `set_config('svs.system_worker', 'true', true)` in `delete_vector_store_file`
   before its chunk mutation.
+- RunPod `delayTime` and `executionTime` captured into the persisted Marker
+  attributes, and Marker status transitions logged on the upload path.
 - Regression tests for each.
 
 ## Acceptance Criteria
@@ -150,11 +153,14 @@ WAVE-126 a real per-document cost figure.
   inactive, and queues index cleanup without weakening tenant/business RLS.
 - The WAVE-126 removal ordering (removals converge before additions) is proven
   through the per-file route.
+- A completed Marker extraction records its queue time and its GPU execution
+  time, so per-document cost can be read off a run rather than inferred from
+  wall clock.
 
 ## Dependencies
 
 - WAVE-012, whose system-worker fix this extends to the third delete route.
-- WAVE-126, whose live run surfaced all four defects.
+- WAVE-126, whose live run surfaced all five defects.
 
 ## Verification
 
