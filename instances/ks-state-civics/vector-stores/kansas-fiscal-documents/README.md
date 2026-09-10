@@ -16,6 +16,10 @@ WAVE-133 through WAVE-136 consume typed structured/document evidence and prove
 real answers. Raw CSV ingestion remains outside this narrative lane. Provision
 identity comes from KS-600, while source spans retain their evidence role.
 
+Related instance research: [law-and-money backbone](../../research/law-and-money-backbone.md)
+records the open-source comparison and the classification, aggregation, and
+provision-evidence responsibilities agreed with the StateCivics developer manager.
+
 ## Extraction boundary
 
 Every retained `application/pdf` is submitted to
