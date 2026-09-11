@@ -1,0 +1,164 @@
+{
+  "approved_runtime_image_sha256": "e7271b65b0554f29c5378a0f39a9a2e5e3e4f46fc710138328ef4cf8515627c5",
+  "base_commit": "ab86356",
+  "coordinator_sha256": "80923ec4623a39a49634e15c844baf01341d360f30393fa26e72ef055756c3b1",
+  "current_live_inventory_unchanged": {
+    "chunks": 99,
+    "documents": 15,
+    "scope": "No API or live DB calls made by this coordinator phase; WAVE-139 QC and root read-only verifier own current inventory proof."
+  },
+  "full_rollout_applied": false,
+  "implementation": {
+    "attempt_history_retained": true,
+    "bounded_fail_stop": true,
+    "exclusive_writer_lock": true,
+    "existing_consumer_reused": true,
+    "immutable_resume_pins": true,
+    "provider_api_index_behavior_changed": false,
+    "secrets_in_proof": false,
+    "serial_per_record_checkpoints": true,
+    "sigterm_finishes_current_request_then_stops": true
+  },
+  "input_pins": {
+    "harvest_sha256": "17bed3eec5f0946de1e2f5126b84b8637d9aa4b910199f98fe4c9f3e3eb207a2",
+    "index_sha256": "65d2424709bb1e54ab7fad9142ceffb6c00f961d463ca78b5dc7c277194f63e0",
+    "seed_sha256": "b64003f370c161c45c6dc5384951ea787242cba56be6446b12327099755d5c2d"
+  },
+  "next_gate": "Independent coordinator QC before launch; final live verification and QC after the full rollout.",
+  "operational_commands": {
+    "launch_executed": false,
+    "launch_json": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/coordinator-launch-command.json",
+    "monitor_container": [
+      "docker",
+      "inspect",
+      "--format",
+      "{{.State.Status}}",
+      "exais-kansas-statute-rollout-wave140"
+    ],
+    "monitor_state": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout/progress.json",
+    "resume_existing_container": [
+      "docker",
+      "start",
+      "exais-kansas-statute-rollout-wave140"
+    ],
+    "stop": [
+      "docker",
+      "stop",
+      "--time",
+      "1800",
+      "exais-kansas-statute-rollout-wave140"
+    ]
+  },
+  "phase": "coordinator_only",
+  "preflight": {
+    "api_calls": 0,
+    "chunks": 83258,
+    "duration_seconds": 26.51067437499296,
+    "indexable_documents": 28812,
+    "network": "none",
+    "note": "28,801 upsert operations include four exporter-digest refreshes of existing canaries; pending new documents remain 28,797.",
+    "planned": {
+      "noop": 2278,
+      "remove": 0,
+      "upsert": 28801
+    },
+    "records": 31079,
+    "seed_records": 20,
+    "tranches": 85
+  },
+  "raw_artifacts": [
+    {
+      "bytes": 27873,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout/plan-dc93a7f5896744099faec3860cd70fd9.json",
+      "sha256": "183d33fcf8d2e37764525b27c80eebd3672d581254dc16ccf089787048cf10c3"
+    },
+    {
+      "bytes": 16447,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/coordinator-80923ec4623a39a49634e15c844baf01341d360f30393fa26e72ef055756c3b1.py",
+      "sha256": "80923ec4623a39a49634e15c844baf01341d360f30393fa26e72ef055756c3b1"
+    },
+    {
+      "bytes": 1520,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/coordinator-plan-command.json",
+      "sha256": "7bcbeade651d118e660788d4ef1bc92e5cdf5ce7dc14a60a1ec41f345460ccbc"
+    },
+    {
+      "bytes": 169,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/coordinator-plan-output.log",
+      "sha256": "bc7a69e844e00aec077683ab5a10a0a7b3d5ea10dc8e19495da92ac83e168784"
+    },
+    {
+      "bytes": 121,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/coordinator-plan-execution.json",
+      "sha256": "105defbce5138bb5f3c1d57d4d663590838bc507fe2038161283402d2eb27055"
+    },
+    {
+      "bytes": 1301,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/coordinator-test-command.json",
+      "sha256": "42024a1efc0f6a05ff2726f5be00b845edbcebabc35d9a73e16d5977febc1fd9"
+    },
+    {
+      "bytes": 3085,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/coordinator-tests.xml",
+      "sha256": "6d2acc7dc6d7f08af539633c76058939e180929e758a28f3ef641533becefa51"
+    },
+    {
+      "bytes": 181,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/coordinator-tests.log",
+      "sha256": "c9d7632595bd115d84d7aa6108aea8c4d1fc988acb9b605dd691e1de8aee5ea0"
+    },
+    {
+      "bytes": 104,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/coordinator-test-execution.json",
+      "sha256": "4dc52927dfd81c0c24f4cb22bef017e2e52ad67736e5bb3b928b2bb93ec37765"
+    },
+    {
+      "bytes": 2026,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/coordinator-launch-command.json",
+      "sha256": "9920545cc85e827ad1427ea3dfb026f04e8931b3aa2786d58b29ca6bb493ab28"
+    }
+  ],
+  "source_files": [
+    "scripts/release/kansas-statute-rollout.py",
+    "tests/test_kansas_statute_rollout.py"
+  ],
+  "state": {
+    "no_seed_changes": true,
+    "operator_root": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout",
+    "partition_files_created": false,
+    "partition_format": "states/chNNN.json (including letter-suffixed chapters)",
+    "seed": "/Users/mfrieson/Developer/statecivics-statute-ingestion/ks-fiscal-local-kansas-statutes.json"
+  },
+  "status": "READY_FOR_INDEPENDENT_COORDINATOR_QC",
+  "ticket": "WAVE-140",
+  "verification": {
+    "cases": [
+      "all 85 real tranches and custody joins",
+      "twenty-row seed partition",
+      "alphanumeric chapter identities",
+      "lost accepted response uses stable idempotency key on resume",
+      "per-record state survives failure",
+      "replay has zero HTTP calls",
+      "omitted chapter state unchanged",
+      "exclusive lock contention",
+      "SIGTERM before effects returns130",
+      "wrong input pin returns2",
+      "INDEX/path/symlink/hash/count/scope/duplicate/chapter rejection",
+      "wrong seed/scope/omitted seed identity rejection",
+      "resume consumer/input/target pin drift rejection",
+      "output input/checkout overlap rejection"
+    ],
+    "doubles": "All API/recovery tests use explicitly isolated HTTP doubles; no test calls a live provider.",
+    "duration_seconds": 26.77,
+    "passed": 22,
+    "skipped": 0,
+    "tests": 22
+  },
+  "coordinator_qc": {
+    "decision": "PASS WITH NOTES",
+    "proof": "wave-140-coordinator-qc.md",
+    "independent_tests_passed": 22,
+    "skipped": 0,
+    "bulk_activation_authorized": true
+  }
+}

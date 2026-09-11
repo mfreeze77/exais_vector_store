@@ -135,7 +135,10 @@ Vectorization cost is not a rollout gate, per the owner. The retained
 [request-planning measurement](../../../../.tranche/statecivics-semantic-graph/aligned/statute-chapter-request-estimate.json)
 records the full-corpus workload; its token/cost numbers are heuristic planning
 values, not billed usage. Rollout gates are source integrity, safe partial-batch
-semantics, resumability and verified search results.
+semantics, resumability and verified search results. The owner has directed the
+[full local rollout](../../../../tickets/WAVE-140-kansas-statute-full-rollout.md);
+its [coordinator review](../../../../.tranche/statecivics-semantic-graph/aligned/wave-140-coordinator-qc.md)
+passed with notes. Bulk application and full live verification are the remaining steps.
 
 ## Evidence versus search
 

@@ -51,6 +51,8 @@ source:
     indexUri: statecivics-export://ks-state-civics/kansas-statutes/chapters/INDEX.json
     indexSha256: 65d2424709bb1e54ab7fad9142ceffb6c00f961d463ca78b5dc7c277194f63e0
     producerRevision: 63ae57b9221ed7a8eaf44ac57622b7025aea556e
+    rolloutRunner: scripts/release/kansas-statute-rollout.py
+    rolloutTicket: WAVE-140
     trancheCount: 85
     recordCount: 31079
     semantics: Partial batches, never omission-based withdrawals; apply serially with durable ingestion state.
@@ -144,4 +146,4 @@ eval:
     - .release/cells/ks-fiscal-local/wave-138/apply-proof.json
     - .release/cells/ks-fiscal-local/wave-138/replay-proof.json
     - .tranche/statecivics-semantic-graph/aligned/wave-138-local-canary-proof.md
-  boundary: Offline full-harvest preparation plus a verified six-record local API/index/recall canary. Full-corpus ingestion, canonical graph integration and OVH activation remain unproven.
+  boundary: Full input audit and chapters 007/011 accepted after the six-record canary; 15 documents and 99 chunks verified locally. WAVE-140 owns full-corpus rollout. Canonical graph integration and OVH activation remain separate.

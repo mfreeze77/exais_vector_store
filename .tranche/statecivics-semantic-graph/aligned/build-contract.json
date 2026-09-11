@@ -2031,5 +2031,45 @@
     "durable_operator_root": "/Users/mfrieson/Developer/statecivics-statute-ingestion",
     "independent_qc": "wave-139-tranche-qc.md",
     "qc_decision": "PASS WITH NOTES"
+  },
+  "statute_full_rollout_increment": {
+    "owner_ticket": "WAVE-140",
+    "worktree": "/Users/mfrieson/Developer/exais-vector-store-law-money",
+    "base_commit": "ab86356",
+    "status": "coordinator_accepted_bulk_launch_pending",
+    "ticket": "tickets/WAVE-140-kansas-statute-full-rollout.md",
+    "authorization": "Owner directs full corpus in existing local Kansas cell; vectorization cost is not a gate.",
+    "scope": "Serial resumable operational coordinator over existing runner, full local indexing and exact evidence/recall proof. No API/provider/schema change, OVH deployment or canonical graph claim.",
+    "edit_sequence": "W139 accepted -> coordinator implementation -> independent coordinator QC -> serial bulk apply -> final live verification -> root declarations -> independent final QC",
+    "implementation_files": [
+      "scripts/release/kansas-statute-rollout.py",
+      "tests/test_kansas_statute_rollout.py"
+    ],
+    "proof": "wave-140-rollout-proof.md",
+    "durable_operator_root": "/Users/mfrieson/Developer/statecivics-statute-ingestion",
+    "input_index_sha256": "65d2424709bb1e54ab7fad9142ceffb6c00f961d463ca78b5dc7c277194f63e0",
+    "predeclared_recall_cases": "wave-140-recall-cases.json",
+    "predeclared_recall_cases_sha256": "09089d7e8a7cf1842cd27e5430333a5c4695d40fe1bf576d89caf523205ec539",
+    "read_only_verifier_self_check": {
+      "partial_verified": {
+        "chunks": 99,
+        "documents": 15,
+        "embeddings": 99,
+        "files": 15,
+        "versions": 15
+      },
+      "full_mode_on_partial_inventory": {
+        "exit_code": 1,
+        "expected_error": "unexpected live inventory",
+        "matched": true
+      },
+      "script_sha256": {
+        "verify-live.py": "2b45dfd082007bba86c940fc330e18b3669efec1e8a858e5e9b3a65bf0aa6cbc",
+        "run-verifier.py": "182cf9b0b6cf17fffae9392e9330e94687c3a05aefda16abab85fa14882d520e"
+      }
+    },
+    "source_package_validation": "10 tests passed, zero skips in0.16s (immutable API image, no network)",
+    "coordinator_qc": "wave-140-coordinator-qc.md",
+    "coordinator_qc_decision": "PASS WITH NOTES"
   }
 }
