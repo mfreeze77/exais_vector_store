@@ -8,8 +8,10 @@ direction, not evidence that the revised runtime or public graph is complete.
 
 The K.S.A. harvest is independent of this milestone. The first appropriation
 sample uses retained bill/Session Laws evidence; current codified statutes
-supply supporting definitions and authority. Finishing that harvest supplies
-none of the missing contracts, legal spans or appropriation-action persistence.
+supply supporting definitions and authority. The harvest is now complete; the
+[retained-corpus audit](../instances/ks-state-civics/research/statute-harvest-handoff.md)
+verifies 31,079 Markdown files. This supplies none of the missing contracts,
+legal spans or appropriation-action persistence.
 
 The StateCivics manager owns the upstream KS implementation. The next handoff is:
 
@@ -86,9 +88,16 @@ Do not silently reinterpret older locators. The
 records the original findings against `668ca412`. The [upstream recheck](../.tranche/statecivics-semantic-graph/aligned/wave-133-upstream-locator-recheck-proof.md)
 covers their closure at `37f5b1c9`: reject missing recorded text hashes,
 duplicate page markers and empty page/character selections. These helper fixes
-do not establish real-span persistence or completed integration. Authoritative
-text retrieval and bound locator-verification metadata remain upstream work,
-alongside the canonical contracts, records and export.
+do not establish real-span persistence or completed integration. Upstream
+`06720d19` subsequently wires the existing hash-bound `context.text` into fiscal
+span registration and repairs the page-marked fixtures. Read-only code review
+confirms that change; the earlier unadapted-caller finding is closed in code.
+The manager reports 67 executed, zero skipped/failures/errors through the
+PostgreSQL evidence gate after `3f975e79`; ExAIS has inspected its JUnit-based
+verdict and collection-only refusal but has not independently rerun that full
+gate. The historical 453/66 result did not execute the covering integration
+proof and must not be used as persistence acceptance. Bound verification
+attestations, canonical contracts, records and export remain producer work.
 
 ### Locator verification handoff
 
@@ -97,11 +106,15 @@ from `evidence_class`, locator confidence, legal identity and publication status
 This requirement is agreed with the manager and belongs to the existing
 KS-595/597 span owners, carried by KS-650's export; the exact wire shape still
 belongs upstream. ExAIS must consume it rather than create a competing contract.
-Suggested representation: `locator_verification`,
-with `status` (`verified` or `unverified`), a verification derivation reference
-for a successful check, and a reason when no supported check ran. Missing legacy
-metadata means unverified, never implicitly verified. A real mismatch rejects
-the write; a failed attempt belongs in the existing derivation/audit path.
+The agreed representation uses append-only verification attestations bound to
+the immutable span, reusing the existing derivation machinery. A mutable status
+column on the span would prevent later verification: ordinary updates are
+rejected and the source-revision/type/locator unique key prevents a duplicate
+span insert. Current verification status is derived from the applicable bound
+attestation, with `verified`/`unverified`, the selected attestation reference and
+its derivation reference available to consumers. Missing legacy metadata means
+unverified. A real mismatch rejects registration; a failed attempt belongs in
+the existing derivation/audit path.
 
 Reuse `derivation.schema.json` for method/version, parameters, typed references
 and input/output hashes. Bind the result to the exact source/extraction revision
@@ -110,6 +123,19 @@ Neither `status=complete` on a general extraction run nor the span's existence
 proves that this particular selection was checked. Re-extraction, locator changes
 or changed quote bytes require a new bound check, preserving prior evidence.
 The producer must set the result from execution, not trust a caller's flag.
+The recorded status is the service's verification result. Database constraints
+enforce required shape and relational bindings within configured permissions;
+they do not establish that an external artifact was actually resolved, nor
+prevent a privileged administrator from disabling a trigger. Same-row checks
+must explicitly reject nulls, and referenced-revision/derivation agreement needs
+relational validation. No new privileged verifier-role requirement is inferred.
+
+Pin the selected attestation in the existing snapshot/as-of envelope. Applicability
+requires the exact span/evidence binding and an explicit accepted-verifier-version
+policy; replay must not silently choose a later attestation. Acceptance includes
+unverified span → executed verification → appended attestation → exported
+verified status/references, with the original span unchanged. Migration 111 is
+the manager's planned upstream delivery, not an implemented ExAIS contract.
 
 Table cells are **unverified by the text resolver**, not inherently unverifiable.
 The current `CandidateTableCell.source_span_registration` carries page, table,
@@ -120,15 +146,12 @@ alone does not prove the cell's text. Preserve candidate evidence while that
 check is absent, but do not present it as a verified exact fiscal citation.
 This does not ban ordinary eligible document search or delete legacy spans.
 
-At `37f5b1c9`, `fiscal_fact_service._validate_text_derivation` checks that a
-`DerivationOutput` records the expected hash; it does not load the text bytes.
-Its `register_span` call still omits `artifact_text`. Retrieve the authoritative
-output through the existing retained-source/derivation path, verify its hash,
-then pass the exact text to the resolver. Passing that verified text is an
-implementation detail; caller-chosen unanchored text is the trust defect.
-The missing-hash, duplicate-marker and empty-selection helper fixes are now
-present; they should not remain on the open-work list. The authoritative-text
-caller wiring and bound verification metadata remain with the StateCivics manager.
+At `06720d19`, the fiscal caller passes `artifact_text=context.text`. The context
+constructor verifies that text against its hash; persistence validates the hash
+against both the source revision and extraction derivation. No second text-fetch
+path is needed. The missing-hash, duplicate-marker, empty-selection and caller
+wiring fixes should no longer appear as open work. Bound attestation persistence
+and export remain with the StateCivics manager.
 
 ## Backbone and authority
 
@@ -322,11 +345,12 @@ gap/ambiguity refusals, isolation/lifecycle leakage, latency and cost. A run tha
 only refuses cannot establish success. Synthetic tests remain useful mechanics
 and security checks, independently labeled from real-source acceptance.
 
-The separate K.S.A. harvest continues on its own track; its completion is not a
-gate for this handoff. Do not restart it or add a pre-harvest canary. Current
-statutes supply standing authority,
-definitions and unresolved history references. Retained Session Laws supply the
-uncodified appropriation provisions; full statute completion does not block them.
+The separate K.S.A. harvest is complete. Its [inventory handoff](../instances/ks-state-civics/research/statute-harvest-handoff.md)
+records the two event-count denominators, six duplicate groups and the measured
+failure of a byte-size embedding filter. Current statutes supply standing
+authority, definitions and unresolved history references. Retained Session Laws
+supply uncodified appropriations. Custody/export eligibility, statute-specific
+chunking and resolved lineage remain distinct from acquisition completion.
 
 ## Historical implementation and corrected work
 

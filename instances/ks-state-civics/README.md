@@ -4,6 +4,9 @@ Instance declaration: [instance.yaml](instance.yaml).
 
 ## Research and agreed direction
 
+- [Completed K.S.A. harvest and ingestion handoff](research/statute-harvest-handoff.md)
+  — verified retained-file counts, duplicate history denominators and the
+  content-based triage required before statute embeddings.
 - [Corrected tickets and handoff](research/ticket-alignment.md)
   — the unified StateCivics/ExAIS ownership map and active planning artifacts.
 - [Law-and-money backbone: open-source research](research/law-and-money-backbone.md)

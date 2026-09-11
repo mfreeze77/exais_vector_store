@@ -209,7 +209,7 @@ Upstream follow-up `37f5b1c9` closes the three reviewed helper gaps from
 `668ca412`: missing recorded text hash, duplicate page markers and empty
 page/character selections. The [bounded recheck](../.tranche/statecivics-semantic-graph/aligned/wave-133-upstream-locator-recheck-proof.md)
 records actual consumer-side verification separately from the manager-reported
-453 passed / 66 skipped upstream gate. The two remaining span tasks are
+453 passed / 66 skipped upstream gate. At that revision the remaining span tasks were
 authoritative-text retrieval/passing in the fiscal-fact caller and bound
 locator-verification metadata; broader canonical export and live integration
 acceptance remain open. This follow-up changes documentation/proof only and
@@ -218,3 +218,16 @@ Independent [documentation/proof QC](../.tranche/statecivics-semantic-graph/alig
 returned **PASS WITH NOTES**, including confirmation of the separately measured
 Markdown-ingestion coordinate gap recorded for WAVE-134 planning. No runtime
 files changed in this follow-up.
+
+Subsequent read-only review confirms `06720d19` passes the existing lineage-bound
+`context.text` into registration and repairs the page-marked fixtures. The caller
+finding is closed in code. The manager reports 67 executed tests through the
+PostgreSQL evidence gate after the JUnit fix at `3f975e79`; ExAIS has not
+independently rerun that gate.
+The [current attestation handoff](../docs/STATECIVICS_LAW_MONEY_ALIGNMENT.md#locator-verification-handoff)
+now specifies append-only results bound to immutable spans, export of the
+selected attestation/derivation references and snapshot-pinned applicability.
+This remains upstream implementation, not a new ExAIS wire contract. The
+[completed statute inventory](../instances/ks-state-civics/research/statute-harvest-handoff.md)
+does not close canonical export or end-to-end acceptance; it corrects the size
+filter and repeated-history denominators before any statute ingestion.

@@ -43,9 +43,14 @@ provide shared owners and sequential edit order.
   benchmark across bills, years and agencies, including a positive held-back
   case. Its labels must be independent of retrieval/extraction tuning. All-refusal
   runs, source inventories and synthetic fixtures cannot satisfy acceptance.
-- The K.S.A. harvest is already running. No scrape restart/canary or completion
-  dependency is required for using retained Session Laws. Unresolved history
-  references are source evidence, not published fiscal relationships.
+- The K.S.A. harvest is complete: the [retained-corpus audit](../instances/ks-state-civics/research/statute-harvest-handoff.md)
+  verifies 31,079 files and corrects the proposed 400-byte exclusion. The raw
+  manifest's 72,753 event occurrences include 20 repeated by duplicate document
+  groups; 72,733 remain after that deduplication, all unresolved. No restart is
+  needed, and statute completion does not supply the appropriation ledger or
+  canonical export. Unresolved history references are source evidence, not
+  published fiscal relationships. No runtime or activation change accompanies
+  this inventory update.
 - Close this ticket only after the follow-up proof, an eligible upstream export,
   correction/withdrawal and isolation evidence, and a concrete scoped operator
   handoff. Any activation remains an explicit operator action; no activation,

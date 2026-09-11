@@ -298,10 +298,12 @@ implementation ownership and the active planning artifacts.
 - Keep semantic search as candidate retrieval over passages and source-derived
   descriptions. Canonical identities and evidenced relationships govern joins.
 
-The K.S.A. harvest is already running and does not need another start/canary
-ticket. At the manager's latest handoff it reported 2,062 of 31,085 sections,
-chapter 9 of 91, with no failures. That is a dated report, not a live completion
-check or evidence that harvested sections have been registered or published.
+The initial manager handoff reported 2,062 of 31,085 sections, chapter 9 of 91,
+with no failures. That dated progress report is now superseded by the
+[completed retained-corpus audit](statute-harvest-handoff.md): 31,079 files after
+six repeated document groups. Its size-filter and history-denominator corrections
+govern ingestion planning. No restart is needed, and acquisition completion is
+not evidence that these sections are registered, indexed or published.
 
 The current ExAIS v1 mechanics still require corrections to provision identity,
 structured evidence, and the provisional publisher envelope. Earlier tests

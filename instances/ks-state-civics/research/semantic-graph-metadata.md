@@ -30,6 +30,14 @@ both paths. Similarity generates candidates, not confirmed edges or authority
 arithmetic. Entity descriptions may also be embedded under WAVE-134, separately
 from document chunks; the KanView CSV observations remain structured records.
 
+The [completed K.S.A. inventory](statute-harvest-handoff.md) now verifies 31,079
+retained Markdown files. A 400-byte cutoff would discard real short provisions
+and keep some metadata-only documents; do not use it as an embedding filter.
+Statutes need their own source policy and section/subsection coordinate path:
+they have no PDF page markers and cannot use the fiscal-only page profile.
+History counts must distinguish 72,753 raw manifest occurrences from 72,733 after
+deduplicating the six repeated document groups. All remain unresolved.
+
 ## Metadata to retain and return
 
 These are semantic requirements, not a new upstream schema. Reuse actual source,
