@@ -79,7 +79,7 @@ silently retarget a span. Quote hashes establish text integrity, not canonical
 provision identity or legal continuity; identical wording can occur in distinct
 provisions and versions.
 
-### Locator resolution is still unimplemented at the reviewed boundaries
+### Runtime locator resolution gap
 
 Upstream `SourceSpanRegistration` validates the shape/order of page and line
 integers. `source_artifact_service.py:224` (`register_span`) checks revision
@@ -97,6 +97,13 @@ discard line keys or invent a chunk binding to fit the legacy adapter.
 
 This follow-up used a read-only line-selection/hash equivalence check and a
 separate producer/consumer code review. No registration or runtime changed.
+
+Subsequent WAVE-133 work adds a separate offline retained-Markdown verifier and
+`verify-document-evidence` CLI. It checks the extraction bytes and actual
+page/line selection before accepting the quote/hash. This supplies the local
+verification primitive; it does not connect the upstream registration service
+or the live graph/API. See the [operator instructions](../../../docs/FISCAL_GRAPH_OPERATOR.md#offline-document-evidence-verification)
+and the ticket's implementation proof for measured acceptance.
 
 ## Quality workflow: what the current code actually does
 

@@ -45,6 +45,43 @@ digest establishes neither canonical source selection, custody, reviewed account
 identity nor publication eligibility; those remain upstream responsibilities.
 Its output is not accepted as a graph artifact by the legacy load path.
 
+## Offline document evidence verification
+
+`verify-document-evidence` resolves page-local lines from a retained Markdown
+extraction before accepting the supplied quotation. Run in the existing ExAIS
+operator/test container with the extraction and reviewed quote file mounted
+read-only:
+
+```console
+python scripts/release/kansas-fiscal-graphrag.py verify-document-evidence \
+  --extraction-md /session-laws/markdown/2025-Session-Laws-Book-2.md \
+  --extraction-sha256 3c336e663f4f84fd6ae99b088be30ffa733a8a10118b8c602362bf1112934be7 \
+  --declared-page-count 1072 --page 358 --line-start 30 --line-end 34 \
+  --locator-convention lf-after-page-marker-count-blank-lines-v1 \
+  --quote-text /evidence/sb125-96j.quote.utf8 \
+  --quote-sha256 3833a0e9a8eff099d9a070eb169ee36596ac9470d0d0bbc71b8eb36d9bca61c6
+```
+
+The quote file contains the exact complete section 96(j) quotation from the
+[retained-source review](../instances/ks-state-civics/research/session-law-extraction-readiness.md#corrected-complete-clause):
+314 Unicode code points / 316 UTF-8 bytes, with no trailing LF. Preserve the
+internal line breaks, trailing spaces on internal lines, and Unicode spacing.
+Expected hashes and locators must come from the reviewed artifact handoff;
+computing expectations from arbitrary new input is not evidence of its identity.
+
+The named offline convention starts line 1 immediately after a page-marker
+line's LF, counts blank lines, and selects one-based inclusive line bounds.
+It excludes only the final selected LF. This is an explicit convention for the
+retained CPU output, not a replacement for KS-597/650 locator definitions.
+Unknown conventions are rejected; extraction changes require a fresh binding.
+
+The verifier checks the whole extraction hash, page-marker sequence/count,
+locator bounds, selected text and quote hash. It performs no fuzzy repair or
+normalization. A quote/hash pair from the neighboring lapse cannot pass for
+these lines. The result is evidence-only and nonpublishable; it does not verify
+raw-PDF parent derivation, canonical source selection, custody, legal identity,
+publication eligibility or a working graph/API. The legacy loader rejects it.
+
 ## Legacy v1 build, load and evaluation
 
 This path activates only the Kansas StateCivics fiscal document store. It does

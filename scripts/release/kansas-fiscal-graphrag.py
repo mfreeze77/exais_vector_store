@@ -12,11 +12,15 @@ from urllib import error, request
 from urllib.parse import urlsplit
 
 from svs_common.fiscal_graph_artifact import (
+    DOCUMENT_PAGE_LINES_CONVENTION,
+    MAX_DOCUMENT_EXTRACTION_BYTES,
+    MAX_DOCUMENT_QUOTE_CHARACTERS,
     MAX_INPUT_FILE_BYTES,
     MAX_STRUCTURED_SOURCE_BYTES,
     build_fiscal_graph_artifact,
     validate_built_artifact,
     validate_vector_store_id,
+    verify_document_page_lines_evidence,
     verify_structured_csv_evidence,
 )
 
@@ -47,6 +51,16 @@ def _read_csv_bytes(path: Path) -> bytes:
         raw = handle.read(MAX_STRUCTURED_SOURCE_BYTES + 1)
     if len(raw) > MAX_STRUCTURED_SOURCE_BYTES:
         raise ValueError("CSV source exceeds 16 MiB")
+    return raw
+
+
+def _read_document_bytes(path: Path, maximum_bytes: int, label: str) -> bytes:
+    if not path.is_file() or path.stat().st_size > maximum_bytes:
+        raise ValueError(f"{label} must be a regular file no larger than {maximum_bytes} bytes")
+    with path.open("rb") as handle:
+        raw = handle.read(maximum_bytes + 1)
+    if len(raw) > maximum_bytes:
+        raise ValueError(f"{label} exceeds {maximum_bytes} bytes")
     return raw
 
 
@@ -99,6 +113,17 @@ def main() -> int:
     verify_csv.add_argument("--source-sha256", required=True)
     verify_csv.add_argument("--records", type=Path, required=True,
                             help="JSON array of data_record_1based/raw_record_sha256 references")
+    verify_document = sub.add_parser("verify-document-evidence", help="verify exact retained Markdown page/line evidence offline")
+    verify_document.add_argument("--extraction-md", type=Path, required=True)
+    verify_document.add_argument("--extraction-sha256", required=True)
+    verify_document.add_argument("--declared-page-count", type=int, required=True)
+    verify_document.add_argument("--page", type=int, required=True)
+    verify_document.add_argument("--line-start", type=int, required=True)
+    verify_document.add_argument("--line-end", type=int, required=True)
+    verify_document.add_argument("--locator-convention", choices=[DOCUMENT_PAGE_LINES_CONVENTION], required=True)
+    verify_document.add_argument("--quote-text", type=Path, required=True,
+                                 help="exact UTF-8 quote file, including internal spaces/LFs; no added trailing LF")
+    verify_document.add_argument("--quote-sha256", required=True)
     build = sub.add_parser("build")
     build.add_argument("--publisher", type=Path, required=True); build.add_argument("--chunks", type=Path, required=True)
     build.add_argument("--vector-store-id", required=True); build.add_argument("--output", type=Path, required=True)
@@ -115,6 +140,24 @@ def main() -> int:
     evaluate.add_argument("--query", required=True); evaluate.add_argument("--expected-relation-id", action="append", required=True)
     args = parser.parse_args()
 
+    if args.command == "verify-document-evidence":
+        try:
+            extraction = _read_document_bytes(args.extraction_md, MAX_DOCUMENT_EXTRACTION_BYTES, "Markdown extraction")
+            quote = _read_document_bytes(args.quote_text, MAX_DOCUMENT_QUOTE_CHARACTERS * 4, "Quote text")
+            result = verify_document_page_lines_evidence(
+                extraction_bytes=extraction, expected_extraction_sha256=args.extraction_sha256,
+                declared_page_count=args.declared_page_count, page_1based=args.page,
+                line_start_1based=args.line_start, line_end_1based=args.line_end,
+                locator_convention=args.locator_convention, quoted_text=quote.decode("utf-8", errors="strict"),
+                expected_quote_sha256=args.quote_sha256,
+            )
+        except UnicodeError:
+            parser.error("document evidence files must contain valid UTF-8")
+        except ValueError as exc:
+            parser.error(str(exc))
+        except OSError:
+            parser.error("document evidence files could not be read")
+        print(json.dumps(result, sort_keys=True)); return 0
     if args.command == "verify-structured-evidence":
         result = verify_structured_csv_evidence(
             source_bytes=_read_csv_bytes(args.source_csv), expected_source_sha256=args.source_sha256,

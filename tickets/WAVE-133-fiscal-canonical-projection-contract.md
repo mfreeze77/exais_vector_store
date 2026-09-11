@@ -174,3 +174,16 @@ offline ExAIS validation do not yet prove that a locator selects the supplied
 quote. The [concrete integration handoff](../docs/STATECIVICS_LAW_MONEY_ALIGNMENT.md#concrete-input-needed-for-exais-integration)
 lists the incoming records/evidence and remaining ExAIS implementation. This
 clarifies existing evidence acceptance; no runtime completion is claimed.
+
+The independent document verifier is now implemented in the existing artifact
+module and `verify-document-evidence` CLI. It resolves actual retained Markdown
+page/line text before accepting quote/hash consistency. The real section 96(j)
+passes; wrong-page, neighboring-lapse and truncated selections fail. Root's
+combined regression returned **370 passed, zero skipped**. See the
+[document-evidence proof](../.tranche/statecivics-semantic-graph/aligned/wave-133-document-evidence-proof.md)
+for commands, exact evidence, bounds and deferred acceptance. Independent
+[QC](../.tranche/statecivics-semantic-graph/aligned/wave-133-document-evidence-qc.md)
+returned **PASS WITH NOTES** for this increment, including 191 passing targeted
+checks with zero skips. This is an offline primitive, not the upstream
+first-write registration fix or live graph integration; WAVE-133 remains in
+progress.

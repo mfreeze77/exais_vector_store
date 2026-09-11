@@ -67,6 +67,13 @@ The completed ExAIS work at `e9a713b` is the independent offline foundation;
 WAVE-133 remains in progress until the actual upstream handoff and adapter/API
 acceptance arrive. See [its proof](../.tranche/statecivics-semantic-graph/aligned/wave-133-offline-proof.md).
 
+The subsequent [offline document-verification increment](../.tranche/statecivics-semantic-graph/aligned/wave-133-document-evidence-proof.md)
+resolves page/line selections from retained Markdown and checks exact quote
+content/hash. It rejects the real neighboring lapse and truncated section 96(j)
+selection. This supplies a separate verification primitive; upstream first-write
+registration, raw-source derivation and live adapter/API integration remain
+required.
+
 ## Backbone and authority
 
 **Enacted provision → appropriation action → fiscal-year account → agency/fund**,

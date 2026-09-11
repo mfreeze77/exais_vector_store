@@ -35,6 +35,12 @@ MAX_STRUCTURED_SOURCE_RECORDS = 100_000
 MAX_STRUCTURED_RECORD_REFERENCES = 1000
 MAX_STRUCTURED_COLUMNS = 256
 MAX_STRUCTURED_FIELD_CHARACTERS = 64 * 1024
+MAX_DOCUMENT_EXTRACTION_BYTES = 16 * 1024 * 1024
+MAX_DOCUMENT_PAGES = 10_000
+MAX_DOCUMENT_LINES = 1_000_000
+MAX_DOCUMENT_PAGE_LINES = 100_000
+MAX_DOCUMENT_QUOTE_CHARACTERS = 64 * 1024
+DOCUMENT_PAGE_LINES_CONVENTION = "lf-after-page-marker-count-blank-lines-v1"
 _HEX = re.compile(r"^[0-9a-f]{64}$")
 _COMMIT = re.compile(r"^[0-9a-f]{40}$")
 _STORE = re.compile(r"^vs_[A-Za-z0-9_-]{1,124}$")
@@ -150,6 +156,120 @@ def verify_structured_csv_evidence(
         "publication_allowed": False,
         "source_content_hash_sha256": source_hash, "source_byte_size": len(source_bytes),
         "source_records_read": records_read, "verified_records": len(matches), "records": matches,
+    }
+
+
+def verify_document_page_lines_evidence(
+    *, extraction_bytes: bytes, expected_extraction_sha256: str,
+    declared_page_count: int, page_1based: int, line_start_1based: int,
+    line_end_1based: int, locator_convention: str, quoted_text: str,
+    expected_quote_sha256: str,
+) -> dict[str, Any]:
+    """Resolve one exact page/line quote in immutable retained Markdown bytes.
+
+    This is an offline selection check, not a KS-650 record or publication
+    decision. Digests must come from the caller's independently trusted evidence.
+    It does not verify the raw PDF, extraction derivation/quality, canonical
+    revision identity, legal interpretation, or eligibility.
+
+    The supported convention requires exact ``<!-- page N -->`` lines ending
+    in LF, uniquely ordered 1..declared_page_count. Page line 1 begins immediately
+    after the marker's LF. Blank lines count. Bounds are one-based, inclusive;
+    the selected text omits only the final selected line's terminating LF.
+    CR line endings are unsupported; other Unicode separators remain characters.
+    No stripping, newline conversion, Unicode normalization, or fuzzy search is
+    performed. The output contains no quote text or inferred entity identity.
+    """
+    expected_extraction_sha256 = _sha(expected_extraction_sha256, "expected_extraction_sha256")
+    expected_quote_sha256 = _sha(expected_quote_sha256, "expected_quote_sha256")
+    if not isinstance(extraction_bytes, bytes) or len(extraction_bytes) > MAX_DOCUMENT_EXTRACTION_BYTES:
+        raise FiscalGraphArtifactError("Markdown extraction must be bounded bytes (maximum 16 MiB)")
+    if not isinstance(locator_convention, str) or locator_convention != DOCUMENT_PAGE_LINES_CONVENTION:
+        raise FiscalGraphArtifactError("unsupported document locator convention")
+    for value, label, maximum in (
+        (declared_page_count, "declared_page_count", MAX_DOCUMENT_PAGES),
+        (page_1based, "page_1based", MAX_DOCUMENT_PAGES),
+        (line_start_1based, "line_start_1based", MAX_DOCUMENT_PAGE_LINES),
+        (line_end_1based, "line_end_1based", MAX_DOCUMENT_PAGE_LINES),
+    ):
+        if type(value) is not int or not 1 <= value <= maximum:
+            raise FiscalGraphArtifactError(f"{label} must be an integer in 1..{maximum}")
+    if page_1based > declared_page_count or line_start_1based > line_end_1based:
+        raise FiscalGraphArtifactError("document locator bounds are invalid")
+    if not isinstance(quoted_text, str) or not 1 <= len(quoted_text) <= MAX_DOCUMENT_QUOTE_CHARACTERS:
+        raise FiscalGraphArtifactError("quoted_text must contain 1..65536 Unicode characters")
+    extraction_hash = hashlib.sha256(extraction_bytes).hexdigest()
+    if extraction_hash != expected_extraction_sha256:
+        raise FiscalGraphArtifactError("Markdown extraction hash mismatch")
+    try:
+        text = extraction_bytes.decode("utf-8", errors="strict")
+        quote_bytes = quoted_text.encode("utf-8", errors="strict")
+    except UnicodeError as exc:
+        raise FiscalGraphArtifactError("Markdown extraction and quote must be valid UTF-8") from exc
+    if "\r" in text:
+        raise FiscalGraphArtifactError("document locator convention requires LF line endings without CR")
+    if text.count("\n") + 1 > MAX_DOCUMENT_LINES:
+        raise FiscalGraphArtifactError("Markdown extraction exceeds 1000000 physical lines")
+
+    # Bound the regex result by the declared page limit before retaining it.
+    markers: list[re.Match[str]] = []
+    for marker in re.finditer(r"^<!-- page ([1-9][0-9]{0,4}) -->\n", text, re.MULTILINE):
+        if len(markers) >= declared_page_count or int(marker.group(1)) != len(markers) + 1:
+            raise FiscalGraphArtifactError("page markers must be unique and contiguous from 1 to declared_page_count")
+        markers.append(marker)
+    if len(markers) != declared_page_count:
+        raise FiscalGraphArtifactError("page marker count does not match declared_page_count")
+    # Do not silently ignore inline, padded, case-changed, or malformed markers.
+    candidate_count = sum(1 for _ in re.finditer(r"<!--\s*page\b", text, re.IGNORECASE))
+    if candidate_count != len(markers):
+        raise FiscalGraphArtifactError("Markdown contains malformed or non-line page markers")
+
+    body_start = markers[page_1based - 1].end()
+    body_end = markers[page_1based].start() if page_1based < declared_page_count else len(text)
+    body = text[body_start:body_end]
+    if body.count("\n") + (not body.endswith("\n")) > MAX_DOCUMENT_PAGE_LINES:
+        raise FiscalGraphArtifactError("selected page exceeds 100000 physical lines")
+    # splitlines() also splits U+2028, form feeds, and other Unicode characters;
+    # only LF is a line separator in this convention. A final LF terminates the
+    # preceding line and does not invent an additional empty line at EOF.
+    lines = body.split("\n")
+    if body.endswith("\n") or not body:
+        lines.pop()
+    if line_end_1based > len(lines):
+        raise FiscalGraphArtifactError("document line locator exceeds the selected page")
+    selected = "\n".join(lines[line_start_1based - 1:line_end_1based])
+    if len(selected) > MAX_DOCUMENT_QUOTE_CHARACTERS:
+        raise FiscalGraphArtifactError("selected document quote exceeds 65536 Unicode characters")
+    if selected != quoted_text:
+        raise FiscalGraphArtifactError("document locator does not select quoted_text exactly")
+    selected_hash = hashlib.sha256(selected.encode("utf-8")).hexdigest()
+    if selected_hash != expected_quote_sha256:
+        raise FiscalGraphArtifactError("selected document quote hash mismatch")
+
+    page_start = sum(len(line) + 1 for line in lines[:line_start_1based - 1])
+    absolute_start = body_start + page_start
+    absolute_end = absolute_start + len(selected)
+    page_byte_start = len(body[:page_start].encode("utf-8"))
+    absolute_byte_start = len(text[:absolute_start].encode("utf-8"))
+    return {
+        "purpose": "offline document evidence verification only; not a publishable graph",
+        "evidence_kind": "document_span", "span_type": "page_lines",
+        "evidence_only": True, "publication_allowed": False,
+        "raw_source_derivation_verified": False,
+        "extraction_content_hash_sha256": extraction_hash,
+        "extraction_byte_size": len(extraction_bytes),
+        "extraction_unicode_characters": len(text), "verified_page_count": len(markers),
+        "locator": {"page": page_1based, "line_start": line_start_1based, "line_end": line_end_1based},
+        "locator_convention": locator_convention, "quote_matches_locator": True,
+        "quote_sha256": selected_hash, "quote_unicode_characters": len(selected),
+        "quote_utf8_bytes": len(quote_bytes),
+        "resolved_offsets": {
+            "index_base": 0, "end_exclusive": True,
+            "artifact_unicode_codepoints": {"start": absolute_start, "end": absolute_end},
+            "artifact_utf8_bytes": {"start": absolute_byte_start, "end": absolute_byte_start + len(quote_bytes)},
+            "page_body_unicode_codepoints": {"start": page_start, "end": page_start + len(selected)},
+            "page_body_utf8_bytes": {"start": page_byte_start, "end": page_byte_start + len(quote_bytes)},
+        },
     }
 
 
