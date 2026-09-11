@@ -123,6 +123,14 @@ real-answer acceptance requirements.
 
 ## Reproducible read-only inventory command
 
+Implementation follow-up: [WAVE-137](../../../tickets/WAVE-137-kansas-statute-document-ingestion.md)
+now owns the bounded preparation and API consumer, with a separate
+[Kansas Statutes source package](../vector-stores/kansas-statutes/README.md).
+Its [execution proof](../../../.tranche/statecivics-semantic-graph/aligned/wave-137-implementation-proof.md)
+separates local corpus preparation from live custody/export and retrieval proof.
+The inventory below remains the earlier read-only audit; it is not the ingestion
+command or an activation record.
+
 This uses host Python's standard library only, without project dependencies or
 network access. A first draft assumed response hashes were non-null and refused
 on the six resume records; the final audit below handles them explicitly. A

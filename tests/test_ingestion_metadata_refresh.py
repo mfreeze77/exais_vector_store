@@ -241,3 +241,27 @@ def test_link_vector_store_file_uses_first_class_source_identity():
     _, params = db.calls[1]
     attrs = json.loads(params["attrs"])
     assert attrs[SOURCE_IDENTITY_ATTRIBUTE] == "statecivics:logical-a"
+
+
+def test_statute_dedupe_compares_model_and_versioned_harvest_evidence():
+    service = object.__new__(IngestionService)
+    request = _request().model_copy(update={'mode': 'markdown_docs_v1', 'source_identity': 'test-statute-source',
+        'attributes': {'source_text_chunking_profile': 'statecivics_statute_markdown_v1',
+                       'source_collection': 'statecivics-kansas-statutes',
+                       'statute_harvest_evidence': {'history_events': [{'citation_text': 'L. 1915', 'resolution_status': 'unresolved'}]}}})
+    db = _FakeDb()
+    service._find_exact_duplicate(db, _principal(), request, 'same-hash')
+    sql, params = db.calls[0]
+    assert params['source_chunking_profile'] == 'statecivics_statute_markdown_v1'
+    assert params['source_embedding_profile'] == 'voyage_4_docs_1024'
+    assert 'dv.embedding_profile_id = :source_embedding_profile' in sql
+    assert 'statute_harvest_evidence' in params['source_evidence_fields']
+    assert json.loads(params['source_evidence_context'])['statute_harvest_evidence'] == request.attributes['statute_harvest_evidence']
+    changed = {**request.attributes, 'statute_harvest_evidence': {'history_events': []}}
+    assert _page_coordinate_evidence_context(changed) != _page_coordinate_evidence_context(request.attributes)
+    for attrs in ({}, {'statute_harvest_evidence': None}):
+        assert _page_coordinate_evidence_context(attrs) != _page_coordinate_evidence_context(request.attributes)
+    retry = _FakeDb()
+    service._find_version_target(retry, _principal(), request, 'same-hash')
+    assert 'd.content_hash <> :hash' not in retry.calls[0][0]
+    assert retry.calls[0][1]['source_identity'] == request.source_identity

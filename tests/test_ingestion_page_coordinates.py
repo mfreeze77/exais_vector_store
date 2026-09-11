@@ -59,9 +59,12 @@ def _request():
                                  })
 
 
-def _run(monkeypatch, *, retry=False, evidence_changes=None):
+def _run(monkeypatch, *, retry=False, evidence_changes=None, statute_request=None):
     principal = Principal(tenant_id='test-tenant', business_instance_id='test-business')
-    req = _request()
+    req = statute_request or _request()
+    test_settings = _settings()
+    if statute_request is not None:
+        test_settings.voyage_api_key = 'test-not-a-real-key'
     if evidence_changes is not None:
         attributes = dict(req.attributes)
         for field, value in evidence_changes.items():
@@ -70,7 +73,7 @@ def _run(monkeypatch, *, retry=False, evidence_changes=None):
             else:
                 attributes[field] = value
         req = req.model_copy(update={'attributes': attributes})
-    plan = build_ingestion_plan(principal, req, settings=_settings())
+    plan = build_ingestion_plan(principal, req, settings=test_settings)
     captured = {'provider_texts': [], 'stored_texts': []}
     service = object.__new__(IngestionService)
     service.object_store = SimpleNamespace(put_text=lambda key, text, mime: captured['stored_texts'].append(text))
@@ -83,11 +86,11 @@ def _run(monkeypatch, *, retry=False, evidence_changes=None):
         async def embed(self, texts, model, dimensions, input_type):
             captured['provider_texts'] = list(texts)
             assert input_type == 'document'
-            return SimpleNamespace(provider='hash_mock', model=model,
+            return SimpleNamespace(provider='voyage' if statute_request is not None else 'hash_mock', model=model,
                                    data=[SimpleNamespace(embedding=[0.0] * dimensions) for _ in texts])
 
     monkeypatch.setattr(ingestion_module, 'provider_for', lambda provider: Provider())
-    monkeypatch.setattr(ingestion_module, 'build_ingestion_plan', lambda p, r: build_ingestion_plan(p, r, settings=_settings()))
+    monkeypatch.setattr(ingestion_module, 'build_ingestion_plan', lambda p, r: build_ingestion_plan(p, r, settings=test_settings))
     monkeypatch.setattr(service, '_find_exact_duplicate', lambda *args: None)
     monkeypatch.setattr(service, '_find_version_target', lambda *args: {'id': 'existing-doc'} if retry else None)
     monkeypatch.setattr(service, '_link_vector_store_file', lambda *args, **kwargs: None)
@@ -193,3 +196,91 @@ def test_unchanged_evidence_repeat_deduplicates_without_provider_or_new_version(
     result = asyncio.run(service.ingest_now(db, Principal(tenant_id='t', business_instance_id='b'), request))
     assert result.status == 'deduplicated' and result.document_id == 'existing-doc'
     assert not any('INSERT INTO chunks' in sql or 'INSERT INTO document_versions' in sql for sql, _ in db.calls)
+
+
+def _retained_statute_request():
+    import os
+    from pathlib import Path
+    configured = os.environ.get('SVS_STATUTE_CORPUS_ROOT')
+    if not configured:
+        pytest.skip('set SVS_STATUTE_CORPUS_ROOT for retained statute ingestion proof')
+    path = Path(configured) / 'data/ksa/ksa_002_003_0003.md'
+    assert path.is_file(), 'explicitly required statute corpus is missing'
+    text = path.read_bytes().decode('utf-8')
+    assert sha256_text(text) == '5501388fc2e8da55cef32d49d15e7f5f14c0b20341d43e9f46d8c4cb381c7d02'
+    return DocumentIngestRequest(title='Retained K.S.A. 2-303', filename=path.name, content=text,
+        mode='markdown_docs_v1', source_identity='test-only-retained-statute', attributes={
+            'source_text_chunking_profile': 'statecivics_statute_markdown_v1',
+            'source_collection': 'statecivics-kansas-statutes', 'extraction_content_hash_sha256': sha256_text(text),
+            'citation_url': 'https://ksrevisor.gov/statutes/chapters/ch02/002_003_0003.html',
+            'source_revision_id': 'test-only-custody-revision',
+            'statute_harvest_evidence': {'history_events': [{'ordinal': 1, 'year': 1915, 'chapter': '178', 'section': '3',
+                'citation_text': 'L. 1915, ch. 178, § 3', 'resolution_status': 'unresolved'}]},
+        })
+
+
+def test_real_statute_preview_and_ingestion_persist_exact_coordinates_with_provider_double(monkeypatch):
+    req, plan, captured, calls, result = _run(monkeypatch, statute_request=_retained_statute_request())
+    assert plan.embedding_profile_id == 'voyage_4_docs_1024' and plan.chunker == 'statecivics_statute_markdown_v1'
+    inserted = [params for sql, params in calls if 'INSERT INTO chunks(' in sql]
+    assert plan.estimated_chunks == len(inserted) == len(captured['provider_texts'])
+    for params, expected in zip(inserted, captured['provider_texts']):
+        assert params['page_start'] is params['page_end'] is None
+        assert params['text'] == expected == req.content[params['char_start']:params['char_end']]
+        metadata = json.loads(params['metadata'])
+        assert metadata['char_start'] == params['char_start'] and metadata['char_end'] == params['char_end']
+        assert metadata['statute_harvest_evidence'] == req.attributes['statute_harvest_evidence']
+        assert metadata['source_revision_id'] == 'test-only-custody-revision'
+    version = next(params for sql, params in calls if 'INSERT INTO document_versions(' in sql)
+    assert version['embedding_profile_id'] == 'voyage_4_docs_1024' and version['chunker'] == plan.chunker
+    assert result.status == 'completed'
+
+
+def test_unconfigured_statute_provider_fails_before_dedupe_writes_or_provider(monkeypatch):
+    req = _retained_statute_request()
+    service = object.__new__(IngestionService)
+    monkeypatch.setattr(ingestion_module, 'build_ingestion_plan', lambda p, r: build_ingestion_plan(p, r, settings=_settings()))
+    def forbidden(*args, **kwargs):
+        pytest.fail('unconfigured statute route reached dedupe/write/provider')
+    monkeypatch.setattr(service, '_find_exact_duplicate', forbidden)
+    monkeypatch.setattr(ingestion_module, 'provider_for', forbidden)
+    db = _Db()
+    with pytest.raises(ValueError, match='fallback is forbidden'):
+        asyncio.run(service.ingest_now(db, Principal(tenant_id='t', business_instance_id='b'), req))
+    assert db.calls == []
+
+
+def test_changed_statute_harvest_context_creates_new_version_with_same_exact_text(monkeypatch):
+    request = _retained_statute_request()
+    changed = {'history_events': [], 'response_hash_basis': 'decoded_response_text_reencoded_utf8'}
+    req, _, _, calls, result = _run(monkeypatch, retry=True, statute_request=request,
+                                   evidence_changes={'statute_harvest_evidence': changed})
+    assert result.document_id == 'existing-doc'
+    version = next(params for sql, params in calls if 'INSERT INTO document_versions(' in sql)
+    assert version['version_number'] == 2
+    assert json.loads(version['metadata'])['attributes']['statute_harvest_evidence'] == changed
+    chunks = [json.loads(params['metadata']) for sql, params in calls if 'INSERT INTO chunks(' in sql]
+    assert chunks and all(c['statute_harvest_evidence'] == changed for c in chunks)
+    assert req.content == request.content
+
+
+def test_unchanged_statute_context_deduplicates_without_provider_or_new_version(monkeypatch):
+    request = _retained_statute_request()
+    settings = _settings()
+    settings.voyage_api_key = 'test-not-real'
+    service = object.__new__(IngestionService)
+    monkeypatch.setattr(ingestion_module, 'build_ingestion_plan', lambda p, r: build_ingestion_plan(p, r, settings=settings))
+    monkeypatch.setattr(service, '_link_vector_store_file', lambda *args, **kwargs: None)
+    monkeypatch.setattr(ingestion_module, 'provider_for', lambda *args: pytest.fail('deduplicated statute called provider'))
+    class CompleteDb(_Db):
+        def execute(self, statement, params=None):
+            if 'FROM documents d' in str(statement) and 'source_evidence_context' in str(statement):
+                self.calls.append((str(statement), params))
+                assert params['source_embedding_profile'] == 'voyage_4_docs_1024'
+                assert json.loads(params['source_evidence_context']) == ingestion_module._page_coordinate_evidence_context(request.attributes)
+                return _Rows([{'id': 'existing-doc', 'current_version_id': 'retained-version'}])
+            return super().execute(statement, params)
+    db = CompleteDb()
+    result = asyncio.run(service.ingest_now(db, Principal(tenant_id='t', business_instance_id='b'), request))
+    assert result.status == 'deduplicated'
+    assert not any('INSERT INTO document_versions' in sql or 'INSERT INTO chunks' in sql for sql, _ in db.calls)

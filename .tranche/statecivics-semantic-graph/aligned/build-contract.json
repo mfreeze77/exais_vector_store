@@ -1910,7 +1910,7 @@
     "status": "implemented_verified_offline",
     "implementation_proof": "wave-134-document-coordinate-proof.md",
     "independent_qc": "wave-134-document-coordinate-qc-2.md",
-    "qc_decision": "PASS WITH NOTES — bounded document coordinates only; full graph integration and live activation remain incomplete",
+    "qc_decision": "PASS WITH NOTES \u2014 bounded document coordinates only; full graph integration and live activation remain incomplete",
     "authorization": "2026-09-10 owner asks to proceed with Tier 2 first using existing chunk columns and reviewed span-level Tier 3 references. Existing session authorizes coder workers and independent QC.",
     "dependency_boundary": "Only the existing document-ingestion coordinate path is ready independently of KS-600/650 entity/provision records. This does not complete WAVE-133 or unlock WAVE-134 canonical entity, lifecycle or activation acceptance.",
     "profile": "statecivics_page_markdown_v1",
@@ -1941,5 +1941,53 @@
       "_page_coordinate_evidence_context": "Extract that exact evidence context, preserving absent-versus-present fields."
     },
     "preamble_policy": "Retain pre-marker text as explicitly unpaginated exact slices with no fabricated page or legal heading; page-bound chunks have actual page bounds."
+  },
+  "statute_ingestion_increment": {
+    "owner_ticket": "WAVE-137",
+    "worktree": "/Users/mfrieson/Developer/exais-vector-store-law-money",
+    "base_commit": "16a92d8",
+    "status": "implemented_verified_offline",
+    "authorization": "Owner asks to proceed after completed harvest; implement next unblocked ExAIS work now.",
+    "dependency_boundary": "Document search implementation reuses existing export; no fabricated custody/entity/attestation contract or live activation.",
+    "files": [
+      "packages/svs_common/svs_common/statecivics_statutes.py",
+      "packages/svs_common/svs_common/chunking.py",
+      "packages/svs_common/svs_common/ingestion.py",
+      "packages/svs_common/svs_common/vectorization_router.py",
+      "scripts/release/kansas-fiscal-document-ingest.py",
+      "scripts/release/kansas-statute-preflight.py",
+      "tests/test_statecivics_statutes.py",
+      "tests/test_kansas_statute_ingest.py",
+      "tests/test_ingestion_page_coordinates.py",
+      "tests/test_ingestion_metadata_refresh.py",
+      "tests/test_vectorization_plan.py",
+      "tests/test_instance_source_packages.py"
+    ],
+    "edit_sequence": "Completed WAVE-134 document-coordinate increment -> WAVE-137 serial coder -> independent QC",
+    "ticket": "tickets/WAVE-137-kansas-statute-document-ingestion.md",
+    "root_source_files": [
+      "instances/ks-state-civics/vector-stores/kansas-statutes/store.yaml",
+      "instances/ks-state-civics/vector-stores/kansas-statutes/README.md",
+      "instances/ks-state-civics/vector-stores/kansas-statutes/sources/statecivics-statute-ledger/source.yaml",
+      "instances/ks-state-civics/vector-stores/kansas-statutes/sources/statecivics-statute-ledger/source.lock.json"
+    ],
+    "implementation_proof": "wave-137-implementation-proof.md",
+    "preparation_proof": "wave-137-statute-preflight.json",
+    "symbols": {
+      "preflight_statute_harvest": "Validate the explicitly pinned retained harvest and files; reconcile exact duplicate observations; produce local preparation proof, never canonical export records.",
+      "parse_statute_markdown": "Recognize the actual renderer body and metadata regions while retaining original characters.",
+      "statecivics_statute_markdown_chunks": "Produce bounded exact body/metadata slices with Unicode offsets and LF-delimited document line coordinates.",
+      "source_coordinate_chunking_profile": "Dispatch only explicitly requested page or statute text profiles; reject ambiguous scope.",
+      "build_ingestion_plan": "The statute opt-in requires the existing Voyage-4/1024 profile and normal provider/privacy checks with no fallback.",
+      "plan_operations": "Explicit statute family joins existing canonical retrieval records to reviewed harvest evidence and handles evidence replay/content exclusions."
+    },
+    "root_proof_files": [
+      ".tranche/statecivics-semantic-graph/aligned/wave-137-implementation-proof.md",
+      ".tranche/statecivics-semantic-graph/aligned/wave-137-statute-preflight.json",
+      ".tranche/statecivics-semantic-graph/aligned/wave-137-regression-summary.json",
+      ".tranche/statecivics-semantic-graph/aligned/wave-137-qc.md"
+    ],
+    "independent_qc": "wave-137-qc.md",
+    "qc_decision": "PASS WITH NOTES \u2014 bounded statute document implementation; live indexing and canonical graph integration remain pending"
   }
 }

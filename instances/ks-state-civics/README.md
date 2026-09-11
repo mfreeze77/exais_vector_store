@@ -22,6 +22,8 @@ Instance declaration: [instance.yaml](instance.yaml).
 
 ## Vector stores
 
+- [Kansas statutes](vector-stores/kansas-statutes/README.md) — retained-corpus
+  preparation and custody-export consumer; live activation pending.
 - [Kansas fiscal documents](vector-stores/kansas-fiscal-documents/README.md)
 - [Kansas court decisions](vector-stores/kansas-court-decisions/README.md)
 - [Topeka municipal code](vector-stores/topeka-municipal-code/README.md)

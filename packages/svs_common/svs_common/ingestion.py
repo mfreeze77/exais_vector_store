@@ -6,7 +6,8 @@ from .db import jsonb_param
 from .schemas import DocumentIngestRequest, IngestionJobResponse, Principal
 from .ids import new_id, point_uuid
 from .hashing import sha256_text
-from .chunking import choose_chunker, source_page_chunking_profile, SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE
+from .chunking import choose_chunker, source_coordinate_chunking_profile, SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE
+from .statecivics_statutes import SOURCE_TEXT_CHUNKING_PROFILE_ATTRIBUTE, STATECIVICS_STATUTE_MARKDOWN_PROFILE, STATUTE_EMBEDDING_PROFILE
 from .model_registry import resolve_vectorization_profile, model_registry
 from .vectorization_router import build_ingestion_plan
 from .providers import EmbeddingBatchError, ProviderConfigurationError, provider_for
@@ -23,11 +24,12 @@ SOURCE_IDENTITY_ATTRIBUTE = "source_identity"
 SOURCE_PAGE_EVIDENCE_CONTEXT_FIELDS = (
     'source_revision_id', 'source_content_hash_sha256', 'logical_document_id',
     'extraction_revision_id', 'citation_url', 'extraction_content_hash_sha256', 'source_page_count',
+    'statute_harvest_evidence',
 )
 
 
 def _page_coordinate_evidence_context(attributes: dict) -> dict:
-    """Fields persisted on each page chunk; absence is different from a value."""
+    """Shared page/statute chunk evidence; absence is different from a value."""
     return {key: attributes[key] for key in SOURCE_PAGE_EVIDENCE_CONTEXT_FIELDS if key in attributes}
 
 
@@ -189,9 +191,10 @@ class IngestionService:
             identity_clause = "AND dv.metadata #>> '{source_identity}' = :source_identity"
             params["source_identity"] = req.source_identity
         coordinate_clause = ""
-        if req.attributes.get(SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE) is not None:
+        if (req.attributes.get(SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE) is not None
+                or req.attributes.get(SOURCE_TEXT_CHUNKING_PROFILE_ATTRIBUTE) is not None):
             mode_id = resolve_vectorization_profile(req.filename, req.mime_type, req.mode, req.attributes)[0]
-            profile = source_page_chunking_profile(mode_id, req.attributes)
+            profile = source_coordinate_chunking_profile(mode_id, req.attributes)
             if not req.source_identity:
                 raise ValueError('source page chunking requires source_identity for profile-aware replay')
             coordinate_clause = '''AND dv.chunking_profile_id = :source_chunking_profile
@@ -201,6 +204,9 @@ class IngestionService:
                   THEN dv.metadata->'attributes' ELSE '{}'::jsonb END) AS evidence
                 WHERE evidence.key = ANY(:source_evidence_fields)
               ) = CAST(:source_evidence_context AS jsonb)'''
+            if profile == STATECIVICS_STATUTE_MARKDOWN_PROFILE:
+                coordinate_clause += ' AND dv.embedding_profile_id = :source_embedding_profile'
+                params['source_embedding_profile'] = STATUTE_EMBEDDING_PROFILE
             params['source_chunking_profile'] = profile
             params['source_evidence_fields'] = list(SOURCE_PAGE_EVIDENCE_CONTEXT_FIELDS)
             params['source_evidence_context'] = jsonb_param(_page_coordinate_evidence_context(req.attributes))
@@ -265,9 +271,10 @@ class IngestionService:
             return None
         params.update({"tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "kb_id": req.knowledge_base_id, "vs_id": req.vector_store_id, "hash": content_hash})
         version_change_clause = 'd.content_hash <> :hash'
-        if req.attributes.get(SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE) is not None:
+        if (req.attributes.get(SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE) is not None
+                or req.attributes.get(SOURCE_TEXT_CHUNKING_PROFILE_ATTRIBUTE) is not None):
             mode_id = resolve_vectorization_profile(req.filename, req.mime_type, req.mode, req.attributes)[0]
-            source_page_chunking_profile(mode_id, req.attributes)
+            source_coordinate_chunking_profile(mode_id, req.attributes)
             if not req.source_identity:
                 raise ValueError('source page chunking requires source_identity for profile-aware replay')
             # Exact complete replay already returned through dedupe. Reuse this
@@ -290,12 +297,18 @@ class IngestionService:
             require_active_vector_store(db, principal, req.vector_store_id)
         content_hash = sha256_text(req.content)
         coordinate_chunks = None
-        if req.attributes.get(SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE) is not None:
+        coordinate_plan = None
+        if (req.attributes.get(SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE) is not None
+                or req.attributes.get(SOURCE_TEXT_CHUNKING_PROFILE_ATTRIBUTE) is not None):
             mode_id = resolve_vectorization_profile(req.filename, req.mime_type, req.mode, req.attributes)[0]
             if not req.source_identity:
                 raise ValueError('source page chunking requires source_identity for profile-aware replay')
             # Validate exact extraction bytes before dedupe can refresh metadata.
             coordinate_chunks = choose_chunker(mode_id, attributes=req.attributes)(req.content)
+            if req.attributes.get(SOURCE_TEXT_CHUNKING_PROFILE_ATTRIBUTE) is not None:
+                # Strict source model/privacy selection precedes metadata writes,
+                # including a deduplicated refresh, and cannot silently fall back.
+                coordinate_plan = build_ingestion_plan(principal, req)
 
         if not req.attributes.get(OPENAI_FILE_ID_ATTRIBUTE):
             exact = self._find_exact_duplicate(db, principal, req, content_hash)
@@ -307,7 +320,7 @@ class IngestionService:
                         require_active_vector_store(db, principal, req.vector_store_id)
                 return IngestionJobResponse(id=new_id("job"), status="deduplicated", document_id=exact["id"], vector_store_file_id=vsf_id)
 
-        plan = build_ingestion_plan(principal, req)
+        plan = coordinate_plan or build_ingestion_plan(principal, req)
         mode_id, mode = resolve_vectorization_profile(req.filename, req.mime_type, req.mode, req.attributes)
         embedding_profile_id = plan.embedding_profile_id
         registry = model_registry().get("models", {})

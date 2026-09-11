@@ -8,6 +8,8 @@ from functools import partial
 from dataclasses import dataclass, field
 from typing import Any
 from .hashing import sha256_text
+from .statecivics_statutes import (STATECIVICS_STATUTE_MARKDOWN_PROFILE, SOURCE_TEXT_CHUNKING_PROFILE_ATTRIBUTE,
+                                  STATUTE_SOURCE_COLLECTION, statecivics_statute_markdown_chunks)
 
 STATECIVICS_PAGE_MARKDOWN_PROFILE = 'statecivics_page_markdown_v1'
 SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE = 'source_page_chunking_profile'
@@ -440,6 +442,9 @@ def log_event_chunks(content: str, max_lines: int = 80, overlap_lines: int = 10)
 
 def source_page_chunking_profile(mode: str, attributes: dict[str, Any] | None = None) -> str | None:
     """Explicit source-specific override; never changes mode or model selection."""
+    if ((attributes or {}).get(SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE) is not None
+            and (attributes or {}).get(SOURCE_TEXT_CHUNKING_PROFILE_ATTRIBUTE) is not None):
+        raise ValueError('simultaneous page/text chunking profiles are ambiguous')
     value = (attributes or {}).get(SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE)
     if value is None:
         return None
@@ -450,6 +455,22 @@ def source_page_chunking_profile(mode: str, attributes: dict[str, Any] | None = 
     if (attributes or {}).get('source_collection') != 'statecivics-kansas-fiscal-documents':
         raise ValueError('source page chunking requires the StateCivics fiscal source collection')
     return value
+
+
+def source_text_chunking_profile(mode: str, attributes: dict[str, Any] | None = None) -> str | None:
+    source_page_chunking_profile(mode, attributes)
+    value = (attributes or {}).get(SOURCE_TEXT_CHUNKING_PROFILE_ATTRIBUTE)
+    if value is None:
+        return None
+    if value != STATECIVICS_STATUTE_MARKDOWN_PROFILE or not isinstance(value, str):
+        raise ValueError('unsupported source_text_chunking_profile')
+    if mode != 'markdown_docs_v1' or (attributes or {}).get('source_collection') != STATUTE_SOURCE_COLLECTION:
+        raise ValueError('statute text chunking requires markdown_docs_v1 and the StateCivics statute source collection')
+    return value
+
+
+def source_coordinate_chunking_profile(mode: str, attributes: dict[str, Any] | None = None) -> str | None:
+    return source_text_chunking_profile(mode, attributes) or source_page_chunking_profile(mode, attributes)
 
 
 def statecivics_page_markdown_chunks(
@@ -570,6 +591,11 @@ def statecivics_page_markdown_chunks(
 
 
 def choose_chunker(mode: str, *, attributes: dict[str, Any] | None = None):
+    if source_text_chunking_profile(mode, attributes):
+        attrs = attributes or {}
+        return partial(statecivics_statute_markdown_chunks,
+                       expected_sha256=attrs.get('extraction_content_hash_sha256'),
+                       expected_source_url=attrs.get('citation_url'))
     if source_page_chunking_profile(mode, attributes):
         attrs = attributes or {}
         return partial(statecivics_page_markdown_chunks,

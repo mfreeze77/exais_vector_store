@@ -24,6 +24,10 @@ from urllib.parse import urlsplit
 
 from svs_common.marker_client import FISCAL_TABLES_PAGE_AWARE_PROFILE
 from svs_common.chunking import STATECIVICS_PAGE_MARKDOWN_PROFILE, statecivics_page_markdown_chunks
+from svs_common.statecivics_statutes import (
+    STATECIVICS_STATUTE_MARKDOWN_PROFILE, STATUTE_SOURCE_COLLECTION, STATUTE_EMBEDDING_PROFILE,
+    StatuteHarvest, preflight_statute_harvest, parse_statute_markdown, MAX_DOCUMENT_BYTES,
+)
 from topeka_pipeline_common import (
     DEFAULT_CELL,
     DEFAULT_KNOWLEDGE_BASE_ID,
@@ -95,6 +99,8 @@ class PlannedOperation:
     record: dict[str, Any]
     content: bytes | None = None
     source_page_chunking_profile: str | None = None
+    statute_evidence: dict[str, Any] | None = None
+    content_exclusion: str | None = None
 
 
 def canonical_json(value: Any) -> str:
@@ -246,12 +252,39 @@ def _validate_record(
         )
 
 
+def _validate_source_family(source_family: str, vector_store_slug: str | None = None) -> None:
+    if source_family not in {'kansas-fiscal-documents', 'kansas-statutes'}:
+        raise FiscalIngestError('unsupported source family')
+    if source_family == 'kansas-statutes' and vector_store_slug is not None and vector_store_slug != 'kansas-statutes':
+        raise FiscalIngestError('statute source family requires the kansas-statutes vector store slug')
+
+
+def _validate_statute_record(record: dict[str, Any]) -> None:
+    if record.get('artifact_type') != 'statute':
+        raise FiscalIngestError('statute source family requires statute records')
+    if record['ingestion']['action'] == 'upsert' and str(record.get('mime_type', '')).split(';', 1)[0].lower() != 'text/markdown':
+        raise FiscalIngestError('statute upserts require retained Markdown')
+
+
+def _statute_evidence(record: dict[str, Any], content: bytes, harvest: StatuteHarvest) -> dict[str, Any]:
+    found = harvest.documents.get((record['citation_url'], record['content_hash_sha256']))
+    if found is None:
+        raise FiscalIngestError('approved export URL/rendered hash does not match the reviewed statute harvest')
+    if len(content) != found['rendered_bytes']:
+        raise FiscalIngestError('statute custody bytes differ from the reviewed harvest')
+    parse_statute_markdown(content.decode('utf-8', errors='strict'),
+                          expected_sha256=found['rendered_sha256'], expected_source_url=found['source_url'])
+    return dict(found)
+
+
 def load_manifest(
     path: Path,
     *,
     instance_slug: str = DEFAULT_INSTANCE_SLUG,
     vector_store_slug: str = DEFAULT_VECTOR_STORE_SLUG,
+    source_family: str = "kansas-fiscal-documents",
 ) -> LoadedManifest:
+    _validate_source_family(source_family, vector_store_slug)
     payload = path.read_bytes()
     if payload and not payload.endswith(b"\n"):
         raise FiscalIngestError(f"{path}: JSONL manifest must end with a newline")
@@ -278,6 +311,8 @@ def load_manifest(
             instance_slug=instance_slug,
             vector_store_slug=vector_store_slug,
         )
+        if source_family == "kansas-statutes":
+            _validate_statute_record(record)
         logical_id = record["logical_document_id"]
         record_id = record["export_record_id"]
         if logical_id in logical_ids:
@@ -300,7 +335,7 @@ def load_manifest(
     )
 
 
-def read_custody_object(custody_root: Path, record: dict[str, Any]) -> bytes:
+def read_custody_object(custody_root: Path, record: dict[str, Any], *, max_bytes: int | None = None) -> bytes:
     uri = str(record.get("custody_uri") or "")
     match = _CUSTODY_RE.fullmatch(uri)
     if match is None:
@@ -314,7 +349,13 @@ def read_custody_object(custody_root: Path, record: dict[str, Any]) -> bytes:
         raise FiscalIngestError(f"custody URI escapes configured root: {uri}")
     if not path.is_file():
         raise FiscalIngestError(f"custody object is missing: {uri}")
-    content = path.read_bytes()
+    if max_bytes is not None:
+        with path.open('rb') as stream:
+            content = stream.read(max_bytes + 1)
+        if len(content) > max_bytes:
+            raise FiscalIngestError('custody object exceeds the source byte bound')
+    else:
+        content = path.read_bytes()
     mime_type = str(record.get("mime_type") or "").split(";", 1)[0].lower()
     if mime_type == "application/pdf" and b"%PDF-" not in content[:1024]:
         raise FiscalIngestError(
@@ -378,7 +419,14 @@ def plan_operations(
     custody_root: Path,
     state: dict[str, Any],
     source_page_chunking_profile: str | None = None,
+    source_family: str = "kansas-fiscal-documents",
+    statute_harvest: StatuteHarvest | None = None,
 ) -> list[PlannedOperation]:
+    _validate_source_family(source_family)
+    if source_family == "kansas-statutes" and (statute_harvest is None or source_page_chunking_profile is not None):
+        raise FiscalIngestError("statutes require reviewed harvest and reject the fiscal page profile")
+    if source_family != "kansas-statutes" and statute_harvest is not None:
+        raise FiscalIngestError("statute harvest requires explicit statute source family")
     if source_page_chunking_profile not in (None, STATECIVICS_PAGE_MARKDOWN_PROFILE):
         raise FiscalIngestError('unsupported source page chunking profile')
     prior = state["records"]
@@ -387,8 +435,19 @@ def plan_operations(
         logical_id = record["logical_document_id"]
         action = record["ingestion"]["action"]
         previous = prior.get(logical_id)
+        if source_family == 'kansas-statutes':
+            _validate_statute_record(record)
+        evidence = None
         if action == "upsert":
-            content = read_custody_object(custody_root, record)
+            content = read_custody_object(custody_root, record, **({'max_bytes': MAX_DOCUMENT_BYTES} if source_family == 'kansas-statutes' else {}))
+            if source_family == 'kansas-statutes':
+                evidence = _statute_evidence(record, content, statute_harvest)
+                if evidence['classification'] != 'substantive_body':
+                    removal = isinstance(previous, dict) and previous.get('action') == 'upsert' and previous.get('vector_store_file_id')
+                    operations.append(PlannedOperation('remove' if removal else 'noop', logical_id,
+                        'statute content excluded: ' + evidence['classification'], record,
+                        statute_evidence=evidence, content_exclusion=evidence['classification']))
+                    continue
             mime_type = str(record.get('mime_type') or '').split(';', 1)[0].lower()
             desired_profile = source_page_chunking_profile if mime_type in _SUPPORTED_TEXT_MIME_TYPES else None
             if desired_profile:
@@ -400,6 +459,8 @@ def plan_operations(
                 == record["record_digest_sha256"]
                 and previous.get("vector_store_file_id")
                 and (desired_profile is None or previous.get('source_page_chunking_profile') == desired_profile)
+                and (evidence is None or (previous.get('source_text_chunking_profile') == STATECIVICS_STATUTE_MARKDOWN_PROFILE
+                     and previous.get('statute_evidence_context_sha256') == evidence['evidence_context_sha256']))
             ):
                 operations.append(
                     PlannedOperation(
@@ -415,6 +476,7 @@ def plan_operations(
                         record,
                         content,
                         desired_profile,
+                        evidence,
                     )
                 )
             continue
@@ -442,7 +504,7 @@ def plan_operations(
     )
 
 
-def ingest_idempotency_key(vector_store_id: str, record: dict[str, Any], *, source_page_chunking_profile: str | None = None) -> str:
+def ingest_idempotency_key(vector_store_id: str, record: dict[str, Any], *, source_page_chunking_profile: str | None = None, statute_evidence: dict[str, Any] | None = None) -> str:
     fields = {
             "vector_store_id": vector_store_id,
             "logical_document_id": record["logical_document_id"],
@@ -451,6 +513,9 @@ def ingest_idempotency_key(vector_store_id: str, record: dict[str, Any], *, sour
         }
     if source_page_chunking_profile is not None:
         fields['source_page_chunking_profile'] = source_page_chunking_profile
+    if statute_evidence is not None:
+        fields['source_text_chunking_profile'] = STATECIVICS_STATUTE_MARKDOWN_PROFILE
+        fields['statute_evidence_context_sha256'] = statute_evidence['evidence_context_sha256']
     value = canonical_json(fields)
     return (
         "statecivics-fiscal-" + hashlib.sha256(value.encode("utf-8")).hexdigest()[:48]
@@ -635,8 +700,22 @@ def submit_upsert(
         raise FiscalIngestError("upsert operation has no verified custody content")
     title = _document_title(record)
     mime_type = str(record.get("mime_type") or "").split(";", 1)[0].lower()
-    key = ingest_idempotency_key(vector_store_id, record, source_page_chunking_profile=operation.source_page_chunking_profile)
+    key = ingest_idempotency_key(vector_store_id, record, source_page_chunking_profile=operation.source_page_chunking_profile, statute_evidence=operation.statute_evidence)
     attributes = _record_attributes(record)
+    if operation.statute_evidence is not None:
+        _validate_statute_record(record)
+        if operation.content_exclusion or operation.statute_evidence.get('classification') != 'substantive_body':
+            raise FiscalIngestError('excluded statute content cannot be submitted')
+        if operation.source_page_chunking_profile is not None:
+            raise FiscalIngestError('simultaneous statute/page chunking is forbidden')
+        attributes.pop('marker_profile', None)
+        attributes.pop('fiscal_year', None)
+        attributes.update({
+            'source_collection': STATUTE_SOURCE_COLLECTION,
+            'source_text_chunking_profile': STATECIVICS_STATUTE_MARKDOWN_PROFILE,
+            'extraction_content_hash_sha256': record['content_hash_sha256'],
+            'statute_harvest_evidence': operation.statute_evidence,
+        })
     if mime_type == "application/pdf":
         fields = {
             "title": title,
@@ -688,17 +767,19 @@ def submit_upsert(
                 "classification": "public",
                 "source_trust": "statecivics_custody_ledger",
             }
-        if operation.source_page_chunking_profile is not None:
+        if operation.source_page_chunking_profile is not None or operation.statute_evidence is not None:
+            desired_chunker = STATECIVICS_STATUTE_MARKDOWN_PROFILE if operation.statute_evidence is not None else STATECIVICS_PAGE_MARKDOWN_PROFILE
             preview = api_json(
                 'POST', api_base, '/api/v1/ingestion/preview', {**document_request, 'persist': False},
                 headers=headers, timeout=timeout, cell=cell, transport=transport,
             )
             if (not isinstance(preview, dict)
-                    or preview.get('chunker') != STATECIVICS_PAGE_MARKDOWN_PROFILE
+                    or preview.get('chunker') != desired_chunker
                     or preview.get('mode') != document_request['mode']
                     or type(preview.get('estimated_chunks')) is not int
-                    or not 1 <= preview['estimated_chunks'] <= 20000):
-                raise FiscalIngestError('server preview did not confirm the requested page chunking profile and valid chunk count')
+                    or not 1 <= preview['estimated_chunks'] <= 20000
+                    or (operation.statute_evidence is not None and preview.get('embedding_profile_id') != STATUTE_EMBEDDING_PROFILE)):
+                raise FiscalIngestError('server preview did not confirm the requested page/text chunking profile, embedding profile and valid chunk count')
         response = api_json(
             "POST", api_base, "/api/v1/documents/ingest", document_request,
             headers=headers,
@@ -740,7 +821,7 @@ def apply_operations(
             # A removal that is already externally satisfied must still advance
             # local desired-state proof to this exact manifest record. Otherwise
             # every later run compares against stale rights/lifecycle metadata.
-            if record["ingestion"]["action"] == "remove":
+            if record["ingestion"]["action"] == "remove" or operation.content_exclusion is not None:
                 previous = state["records"].get(logical_id)
                 next_state = {
                     "action": "remove",
@@ -801,6 +882,9 @@ def apply_operations(
             }
             if operation.source_page_chunking_profile is not None:
                 state['records'][logical_id]['source_page_chunking_profile'] = operation.source_page_chunking_profile
+            if operation.statute_evidence is not None:
+                state['records'][logical_id]['source_text_chunking_profile'] = STATECIVICS_STATUTE_MARKDOWN_PROFILE
+                state['records'][logical_id]['statute_evidence_context_sha256'] = operation.statute_evidence['evidence_context_sha256']
             counts["upserted"] += 1
         write_json_atomic(state_path, state)
     return counts
@@ -808,6 +892,10 @@ def apply_operations(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--source-family', choices=['kansas-fiscal-documents', 'kansas-statutes'], default='kansas-fiscal-documents')
+    parser.add_argument('--harvest-manifest', type=Path)
+    parser.add_argument('--harvest-root', type=Path)
+    parser.add_argument('--harvest-manifest-sha256')
     parser.add_argument("--cell", default=DEFAULT_CELL)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--custody-root", type=Path, required=True)
@@ -835,12 +923,31 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    source_family = getattr(args, 'source_family', 'kansas-fiscal-documents')
+    _validate_source_family(source_family, args.vector_store_slug)
+    harvest = None
+    if source_family == 'kansas-statutes':
+        if not all((args.harvest_manifest, args.harvest_root, args.harvest_manifest_sha256)):
+            raise FiscalIngestError('statute source requires --harvest-manifest, --harvest-root and --harvest-manifest-sha256')
+        if args.allow_create_vector_store or (args.apply and not args.vector_store_id):
+            raise FiscalIngestError('statute application requires an existing explicit vector store; creation is not supported')
+        harvest = preflight_statute_harvest(args.harvest_manifest, args.harvest_root,
+                                          expected_manifest_sha256=args.harvest_manifest_sha256)
+    elif any(getattr(args, k, None) is not None for k in ('harvest_manifest', 'harvest_root', 'harvest_manifest_sha256')):
+        raise FiscalIngestError('harvest flags require the explicit statute source family')
     manifest = load_manifest(
         args.manifest,
         instance_slug=args.instance_slug,
         vector_store_slug=args.vector_store_slug,
+        source_family=source_family,
     )
-    vector_store_id = args.vector_store_id or "vs_kansas_fiscal_documents_pending"
+    vector_store_id = args.vector_store_id or ("vs_kansas_statutes_pending" if source_family == "kansas-statutes" else "vs_kansas_fiscal_documents_pending")
+    prepared = None
+    if source_family == 'kansas-statutes':
+        state = load_state(args.state, vector_store_id=vector_store_id)
+        prepared = plan_operations(manifest, custody_root=args.custody_root, state=state,
+                                   source_family=source_family, statute_harvest=harvest,
+                                   source_page_chunking_profile=args.source_page_chunking_profile)
     if args.apply:
         headers = default_headers(cell=args.cell, auth_token_file=args.auth_token_file)
         vector_store_id = ensure_vector_store(
@@ -863,7 +970,7 @@ def main() -> int:
     else:
         headers = {}
     state = load_state(args.state, vector_store_id=vector_store_id)
-    operations = plan_operations(manifest, custody_root=args.custody_root, state=state,
+    operations = prepared if prepared is not None else plan_operations(manifest, custody_root=args.custody_root, state=state,
                                  source_page_chunking_profile=args.source_page_chunking_profile)
     planned = {
         action: sum(1 for item in operations if item.action == action)
@@ -871,6 +978,8 @@ def main() -> int:
     }
     result: dict[str, Any] = {
         "applied": args.apply,
+        "source_family": source_family,
+        "harvest_manifest_sha256": harvest.manifest_sha256 if harvest else None,
         "manifest": str(manifest.path),
         "manifest_sha256": manifest.sha256,
         "manifest_byte_count": manifest.byte_count,

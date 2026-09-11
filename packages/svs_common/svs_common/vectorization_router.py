@@ -4,7 +4,8 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 from .sql import jsonb_text
 from .db import jsonb_param
-from .chunking import estimate_tokens, choose_chunker, source_page_chunking_profile
+from .chunking import estimate_tokens, choose_chunker, source_coordinate_chunking_profile
+from .statecivics_statutes import STATECIVICS_STATUTE_MARKDOWN_PROFILE, STATUTE_EMBEDDING_PROFILE
 from .ids import new_id
 from .config import get_settings
 from .model_registry import resolve_vectorization_profile, vectorization_modes, model_registry, resolve_embedding_profile, estimate_embedding_cost
@@ -61,13 +62,22 @@ def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest, setti
         fallback_private_embedding_profile=policy_cfg.get('fallback_private_embedding_profile', 'bge_m3_local'),
         fallback_dev_embedding_profile=policy_cfg.get('fallback_dev_embedding_profile', 'hash_mock_1536'),
     )
+    coordinate_profile = source_coordinate_chunking_profile(mode_id, req.attributes)
+    statute = coordinate_profile == STATECIVICS_STATUTE_MARKDOWN_PROFILE
     preferred = mode.get('embedding_profile') or resolve_embedding_profile(mode_id, req.security_level)
-    candidate_ids = _expand_profile_candidates(preferred, registry)
-    if policy.fallback_private_embedding_profile not in candidate_ids:
-        candidate_ids.append(policy.fallback_private_embedding_profile)
-    if policy.fallback_dev_embedding_profile not in candidate_ids:
-        candidate_ids.append(policy.fallback_dev_embedding_profile)
     profiles = registry.get('models', {})
+    if statute:
+        preferred = STATUTE_EMBEDDING_PROFILE
+        p = profiles.get(preferred, {})
+        if (p.get('provider'), p.get('model'), p.get('dimensions'), p.get('privacy')) != ('voyage', 'voyage-4', 1024, 'external_api'):
+            raise ValueError('statutes require the configured Voyage-4 1024-dimensional profile')
+        candidate_ids = [preferred]
+    else:
+        candidate_ids = _expand_profile_candidates(preferred, registry)
+        if policy.fallback_private_embedding_profile not in candidate_ids:
+            candidate_ids.append(policy.fallback_private_embedding_profile)
+        if policy.fallback_dev_embedding_profile not in candidate_ids:
+            candidate_ids.append(policy.fallback_dev_embedding_profile)
     candidates: list[ModelCandidate] = []
     estimated_tokens = estimate_tokens(req.content)
     for idx, candidate_id in enumerate(candidate_ids):
@@ -120,9 +130,13 @@ def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest, setti
         ))
     candidates.sort(key=lambda c: (c.allowed, c.score), reverse=True)
     chosen_candidate = next((c for c in candidates if c.allowed), None)
+    if statute and chosen_candidate is None:
+        raise ValueError('statute Voyage-4 profile unavailable or refused by privacy policy; fallback is forbidden')
     chosen = chosen_candidate.model_profile_id if chosen_candidate else preferred
     chunker = choose_chunker(mode_id, attributes=req.attributes)
     sample_chunks = chunker(req.content)
+    if statute and not sample_chunks:
+        raise ValueError('statute body is excluded from semantic ingestion')
     warnings = []
     if mode.get('status') == 'research':
         warnings.append(f'mode {mode_id} is research; use external parser/bakeoff before production')
@@ -135,7 +149,7 @@ def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest, setti
     return IngestionPlanResponse(
         mode=mode_id,
         parser=mode.get('parser') or ','.join(mode.get('parser_candidates', [])) or None,
-        chunker=source_page_chunking_profile(mode_id, req.attributes) or mode.get('chunker'),
+        chunker=source_coordinate_chunking_profile(mode_id, req.attributes) or mode.get('chunker'),
         embedding_profile_id=chosen,
         retrieval_profile_id=mode.get('retrieval_profile', 'hybrid_rrf_secure_v2'),
         candidates=candidates,

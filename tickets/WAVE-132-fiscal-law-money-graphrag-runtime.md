@@ -17,6 +17,10 @@ Follow-up tickets: [WAVE-133](WAVE-133-fiscal-canonical-projection-contract.md),
 [WAVE-134](WAVE-134-fiscal-projection-ingestion-lifecycle.md),
 [WAVE-135](WAVE-135-fiscal-hybrid-retrieval-and-typed-traversal.md), and
 [WAVE-136](WAVE-136-fiscal-real-source-generalization-evaluation.md).
+The owner has also unblocked [WAVE-137](WAVE-137-kansas-statute-document-ingestion.md),
+the separate retained-statute document path. It reuses the existing document
+export and does not wait on provision/attestation contracts to implement parsing
+and ingestion; actual eligible custody/export records still gate a live run.
 The gated [build contract](../.tranche/statecivics-semantic-graph/aligned/build-contract.json)
 and [file/symbol index](../.tranche/statecivics-semantic-graph/aligned/stack.index.json)
 provide shared owners and sequential edit order.

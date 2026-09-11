@@ -209,3 +209,44 @@ def test_plan_candidates_include_cost_hints_without_reordering():
     local = next(c for c in plan.candidates if c.model_profile_id == 'bge_m3_local')
     assert local.estimated_cost_usd is None
     assert local.cost_reason == 'cost_unavailable'
+
+
+def _statute_request():
+    from svs_common.statecivics_statutes import STATECIVICS_STATUTE_MARKDOWN_PROFILE, STATUTE_SOURCE_COLLECTION
+    text = '# K.S.A. 2-303 — Test mechanics\n\n**Source:** https://ksrevisor.gov/statutes/chapters/ch02/002_003_0003.html\n\nA short law.\n'
+    return DocumentIngestRequest(title='statute', filename='statute.md', content=text, mode='markdown_docs_v1',
+                                 source_identity='test-statute', attributes={
+                                     'source_text_chunking_profile': STATECIVICS_STATUTE_MARKDOWN_PROFILE,
+                                     'source_collection': STATUTE_SOURCE_COLLECTION,
+                                     'extraction_content_hash_sha256': sha256_text(text)})
+
+
+def test_statutes_select_only_voyage_4_1024_even_when_other_providers_available():
+    plan = build_ingestion_plan(Principal(tenant_id='t', business_instance_id='b'), _statute_request(),
+                               settings=settings(voyage_api_key='test-not-a-real-key', openai_api_key='also-not-real'))
+    assert plan.chunker == 'statecivics_statute_markdown_v1'
+    assert plan.mode == 'markdown_docs_v1' and plan.embedding_profile_id == 'voyage_4_docs_1024'
+    assert len(plan.candidates) == 1
+    assert (plan.candidates[0].provider, plan.candidates[0].model, plan.candidates[0].dimensions) == ('voyage', 'voyage-4', 1024)
+
+
+def test_statutes_fail_when_voyage_is_unconfigured_or_privacy_denied():
+    import pytest
+    principal = Principal(tenant_id='t', business_instance_id='b')
+    for request, config in [(_statute_request(), settings(openai_api_key='not-real')),
+                            (_statute_request().model_copy(update={'security_level': 4}),
+                             settings(voyage_api_key='not-real', runpod_embedding_endpoint_url='http://fake'))]:
+        with pytest.raises(ValueError, match='fallback is forbidden'):
+            build_ingestion_plan(principal, request, settings=config)
+
+
+def test_statutes_fail_for_wrong_registered_voyage_dimensions(monkeypatch):
+    import copy
+    import pytest
+    from svs_common import vectorization_router as router
+    registry = copy.deepcopy(model_registry())
+    registry['models']['voyage_4_docs_1024']['dimensions'] = 1536
+    monkeypatch.setattr(router, 'model_registry', lambda: registry)
+    with pytest.raises(ValueError, match='1024-dimensional'):
+        build_ingestion_plan(Principal(tenant_id='t', business_instance_id='b'), _statute_request(),
+                             settings=settings(voyage_api_key='not-real'))
