@@ -56,6 +56,48 @@ own evidence coordinates/hash; legal provision identity remains separate.
 The section heading supplies agency context on page 351. Its evidence must be
 linked separately rather than pretending this subsection names the agency.
 
+### Page-local convention checked against the same artifact
+
+Page 358, lines **30–34 inclusive**, selects the complete clause if line 1
+starts immediately after the page-marker line's terminating LF and blank lines
+count. Under that convention, the page body begins at absolute code-point
+984508 and the page-local code-point range is **`[1589, 1903)`**. Concatenating
+those lines while excluding only the final line-ending LF reproduces the exact
+314-character quote and its hash above; internal spaces and line endings remain.
+
+The reported local range `[1607, 1921)` instead uses the opening `<` of the page
+marker as its origin. Both are describable coordinate systems, but they are not
+interchangeable. The upstream locator convention must state marker treatment,
+blank-line counting, coordinate units, index base and endpoint rules. These are
+measured examples, not a second ExAIS locator contract. Markdown line numbers
+must not be presented as line numbers printed in the PDF.
+
+Page-local coordinates help review and limit the effect of edits, but still
+belong to one immutable extraction revision. Absolute offsets also remain exact
+within that revision. A changed extraction must fail the old hash check, not
+silently retarget a span. Quote hashes establish text integrity, not canonical
+provision identity or legal continuity; identical wording can occur in distinct
+provisions and versions.
+
+### Locator resolution is still unimplemented at the reviewed boundaries
+
+Upstream `SourceSpanRegistration` validates the shape/order of page and line
+integers. `source_artifact_service.py:224` (`register_span`) checks revision
+existence and consistency between supplied quote and quote hash, but does not
+open retained bytes or resolve the locator to compare the selected text.
+Thus a self-consistent quote/hash attached to the wrong lines can still pass.
+
+ExAIS's current offline `FiscalDocumentSpanEvidence` similarly preserves opaque
+locator JSON and hashes without resolving source text; it does not carry quote
+text itself. The legacy adapter only accepts page/page-range keys and cannot
+consume the complete `page_lines` locator unchanged. WAVE-133 must consume the
+actual KS-650 evidence handoff, preserve its full locator, obtain the exact
+quote/evidence, and verify its selection from the pinned extraction. Do not
+discard line keys or invent a chunk binding to fit the legacy adapter.
+
+This follow-up used a read-only line-selection/hash equivalence check and a
+separate producer/consumer code review. No registration or runtime changed.
+
 ## Quality workflow: what the current code actually does
 
 Upstream paths below are relative to `operator-source://statecivics-ai`, inspected

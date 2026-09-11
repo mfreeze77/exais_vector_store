@@ -77,6 +77,7 @@ Expected integrated output: WAVE-133 defines one v2 canonical-reference/evidence
 - Do not create edges from semantic similarity, section-number equality, unresolved statute History or normalized account labels. Stronger legal lineage or action/fact edges require explicit source-backed upstream correspondence.
 - Define bounded partitions/batches and complete manifest accounting for multiple bills, years, and source revisions; reject incomplete/truncated activation. Loading another bill does not silently replace the first. Preserve immutable source/run/snapshot identity and a migration/rollback route for supported prior artifacts.
 - Focused contract/persistence tests cover structured-only and document-span evidence, identity stability under re-extraction, separation across legal versions, joint-lineage edge rejection, typed path provenance/direction, multiple coexisting partitions, incomplete manifests, and valid prior document records.
+- Resolve document locators against the pinned retained extraction, compare selected text with the exact quote/hash, and preserve raw-source derivation. Page/line type checks and a supplied quote/hash agreement alone are insufficient. Test wrong page/line bounds, truncated clauses, changed extraction bytes and incompatible locator conventions; never discard line fields to fit the legacy page-only adapter.
 
 ## Dependencies
 
@@ -166,3 +167,10 @@ corrects section 96(j)'s proposed character endpoint, documents producer-side
 QA/registration exclusions and preserves the same owner boundary. These
 machine-readable bytes are now available for evidence review; the canonical
 schemas, reviewed derivation/records and adapter/API acceptance remain separate.
+
+The page-local follow-up verified section 96(j) at page 358, inclusive lines
+30–34 under an explicit marker/blank-line convention. Registration and current
+offline ExAIS validation do not yet prove that a locator selects the supplied
+quote. The [concrete integration handoff](../docs/STATECIVICS_LAW_MONEY_ALIGNMENT.md#concrete-input-needed-for-exais-integration)
+lists the incoming records/evidence and remaining ExAIS implementation. This
+clarifies existing evidence acceptance; no runtime completion is claimed.

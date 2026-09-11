@@ -119,6 +119,14 @@ version-specific reference. Required bill/version references must resolve to
 retained canonical records; the manager-reported absence of an SB 125 bill
 version is not permission to fabricate one in the ExAIS adapter.
 
+Page-local lines are useful evidence locators, but require a versioned convention
+and exact extraction binding. A quote hash is not a canonical provision ID, and
+checking a supplied quote against its hash does not prove that a locator selects
+it. Both absolute and local offsets are exact within immutable artifacts; old
+locators must fail verification against changed extraction bytes. The
+[measured locator review](../instances/ks-state-civics/research/session-law-extraction-readiness.md#page-local-convention-checked-against-the-same-artifact)
+records the supported example and current verification gap.
+
 Use `derivation.schema.json` typed `inputs` and `outputs` and input/output set
 hashes for action-to-fact lineage. Inputs require `{type, id, revision_or_hash}`;
 outputs use `{type, id, hash_sha256}`. The current output hash is optional/nullable;
@@ -166,6 +174,54 @@ context; decimals and accounting observations stay structured. Vector similarity
 finds candidates and never proves a legal/account join. Each embedding index
 requires compatible query embeddings; graph joins use canonical IDs. This
 milestone does not enable new cross-store traversal or change provider policy.
+
+Keep retained text and quoted evidence unchanged. A separately versioned,
+rebuildable search representation may join line-break hyphenation and normalize
+whitespace, with mapping or canonical references back to exact evidence. Query
+normalization alone may not match an index that retains split words. Preserve
+legal/account identifiers and meaningful hyphens; never hash normalized search
+text as though it were the retained quotation.
+
+## Concrete input needed for ExAIS integration
+
+The next incoming bundle is produced by StateCivics; it is not another contract
+authored by ExAIS. Its record-level eligibility may be established before all
+upstream tickets close.
+
+| Incoming item | What it must supply |
+|---|---|
+| KS-600/650 schemas and producer version | Actual provision-reference and second export-record schemas, required referenced schemas, dispatch/version semantics and compatible document records. |
+| Small real canonical export | SB 125 legal instrument/version, section 96(j), persisted lapse action, supporting spans/derivations and accounting context; preserve the literal account and unresolved composite link. Include publication, resolution, lifecycle and as-of context. |
+| Resolvable evidence bundle | Registered raw PDF and derived Markdown references/hashes, derivation and QA evidence, full locator convention, exact quote/hash and official PDF citation. Use deployable custody/approved evidence access, not only a workstation path. |
+| Replay/correction example | Deterministic record/snapshot/source-set identity plus a reviewed correction or withdrawal example, preserving the existing document contract's removal semantics. |
+
+The ExAIS repository needs the following implementation around that bundle:
+
+1. Update the State Civics source declarations/locks from the delivered contract
+   and supported Session Laws scope. Preserve the existing fiscal-document path;
+   CPU-derived Markdown must keep its actual extractor provenance rather than
+   be described as Marker output. Corpus bytes stay in custody or approved
+   deployment storage; source declarations, bounded real fixtures and proof
+   belong in this repository.
+2. Finish WAVE-133's upstream adapter, exact evidence resolution, canonical
+   projection persistence and API integration. Resolve full page/line locators
+   against pinned text and compare the selected quote/hash. Reject wrong bounds,
+   missing derivations, mismatched source/extraction revisions and truncated
+   evidence; preserve CSV record evidence without fabricated document bindings.
+3. WAVE-134 ingests eligible source text/entity descriptions with scoped
+   correction/removal handling; WAVE-135 combines provider-free exact retrieval,
+   semantic candidates and typed traversal with native citations. Use configured
+   store embedding profiles; similarity never proves an account join.
+4. WAVE-136 verifies real answers, failures and correction handling, including
+   the KS-651 diverse and separately held-back cases. The first integration
+   answer should report the $4M lapse, its date/fiscal year and exact citation,
+   while stating that the composite KanView account mapping is unresolved.
+   This useful partial path does not complete the reviewed full-chain benchmark.
+
+Schemas permit adapter work to begin; the small real export and evidence permit
+integration proof. Full statute harvest, bulk CSV embedding and a new graph
+database are not prerequisites. These are remaining implementation requirements,
+not capabilities established by the existing offline checks.
 
 ## Real-data acceptance and ongoing acquisition
 
