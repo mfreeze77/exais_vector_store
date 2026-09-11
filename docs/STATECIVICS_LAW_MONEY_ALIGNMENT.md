@@ -190,6 +190,14 @@ locators must fail verification against changed extraction bytes. The
 [measured locator review](../instances/ks-state-civics/research/session-law-extraction-readiness.md#page-local-convention-checked-against-the-same-artifact)
 records the supported example and current verification gap.
 
+Chunk boundaries are retrieval boundaries, not provision boundaries. Attach
+canonical action references through reviewed exact span-to-action bindings,
+preserving their source revision and locator. A chunk may contain both section
+96(i) and 96(j); citing either requires resolving that specific supporting span.
+Never infer the binding from shared words, an agency name or a chunk-level tag.
+The existing chunk page/character columns should be populated first; the bounded
+WAVE-134 document-coordinate increment can proceed without inventing Tier 3 IDs.
+
 Use `derivation.schema.json` typed `inputs` and `outputs` and input/output set
 hashes for action-to-fact lineage. Inputs require `{type, id, revision_or_hash}`;
 outputs use `{type, id, hash_sha256}`. The current output hash is optional/nullable;

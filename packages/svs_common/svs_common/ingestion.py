@@ -6,7 +6,7 @@ from .db import jsonb_param
 from .schemas import DocumentIngestRequest, IngestionJobResponse, Principal
 from .ids import new_id, point_uuid
 from .hashing import sha256_text
-from .chunking import choose_chunker
+from .chunking import choose_chunker, source_page_chunking_profile, SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE
 from .model_registry import resolve_vectorization_profile, model_registry
 from .vectorization_router import build_ingestion_plan
 from .providers import EmbeddingBatchError, ProviderConfigurationError, provider_for
@@ -20,6 +20,15 @@ from .vector_store_repo import refresh_vector_store_activity, require_active_vec
 OPENAI_FILE_ID_ATTRIBUTE = "_openai_file_id"
 VECTOR_STORE_FILE_CHUNKING_STRATEGY_ATTRIBUTE = "_openai_chunking_strategy"
 SOURCE_IDENTITY_ATTRIBUTE = "source_identity"
+SOURCE_PAGE_EVIDENCE_CONTEXT_FIELDS = (
+    'source_revision_id', 'source_content_hash_sha256', 'logical_document_id',
+    'extraction_revision_id', 'citation_url', 'extraction_content_hash_sha256', 'source_page_count',
+)
+
+
+def _page_coordinate_evidence_context(attributes: dict) -> dict:
+    """Fields persisted on each page chunk; absence is different from a value."""
+    return {key: attributes[key] for key in SOURCE_PAGE_EVIDENCE_CONTEXT_FIELDS if key in attributes}
 
 
 def _request_attributes(req: DocumentIngestRequest) -> dict:
@@ -179,6 +188,22 @@ class IngestionService:
             # scoped to that identity as well as the content hash.
             identity_clause = "AND dv.metadata #>> '{source_identity}' = :source_identity"
             params["source_identity"] = req.source_identity
+        coordinate_clause = ""
+        if req.attributes.get(SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE) is not None:
+            mode_id = resolve_vectorization_profile(req.filename, req.mime_type, req.mode, req.attributes)[0]
+            profile = source_page_chunking_profile(mode_id, req.attributes)
+            if not req.source_identity:
+                raise ValueError('source page chunking requires source_identity for profile-aware replay')
+            coordinate_clause = '''AND dv.chunking_profile_id = :source_chunking_profile
+              AND (
+                SELECT coalesce(jsonb_object_agg(evidence.key, evidence.value), '{}'::jsonb)
+                FROM jsonb_each(CASE WHEN jsonb_typeof(dv.metadata->'attributes') = 'object'
+                  THEN dv.metadata->'attributes' ELSE '{}'::jsonb END) AS evidence
+                WHERE evidence.key = ANY(:source_evidence_fields)
+              ) = CAST(:source_evidence_context AS jsonb)'''
+            params['source_chunking_profile'] = profile
+            params['source_evidence_fields'] = list(SOURCE_PAGE_EVIDENCE_CONTEXT_FIELDS)
+            params['source_evidence_context'] = jsonb_param(_page_coordinate_evidence_context(req.attributes))
         return db.execute(text(f"""
             SELECT d.id, d.current_version_id
             FROM documents d
@@ -193,6 +218,7 @@ class IngestionService:
               AND d.content_hash=:hash AND d.status='active'
               AND dv.status='indexed'
               {identity_clause}
+              {coordinate_clause}
               AND EXISTS (
                 SELECT 1 FROM chunks c
                 WHERE c.document_id=d.id
@@ -238,6 +264,16 @@ class IngestionService:
         else:
             return None
         params.update({"tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id, "kb_id": req.knowledge_base_id, "vs_id": req.vector_store_id, "hash": content_hash})
+        version_change_clause = 'd.content_hash <> :hash'
+        if req.attributes.get(SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE) is not None:
+            mode_id = resolve_vectorization_profile(req.filename, req.mime_type, req.mode, req.attributes)[0]
+            source_page_chunking_profile(mode_id, req.attributes)
+            if not req.source_identity:
+                raise ValueError('source page chunking requires source_identity for profile-aware replay')
+            # Exact complete replay already returned through dedupe. Reuse this
+            # source's document for profile changes and incomplete same-profile
+            # retries, even when its retained bytes have not changed.
+            version_change_clause = 'TRUE'
         return db.execute(text(f"""
             SELECT d.id, d.current_version_id FROM documents d
             {join}
@@ -245,7 +281,7 @@ class IngestionService:
               AND d.knowledge_base_id IS NOT DISTINCT FROM :kb_id
               AND d.vector_store_id IS NOT DISTINCT FROM :vs_id
               AND {clause}
-              AND d.content_hash <> :hash AND d.status='active'
+              AND {version_change_clause} AND d.status='active'
             ORDER BY d.created_at DESC LIMIT 1
         """), params).mappings().first()
 
@@ -253,6 +289,13 @@ class IngestionService:
         if req.vector_store_id:
             require_active_vector_store(db, principal, req.vector_store_id)
         content_hash = sha256_text(req.content)
+        coordinate_chunks = None
+        if req.attributes.get(SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE) is not None:
+            mode_id = resolve_vectorization_profile(req.filename, req.mime_type, req.mode, req.attributes)[0]
+            if not req.source_identity:
+                raise ValueError('source page chunking requires source_identity for profile-aware replay')
+            # Validate exact extraction bytes before dedupe can refresh metadata.
+            coordinate_chunks = choose_chunker(mode_id, attributes=req.attributes)(req.content)
 
         if not req.attributes.get(OPENAI_FILE_ID_ATTRIBUTE):
             exact = self._find_exact_duplicate(db, principal, req, content_hash)
@@ -339,11 +382,14 @@ class IngestionService:
         """, 'metadata'), {
             "id": docv_id, "doc_id": doc_id, "tenant_id": principal.tenant_id, "biz_id": principal.business_instance_id,
             "version_number": version_number, "object_key": object_key, "parsed_key": parsed_key, "parser": mode.get("parser", "markdown_ast_v1"),
-            "mode_id": mode_id, "embedding_profile_id": embedding_profile_id, "chunker": mode.get("chunker", "markdown_heading_hierarchy_v2"),
+            "mode_id": mode_id, "embedding_profile_id": embedding_profile_id, "chunker": plan.chunker or mode.get("chunker", "markdown_heading_hierarchy_v2"),
             "hash": content_hash, "metadata": jsonb_param(version_metadata),
         })
 
-        parsed_chunks = choose_chunker(mode_id)(req.content)
+        parsed_chunks = coordinate_chunks if coordinate_chunks is not None else choose_chunker(mode_id, attributes=req.attributes)(req.content)
+        if coordinate_chunks is not None:
+            for chunk in parsed_chunks:
+                chunk.metadata.update(_page_coordinate_evidence_context(req.attributes))
         if not parsed_chunks:
             raise ValueError("No chunks produced from document content")
         embeddings = await provider.embed([c.text for c in parsed_chunks], model_name, dimensions, input_type="document")

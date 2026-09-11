@@ -16,7 +16,8 @@ For a question such as “What happened to supplemental state aid in FY2026?”:
 
 1. Semantic/lexical search finds relevant legal clauses and budget explanations.
 2. Returned source revisions and exact locators identify the retained passages;
-   reviewed canonical references connect applicable passages to graph entities.
+   reviewed span-to-entity bindings connect the precise supporting evidence to
+   graph entities. A surrounding chunk is retrieval context, not the legal span.
 3. Typed graph traversal retrieves legal actions, their fiscal values/context,
    agency/fund/account relationships and supporting evidence. Exact identifiers
    can also initiate traversal, followed by supporting document search.
@@ -38,7 +39,7 @@ span, provision, derivation, publication and snapshot contracts/IDs.
 |---|---|---|
 | Source/document | Existing logical document and source revision IDs, raw PDF and derived text hashes, official URL, source family, jurisdiction, publication date | Identify exactly which retained source a hit represents. |
 | Passage | Source/extraction revision, PDF page(s), printed-page label when known, exact page-local lines/offsets with convention, selected-text hash, supported section/subsection labels | Resolve a passage back to unchanged evidence. Search chunk identity is not a provision ID. |
-| Canonical links | Actual bill/version/provision/action and agency/fund/account IDs, with relationship/evidence references where delivered | Connect passages to reviewed graph records. Missing IDs stay absent/unresolved; keyword mentions are candidates. |
+| Canonical links | Reviewed exact span-to-provision/action bindings, plus actual bill/version and agency/fund/account references where delivered | Connect specific evidence to graph records. A containing chunk may overlap several spans; a reference cannot imply its whole text supports one action. Missing bindings stay absent/unresolved. |
 | Time and context | Supported legislative session, fiscal year(s), effective/as-of dates; action type and fiscal stage/metric on their owning records | Separate authority, lapse, proposed budget, observed spending and historical versions. Do not stamp every passage in a multi-year book with one fiscal year or action. |
 | Verification and eligibility | Bound locator-verification result/derivation; distinct publication, resolution and lifecycle state | Explain what was checked and prevent withdrawn/stale evidence from remaining usable. Verification does not itself grant publication. |
 | Search representation | Chunker/search-normalization version, original text range mapping, embedding profile/model/dimensions and indexed-text hash | Rebuild and query the right index while preserving exact evidence. |
@@ -58,7 +59,28 @@ may normalize whitespace and line-break hyphenation, provided each result maps
 back to exact original text and offsets. Embed useful wording and sourced labels;
 UUIDs and hashes primarily support joins, integrity and filtering.
 
+The manager's current-cell inventory reports 13,181 chunks with no populated
+page or character columns. The existing `ParsedChunk`/database fields already
+represent those coordinates; no new locator columns are needed. The first
+implementation increment therefore fills them through ingestion. This reported
+inventory is not an independent ExAIS database query, and an offline parser
+fix does not backfill those live rows by itself.
+
+Tier 3 follows reviewed span-to-action bindings. Section 96(j)'s 314-character
+clause and the neighboring section 96(i) can fit in one retrieval chunk. Resolve
+and verify the specific span before citing an action; never choose a canonical
+reference from a label such as “supplemental state aid.” Overlap with a reviewed
+span is a way to locate candidate evidence, not proof of a new relationship.
+
 ## Measured ingestion gap before a bulk run
+
+The measurements below describe the default chunkers at `0456b74`; those
+defaults remain unchanged. The later bounded WAVE-134 increment adds an explicit
+`statecivics_page_markdown_v1` opt-in to populate the existing coordinate columns
+and exact retrieval metadata, preserving model selection. See the
+[coordinate implementation proof](../../../.tranche/statecivics-semantic-graph/aligned/wave-134-document-coordinate-proof.md)
+and [operator workflow](../../../docs/FISCAL_GRAPH_OPERATOR.md#retained-markdown-ingestion-with-coordinates).
+This does not mean the live chunk rows have been re-ingested.
 
 `kansas-fiscal-document-ingest.py` currently sends retained text using
 `markdown_docs_v1`. Its generic heading chunker does not preserve the CPU

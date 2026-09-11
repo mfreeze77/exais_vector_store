@@ -1,6 +1,6 @@
 # WAVE-134: Ingest scoped projections with consistent eligibility and lifecycle
 
-Status: proposed. Parent: WAVE-132 (reopened). Filed 2026-09-10.
+Status: in progress — bounded document coordinates; canonical projection integration pending. Parent: WAVE-132 (reopened). Filed 2026-09-10.
 
 ## Summary
 
@@ -126,4 +126,35 @@ Stop new fiscal projection ingestion and serving, reconcile removals, and restor
 
 ## Implementation Log
 
-Implementation has not started under this ticket. Planning only: corrected against the 2026-09-10 developer-manager handoff and independently gated ticket stack. Record actual changed code and verification results here during execution.
+The owner has prioritized Tier 2 on 2026-09-10: populate the existing chunk
+page/character columns from retained page-marked Markdown, before attaching
+canonical legal references. The StateCivics manager reports all 13,181 current
+chunks lack page/character coordinates; this is reported operational evidence,
+not a new ExAIS database measurement.
+
+The bounded document-coordinate increment starts independently of canonical
+KS-600/650 records. Its exact active-worktree files/owner are assigned in
+`build-contract.json:document_coordinate_increment` and `stack.index.json`.
+An explicit StateCivics page-chunking profile preserves the current embedding
+mode/provider and existing non-opted-in/PDF behavior. Preview and ingestion use
+the same parser; chunks are exact original-text slices with page bounds and
+zero-based, end-exclusive Unicode code-point offsets. Profile-aware replay must
+not silently reuse old unlocated chunks or duplicate canonical document identity.
+No live reindex, paid embedding batch or deployment is performed by this increment.
+
+Canonical action references belong to reviewed exact span-to-action bindings.
+A chunk may overlap section 96(i) and 96(j); it must not acquire either action
+merely from keyword or label matching. This increment creates no such references.
+Full canonical entity/lifecycle integration retains the dependencies and
+acceptance criteria above.
+
+The bounded coordinate increment is implemented and verified offline. See
+[implementation proof](../.tranche/statecivics-semantic-graph/aligned/wave-134-document-coordinate-proof.md)
+and [second independent QC](../.tranche/statecivics-semantic-graph/aligned/wave-134-document-coordinate-qc-2.md),
+which returned PASS WITH NOTES after two initial review findings were fixed.
+Root's combined regression passed 490 tests with zero skips; the independent
+focused run passed 106 with zero skips. All seven retained Session Laws books
+were exercised. Separate disposable PostgreSQL checks verified profile migration,
+evidence-context changes, dedupe, retries and source/tenant scope. Full migrated
+API/backend integration, live replay and the canonical projection acceptance
+criteria above remain incomplete; this ticket stays in progress.

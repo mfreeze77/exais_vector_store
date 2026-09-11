@@ -89,6 +89,65 @@ these lines. The result is evidence-only and nonpublishable; it does not verify
 raw-PDF parent derivation, canonical source selection, custody, legal identity,
 publication eligibility or a working graph/API. The legacy loader rejects it.
 
+## Retained Markdown ingestion with coordinates
+
+The StateCivics document runner supports the explicit
+`--source-page-chunking-profile statecivics_page_markdown_v1` option. It keeps
+`markdown_docs_v1` and the existing embedding/provider selection, while choosing
+an exact-slice page-aware chunker for retained text. PDFs keep their existing
+Marker path. An opted-in text record must contain valid, unique, contiguous
+`<!-- page N -->` LF markers and match its retained extraction hash.
+
+Run a dry plan against the approved manifest, mounted custody and existing
+operator state before scheduling any re-ingestion:
+
+```sh
+python scripts/release/kansas-fiscal-document-ingest.py \
+  --cell ks-state-civics \
+  --manifest /handoff/eligible-markdown.jsonl --custody-root /custody \
+  --state /state/fiscal-ingest.json \
+  --source-page-chunking-profile statecivics_page_markdown_v1
+```
+
+The command remains a dry run without `--apply`. Use the real approved export
+and its original identity/rights/lifecycle fields; a directory listing is not a
+substitute manifest. The option does not approve new source families, extraction
+QA or publication. A document's logical identity and expected extraction hash
+must be established before it can be replayed safely.
+
+The chosen profile participates in desired-state and request idempotency. An
+old applied record without this profile needs re-ingestion even if the Markdown
+bytes are unchanged. API version selection keeps its existing source document,
+creates the new chunked version and avoids creating another document on an
+incomplete retry. A successfully completed repeat remains a no-op. This is a
+re-ingestion path, not a guessed offset backfill into normalized legacy chunks;
+new chunk texts require the normal indexing/provider work when explicitly applied.
+
+Before an opted-in upsert, the runner submits the identical document request to
+the server's nonpersistent ingestion preview. It requires confirmation of the
+requested chunker, mode and a valid positive chunk count. An older server that
+ignores the profile cannot be recorded as a successful coordinate migration.
+The ingestion service also compares the source revision, citation, extraction
+reference/hash and declared page count stored on the current version. Changed
+evidence context requires a new version even when the Markdown bytes match;
+unchanged context still deduplicates. This keeps retrieved chunk provenance
+aligned with the version that created it.
+
+Page-bound chunks populate `page_start/page_end` and absolute `char_start/char_end`
+in the existing columns. Character coordinates are zero-based, end-exclusive
+Unicode code points into unchanged retained text, also returned in chunk
+metadata with extraction hash and convention. Page-local lines count the marker
+as line 1; they enclose a chunk that may start or end inside a line, so character
+offsets determine its exact text. Preamble text remains explicitly unpaginated
+with exact offsets and no invented legal heading; blank pages create no empty
+search chunks. Source-PDF QA and raw-parent provenance remain separate.
+
+A chunk can contain multiple provisions. Canonical action references must come
+from reviewed exact span bindings; this parser adds no action IDs or graph edges.
+The [implementation proof](../.tranche/statecivics-semantic-graph/aligned/wave-134-document-coordinate-proof.md)
+records real-source, pipeline and replay checks. Existing live chunks are not
+changed merely by installing this code or running the dry plan.
+
 ## Legacy v1 build, load and evaluation
 
 This path activates only the Kansas StateCivics fiscal document store. It does

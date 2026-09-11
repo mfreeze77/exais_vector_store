@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 
-from svs_common.chunking import estimate_tokens
+from svs_common.chunking import estimate_tokens, STATECIVICS_PAGE_MARKDOWN_PROFILE
+from svs_common.hashing import sha256_text
 from svs_common.model_registry import estimate_embedding_cost, model_registry
 from svs_common.schemas import Principal, DocumentIngestRequest, EmbeddingRequest
 from svs_common.vectorization_router import build_ingestion_plan
@@ -30,6 +31,24 @@ def test_router_denies_external_for_regulated_content():
     assert plan.embedding_profile_id == 'openai_text_embedding_3_small_1536'
     assert all(not c.allowed for c in plan.candidates)
     assert any('requires private provider' in reason for c in plan.candidates for reason in c.reasons)
+
+
+def test_page_coordinate_opt_in_changes_chunking_but_preserves_mode_and_embedding_selection():
+    principal = Principal(tenant_id='t', business_instance_id='b')
+    content = '<!-- page 1 -->\nfirst\n<!-- page 2 -->\nsecond\n'
+    req = DocumentIngestRequest(title='retained text', filename='text.md', content=content, mode='markdown_docs_v1')
+    baseline = build_ingestion_plan(principal, req, settings=settings())
+    opted = req.model_copy(update={'attributes': {
+        'source_page_chunking_profile': STATECIVICS_PAGE_MARKDOWN_PROFILE,
+        'source_collection': 'statecivics-kansas-fiscal-documents',
+        'extraction_content_hash_sha256': sha256_text(content), 'source_page_count': 2,
+    }})
+    plan = build_ingestion_plan(principal, opted, settings=settings())
+    assert plan.mode == baseline.mode == 'markdown_docs_v1'
+    assert plan.embedding_profile_id == baseline.embedding_profile_id
+    assert plan.candidates == baseline.candidates
+    assert plan.chunker == STATECIVICS_PAGE_MARKDOWN_PROFILE and plan.chunker != baseline.chunker
+    assert plan.estimated_chunks == 2
 
 
 def test_router_uses_private_provider_for_regulated_content_when_configured():

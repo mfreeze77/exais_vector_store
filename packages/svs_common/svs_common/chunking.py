@@ -3,9 +3,19 @@ import csv
 import io
 import json
 import re
+from bisect import bisect_right
+from functools import partial
 from dataclasses import dataclass, field
 from typing import Any
 from .hashing import sha256_text
+
+STATECIVICS_PAGE_MARKDOWN_PROFILE = 'statecivics_page_markdown_v1'
+SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE = 'source_page_chunking_profile'
+_PAGE_MARKDOWN_MAX_BYTES = 16 * 1024 * 1024
+_PAGE_MARKDOWN_MAX_PAGES = 10000
+_PAGE_MARKDOWN_MAX_CHUNKS = 20000
+_PAGE_MARKDOWN_MAX_CHARACTERS = 4096
+_PAGE_MARKDOWN_MAX_REGION_WORDS = 100000
 
 @dataclass
 class ParsedChunk:
@@ -428,7 +438,143 @@ def log_event_chunks(content: str, max_lines: int = 80, overlap_lines: int = 10)
         event_index = max(overlap_start, chunk_start_event + 1)
     return chunks
 
-def choose_chunker(mode: str):
+def source_page_chunking_profile(mode: str, attributes: dict[str, Any] | None = None) -> str | None:
+    """Explicit source-specific override; never changes mode or model selection."""
+    value = (attributes or {}).get(SOURCE_PAGE_CHUNKING_PROFILE_ATTRIBUTE)
+    if value is None:
+        return None
+    if value != STATECIVICS_PAGE_MARKDOWN_PROFILE or not isinstance(value, str):
+        raise ValueError('unsupported source_page_chunking_profile')
+    if mode != 'markdown_docs_v1':
+        raise ValueError('source page chunking requires markdown_docs_v1 mode')
+    if (attributes or {}).get('source_collection') != 'statecivics-kansas-fiscal-documents':
+        raise ValueError('source page chunking requires the StateCivics fiscal source collection')
+    return value
+
+
+def statecivics_page_markdown_chunks(
+    md: str, max_tokens: int = 800, overlap_tokens: int = 120, *,
+    expected_sha256: str, declared_page_count: int | None = None,
+) -> list[ParsedChunk]:
+    """Exact source slices, bounded to one declared physical page at a time.
+
+    This preserves extraction coordinates, not canonical legal identities or
+    raw-PDF provenance. LF markers are line 1; Unicode codepoint character
+    ranges are authoritative when a bounded window splits inside a source line.
+    The token budget uses the existing approximate word estimator plus a hard
+    4096-character ceiling. Overlap retains original characters, never rejoins
+    words. Meaningful pre-marker text remains explicitly unpaginated.
+    """
+    if not isinstance(md, str) or len(md) > _PAGE_MARKDOWN_MAX_BYTES:
+        raise ValueError('page Markdown must be bounded Unicode text (maximum 16 MiB UTF-8)')
+    try:
+        raw = md.encode('utf-8', errors='strict')
+    except UnicodeError as exc:
+        raise ValueError('page Markdown must be valid UTF-8') from exc
+    if len(raw) > _PAGE_MARKDOWN_MAX_BYTES:
+        raise ValueError('page Markdown exceeds 16 MiB UTF-8')
+    if not isinstance(expected_sha256, str) or not re.fullmatch(r'[0-9a-f]{64}', expected_sha256):
+        raise ValueError('page Markdown requires an exact extraction SHA-256')
+    if sha256_text(md) != expected_sha256:
+        raise ValueError('page Markdown extraction hash mismatch')
+    if '\r' in md or md.count('\n') > 1000000:
+        raise ValueError('page Markdown requires LF-only line endings and at most 1000000 lines')
+    if (type(max_tokens) is not int or not 16 <= max_tokens <= 2000
+            or type(overlap_tokens) is not int or not 0 <= overlap_tokens < max_tokens):
+        raise ValueError('page Markdown token bounds require 16..2000 with 0 <= overlap < maximum')
+    if declared_page_count is not None and (
+        type(declared_page_count) is not int or not 1 <= declared_page_count <= _PAGE_MARKDOWN_MAX_PAGES
+    ):
+        raise ValueError('declared page count must be an integer in 1..10000')
+    markers = []
+    for marker in re.finditer(r'^<!-- page ([1-9][0-9]{0,4}) -->\n', md, re.MULTILINE):
+        if len(markers) >= _PAGE_MARKDOWN_MAX_PAGES or int(marker.group(1)) != len(markers) + 1:
+            raise ValueError('page markers must be unique and contiguous from 1')
+        markers.append(marker)
+    if not markers or (declared_page_count is not None and len(markers) != declared_page_count):
+        raise ValueError('page marker count is missing or differs from declared page count')
+    if sum(1 for _ in re.finditer(r'<!--\s*page\b', md, re.IGNORECASE)) != len(markers):
+        raise ValueError('malformed or non-line page marker')
+
+    regions = [(None, 0, 0, markers[0].start())]
+    regions.extend((index + 1, marker.start(), marker.end(),
+                    markers[index + 1].start() if index + 1 < len(markers) else len(md))
+                   for index, marker in enumerate(markers))
+    chunks: list[ParsedChunk] = []
+    max_words = max_tokens * 3 // 4
+    overlap_words = overlap_tokens * 3 // 4
+    for page, origin, region_start, region_end in regions:
+        body = md[region_start:region_end]
+        if not body.strip():
+            continue
+        line_starts = [origin] + [origin + match.end() for match in re.finditer('\n', md[origin:region_end])]
+        words = []
+        for word in re.finditer(r'\S+', body):
+            if len(words) >= _PAGE_MARKDOWN_MAX_REGION_WORDS:
+                raise ValueError('page Markdown region exceeds 100000 words')
+            words.append(word)
+        word_starts = [match.start() for match in words]
+        word_ends = [match.end() for match in words]
+        paragraph_ends = [match.end() for match in re.finditer(r'\n[ \t]*\n', body)]
+        headings = list(re.finditer(r'^(#{1,6})[ \t]+([^\n]+)', body, re.MULTILINE)) if page else []
+        boundaries = sorted(set(paragraph_ends + [match.start() for match in headings]))
+        start = 0
+        while start < len(body):
+            first_word = bisect_right(word_ends, start)
+            end = min(len(body), start + _PAGE_MARKDOWN_MAX_CHARACTERS)
+            if first_word + max_words < len(words):
+                end = min(end, word_starts[first_word + max_words])
+            next_heading = next((heading.start() for heading in headings if start < heading.start() < end), None)
+            if next_heading is not None:
+                end = next_heading
+            if end < len(body):
+                natural = bisect_right(boundaries, end) - 1
+                if natural >= 0 and boundaries[natural] >= start + max(1, (end - start) // 2):
+                    end = boundaries[natural]
+            if end <= start:
+                raise ValueError('page Markdown splitter failed to advance')
+            text = body[start:end]
+            char_start, char_end = region_start + start, region_start + end
+            if text.strip():
+                if len(chunks) >= _PAGE_MARKDOWN_MAX_CHUNKS:
+                    raise ValueError('page Markdown exceeds 20000 chunks')
+                heading_path: list[str] = []
+                for heading in headings:
+                    if heading.start() > start:
+                        break
+                    level = len(heading.group(1))
+                    heading_path = heading_path[:level - 1] + [heading.group(2).strip()]
+                metadata = {
+                    'chunker': STATECIVICS_PAGE_MARKDOWN_PROFILE,
+                    'text_hash': sha256_text(text), 'extraction_content_hash_sha256': expected_sha256,
+                    'parsed_page_count': len(markers), 'page_count_basis': 'declared' if declared_page_count is not None else 'parsed_marker_inventory',
+                    'char_start': char_start, 'char_end': char_end,
+                    'character_coordinate_convention': 'unicode-codepoints-zero-based-end-exclusive-v1',
+                    'line_coordinate_convention': 'lf-page-marker-is-line-one-v1' if page else 'lf-document-lines-one-based-inclusive-v1',
+                    'line_start': bisect_right(line_starts, char_start),
+                    'line_end': bisect_right(line_starts, char_end - 1),
+                    'line_range_is_enclosing': True, 'unpaginated_preamble': page is None,
+                }
+                chunks.append(ParsedChunk(ordinal=len(chunks), text=text, heading_path=heading_path,
+                                          page_start=page, page_end=page, char_start=char_start, char_end=char_end,
+                                          token_count=estimate_tokens(text), metadata=metadata))
+            if end == len(body):
+                break
+            if any(heading.start() == end for heading in headings):
+                start = end
+                continue
+            last_word = bisect_right(word_starts, end - 1)
+            overlap_start = word_starts[max(first_word, last_word - overlap_words)] if overlap_words and last_word else end
+            start = max(end - (end - start) // 2, min(end, overlap_start))
+    return chunks
+
+
+def choose_chunker(mode: str, *, attributes: dict[str, Any] | None = None):
+    if source_page_chunking_profile(mode, attributes):
+        attrs = attributes or {}
+        return partial(statecivics_page_markdown_chunks,
+                       expected_sha256=attrs.get('extraction_content_hash_sha256'),
+                       declared_page_count=attrs.get('source_page_count'))
     if mode == 'pdf_markdown_external_v1':
         return pdf_markdown_external_chunks
     if mode == 'code_repo_v1':

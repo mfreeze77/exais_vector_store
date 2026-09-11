@@ -199,6 +199,114 @@ def test_plan_is_removal_first_and_repeat_upsert_is_a_noop(ingest, tmp_path):
     ]
 
 
+def test_coordinate_profile_change_replays_same_digest_once_and_then_noops(ingest, tmp_path, monkeypatch):
+    content = b'<!-- page 1 -->\nExact retained text.\n'
+    record = _record(ingest, content, mime_type='text/markdown')
+    custody = tmp_path / 'custody'
+    _write_custody(custody, record, content)
+    manifest = ingest.LoadedManifest(tmp_path / 'manifest.jsonl', '4' * 64, 1, (record,))
+    state = {'schema_version': 1, 'vector_store_id': 'vs_fiscal', 'records': {
+        record['logical_document_id']: {'action': 'upsert', 'record_digest_sha256': record['record_digest_sha256'],
+                                         'document_id': 'doc-existing', 'vector_store_file_id': 'vsf-existing'}}}
+    profile = ingest.STATECIVICS_PAGE_MARKDOWN_PROFILE
+    assert ingest.plan_operations(manifest, custody_root=custody, state=state)[0].action == 'noop'
+    operations = ingest.plan_operations(manifest, custody_root=custody, state=state, source_page_chunking_profile=profile)
+    assert operations[0].action == 'upsert' and operations[0].source_page_chunking_profile == profile
+    original_digest = record['record_digest_sha256']
+    assert ingest.ingest_idempotency_key('vs_fiscal', record) != ingest.ingest_idempotency_key(
+        'vs_fiscal', record, source_page_chunking_profile=profile)
+    monkeypatch.setattr(ingest, 'submit_upsert', lambda *args, **kwargs: {
+        'document_id': 'doc-existing', 'vector_store_file_id': 'vsf-coordinate'})
+    ingest.apply_operations(operations, state=state, state_path=tmp_path / 'state.json', api_base='https://unused.invalid',
+                            headers={}, vector_store_id='vs_fiscal', knowledge_base_id='kb', timeout=1, cell='test', transport='auto')
+    assert state['records'][record['logical_document_id']]['source_page_chunking_profile'] == profile
+    assert ingest.plan_operations(manifest, custody_root=custody, state=state,
+                                  source_page_chunking_profile=profile)[0].action == 'noop'
+    assert record['record_digest_sha256'] == original_digest
+
+
+def test_coordinate_opt_in_sends_exact_text_and_provenance_without_mode_change(ingest, monkeypatch):
+    content = '# File-Name\n\n<!-- page 1 -->\n  café\n'.encode()
+    record = _record(ingest, content, mime_type='text/markdown')
+    record['page_count'] = 1
+    record['record_digest_sha256'] = ingest.record_digest(record)
+    operation = ingest.PlannedOperation('upsert', record['logical_document_id'], 'profile change', record, content,
+                                       ingest.STATECIVICS_PAGE_MARKDOWN_PROFILE)
+    captured = {}
+
+    def fake_json(method, base, path, payload, **kwargs):
+        if path == '/api/v1/ingestion/preview':
+            captured['preview'] = payload
+            return {'chunker': ingest.STATECIVICS_PAGE_MARKDOWN_PROFILE, 'mode': 'markdown_docs_v1', 'estimated_chunks': 2}
+        captured.update(payload=payload, request_kwargs=kwargs)
+        return {'status': 'completed', 'document_id': 'doc', 'vector_store_file_id': 'vsf'}
+
+    monkeypatch.setattr(ingest, 'api_json', fake_json)
+    ingest.submit_upsert(operation, api_base='https://unused.invalid', headers={}, vector_store_id='vs_fiscal',
+                         knowledge_base_id='kb', timeout=1, cell='test', transport='auto')
+    payload = captured['payload']
+    assert captured['preview'] == {**payload, 'persist': False}
+    assert payload['mode'] == 'markdown_docs_v1' and payload['content'].encode() == content
+    attrs = payload['attributes']
+    assert attrs['source_page_chunking_profile'] == ingest.STATECIVICS_PAGE_MARKDOWN_PROFILE
+    assert attrs['extraction_content_hash_sha256'] == record['content_hash_sha256']
+    assert attrs['source_content_hash_sha256'] == record['content_hash_sha256']
+    assert attrs['source_revision_id'] == record['source_revision_id'] and attrs['source_page_count'] == 1
+    assert 'embedding_profile_id' not in attrs and 'provision_id' not in attrs
+
+
+@pytest.mark.parametrize('preview', [None, {}, {'status': 'completed'},
+    {'chunker': 'markdown_heading_hierarchy_v2', 'mode': 'markdown_docs_v1', 'estimated_chunks': 1},
+    {'chunker': 'statecivics_page_markdown_v1', 'mode': 'pdf_markdown_external_v1', 'estimated_chunks': 1},
+    {'chunker': 'statecivics_page_markdown_v1', 'mode': 'markdown_docs_v1', 'estimated_chunks': True},
+    {'chunker': 'statecivics_page_markdown_v1', 'mode': 'markdown_docs_v1', 'estimated_chunks': 0},
+    {'chunker': 'statecivics_page_markdown_v1', 'mode': 'markdown_docs_v1', 'estimated_chunks': 20001},
+    RuntimeError('preview HTTP 404')])
+def test_profile_preview_failure_prevents_ingest_and_state_advance(ingest, tmp_path, monkeypatch, preview):
+    content = b'<!-- page 1 -->\ntext\n'
+    record = _record(ingest, content, mime_type='text/markdown')
+    operation = ingest.PlannedOperation('upsert', record['logical_document_id'], 'profile change', record, content,
+                                       ingest.STATECIVICS_PAGE_MARKDOWN_PROFILE)
+    calls = []
+
+    def fake_json(method, base, path, payload, **kwargs):
+        calls.append(path)
+        assert path == '/api/v1/ingestion/preview', 'failed preview must prevent ingest POST'
+        assert payload['persist'] is False
+        if isinstance(preview, Exception):
+            raise preview
+        return preview
+
+    monkeypatch.setattr(ingest, 'api_json', fake_json)
+    state = {'schema_version': 1, 'vector_store_id': 'vs', 'records': {}}
+    state_file = tmp_path / 'state.json'
+    with pytest.raises((ingest.FiscalIngestError, RuntimeError)):
+        ingest.apply_operations([operation], state=state, state_path=state_file, api_base='https://unused.invalid',
+                                headers={}, vector_store_id='vs', knowledge_base_id='kb', timeout=1, cell='test', transport='auto')
+    assert calls == ['/api/v1/ingestion/preview']
+    assert state['records'] == {} and not state_file.exists()
+
+
+@pytest.mark.parametrize('counts', [{'page_count': 2}, {'page_count': True}, {'pages': -1},
+                                  {'source_page_count': 1, 'page_count': 2}])
+def test_coordinate_opt_in_rejects_declared_count_mismatches(ingest, counts):
+    content = b'<!-- page 1 -->\ntext\n'
+    record = {**_record(ingest, content, mime_type='text/markdown'), **counts}
+    with pytest.raises(ingest.FiscalIngestError):
+        ingest._page_chunking_attributes(record, content)
+
+
+def test_coordinate_profile_leaves_pdf_operations_on_existing_marker_path(ingest, tmp_path):
+    content = b'%PDF-1.7\nFiscal report'
+    record = _record(ingest, content)
+    custody = tmp_path / 'custody'
+    _write_custody(custody, record, content)
+    manifest = ingest.LoadedManifest(tmp_path / 'manifest.jsonl', '4' * 64, 1, (record,))
+    operation = ingest.plan_operations(manifest, custody_root=custody, state={'records': {}},
+                                       source_page_chunking_profile=ingest.STATECIVICS_PAGE_MARKDOWN_PROFILE)[0]
+    assert operation.action == 'upsert' and operation.source_page_chunking_profile is None
+
+
 def test_pdf_upsert_uses_marker_upload_and_stable_identity(ingest, monkeypatch):
     content = b"%PDF-1.7\nFiscal report"
     record = _record(ingest, content)

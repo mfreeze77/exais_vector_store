@@ -4,7 +4,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 from .sql import jsonb_text
 from .db import jsonb_param
-from .chunking import estimate_tokens, choose_chunker
+from .chunking import estimate_tokens, choose_chunker, source_page_chunking_profile
 from .ids import new_id
 from .config import get_settings
 from .model_registry import resolve_vectorization_profile, vectorization_modes, model_registry, resolve_embedding_profile, estimate_embedding_cost
@@ -121,7 +121,7 @@ def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest, setti
     candidates.sort(key=lambda c: (c.allowed, c.score), reverse=True)
     chosen_candidate = next((c for c in candidates if c.allowed), None)
     chosen = chosen_candidate.model_profile_id if chosen_candidate else preferred
-    chunker = choose_chunker(mode_id)
+    chunker = choose_chunker(mode_id, attributes=req.attributes)
     sample_chunks = chunker(req.content)
     warnings = []
     if mode.get('status') == 'research':
@@ -135,7 +135,7 @@ def build_ingestion_plan(principal: Principal, req: DocumentIngestRequest, setti
     return IngestionPlanResponse(
         mode=mode_id,
         parser=mode.get('parser') or ','.join(mode.get('parser_candidates', [])) or None,
-        chunker=mode.get('chunker'),
+        chunker=source_page_chunking_profile(mode_id, req.attributes) or mode.get('chunker'),
         embedding_profile_id=chosen,
         retrieval_profile_id=mode.get('retrieval_profile', 'hybrid_rrf_secure_v2'),
         candidates=candidates,

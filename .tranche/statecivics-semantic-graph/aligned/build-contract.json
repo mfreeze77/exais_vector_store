@@ -1,6 +1,6 @@
 {
   "end_goal": "Enable the Kansas State Civics cell to answer law-to-money questions across bills and fiscal years by combining semantic and exact retrieval over source-bound entity descriptions and documents with validated structured graph relationships, proven on diverse real sources including an unseen bill.",
-  "artifact_status": "Wave 3 proposed build contract; no runtime implementation, source publication/indexing, activation or provider tests performed. Existing signatures are grounded; all new interfaces and model-field extensions are proposed. Planning changes are separately marked in the file map.",
+  "artifact_status": "Original Wave 3 build plan with later bounded execution addenda. Original proposed interfaces remain planning unless implementation proof says otherwise; document_coordinate_increment records the active Tier 2 work. No live indexing or activation is established by this plan.",
   "authoritative_handoff": "/Users/mfrieson/Developer/exais-vector-store-ovh/.tranche/statecivics-semantic-graph/manager-alignment.md",
   "shared_functions": [
     {
@@ -1558,6 +1558,123 @@
       "edit_sequence": [
         "T-008"
       ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-law-money/packages/svs_common/svs_common/chunking.py",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": false,
+      "phase": "bounded_document_coordinate_implementation",
+      "owner_ticket": "T-005",
+      "what": "Opt-in exact-slice page-marked Markdown chunker and compatible request-aware selection; existing default chunkers unchanged.",
+      "edit_sequence": [
+        "T-005"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-law-money/packages/svs_common/svs_common/ingestion.py",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": false,
+      "phase": "bounded_document_coordinate_implementation",
+      "owner_ticket": "T-005",
+      "what": "Use selected coordinate chunker/profile and profile-aware same-source deduplication/versioning only for the new opt-in path; persist existing coordinate columns.",
+      "edit_sequence": [
+        "T-005"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-law-money/packages/svs_common/svs_common/vectorization_router.py",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": false,
+      "phase": "bounded_document_coordinate_implementation",
+      "owner_ticket": "T-005",
+      "what": "Use the same opt-in chunker in preview and report its profile, preserving embedding/provider selection.",
+      "edit_sequence": [
+        "T-005"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-law-money/scripts/release/kansas-fiscal-document-ingest.py",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": false,
+      "phase": "bounded_document_coordinate_implementation",
+      "owner_ticket": "T-005",
+      "what": "Opt eligible page-marked text into coordinate chunking; include profile in desired-state/idempotency accounting without modifying upstream records or PDF behavior.",
+      "edit_sequence": [
+        "T-005"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-law-money/tests/test_statecivics_page_chunking.py",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": true,
+      "phase": "bounded_document_coordinate_implementation",
+      "owner_ticket": "T-005",
+      "what": "New real-source exact-slice, locator, malformed-input and span-within-chunk proof.",
+      "edit_sequence": [
+        "T-005"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-law-money/tests/test_ingestion_page_coordinates.py",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": true,
+      "phase": "bounded_document_coordinate_implementation",
+      "owner_ticket": "T-005",
+      "what": "New no-provider pipeline/persistence-parameter proof for populated coordinates and safe profile-aware replay.",
+      "edit_sequence": [
+        "T-005"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-law-money/tests/test_ingestion_metadata_refresh.py",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": false,
+      "phase": "bounded_document_coordinate_implementation",
+      "owner_ticket": "T-005",
+      "what": "Bounded SQL selection regression for same-source profile changes; legacy selection remains unchanged.",
+      "edit_sequence": [
+        "T-005"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-law-money/tests/test_kansas_fiscal_document_ingest.py",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": false,
+      "phase": "bounded_document_coordinate_implementation",
+      "owner_ticket": "T-005",
+      "what": "Profile opt-in, migration dry plan, idempotency and legacy/PDF compatibility proof.",
+      "edit_sequence": [
+        "T-005"
+      ]
+    },
+    {
+      "file": "/Users/mfrieson/Developer/exais-vector-store-law-money/tests/test_vectorization_plan.py",
+      "ticket_ids": [
+        "T-005"
+      ],
+      "is_new": false,
+      "phase": "bounded_document_coordinate_implementation",
+      "owner_ticket": "T-005",
+      "what": "Preview and actual parser/profile compatibility, with no embedding/provider policy change.",
+      "edit_sequence": [
+        "T-005"
+      ]
     }
   ],
   "anti_duplication_rules": [
@@ -1784,5 +1901,45 @@
       "resolution": "Coordinate the minimal producer/adapter with existing KS-605 ownership; ground and add any actual bounded owner files to this map/index before editing. Withhold records until their prerequisites exist; never fabricate publication or gate on unrelated whole epics."
     }
   ],
-  "signature_policy": "signature is the sole existing or proposed call/class signature for a shared symbol. Existing actual signatures remain verbatim; planned_signature explicitly identifies a future compatible model-field extension and never asserts current implementation. owner_ticket is the tranche integration steward; existing KS-595/597/601/605 service ownership remains authoritative as stated in the notes."
+  "signature_policy": "signature is the sole existing or proposed call/class signature for a shared symbol. Existing actual signatures remain verbatim; planned_signature explicitly identifies a future compatible model-field extension and never asserts current implementation. owner_ticket is the tranche integration steward; existing KS-595/597/601/605 service ownership remains authoritative as stated in the notes.",
+  "document_coordinate_increment": {
+    "owner_ticket": "T-005",
+    "canonical_ticket": "WAVE-134",
+    "worktree": "/Users/mfrieson/Developer/exais-vector-store-law-money",
+    "base_commit": "86bf4b3",
+    "status": "implemented_verified_offline",
+    "implementation_proof": "wave-134-document-coordinate-proof.md",
+    "independent_qc": "wave-134-document-coordinate-qc-2.md",
+    "qc_decision": "PASS WITH NOTES — bounded document coordinates only; full graph integration and live activation remain incomplete",
+    "authorization": "2026-09-10 owner asks to proceed with Tier 2 first using existing chunk columns and reviewed span-level Tier 3 references. Existing session authorizes coder workers and independent QC.",
+    "dependency_boundary": "Only the existing document-ingestion coordinate path is ready independently of KS-600/650 entity/provision records. This does not complete WAVE-133 or unlock WAVE-134 canonical entity, lifecycle or activation acceptance.",
+    "profile": "statecivics_page_markdown_v1",
+    "request_attribute": "source_page_chunking_profile",
+    "constraints": [
+      "Keep current mode and embedding/provider selection.",
+      "Original exact text slices, Unicode codepoint half-open absolute offsets and marker-inclusive page-local line convention.",
+      "No canonical provision/action references or edges manufactured by chunker.",
+      "Explicit safe profile-aware replay; no paid bulk ingestion, live reindex, deployment or source-store activation.",
+      "One worker owns runtime files serially; independent QC follows."
+    ],
+    "files": [
+      "packages/svs_common/svs_common/chunking.py",
+      "packages/svs_common/svs_common/ingestion.py",
+      "packages/svs_common/svs_common/vectorization_router.py",
+      "scripts/release/kansas-fiscal-document-ingest.py",
+      "tests/test_statecivics_page_chunking.py",
+      "tests/test_ingestion_page_coordinates.py",
+      "tests/test_ingestion_metadata_refresh.py",
+      "tests/test_kansas_fiscal_document_ingest.py",
+      "tests/test_vectorization_plan.py"
+    ],
+    "symbols": {
+      "statecivics_page_markdown_chunks": "Pure exact-slice page parser; expected extraction hash and declared marker count; bounded tokens/characters and overlap.",
+      "source_page_chunking_profile": "Validate explicit opt-in attributes and return chosen coordinate profile without changing embedding mode.",
+      "choose_chunker": "Compatible optional request attributes shared by ingestion preview and execution.",
+      "SOURCE_PAGE_EVIDENCE_CONTEXT_FIELDS": "Single whitelist governing version evidence-context dedupe and chunk provenance copying.",
+      "_page_coordinate_evidence_context": "Extract that exact evidence context, preserving absent-versus-present fields."
+    },
+    "preamble_policy": "Retain pre-marker text as explicitly unpaginated exact slices with no fabricated page or legal heading; page-bound chunks have actual page bounds."
+  }
 }

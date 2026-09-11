@@ -23,6 +23,7 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from svs_common.marker_client import FISCAL_TABLES_PAGE_AWARE_PROFILE
+from svs_common.chunking import STATECIVICS_PAGE_MARKDOWN_PROFILE, statecivics_page_markdown_chunks
 from topeka_pipeline_common import (
     DEFAULT_CELL,
     DEFAULT_KNOWLEDGE_BASE_ID,
@@ -93,6 +94,7 @@ class PlannedOperation:
     reason: str
     record: dict[str, Any]
     content: bytes | None = None
+    source_page_chunking_profile: str | None = None
 
 
 def canonical_json(value: Any) -> str:
@@ -375,7 +377,10 @@ def plan_operations(
     *,
     custody_root: Path,
     state: dict[str, Any],
+    source_page_chunking_profile: str | None = None,
 ) -> list[PlannedOperation]:
+    if source_page_chunking_profile not in (None, STATECIVICS_PAGE_MARKDOWN_PROFILE):
+        raise FiscalIngestError('unsupported source page chunking profile')
     prior = state["records"]
     operations: list[PlannedOperation] = []
     for record in manifest.records:
@@ -384,12 +389,17 @@ def plan_operations(
         previous = prior.get(logical_id)
         if action == "upsert":
             content = read_custody_object(custody_root, record)
+            mime_type = str(record.get('mime_type') or '').split(';', 1)[0].lower()
+            desired_profile = source_page_chunking_profile if mime_type in _SUPPORTED_TEXT_MIME_TYPES else None
+            if desired_profile:
+                _page_chunking_attributes(record, content)
             if (
                 isinstance(previous, dict)
                 and previous.get("action") == "upsert"
                 and previous.get("record_digest_sha256")
                 == record["record_digest_sha256"]
                 and previous.get("vector_store_file_id")
+                and (desired_profile is None or previous.get('source_page_chunking_profile') == desired_profile)
             ):
                 operations.append(
                     PlannedOperation(
@@ -404,6 +414,7 @@ def plan_operations(
                         "new or changed desired state",
                         record,
                         content,
+                        desired_profile,
                     )
                 )
             continue
@@ -431,15 +442,16 @@ def plan_operations(
     )
 
 
-def ingest_idempotency_key(vector_store_id: str, record: dict[str, Any]) -> str:
-    value = canonical_json(
-        {
+def ingest_idempotency_key(vector_store_id: str, record: dict[str, Any], *, source_page_chunking_profile: str | None = None) -> str:
+    fields = {
             "vector_store_id": vector_store_id,
             "logical_document_id": record["logical_document_id"],
             "record_digest_sha256": record["record_digest_sha256"],
             "action": record["ingestion"]["action"],
         }
-    )
+    if source_page_chunking_profile is not None:
+        fields['source_page_chunking_profile'] = source_page_chunking_profile
+    value = canonical_json(fields)
     return (
         "statecivics-fiscal-" + hashlib.sha256(value.encode("utf-8")).hexdigest()[:48]
     )
@@ -472,6 +484,34 @@ def _record_attributes(record: dict[str, Any]) -> dict[str, Any]:
             exporter.get("code_commit") if isinstance(exporter, dict) else None
         ),
     }
+
+
+def _page_chunking_attributes(record: dict[str, Any], content: bytes) -> dict[str, Any]:
+    """Validate the exact retained text; this does not assert PDF extraction QA."""
+    if len(content) > 16 * 1024 * 1024:
+        raise FiscalIngestError('page Markdown exceeds 16 MiB UTF-8')
+    declared_counts = [record[key] for key in ('source_page_count', 'page_count', 'pages') if key in record]
+    if any(value is not None and (type(value) is not int or not 1 <= value <= 10000) for value in declared_counts):
+        raise FiscalIngestError('declared source page counts must be integers in 1..10000')
+    if declared_counts and any(value != declared_counts[0] for value in declared_counts):
+        raise FiscalIngestError('conflicting declared source page counts')
+    declared_count = declared_counts[0] if declared_counts else None
+    try:
+        chunks = statecivics_page_markdown_chunks(content.decode('utf-8', errors='strict'),
+                                                expected_sha256=record['content_hash_sha256'],
+                                                declared_page_count=declared_count)
+    except (UnicodeError, ValueError) as exc:
+        raise FiscalIngestError(f'invalid retained page Markdown: {exc}') from exc
+    if not chunks:
+        raise FiscalIngestError('retained page Markdown has no content chunks')
+    attrs = {
+        'source_page_chunking_profile': STATECIVICS_PAGE_MARKDOWN_PROFILE,
+        'extraction_content_hash_sha256': record['content_hash_sha256'],
+        'parsed_page_count': chunks[0].metadata['parsed_page_count'],
+    }
+    if declared_count is not None:
+        attrs['source_page_count'] = declared_count
+    return attrs
 
 
 def _multipart_payload(
@@ -595,7 +635,7 @@ def submit_upsert(
         raise FiscalIngestError("upsert operation has no verified custody content")
     title = _document_title(record)
     mime_type = str(record.get("mime_type") or "").split(";", 1)[0].lower()
-    key = ingest_idempotency_key(vector_store_id, record)
+    key = ingest_idempotency_key(vector_store_id, record, source_page_chunking_profile=operation.source_page_chunking_profile)
     attributes = _record_attributes(record)
     if mime_type == "application/pdf":
         fields = {
@@ -623,17 +663,17 @@ def submit_upsert(
             transport=transport,
         )
     else:
+        if operation.source_page_chunking_profile is not None:
+            if operation.source_page_chunking_profile != STATECIVICS_PAGE_MARKDOWN_PROFILE:
+                raise FiscalIngestError('unsupported source page chunking profile')
+            attributes.update(_page_chunking_attributes(record, content))
         try:
             text_content = content.decode("utf-8")
         except UnicodeDecodeError as exc:
             raise FiscalIngestError(
                 f"record {record['export_record_id']} declares UTF-8 text but bytes do not decode"
             ) from exc
-        response = api_json(
-            "POST",
-            api_base,
-            "/api/v1/documents/ingest",
-            {
+        document_request = {
                 "vector_store_id": vector_store_id,
                 "knowledge_base_id": knowledge_base_id,
                 "title": title,
@@ -647,7 +687,20 @@ def submit_upsert(
                 "security_level": 0,
                 "classification": "public",
                 "source_trust": "statecivics_custody_ledger",
-            },
+            }
+        if operation.source_page_chunking_profile is not None:
+            preview = api_json(
+                'POST', api_base, '/api/v1/ingestion/preview', {**document_request, 'persist': False},
+                headers=headers, timeout=timeout, cell=cell, transport=transport,
+            )
+            if (not isinstance(preview, dict)
+                    or preview.get('chunker') != STATECIVICS_PAGE_MARKDOWN_PROFILE
+                    or preview.get('mode') != document_request['mode']
+                    or type(preview.get('estimated_chunks')) is not int
+                    or not 1 <= preview['estimated_chunks'] <= 20000):
+                raise FiscalIngestError('server preview did not confirm the requested page chunking profile and valid chunk count')
+        response = api_json(
+            "POST", api_base, "/api/v1/documents/ingest", document_request,
             headers=headers,
             timeout=timeout,
             idempotency_key=key,
@@ -746,6 +799,8 @@ def apply_operations(
                 "document_id": response["document_id"],
                 "vector_store_file_id": response["vector_store_file_id"],
             }
+            if operation.source_page_chunking_profile is not None:
+                state['records'][logical_id]['source_page_chunking_profile'] = operation.source_page_chunking_profile
             counts["upserted"] += 1
         write_json_atomic(state_path, state)
     return counts
@@ -773,6 +828,8 @@ def parse_args() -> argparse.Namespace:
         choices=["auto", "host-curl", "api-container", "docker-network"],
     )
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument('--source-page-chunking-profile', choices=[STATECIVICS_PAGE_MARKDOWN_PROFILE],
+                        help='opt retained text into exact page coordinates; PDF/Marker requests remain unchanged')
     return parser.parse_args()
 
 
@@ -806,7 +863,8 @@ def main() -> int:
     else:
         headers = {}
     state = load_state(args.state, vector_store_id=vector_store_id)
-    operations = plan_operations(manifest, custody_root=args.custody_root, state=state)
+    operations = plan_operations(manifest, custody_root=args.custody_root, state=state,
+                                 source_page_chunking_profile=args.source_page_chunking_profile)
     planned = {
         action: sum(1 for item in operations if item.action == action)
         for action in ("remove", "upsert", "noop")

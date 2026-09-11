@@ -9,6 +9,8 @@ from svs_common.ingestion import (
     SOURCE_IDENTITY_ATTRIBUTE,
     VECTOR_STORE_FILE_CHUNKING_STRATEGY_ATTRIBUTE,
     _document_version_metadata,
+    _page_coordinate_evidence_context,
+    SOURCE_PAGE_EVIDENCE_CONTEXT_FIELDS,
 )
 from svs_common.schemas import DocumentIngestRequest, Principal
 
@@ -72,6 +74,60 @@ def test_source_identity_is_trimmed_and_must_not_be_blank():
     assert request.source_identity == "id"
     with pytest.raises(ValueError, match="source_identity"):
         DocumentIngestRequest(title="Fiscal report", content="body", source_identity="   ")
+
+
+def test_page_profile_dedupe_requires_actual_version_profile_and_source_scope():
+    service = object.__new__(IngestionService)
+    db = _FakeDb()
+    request = _request().model_copy(update={'mode': 'markdown_docs_v1', 'source_identity': 'statecivics:logical-a',
+                                           'attributes': {'source_page_chunking_profile': 'statecivics_page_markdown_v1',
+                                                          'source_collection': 'statecivics-kansas-fiscal-documents'}})
+    service._find_exact_duplicate(db, _principal(), request, 'same-hash')
+    sql, params = db.calls[0]
+    assert 'dv.chunking_profile_id = :source_chunking_profile' in sql
+    assert "dv.metadata #>> '{source_identity}' = :source_identity" in sql
+    assert params['source_chunking_profile'] == 'statecivics_page_markdown_v1'
+    assert params['source_identity'] == 'statecivics:logical-a'
+    assert "c.dense_index_status <> 'indexed'" in sql
+    assert 'jsonb_object_agg(evidence.key, evidence.value)' in sql
+    assert params['source_evidence_fields'] == list(SOURCE_PAGE_EVIDENCE_CONTEXT_FIELDS)
+    assert json.loads(params['source_evidence_context']) == _page_coordinate_evidence_context(request.attributes)
+
+
+@pytest.mark.parametrize('field', SOURCE_PAGE_EVIDENCE_CONTEXT_FIELDS)
+def test_page_evidence_context_distinguishes_missing_and_changed_values(field):
+    prior = {field: 'old'}
+    assert _page_coordinate_evidence_context(prior) != _page_coordinate_evidence_context({})
+    assert _page_coordinate_evidence_context(prior) != _page_coordinate_evidence_context({field: 'new'})
+    assert _page_coordinate_evidence_context(prior) == _page_coordinate_evidence_context({**prior, 'title': 'irrelevant'})
+
+
+def test_page_profile_retry_targets_same_source_after_dedupe_fails_for_any_reason():
+    service = object.__new__(IngestionService)
+    db = _FakeDb()
+    request = _request().model_copy(update={'mode': 'markdown_docs_v1', 'source_identity': 'statecivics:logical-a',
+                                           'attributes': {'source_page_chunking_profile': 'statecivics_page_markdown_v1',
+                                                          'source_collection': 'statecivics-kansas-fiscal-documents'}})
+    service._find_version_target(db, _principal(), request, 'same-hash')
+    sql, params = db.calls[0]
+    assert "dv.metadata #>> '{source_identity}' = :source_identity" in sql
+    assert 'd.content_hash <> :hash' not in sql
+    assert params['source_identity'] == 'statecivics:logical-a'
+    assert 'd.tenant_id=:tenant_id' in sql and 'd.business_instance_id=:biz_id' in sql
+    assert 'd.vector_store_id IS NOT DISTINCT FROM :vs_id' in sql
+    legacy = _FakeDb()
+    service._find_version_target(legacy, _principal(), _request(), 'same-hash')
+    assert 'd.content_hash <> :hash' in legacy.calls[0][0]
+
+
+def test_page_profile_requires_explicit_stable_source_identity():
+    service = object.__new__(IngestionService)
+    request = _request().model_copy(update={'mode': 'markdown_docs_v1', 'attributes': {
+        'source_page_chunking_profile': 'statecivics_page_markdown_v1',
+        'source_collection': 'statecivics-kansas-fiscal-documents'}})
+    for method in (service._find_exact_duplicate, service._find_version_target):
+        with pytest.raises(ValueError, match='source_identity'):
+            method(_FakeDb(), _principal(), request, 'same-hash')
 
 
 def test_link_vector_store_file_refreshes_existing_file_metadata():
