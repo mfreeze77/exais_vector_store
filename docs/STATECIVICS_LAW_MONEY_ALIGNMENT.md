@@ -74,6 +74,57 @@ selection. This supplies a separate verification primitive; upstream first-write
 registration, raw-source derivation and live adapter/API integration remain
 required.
 
+The upstream first-write resolver is committed at `668ca412` (2026-09-10).
+The manager reports 453 passed, 66 skipped and zero failures; ExAIS did not
+rerun that upstream gate. Its page-local
+origin includes the marker as line 1: the worked section 96(j) is therefore
+page 358, lines 31–35. ExAIS explicitly supports this origin alongside its prior
+after-marker-LF convention (30–34); both reproduce the same retained quote/hash.
+Do not silently reinterpret older locators. The
+[convention alignment proof](../.tranche/statecivics-semantic-graph/aligned/wave-133-locator-convention-alignment-proof.md)
+also records outstanding trust/bounds checks reproduced against the same source
+bytes that are now committed. Schema, review,
+registration and export availability still need their own evidence.
+
+### Locator verification handoff
+
+Record whether the locator was verified against the retained artifact, separately
+from `evidence_class`, locator confidence, legal identity and publication status.
+This is a proposed bounded extension for the existing KS-595/597 span owners,
+carried by KS-650's export; ExAIS must consume the agreed upstream shape rather
+than create a competing wire contract. Suggested field: `locator_verification`,
+with `status` (`verified` or `unverified`), a verification derivation reference
+for a successful check, and a reason when no supported check ran. Missing legacy
+metadata means unverified, never implicitly verified. A real mismatch rejects
+the write; a failed attempt belongs in the existing derivation/audit path.
+
+Reuse `derivation.schema.json` for method/version, parameters, typed references
+and input/output hashes. Bind the result to the exact source/extraction revision
+and retained bytes, locator including its convention, and selected quote hash.
+Neither `status=complete` on a general extraction run nor the span's existence
+proves that this particular selection was checked. Re-extraction, locator changes
+or changed quote bytes require a new bound check, preserving prior evidence.
+The producer must set the result from execution, not trust a caller's flag.
+
+Table cells are **unverified by the text resolver**, not inherently unverifiable.
+The current `CandidateTableCell.source_span_registration` carries page, table,
+row/column, row/column spans and exact `raw_text`, using
+`marker_paginated_markdown_table_v1`. A table-aware resolver can verify these
+against hash-bound retained table/layout output and extraction lineage; geometry
+alone does not prove the cell's text. Preserve candidate evidence while that
+check is absent, but do not present it as a verified exact fiscal citation.
+This does not ban ordinary eligible document search or delete legacy spans.
+
+At `668ca412`, `fiscal_fact_service._validate_text_derivation` checks that a
+`DerivationOutput` records the expected hash; it does not load the text bytes.
+Its `register_span` call still omits `artifact_text`. Retrieve the authoritative
+output through the existing retained-source/derivation path, verify its hash,
+then pass the exact text to the resolver. Passing that verified text is an
+implementation detail; caller-chosen unanchored text is the trust defect.
+The registration helper must reject a missing recorded text hash, duplicate
+page markers and empty/phantom EOF selections before reporting verification.
+These upstream fixes remain with the StateCivics manager.
+
 ## Backbone and authority
 
 **Enacted provision → appropriation action → fiscal-year account → agency/fund**,

@@ -78,6 +78,7 @@ Expected integrated output: WAVE-133 defines one v2 canonical-reference/evidence
 - Define bounded partitions/batches and complete manifest accounting for multiple bills, years, and source revisions; reject incomplete/truncated activation. Loading another bill does not silently replace the first. Preserve immutable source/run/snapshot identity and a migration/rollback route for supported prior artifacts.
 - Focused contract/persistence tests cover structured-only and document-span evidence, identity stability under re-extraction, separation across legal versions, joint-lineage edge rejection, typed path provenance/direction, multiple coexisting partitions, incomplete manifests, and valid prior document records.
 - Resolve document locators against the pinned retained extraction, compare selected text with the exact quote/hash, and preserve raw-source derivation. Page/line type checks and a supplied quote/hash agreement alone are insufficient. Test wrong page/line bounds, truncated clauses, changed extraction bytes and incompatible locator conventions; never discard line fields to fit the legacy page-only adapter.
+- Consume the upstream-owned locator-verification state and bound verification derivation once its contract is agreed. Missing legacy metadata or an unsupported resolver must not imply a verified exact citation. Keep this separate from confidence, evidence class and publication eligibility; preserve unverified candidate evidence without promoting it to verified fiscal support. Do not invent the upstream wire shape.
 
 ## Dependencies
 
@@ -187,3 +188,19 @@ returned **PASS WITH NOTES** for this increment, including 191 passing targeted
 checks with zero skips. This is an offline primitive, not the upstream
 first-write registration fix or live graph integration; WAVE-133 remains in
 progress.
+
+The next bounded increment adds the explicitly named marker-inclusive convention
+used by upstream `668ca412`: page 358, lines 31–35. The prior after-marker-LF
+convention remains unchanged at 30–34; both resolve the same quote and absolute
+offsets, and swapped conventions/ranges are rejected. Root's regression returned
+**379 passed, zero skipped**. See the [convention alignment proof](../.tranche/statecivics-semantic-graph/aligned/wave-133-locator-convention-alignment-proof.md).
+Independent [QC](../.tranche/statecivics-semantic-graph/aligned/wave-133-locator-convention-alignment-qc.md)
+returned **PASS WITH NOTES**, with 200 targeted tests passed and zero skipped.
+This completes only the convention-alignment increment; no next ticket has started.
+
+The [locator verification handoff](../docs/STATECIVICS_LAW_MONEY_ALIGNMENT.md#locator-verification-handoff)
+records a proposed upstream-owned verification state, distinct from confidence,
+publication and evidence class. The eventual adapter must preserve the agreed
+state and its bound derivation; absent legacy metadata and unsupported resolvers
+cannot imply an exact verified citation. No new upstream schema or production
+registration behavior is implemented in this ExAIS increment.

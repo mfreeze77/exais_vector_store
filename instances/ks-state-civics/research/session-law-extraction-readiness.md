@@ -58,6 +58,12 @@ linked separately rather than pretending this subsection names the agency.
 
 ### Page-local convention checked against the same artifact
 
+**Current upstream handoff:** the resolver committed at `668ca412` counts the marker line as line
+1, so use page **358, lines 31–35 inclusive**, with the explicitly named
+`lf-page-marker-is-line-one-v1` consumer convention. The following older measured
+30–34 result remains correct under its different, explicitly recorded origin.
+This is a convention alignment, not a failed earlier selection check.
+
 Page 358, lines **30–34 inclusive**, selects the complete clause if line 1
 starts immediately after the page-marker line's terminating LF and blank lines
 count. Under that convention, the page body begins at absolute code-point
@@ -72,6 +78,16 @@ blank-line counting, coordinate units, index base and endpoint rules. These are
 measured examples, not a second ExAIS locator contract. Markdown line numbers
 must not be presented as line numbers printed in the PDF.
 
+| Convention | Page-local origin | Section 96(j) lines | Local code points |
+|---|---:|---:|---|
+| Marker line is line 1 | Absolute code point 984490, opening `<` of marker | 31–35 | `[1607,1921)` |
+| Line 1 starts after marker-line LF | Absolute code point 984508 | 30–34 | `[1589,1903)` |
+
+Both resolve to absolute code points `[986097,986411)` and the same fixed quote
+hash. The upstream resolver and ExAIS verifier were executed against the same
+retained artifact to establish this equivalence; matching descriptions alone
+were not treated as proof. Existing locators must keep their declared origin.
+
 Page-local coordinates help review and limit the effect of edits, but still
 belong to one immutable extraction revision. Absolute offsets also remain exact
 within that revision. A changed extraction must fail the old hash check, not
@@ -80,6 +96,13 @@ provision identity or legal continuity; identical wording can occur in distinct
 provisions and versions.
 
 ### Runtime locator resolution gap
+
+The paragraphs below describe the earlier inspected boundary. A subsequent
+upstream commit `668ca412` added first-write selection checks; the [alignment follow-up](../../../.tranche/statecivics-semantic-graph/aligned/wave-133-locator-convention-alignment-proof.md)
+records its actual line origin and the remaining missing-hash, duplicate-marker
+and empty-selection gaps. The manager reports 453 passed, 66 skipped and zero
+failures; ExAIS has not independently rerun that upstream gate. The commit alone
+does not establish real-span persistence or completed integration.
 
 Upstream `SourceSpanRegistration` validates the shape/order of page and line
 integers. `source_artifact_service.py:224` (`register_span`) checks revision

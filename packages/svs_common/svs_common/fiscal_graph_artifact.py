@@ -41,6 +41,7 @@ MAX_DOCUMENT_LINES = 1_000_000
 MAX_DOCUMENT_PAGE_LINES = 100_000
 MAX_DOCUMENT_QUOTE_CHARACTERS = 64 * 1024
 DOCUMENT_PAGE_LINES_CONVENTION = "lf-after-page-marker-count-blank-lines-v1"
+DOCUMENT_PAGE_MARKER_LINES_CONVENTION = "lf-page-marker-is-line-one-v1"
 _HEX = re.compile(r"^[0-9a-f]{64}$")
 _COMMIT = re.compile(r"^[0-9a-f]{40}$")
 _STORE = re.compile(r"^vs_[A-Za-z0-9_-]{1,124}$")
@@ -172,9 +173,12 @@ def verify_document_page_lines_evidence(
     It does not verify the raw PDF, extraction derivation/quality, canonical
     revision identity, legal interpretation, or eligibility.
 
-    The supported convention requires exact ``<!-- page N -->`` lines ending
-    in LF, uniquely ordered 1..declared_page_count. Page line 1 begins immediately
-    after the marker's LF. Blank lines count. Bounds are one-based, inclusive;
+    Both supported conventions require exact ``<!-- page N -->`` lines ending
+    in LF, uniquely ordered 1..declared_page_count. The after-marker convention
+    starts page line 1 immediately after the marker's LF; the marker-is-line-one
+    convention includes the marker itself as line 1. The caller must explicitly
+    choose a convention; no coordinate adjustment or fallback is attempted.
+    Blank lines count. Bounds are one-based, inclusive;
     the selected text omits only the final selected line's terminating LF.
     CR line endings are unsupported; other Unicode separators remain characters.
     No stripping, newline conversion, Unicode normalization, or fuzzy search is
@@ -184,7 +188,9 @@ def verify_document_page_lines_evidence(
     expected_quote_sha256 = _sha(expected_quote_sha256, "expected_quote_sha256")
     if not isinstance(extraction_bytes, bytes) or len(extraction_bytes) > MAX_DOCUMENT_EXTRACTION_BYTES:
         raise FiscalGraphArtifactError("Markdown extraction must be bounded bytes (maximum 16 MiB)")
-    if not isinstance(locator_convention, str) or locator_convention != DOCUMENT_PAGE_LINES_CONVENTION:
+    if not isinstance(locator_convention, str) or locator_convention not in {
+        DOCUMENT_PAGE_LINES_CONVENTION, DOCUMENT_PAGE_MARKER_LINES_CONVENTION,
+    }:
         raise FiscalGraphArtifactError("unsupported document locator convention")
     for value, label, maximum in (
         (declared_page_count, "declared_page_count", MAX_DOCUMENT_PAGES),
@@ -224,7 +230,8 @@ def verify_document_page_lines_evidence(
     if candidate_count != len(markers):
         raise FiscalGraphArtifactError("Markdown contains malformed or non-line page markers")
 
-    body_start = markers[page_1based - 1].end()
+    include_marker = locator_convention == DOCUMENT_PAGE_MARKER_LINES_CONVENTION
+    body_start = markers[page_1based - 1].start() if include_marker else markers[page_1based - 1].end()
     body_end = markers[page_1based].start() if page_1based < declared_page_count else len(text)
     body = text[body_start:body_end]
     if body.count("\n") + (not body.endswith("\n")) > MAX_DOCUMENT_PAGE_LINES:
@@ -265,6 +272,7 @@ def verify_document_page_lines_evidence(
         "quote_utf8_bytes": len(quote_bytes),
         "resolved_offsets": {
             "index_base": 0, "end_exclusive": True,
+            "page_local_origin": "page_marker_start" if include_marker else "after_page_marker_lf",
             "artifact_unicode_codepoints": {"start": absolute_start, "end": absolute_end},
             "artifact_utf8_bytes": {"start": absolute_byte_start, "end": absolute_byte_start + len(quote_bytes)},
             "page_body_unicode_codepoints": {"start": page_start, "end": page_start + len(selected)},

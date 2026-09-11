@@ -18,6 +18,7 @@ import pytest
 
 from svs_common.fiscal_graph_artifact import (
     DOCUMENT_PAGE_LINES_CONVENTION,
+    DOCUMENT_PAGE_MARKER_LINES_CONVENTION,
     MAX_DOCUMENT_EXTRACTION_BYTES,
     MAX_DOCUMENT_QUOTE_CHARACTERS,
     FiscalGraphArtifactError,
@@ -95,6 +96,33 @@ def test_last_line_without_lf_and_final_empty_line_have_precise_boundaries():
         _verify(line_end_1based=2)
     with pytest.raises(FiscalGraphArtifactError, match="exceeds the selected page"):
         _verify(b"<!-- page 1 -->\n")
+
+
+def test_marker_line_convention_preserves_marker_blank_lines_and_unicode_units():
+    raw = "préface\n<!-- page 1 -->\n\n  café\u2028same line  \n".encode()
+    quote = "<!-- page 1 -->\n\n  café\u2028same line  "
+    result = _verify(raw, quote, line_end_1based=3,
+                     locator_convention=DOCUMENT_PAGE_MARKER_LINES_CONVENTION)
+    assert result["locator"] == {"page": 1, "line_start": 1, "line_end": 3}
+    offsets = result["resolved_offsets"]
+    assert offsets["page_local_origin"] == "page_marker_start"
+    assert offsets["page_body_unicode_codepoints"] == {"start": 0, "end": len(quote)}
+    assert offsets["page_body_utf8_bytes"] == {"start": 0, "end": len(quote.encode())}
+    assert offsets["artifact_unicode_codepoints"]["start"] == len("préface\n")
+    assert offsets["artifact_utf8_bytes"]["start"] == len("préface\n".encode())
+
+
+def test_marker_line_convention_rejects_phantom_eof_line_and_empty_quote():
+    args = {"locator_convention": DOCUMENT_PAGE_MARKER_LINES_CONVENTION,
+            "line_start_1based": 2, "line_end_1based": 2}
+    assert _verify(b"<!-- page 1 -->\nquote", **args)["quote_matches_locator"] is True
+    assert _verify(**args)["quote_matches_locator"] is True
+    with pytest.raises(FiscalGraphArtifactError, match="exceeds the selected page"):
+        _verify(b"<!-- page 1 -->\n", **args)
+    with pytest.raises(FiscalGraphArtifactError, match="exceeds the selected page"):
+        _verify(line_start_1based=3, line_end_1based=3, locator_convention=DOCUMENT_PAGE_MARKER_LINES_CONVENTION)
+    with pytest.raises(FiscalGraphArtifactError, match="1..65536 Unicode characters"):
+        _verify(b"<!-- page 1 -->\n\n", "", **args)
 
 
 def test_identical_quotes_at_distinct_locators_remain_distinct_without_invented_identity():
@@ -303,6 +331,54 @@ def test_real_complete_sb125_clause_exact_locator_hash_and_units(retained_sessio
     assert result["publication_allowed"] is False and result["raw_source_derivation_verified"] is False
 
 
+def test_real_two_explicit_conventions_select_same_quote_and_absolute_offsets(retained_session_laws):
+    _, raw = retained_session_laws
+    old = _real(raw)
+    marker = _real(raw, line_start_1based=31, line_end_1based=35,
+                   locator_convention=DOCUMENT_PAGE_MARKER_LINES_CONVENTION)
+    assert old["locator"] == {"page": 358, "line_start": 30, "line_end": 34}
+    assert marker["locator"] == {"page": 358, "line_start": 31, "line_end": 35}
+    for result in (old, marker):
+        assert result["quote_sha256"] == QUOTE_SHA256
+        assert result["quote_unicode_characters"] == 314 and result["quote_utf8_bytes"] == 316
+        assert result["resolved_offsets"]["artifact_unicode_codepoints"] == {"start": 986097, "end": 986411}
+        assert result["resolved_offsets"]["artifact_utf8_bytes"] == {"start": 992620, "end": 992936}
+        assert result["publication_allowed"] is False and result["raw_source_derivation_verified"] is False
+    assert old["resolved_offsets"]["page_local_origin"] == "after_page_marker_lf"
+    assert marker["resolved_offsets"]["page_local_origin"] == "page_marker_start"
+    assert old["resolved_offsets"]["page_body_unicode_codepoints"] == {"start": 1589, "end": 1903}
+    assert marker["resolved_offsets"]["page_body_unicode_codepoints"] == {"start": 1607, "end": 1921}
+    assert (marker["resolved_offsets"]["page_body_utf8_bytes"]["start"]
+            - old["resolved_offsets"]["page_body_utf8_bytes"]["start"]) == len(b"<!-- page 358 -->\n")
+
+
+@pytest.mark.parametrize("convention,start,end", [
+    (DOCUMENT_PAGE_MARKER_LINES_CONVENTION, 30, 34),
+    (DOCUMENT_PAGE_LINES_CONVENTION, 31, 35),
+    (DOCUMENT_PAGE_MARKER_LINES_CONVENTION, 26, 30),
+])
+def test_real_conventions_never_auto_adjust_wrong_or_neighboring_lines(retained_session_laws, convention, start, end):
+    _, raw = retained_session_laws
+    with pytest.raises(FiscalGraphArtifactError, match="does not select quoted_text exactly"):
+        _real(raw, locator_convention=convention, line_start_1based=start, line_end_1based=end)
+
+
+@pytest.mark.parametrize("mutation", ["wrong_hash", "duplicate_marker"])
+def test_real_marker_line_convention_keeps_hash_and_unique_marker_requirements(retained_session_laws, mutation):
+    _, raw = retained_session_laws
+    changes = {"line_start_1based": 31, "line_end_1based": 35,
+               "locator_convention": DOCUMENT_PAGE_MARKER_LINES_CONVENTION}
+    if mutation == "wrong_hash":
+        changes["expected_extraction_sha256"] = "0" * 64
+        match = "extraction hash mismatch"
+    else:
+        raw = raw.replace(b"<!-- page 359 -->\n", b"<!-- page 358 -->\n")
+        changes["expected_extraction_sha256"] = _sha(raw)
+        match = "page markers must be unique and contiguous"
+    with pytest.raises(FiscalGraphArtifactError, match=match):
+        _real(raw, **changes)
+
+
 @pytest.mark.parametrize("changes", [
     {"page_1based": 357},
     {"line_start_1based": 25, "line_end_1based": 29},
@@ -358,3 +434,37 @@ def test_real_cli_verifies_without_emitting_the_appropriation_text(retained_sess
     assert result["quote_sha256"] == QUOTE_SHA256 and result["quote_matches_locator"] is True
     assert "$4,000,000" not in output and "652-00-1000-0840" not in output
     assert result["publication_allowed"] is False
+
+
+def test_real_cli_requires_explicit_marker_line_convention_for_lines31_to35(
+    retained_session_laws, tmp_path, monkeypatch, capsys,
+):
+    source, raw = retained_session_laws
+    quote_file = tmp_path / "sb125-quote.txt"
+    quote_file.write_bytes(SB125_QUOTE.encode())
+    args = _arguments(source, quote_file, raw, SB125_QUOTE, page=358, start=31, end=35, pages=1072)
+    convention_index = args.index("--locator-convention") + 1
+    args[convention_index] = DOCUMENT_PAGE_MARKER_LINES_CONVENTION
+    monkeypatch.setattr(sys, "argv", args)
+    assert _cli().main() == 0
+    output = capsys.readouterr().out
+    result = json.loads(output)
+    assert result["locator_convention"] == DOCUMENT_PAGE_MARKER_LINES_CONVENTION
+    assert result["quote_sha256"] == QUOTE_SHA256 and result["quote_matches_locator"] is True
+    assert result["publication_allowed"] is False
+    assert SB125_QUOTE not in output
+
+    args[convention_index] = DOCUMENT_PAGE_LINES_CONVENTION
+    with pytest.raises(SystemExit) as exc:
+        _cli().main()
+    assert exc.value.code == 2
+    error = capsys.readouterr()
+    assert not error.out and "does not select quoted_text exactly" in error.err
+
+    # A numerically plausible range cannot substitute for the required convention.
+    del args[convention_index - 1:convention_index + 1]
+    with pytest.raises(SystemExit) as exc:
+        _cli().main()
+    assert exc.value.code == 2
+    error = capsys.readouterr()
+    assert not error.out and "required: --locator-convention" in error.err

@@ -56,8 +56,8 @@ read-only:
 python scripts/release/kansas-fiscal-graphrag.py verify-document-evidence \
   --extraction-md /session-laws/markdown/2025-Session-Laws-Book-2.md \
   --extraction-sha256 3c336e663f4f84fd6ae99b088be30ffa733a8a10118b8c602362bf1112934be7 \
-  --declared-page-count 1072 --page 358 --line-start 30 --line-end 34 \
-  --locator-convention lf-after-page-marker-count-blank-lines-v1 \
+  --declared-page-count 1072 --page 358 --line-start 31 --line-end 35 \
+  --locator-convention lf-page-marker-is-line-one-v1 \
   --quote-text /evidence/sb125-96j.quote.utf8 \
   --quote-sha256 3833a0e9a8eff099d9a070eb169ee36596ac9470d0d0bbc71b8eb36d9bca61c6
 ```
@@ -69,11 +69,18 @@ internal line breaks, trailing spaces on internal lines, and Unicode spacing.
 Expected hashes and locators must come from the reviewed artifact handoff;
 computing expectations from arbitrary new input is not evidence of its identity.
 
-The named offline convention starts line 1 immediately after a page-marker
-line's LF, counts blank lines, and selects one-based inclusive line bounds.
-It excludes only the final selected LF. This is an explicit convention for the
-retained CPU output, not a replacement for KS-597/650 locator definitions.
-Unknown conventions are rejected; extraction changes require a fresh binding.
+The named convention counts the page-marker line itself as line 1, matching the
+StateCivics resolver's observed origin. Blank lines count and line bounds are
+one-based/inclusive; only the final selected LF is excluded. The prior explicit
+`lf-after-page-marker-count-blank-lines-v1` convention remains supported for
+already-recorded offline evidence: it starts after the marker's LF and selects
+the same quotation at lines 30–34. Specify the producer's actual convention;
+the command never guesses one or silently shifts line numbers.
+
+Both choices identify the same absolute quote bytes. Their page-local coordinate
+origins differ and are labeled in the result. These are explicit consumer
+conventions, not replacement KS-597/650 contracts. Unknown conventions are
+rejected; extraction changes require a fresh binding.
 
 The verifier checks the whole extraction hash, page-marker sequence/count,
 locator bounds, selected text and quote hash. It performs no fuzzy repair or

@@ -13,6 +13,7 @@ from urllib.parse import urlsplit
 
 from svs_common.fiscal_graph_artifact import (
     DOCUMENT_PAGE_LINES_CONVENTION,
+    DOCUMENT_PAGE_MARKER_LINES_CONVENTION,
     MAX_DOCUMENT_EXTRACTION_BYTES,
     MAX_DOCUMENT_QUOTE_CHARACTERS,
     MAX_INPUT_FILE_BYTES,
@@ -120,7 +121,8 @@ def main() -> int:
     verify_document.add_argument("--page", type=int, required=True)
     verify_document.add_argument("--line-start", type=int, required=True)
     verify_document.add_argument("--line-end", type=int, required=True)
-    verify_document.add_argument("--locator-convention", choices=[DOCUMENT_PAGE_LINES_CONVENTION], required=True)
+    verify_document.add_argument("--locator-convention", required=True,
+                                 choices=[DOCUMENT_PAGE_LINES_CONVENTION, DOCUMENT_PAGE_MARKER_LINES_CONVENTION])
     verify_document.add_argument("--quote-text", type=Path, required=True,
                                  help="exact UTF-8 quote file, including internal spaces/LFs; no added trailing LF")
     verify_document.add_argument("--quote-sha256", required=True)
