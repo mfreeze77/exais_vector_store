@@ -27,7 +27,7 @@
   },
   "vectorStore": {
     "id": "vs_daafbc5d7aa54b23b3f10392",
-    "status": "local_canary_verified"
+    "status": "local_chapters_verified"
   },
   "embedding": {
     "profileId": "voyage_4_docs_1024",
@@ -72,5 +72,36 @@
     "independentQc": "PASS WITH NOTES",
     "boundary": "Six-record local document canary only. Full harvest registration/indexing, canonical graph integration and OVH activation are not established.",
     "independentQcProof": ".tranche/statecivics-semantic-graph/aligned/wave-138-local-canary-qc.md"
+  },
+  "chapterTranches": {
+    "status": "full_input_audit_and_two_chapter_live_proof_accepted",
+    "indexUri": "statecivics-export://ks-state-civics/kansas-statutes/chapters/INDEX.json",
+    "indexSha256": "65d2424709bb1e54ab7fad9142ceffb6c00f961d463ca78b5dc7c277194f63e0",
+    "producerRevision": "63ae57b9221ed7a8eaf44ac57622b7025aea556e",
+    "tranches": 85,
+    "records": 31079,
+    "bytes": 57034050,
+    "indexableDocuments": 28812,
+    "excludedDocuments": 2267,
+    "expectedChunks": 83258,
+    "semantics": "Partial batches: omitted identities retain prior state. Removal requires an incoming record action or supported content exclusion.",
+    "inputAudit": ".tranche/statecivics-semantic-graph/aligned/statute-chapter-export-audit.md",
+    "boundary": "Input validation is not live indexing or canonical graph acceptance.",
+    "liveStage": {
+      "chapters": [
+        "007",
+        "011"
+      ],
+      "indexedDocuments": 15,
+      "indexedChunks": 99,
+      "storedSlicesVerified": 99,
+      "nativeReturnedSlicesVerified": 10,
+      "denseRecallExpectedTopHitsMatched": 2,
+      "replayEmbeddingRequests": 0,
+      "proof": ".tranche/statecivics-semantic-graph/aligned/wave-139-tranche-proof.md",
+      "statePath": "/Users/mfrieson/Developer/statecivics-statute-ingestion/ks-fiscal-local-kansas-statutes.json",
+      "independentQc": "PASS WITH NOTES",
+      "independentQcProof": ".tranche/statecivics-semantic-graph/aligned/wave-139-tranche-qc.md"
+    }
   }
 }

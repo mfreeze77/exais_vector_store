@@ -38,6 +38,7 @@ source:
     storeExtractedArtifacts: true
   manifest:
     format: jsonl
+    semantics: Explicit record actions; omitted identities retain prior state.
     stableIdentityFields:
       - logical_document_id
     checksumField: record_digest_sha256
@@ -46,6 +47,13 @@ source:
     rowCount: 6
     byteCount: 10954
     sha256: c9a06920795b47d92c8d336395ab94c459fa8404e029a92708444d06276ea3a7
+  chapterTranches:
+    indexUri: statecivics-export://ks-state-civics/kansas-statutes/chapters/INDEX.json
+    indexSha256: 65d2424709bb1e54ab7fad9142ceffb6c00f961d463ca78b5dc7c277194f63e0
+    producerRevision: 63ae57b9221ed7a8eaf44ac57622b7025aea556e
+    trancheCount: 85
+    recordCount: 31079
+    semantics: Partial batches, never omission-based withdrawals; apply serially with durable ingestion state.
 artifactGeneration:
   mode: retained_statute_markdown_v1
   boundary: Retain exact upstream Markdown; no PDF conversion, local rescrape, source mutation or invented pages.
@@ -115,7 +123,7 @@ ingestion:
     - auto
   idempotency: scoped_source_identity_record_digest_profile_and_evidence
 updatePolicy:
-  diffMode: desired_state_logical_identity_record_digest_and_source_profile
+  diffMode: explicit_record_actions_preserve_omitted_state
   removedRecords: explicit_api_delete_by_prior_vector_store_file_id
   dryRunRequired: true
   removalFirst: true

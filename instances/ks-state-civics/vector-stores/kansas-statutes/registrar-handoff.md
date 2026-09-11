@@ -34,6 +34,33 @@ The input audit is a bounded handoff result, not certification of that full
 suite. Custody reconciliation compares distinct revision hashes to objects;
 multiple revision rows may correctly share the same object.
 
+## Full chapter delivery — 2026-09-11
+
+Upstream main `ad6b38c0c0448b120ac4206a13aaf00d305b9d7b` delivered 85 chapter
+exports produced at `63ae57b9221ed7a8eaf44ac57622b7025aea556e`, with
+INDEX SHA-256 `65d2424709bb1e54ab7fad9142ceffb6c00f961d463ca78b5dc7c277194f63e0`.
+The original six-record manifest remains byte-identical.
+
+The [complete input audit](../../../../.tranche/statecivics-semantic-graph/aligned/statute-chapter-export-audit.md)
+checked every tranche/record, every custody-to-corpus byte pair and every parsed
+chunk: 31,079 records, 28,812 substantive documents, 2,264 empty bodies,
+three inline-History-only documents and 83,258 exact-source chunks. These are
+available inputs, not live index counts. No upstream database or full-suite
+health claim follows from this audit.
+
+These files are partial batches. Omission is not withdrawal. The existing
+consumer plans only incoming rows and preserves omitted state; explicit
+lifecycle removals and content exclusions still apply to their named documents.
+[WAVE-139](../../../../tickets/WAVE-139-kansas-statute-chapter-handoff.md)
+owns the shared-state regression and two-chapter live proof before further rollout.
+
+Canonical document identity remains jurisdiction/source-family/logical-key;
+SHA-256 binds content. The manager's hash-as-identity wording does not describe
+a contract change. The actual label guard does have a producer-owned defect:
+substring matching accepts `1-20` for `1-204`. All delivered joins passed the
+independent audit, so tightening that guard is a future-input correction, not a
+reason to discard this pinned delivery. The audit records the executable case.
+
 ## Reuse the existing storage and ledger services
 
 A small sibling such as `scripts/operator/register_statute_document_corpus.py`

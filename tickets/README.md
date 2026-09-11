@@ -144,6 +144,7 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-136 Fiscal Real-Source Generalization Evaluation](./WAVE-136-fiscal-real-source-generalization-evaluation.md)
 - [WAVE-137 Kansas Statute Document Ingestion — offline implementation complete](./WAVE-137-kansas-statute-document-ingestion.md)
 - [WAVE-138 Kansas Statute Local Canary — complete, QC PASS WITH NOTES](./WAVE-138-kansas-statute-local-canary.md)
+- [WAVE-139 Kansas Statute Chapter Handoff — complete, QC PASS WITH NOTES](./WAVE-139-kansas-statute-chapter-handoff.md)
 
 For the corrected StateCivics ownership, read
 [the unified law-and-money handoff](../docs/STATECIVICS_LAW_MONEY_ALIGNMENT.md).

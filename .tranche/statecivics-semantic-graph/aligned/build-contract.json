@@ -2014,5 +2014,22 @@
     ],
     "independent_qc": "wave-138-local-canary-qc.md",
     "qc_decision": "PASS WITH NOTES \u2014 six-record local document canary only; full graph and OVH remain unproven"
+  },
+  "statute_chapter_handoff_increment": {
+    "owner_ticket": "WAVE-139",
+    "worktree": "/Users/mfrieson/Developer/exais-vector-store-law-money",
+    "base_commit": "872f7e2",
+    "status": "implemented_verified_local",
+    "ticket": "tickets/WAVE-139-kansas-statute-chapter-handoff.md",
+    "scope": "Full input audit, existing partial-batch behavior proof, staged live chapters007/011 and replay in existing local store. No runtime source changes or full-corpus activation claim.",
+    "input_index_sha256": "65d2424709bb1e54ab7fad9142ceffb6c00f961d463ca78b5dc7c277194f63e0",
+    "edit_sequence": "independent input audit + proof implementation -> serial live stage -> root declarations -> independent final QC",
+    "implementation_files": [
+      "tests/test_kansas_statute_tranches.py"
+    ],
+    "proof": "wave-139-tranche-proof.md",
+    "durable_operator_root": "/Users/mfrieson/Developer/statecivics-statute-ingestion",
+    "independent_qc": "wave-139-tranche-qc.md",
+    "qc_decision": "PASS WITH NOTES"
   }
 }
