@@ -1990,5 +1990,29 @@
     ],
     "independent_qc": "wave-137-qc.md",
     "qc_decision": "PASS WITH NOTES \u2014 bounded statute document implementation; live indexing and canonical graph integration remain pending"
+  },
+  "statute_local_canary_increment": {
+    "owner_ticket": "WAVE-138",
+    "worktree": "/Users/mfrieson/Developer/exais-vector-store-law-money",
+    "base_commit": "f0114e0",
+    "status": "implemented_verified_local",
+    "authorization": "Owner selected existing local Kansas cell; OVH unknown. Six real approved records only.",
+    "ticket": "tickets/WAVE-138-kansas-statute-local-canary.md",
+    "runtime_cell": "ks-fiscal-local",
+    "logical_instance": "ks-state-civics",
+    "input_export_sha256": "c9a06920795b47d92c8d336395ab94c459fa8404e029a92708444d06276ea3a7",
+    "scope": "Application-only local API/worker deployment, normal API store/preview/ingest/recall, unchanged replay, source pins and proof. No runtime code edits, migrations, upstream changes, bulk apply or graph activation.",
+    "edit_sequence": "WAVE-137 QC and real-export input audit -> one serial deployment worker -> root declaration updates -> independent QC",
+    "implementation_proof": "wave-138-local-canary-proof.md",
+    "operational_directory": ".release/cells/ks-fiscal-local/wave-138",
+    "root_source_files": [
+      "instances/ks-state-civics/vector-stores/kansas-statutes/store.yaml",
+      "instances/ks-state-civics/vector-stores/kansas-statutes/README.md",
+      "instances/ks-state-civics/vector-stores/kansas-statutes/sources/statecivics-statute-ledger/source.yaml",
+      "instances/ks-state-civics/vector-stores/kansas-statutes/sources/statecivics-statute-ledger/source.lock.json",
+      "instances/ks-state-civics/vector-stores/kansas-statutes/registrar-handoff.md"
+    ],
+    "independent_qc": "wave-138-local-canary-qc.md",
+    "qc_decision": "PASS WITH NOTES \u2014 six-record local document canary only; full graph and OVH remain unproven"
   }
 }

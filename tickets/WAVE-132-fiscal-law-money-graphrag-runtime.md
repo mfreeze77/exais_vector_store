@@ -21,6 +21,13 @@ The owner has also unblocked [WAVE-137](WAVE-137-kansas-statute-document-ingesti
 the separate retained-statute document path. It reuses the existing document
 export and does not wait on provision/attestation contracts to implement parsing
 and ingestion; actual eligible custody/export records still gate a live run.
+The six-record custody-backed handoff is now verified. The owner selected the
+existing local Kansas cell for [WAVE-138](WAVE-138-kansas-statute-local-canary.md),
+which owns the bounded live indexing and retrieval proof. OVH is not a dependency
+of that local run. Canonical fiscal graph acceptance remains separate.
+WAVE-138 is now complete with independent QC PASS WITH NOTES: the six-record
+handoff produced four indexed statutes and 62 chunks, with real dense recall,
+exact retained-source coordinates and unchanged replay. This parent remains open.
 The gated [build contract](../.tranche/statecivics-semantic-graph/aligned/build-contract.json)
 and [file/symbol index](../.tranche/statecivics-semantic-graph/aligned/stack.index.json)
 provide shared owners and sequential edit order.

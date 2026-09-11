@@ -1,7 +1,16 @@
 # Kansas Statutes source
 
-This declares the Kansas StateCivics statute document path. The store ID is a
-pending placeholder; no live store or source activation is asserted.
+This declares the Kansas StateCivics statute document path. The first approved
+batch has been applied to the existing local Kansas cell: four documents indexed
+and two content exclusions, yielding 62 live Voyage-4/1024 chunks. Four dense
+paraphrase queries returned the expected statute first. All stored chunks and
+20 native returned hits resolved exactly to retained text, and export replay
+left the persisted index unchanged. See the
+[WAVE-138 local proof](../../../../.tranche/statecivics-semantic-graph/aligned/wave-138-local-canary-proof.md).
+[Independent QC](../../../../.tranche/statecivics-semantic-graph/aligned/wave-138-local-canary-qc.md)
+passed with notes on the local scope and retention of operational state/overlays.
+The store remains `productionReady: false`; this six-record run does not establish
+full-corpus coverage, canonical graph integration or an OVH deployment.
 [Source package](sources/statecivics-statute-ledger/source.yaml) and
 [source lock](sources/statecivics-statute-ledger/source.lock.json) reuse the
 StateCivics document retrieval-export contract. Corpus bytes remain outside Git.
@@ -50,7 +59,8 @@ services, six real source files and the first export/replay checks.
 ```sh
 python scripts/release/kansas-fiscal-document-ingest.py \
   --source-family kansas-statutes \
-  --cell ks-state-civics \
+  --cell "$STATECIVICS_RUNTIME_CELL" \
+  --api "$STATECIVICS_API_BASE" \
   --vector-store-slug kansas-statutes \
   --vector-store-name "Kansas Statutes" \
   --vector-store-id "$KANSAS_STATUTES_VECTOR_STORE_ID" \
@@ -63,6 +73,16 @@ python scripts/release/kansas-fiscal-document-ingest.py \
   --state /state/kansas-statutes.json \
   --proof /proof/statute-ingest-plan.json
 ```
+
+The logical instance remains `ks-state-civics`. The owner selected physical local
+cell `ks-fiscal-local` for the first live batch; OVH is unknown. In a runner
+container joined to `exais-vector-store-ks-fiscal-local_default`, use
+`STATECIVICS_RUNTIME_CELL=ks-fiscal-local` and
+`STATECIVICS_API_BASE=http://api:8080`. The host-facing API is
+`http://127.0.0.1:28085`. Supply the existing Kansas tenant/business/user scope,
+not the cell's generic development defaults. The package command also requires
+`STATECIVICS_STATUTE_STATE` and `STATECIVICS_STATUTE_PROOF` pointing at writable
+mounted paths. Keep state across replay; it is separate from source evidence.
 
 The shared runner retains its fiscal default; the explicit family selects statute
 validation and the dedicated source collection. Upstream records must target
@@ -81,17 +101,27 @@ evidence context. A changed source/citation cannot silently reuse old chunk
 provenance. A document newly excluded from the statute-body index must not leave
 its older text searchable.
 
-Live application requires the actual reviewed retrieval export/custody delivery
-and the deployed consumer. The ticket records completed offline implementation
-and independent QC; live readiness still requires an applied export and retrieval
-recall proof. Migration 111's verification attestations are
+The reviewed first export and local consumer have now passed the bounded live
+application and recall checks. The local replay state is
+`.release/cells/ks-fiscal-local/wave-138/statute-state.json`; retain it for later
+updates. A wider batch requires its own reviewed custody-backed export and
+coverage proof. Migration 111's verification attestations are
 independent of ordinary eligible document search; graph integration continues
 under KS-600/650 and WAVE-133–136.
 
 ## Evidence versus search
 
+Use the native `/api/v1/retrieval/search` response's `ChunkRecord.metadata` for
+source-coordinate evidence. The compatibility vector-store search endpoint
+returns document attributes and citation-decorated content; it does not expose
+the same chunk-coordinate fields, and its decorated text is not itself the
+original retained slice. Preserve the returned chunk/document references when
+moving between these interfaces. The local proof records which endpoint was
+used for semantic ranking and which for exact-source verification.
+
 Chunks preserve original text and coordinates. Section labels, official URLs,
 source/extraction hashes and unresolved ordered History references are metadata.
 A search hit is a candidate passage; canonical graph relationships and exact
 verified legal support come from their upstream contracts and attestations.
-This package leaves graph activation disabled and live recall proof pending.
+This package leaves graph activation disabled. Semantic matches and unresolved
+History metadata do not establish canonical fiscal or legal relationships.

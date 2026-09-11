@@ -2,7 +2,37 @@
 
 Reviewed upstream `a4091f62` against ExAIS `8804f79`. The registry corrections
 are present. This is an operator handoff for the existing StateCivics owner;
-it does not implement a registrar, register custody, or assert a live export.
+it does not implement a registrar or register custody. The requirements below
+are retained as the original handoff; the subsequent delivery is recorded here.
+
+## Delivered handoff — 2026-09-11
+
+StateCivics delivered the sibling registrar at `a54590b3b3ec8de064ae2b59ed620290750d2d4f`
+and its proof at main `f445519009fb40b846af6a47cd7224992dd45a60`.
+The approved `kansas-statutes.jsonl` is 10,954 bytes, six records, SHA-256
+`c9a06920795b47d92c8d336395ab94c459fa8404e029a92708444d06276ea3a7`.
+Its actual custody namespace is `civic-custody://kansas_statutes/`.
+
+The [independent ExAIS input audit](../../../../.tranche/statecivics-semantic-graph/aligned/statute-real-export-audit.md)
+validated all six records against the retained upstream schema, recomputed
+record and identity digests, and verified the exact intended files, official
+URLs, harvest bindings and six byte-identical custody objects (154,148 bytes).
+The existing consumer's [dry run](../../../../.tranche/statecivics-semantic-graph/aligned/statute-real-export-plan.json)
+planned four semantic upserts and two exclusions. Upstream reports unchanged
+registration/export replay; ExAIS has not independently queried that ledger or
+replayed registration. Live local indexing and retrieval belong to
+[WAVE-138](../../../../tickets/WAVE-138-kansas-statute-local-canary.md).
+
+Unchanged bytes currently have no separate repeat-observation row upstream.
+That requires a producer-owned collection-observation decision; do not mint a
+new document/revision or imply the observation was persisted. It does not block
+indexing this export. Bounded source selection is still required before a wider
+or second statute family enters the same export query.
+
+The manager reports a pre-existing red full suite and 33 added passing tests.
+The input audit is a bounded handoff result, not certification of that full
+suite. Custody reconciliation compares distinct revision hashes to objects;
+multiple revision rows may correctly share the same object.
 
 ## Reuse the existing storage and ledger services
 

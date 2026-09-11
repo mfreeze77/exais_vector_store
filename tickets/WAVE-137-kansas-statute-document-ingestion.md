@@ -1,6 +1,7 @@
 # WAVE-137: Prepare and ingest retained Kansas statutes with exact coordinates
 
-Status: complete for bounded offline document implementation; live activation pending.
+Status: complete for bounded offline document implementation. Subsequent local
+activation is tracked separately in [WAVE-138](WAVE-138-kansas-statute-local-canary.md).
 Parent: WAVE-132. Owner: ExAIS. Base: `16a92d8`.
 
 ## Problem and owner direction

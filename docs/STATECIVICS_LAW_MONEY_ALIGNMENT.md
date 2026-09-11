@@ -352,6 +352,20 @@ authority, definitions and unresolved history references. Retained Session Laws
 supply uncodified appropriations. Custody/export eligibility, statute-specific
 chunking and resolved lineage remain distinct from acquisition completion.
 
+The first approved statute export is now available: six records with matching
+custody objects, independently checked by ExAIS in the
+[input audit](../.tranche/statecivics-semantic-graph/aligned/statute-real-export-audit.md).
+The owner selected the existing local Kansas cell for the bounded
+[WAVE-138 activation](../tickets/WAVE-138-kansas-statute-local-canary.md).
+OVH readiness remains unknown and is not a dependency of local semantic search.
+The six-record local canary is complete with independent QC PASS WITH NOTES:
+four indexed documents, 62 Voyage-4/1024 chunks, four expected top-ranked dense
+recalls, exact-source checks and unchanged replay. Its
+[proof](../.tranche/statecivics-semantic-graph/aligned/wave-138-local-canary-proof.md)
+does not close canonical graph or full-corpus acceptance.
+Repeat collection observations on unchanged bytes remain an upstream schema
+decision; they must not be represented by artificial document/revision changes.
+
 ## Historical implementation and corrected work
 
 WAVE-130's v1 design and WAVE-132's existing mechanics assumed PDF/chunk evidence
