@@ -44,6 +44,9 @@ available even when a source contributes no statute-body embedding.
 
 ## Plan an approved custody export
 
+The [registrar handoff](registrar-handoff.md) identifies the shared upstream
+services, six real source files and the first export/replay checks.
+
 ```sh
 python scripts/release/kansas-fiscal-document-ingest.py \
   --source-family kansas-statutes \
