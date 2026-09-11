@@ -105,17 +105,29 @@
     },
     "fullRollout": {
       "ticket": "WAVE-140",
-      "status": "coordinator_accepted_bulk_launch_pending",
+      "status": "paced_launch_pending",
       "expectedIndexedDocuments": 28812,
       "expectedIndexedChunks": 83258,
       "remainingNewDocumentsAfterStage": 28797,
       "plannedUpsertsIncludingExporterRefresh": 28801,
       "plannedNoops": 2278,
       "plannedRemovals": 0,
-      "operatorRoot": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout",
+      "operatorRoot": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout-paced",
       "costIsNotAnApprovalGate": true,
       "coordinatorQc": "PASS WITH NOTES",
-      "coordinatorQcProof": ".tranche/statecivics-semantic-graph/aligned/wave-140-coordinator-qc.md"
+      "coordinatorQcProof": ".tranche/statecivics-semantic-graph/aligned/wave-140-coordinator-qc.md",
+      "container": "exais-kansas-statute-rollout-wave140",
+      "consumerCommit": "eb1d181162738db9e4620b7bbc4e59f554ca522b",
+      "coordinatorSha256": "80923ec4623a39a49634e15c844baf01341d360f30393fa26e72ef055756c3b1",
+      "checkpointedRecordsBeforePause": 575,
+      "pacingTicket": "WAVE-141",
+      "pacingQc": "PASS WITH NOTES",
+      "pacingMaxUpsertsPerMinute": 110,
+      "initialOperatorRoot": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout",
+      "pausedInventory": {
+        "documents": 579,
+        "chunks": 1518
+      }
     }
   }
 }

@@ -20,6 +20,7 @@ from pathlib import Path
 import re
 import signal
 import sys
+import time
 import uuid
 
 from svs_common import chunking, statecivics_statutes
@@ -39,6 +40,8 @@ CELL = 'ks-fiscal-local'
 KB = 'kb_ks_civics'
 TENANT = 'ten_ks_state_civics'
 BUSINESS = 'biz_ks_state_civics'
+PACING_POLICY = {'kind': 'monotonic_serial_upsert_starts_v1', 'max_upserts_per_minute': 110,
+                 'minimum_interval_seconds': 0.55, 'stop_poll_seconds': 0.1, 'catch_up': False}
 TOTALS = {'tranches': 85, 'records': 31079, 'bytes': 57034050,
           'indexable_documents': 28812, 'chunks': 83258, 'chunk_chars': 62206966}
 
@@ -153,7 +156,7 @@ def prepare(args) -> Prepared:
     pins = {'schema_version': 1, 'index_sha256': args.index_sha256,
             'harvest_sha256': args.harvest_manifest_sha256, 'seed_sha256': args.seed_state_sha256,
             'api': args.api, 'cell': CELL, 'vector_store_id': STORE, 'knowledge_base_id': KB,
-            'tenant_id': TENANT, 'business_instance_id': BUSINESS,
+            'tenant_id': TENANT, 'business_instance_id': BUSINESS, 'pacing_policy': dict(PACING_POLICY),
             'required_runtime_image_sha256': IMAGE_SHA256, 'consumer_files': code_pins(),
             'chapters': {e['chapter']: m.sha256 for e, m in manifests}}
     pin_path = args.operator_root / 'inputs.lock.json'
@@ -207,6 +210,26 @@ def validate_output_paths(args) -> None:
         require((root / child).resolve().is_relative_to(root), 'operator output symlink escapes root')
 
 
+class UpsertPacer:
+    """Space serial upsert starts; elapsed slow work never earns burst credits."""
+    def __init__(self, *, clock=None, sleep=None):
+        self.clock = clock or time.monotonic
+        self.sleep = sleep or time.sleep
+        self.next_start: float | None = None
+
+    def wait(self, stop_requested) -> None:
+        while True:
+            if stop_requested():
+                raise InterruptedError('stop requested while pacing')
+            current = self.clock()
+            remaining = 0 if self.next_start is None else self.next_start - current
+            if remaining <= 0:
+                # Anchor to actual admission time, never an overdue schedule.
+                self.next_start = current + PACING_POLICY['minimum_interval_seconds']
+                return
+            self.sleep(min(remaining, PACING_POLICY['stop_poll_seconds']))
+
+
 def apply_prepared(args, prepared: Prepared, stop_requested=lambda: False) -> dict:
     headers = consumer.default_headers(cell=CELL)
     require(headers.get('X-SVS-Tenant-Id') == TENANT and headers.get('X-SVS-Business-Instance-Id') == BUSINESS, 'caller scope is not the approved Kansas cell')
@@ -219,11 +242,12 @@ def apply_prepared(args, prepared: Prepared, stop_requested=lambda: False) -> di
     attempt = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S') + '-' + uuid.uuid4().hex[:8]
     progress = {'status': 'running', 'attempt': attempt, 'started_at': now(),
                 'chapter': None, 'logical_document_id': None, 'completed_chapters': [],
-                'processed_this_attempt': 0, 'results': {'upserted': 0, 'removed': 0, 'unchanged': 0}}
+                'processed_this_attempt': 0, 'pacing_policy': dict(PACING_POLICY), 'results': {'upserted': 0, 'removed': 0, 'unchanged': 0}}
     def checkpoint():
         progress['updated_at'] = now()
         consumer.write_json_atomic(args.operator_root / 'attempts' / f'{attempt}.json', progress)
         consumer.write_json_atomic(args.operator_root / 'progress.json', progress)
+    pacer = UpsertPacer()
     try:
         checkpoint()
         for entry, manifest in prepared.manifests:
@@ -239,6 +263,10 @@ def apply_prepared(args, prepared: Prepared, stop_requested=lambda: False) -> di
                 if stop_requested():
                     raise InterruptedError('stop requested')
                 require(operation.action != 'remove', 'unexpected removal')
+                if operation.action == 'upsert':
+                    pacer.wait(stop_requested)
+                if stop_requested():
+                    raise InterruptedError('stop requested before operation')
                 result = consumer.apply_operations([operation], state=state, state_path=state_path,
                     api_base=args.api, headers=headers, vector_store_id=STORE, knowledge_base_id=KB,
                     timeout=args.api_timeout_seconds, cell=CELL, transport='auto')

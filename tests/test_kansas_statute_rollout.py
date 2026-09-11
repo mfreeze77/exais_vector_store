@@ -114,9 +114,26 @@ def test_bad_input_fails_before_effects(retained, tmp_path, monkeypatch, case):
     assert not (tmp_path/'states').exists()
 
 
+class ControlledClock:
+    def __init__(self):
+        self.value = 0.0
+        self.sleeps = []
+
+    def monotonic(self):
+        return self.value
+
+    def sleep(self, seconds):
+        assert 0 < seconds <= 0.1
+        self.sleeps.append(seconds)
+        self.value += seconds
+
+
 def isolated_apply(retained, tmp_path, monkeypatch):
     rollout, original, full = retained
     args = copy.copy(original);args.operator_root = tmp_path
+    args.test_clock = ControlledClock()
+    pacer = rollout.UpsertPacer
+    monkeypatch.setattr(rollout, 'UpsertPacer', lambda: pacer(clock=args.test_clock.monotonic, sleep=args.test_clock.sleep))
     manifests = [(e, m) for e, m in full.manifests if e['chapter'] in ('007', '011')]
     seeds = {e['chapter']: {'schema_version': 1, 'vector_store_id': rollout.STORE, 'records': {}} for e, _ in manifests}
     prepared = rollout.Prepared(manifests, full.harvest, seeds, full.pins, {})
@@ -253,3 +270,71 @@ def test_cli_wrong_pin_exits_nonzero_without_api_effects(retained, tmp_path, mon
     monkeypatch.setattr(rollout, 'apply_prepared', lambda *a, **kw: pytest.fail('API apply after failed preflight'))
     assert rollout.main([]) == 2
     assert not (args.operator_root/'states').exists()
+
+
+def test_pacer_short_burst_ceiling_and_no_catchup_after_slow_work(retained):
+    rollout, *_ = retained
+    clock = ControlledClock()
+    pacer = rollout.UpsertPacer(clock=clock.monotonic, sleep=clock.sleep)
+    starts = []
+    for _ in range(220):
+        pacer.wait(lambda: False);starts.append(clock.value)
+    assert starts[0] == 0
+    assert all(b-a >= 0.55-1e-9 for a, b in zip(starts, starts[1:]))
+    assert all(sum(t <= value < t+60 for value in starts) <= 110 for t in starts)
+    clock.value += 30  # An unusually slow completed request grants no burst credit.
+    pacer.wait(lambda: False);after_slow = clock.value
+    pacer.wait(lambda: False)
+    assert clock.value-after_slow == pytest.approx(0.55)
+    assert all(0 < seconds <= 0.1 for seconds in clock.sleeps)
+
+
+def test_stop_during_pacing_does_not_admit_another_upsert(retained):
+    rollout, *_ = retained
+    clock = ControlledClock();pacer = rollout.UpsertPacer(clock=clock.monotonic, sleep=clock.sleep)
+    pacer.wait(lambda: False)
+    with pytest.raises(InterruptedError, match='pacing'):
+        pacer.wait(lambda: clock.value >= 0.2)
+    assert clock.value == pytest.approx(0.2)
+
+
+def test_real_upserts_are_paced_noops_and_replay_do_not_wait(retained, tmp_path, monkeypatch):
+    rollout, args, prepared, calls, _, api = isolated_apply(retained, tmp_path, monkeypatch)
+    starts = []
+    def timed_api(method, base, path, body, **kw):
+        if path.endswith('/preview'):
+            starts.append(args.test_clock.value)
+        return api(method, base, path, body, **kw)
+    monkeypatch.setattr(rollout.consumer, 'api_json', timed_api)
+    result = rollout.apply_prepared(args, prepared)
+    assert result['results'] == {'upserted': 11, 'removed': 0, 'unchanged': 3}
+    assert len(starts) == 11 and all(b-a >= 0.55-1e-9 for a, b in zip(starts, starts[1:]))
+    assert args.test_clock.value == pytest.approx(10 * 0.55)
+    before = (len(calls), len(args.test_clock.sleeps), args.test_clock.value)
+    result = rollout.apply_prepared(args, prepared)
+    assert result['results']['unchanged'] == 14
+    assert before == (len(calls), len(args.test_clock.sleeps), args.test_clock.value)
+    assert json.loads((tmp_path/'progress.json').read_text())['pacing_policy'] == rollout.PACING_POLICY
+
+
+def test_stop_during_real_operation_pacing_checkpoints_before_second_upsert(retained, tmp_path, monkeypatch):
+    rollout, args, prepared, calls, server, _ = isolated_apply(retained, tmp_path, monkeypatch)
+    with pytest.raises(InterruptedError):
+        rollout.apply_prepared(args, prepared, lambda: args.test_clock.value >= 0.2)
+    assert len(server) == 1
+    assert sum(path.endswith('/preview') for _, path, _, _ in calls) == 1
+    progress = json.loads((tmp_path/'progress.json').read_text())
+    assert progress['status'] == 'stopped' and progress['results']['upserted'] == 1
+
+
+def test_new_pacing_policy_is_pinned_and_old_lock_still_rejected(retained, tmp_path, monkeypatch):
+    rollout, original, prepared = retained
+    assert prepared.pins['pacing_policy'] == rollout.PACING_POLICY
+    args = copy.copy(original);args.operator_root = tmp_path
+    old = copy.deepcopy(prepared.pins);old.pop('pacing_policy');old['consumer_files']['coordinator'] = '80923ec4623a39a49634e15c844baf01341d360f30393fa26e72ef055756c3b1'
+    (tmp_path/'inputs.lock.json').write_text(json.dumps(old))
+    monkeypatch.setattr(rollout, 'load_index', lambda *a: ({}, prepared.manifests))
+    monkeypatch.setattr(rollout, 'partition_seed', lambda *a: prepared.seeds)
+    with pytest.raises(ValueError, match='pins changed'):
+        rollout.prepare(args)
+    assert json.loads((tmp_path/'inputs.lock.json').read_text()) == old

@@ -138,7 +138,12 @@ values, not billed usage. Rollout gates are source integrity, safe partial-batch
 semantics, resumability and verified search results. The owner has directed the
 [full local rollout](../../../../tickets/WAVE-140-kansas-statute-full-rollout.md);
 its [coordinator review](../../../../.tranche/statecivics-semantic-graph/aligned/wave-140-coordinator-qc.md)
-passed with notes. Bulk application and full live verification are the remaining steps.
+passed with notes. The first full run stopped at the existing API rate limit after 575 checkpointed
+records. [WAVE-141](../../../../tickets/WAVE-141-kansas-statute-rollout-pacing.md)
+added reviewed caller pacing at up to 110 upserts/minute;
+the verified paused inventory contains 579 documents and 1,518 chunks;
+progress is retained at `/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout/progress.json`.
+Full live verification is still required before reporting corpus completion.
 
 ## Evidence versus search
 

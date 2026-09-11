@@ -1,11 +1,35 @@
 {
   "approved_runtime_image_sha256": "e7271b65b0554f29c5378a0f39a9a2e5e3e4f46fc710138328ef4cf8515627c5",
   "base_commit": "ab86356",
+  "coordinator_qc": "PASS WITH NOTES",
   "coordinator_sha256": "80923ec4623a39a49634e15c844baf01341d360f30393fa26e72ef055756c3b1",
-  "current_live_inventory_unchanged": {
-    "chunks": 99,
-    "documents": 15,
-    "scope": "No API or live DB calls made by this coordinator phase; WAVE-139 QC and root read-only verifier own current inventory proof."
+  "first_canary_reexport": {
+    "chunks": 2,
+    "document_id": "doc_d1e8c84ff60840b782e7be7b",
+    "embeddings": 2,
+    "new_export_digest_applied": "c08f490dca30081297dba7043ba8d7b3b90b8641b163bd54bd379e97498282c0",
+    "prior_document_version_chunk_metadata_and_vector_fingerprints_unchanged": true,
+    "section": "1-204",
+    "version_id": "docv_ba32dfdef29942708361a210",
+    "versions": 1
+  },
+  "first_live_failure": {
+    "automatic_retry": false,
+    "chapter": "003",
+    "checkpointed_records": 575,
+    "classification": "local_API_rate_limit",
+    "code_or_configuration_changed": false,
+    "committed_rate_count": 120,
+    "configured_limit_per_minute": 120,
+    "endpoint": "/api/v1/documents/ingest",
+    "http_status": 429,
+    "logical_document_id": "874187a120508abbdfe9796ea85c9c38dff7b56925f8cc7bae7b3c9246200cc9",
+    "observed_api_line": "INFO:     192.168.112.9:39754 - \"POST /api/v1/documents/ingest HTTP/1.1\" 429 Too Many Requests",
+    "rate_window": "2026-09-11T16:01:00+00:00",
+    "resumed": false,
+    "scope": "usr_ks_state_civics_admin / ten_ks_state_civics / biz_ks_state_civics",
+    "source_has_document_row": false,
+    "source_url": "https://ksrevisor.gov/statutes/chapters/ch03/003_003_0019.html"
   },
   "full_rollout_applied": false,
   "implementation": {
@@ -24,9 +48,81 @@
     "index_sha256": "65d2424709bb1e54ab7fad9142ceffb6c00f961d463ca78b5dc7c277194f63e0",
     "seed_sha256": "b64003f370c161c45c6dc5384951ea787242cba56be6446b12327099755d5c2d"
   },
-  "next_gate": "Independent coordinator QC before launch; final live verification and QC after the full rollout.",
+  "live_launch": {
+    "approved_command_sha256": "9920545cc85e827ad1427ea3dfb026f04e8931b3aa2786d58b29ca6bb493ab28",
+    "code_commit": "eb1d181162738db9e4620b7bbc4e59f554ca522b",
+    "command": [
+      "docker",
+      "run",
+      "--name",
+      "exais-kansas-statute-rollout-wave140",
+      "--detach",
+      "--platform",
+      "linux/arm64",
+      "--network",
+      "exais-vector-store-ks-fiscal-local_default",
+      "--memory",
+      "2g",
+      "--cpus",
+      "2",
+      "-v",
+      "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/coordinator-80923ec4623a39a49634e15c844baf01341d360f30393fa26e72ef055756c3b1.py:/app/scripts/release/kansas-statute-rollout.py:ro",
+      "-v",
+      "/Users/mfrieson/Developer/statecivics-statute-corpus:/statutes:ro",
+      "-v",
+      "/Users/mfrieson/Developer/statecivics-statute-exports:/exports:ro",
+      "-v",
+      "/Users/mfrieson/Developer/statecivics-custody:/custody:ro",
+      "-v",
+      "/Users/mfrieson/Developer/statecivics-statute-ingestion/ks-fiscal-local-kansas-statutes.json:/seed.json:ro",
+      "-v",
+      "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140:/operator",
+      "-w",
+      "/app",
+      "-e",
+      "PYTHONDONTWRITEBYTECODE=1",
+      "-e",
+      "SVS_TENANT_ID=ten_ks_state_civics",
+      "-e",
+      "SVS_BUSINESS_INSTANCE_ID=biz_ks_state_civics",
+      "-e",
+      "SVS_USER_ID=usr_ks_state_civics_admin",
+      "sha256:e7271b65b0554f29c5378a0f39a9a2e5e3e4f46fc710138328ef4cf8515627c5",
+      "python",
+      "scripts/release/kansas-statute-rollout.py",
+      "--index",
+      "/exports/chapters/INDEX.json",
+      "--index-sha256",
+      "65d2424709bb1e54ab7fad9142ceffb6c00f961d463ca78b5dc7c277194f63e0",
+      "--harvest-manifest",
+      "/statutes/manifests/statute_scrape_20260911_030653.json",
+      "--harvest-manifest-sha256",
+      "17bed3eec5f0946de1e2f5126b84b8637d9aa4b910199f98fe4c9f3e3eb207a2",
+      "--harvest-root",
+      "/statutes",
+      "--custody-root",
+      "/custody",
+      "--seed-state",
+      "/seed.json",
+      "--seed-state-sha256",
+      "b64003f370c161c45c6dc5384951ea787242cba56be6446b12327099755d5c2d",
+      "--operator-root",
+      "/operator/rollout",
+      "--api",
+      "http://api:8080",
+      "--apply"
+    ],
+    "complete": false,
+    "container_id": "1004765ea9013676bcf0977f558f629b73c1c18d5c943c5e74d1b9f55d9366db",
+    "container_name": "exais-kansas-statute-rollout-wave140",
+    "coordinator_sha256": "80923ec4623a39a49634e15c844baf01341d360f30393fa26e72ef055756c3b1",
+    "deployed_api_image": "sha256:e7271b65b0554f29c5378a0f39a9a2e5e3e4f46fc710138328ef4cf8515627c5",
+    "launched": true,
+    "started_unix": 1789142163.754014
+  },
+  "next_gate": "Review caller pacing or explicit identical-command resume after the rate window; then full live verification and final QC.",
   "operational_commands": {
-    "launch_executed": false,
+    "launch_executed": true,
     "launch_json": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/coordinator-launch-command.json",
     "monitor_container": [
       "docker",
@@ -49,7 +145,7 @@
       "exais-kansas-statute-rollout-wave140"
     ]
   },
-  "phase": "coordinator_only",
+  "phase": "live_rollout_fail_stopped",
   "preflight": {
     "api_calls": 0,
     "chunks": 83258,
@@ -116,6 +212,51 @@
       "bytes": 2026,
       "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/coordinator-launch-command.json",
       "sha256": "9920545cc85e827ad1427ea3dfb026f04e8931b3aa2786d58b29ca6bb493ab28"
+    },
+    {
+      "bytes": 2543,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/live-launch.json",
+      "sha256": "6cddb27bfad3cd5483e181858929865dbf76d148a9286cbce8ff492579b05a2b"
+    },
+    {
+      "bytes": 356,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/first-canary-proof.json",
+      "sha256": "406a4ac76eb93aed6ed29abb5381371879ae6f4417de941c4aed129ed212466a"
+    },
+    {
+      "bytes": 15191,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/first-canary-db.json",
+      "sha256": "a24a0f0e91895f9bbccf8227b63147c84ddefb1795e6b7833a86dd290307281a"
+    },
+    {
+      "bytes": 3717,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/verify-first-canary.py",
+      "sha256": "c68c8d5a368279bdbfddd42cfe872b968c7469defd0f1cb19f2f9e3dfc164377"
+    },
+    {
+      "bytes": 1428,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/supervise.py",
+      "sha256": "f0a0e5d61a6a97d69d7206c95bf43e83265e8f2400bde687a69f85445bae3aaa"
+    },
+    {
+      "bytes": 785,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/first-failure-classification.json",
+      "sha256": "19a9e1c1d1c21ba51b3ee1e7814812db21444a288b3b484d7988106ac0fb38b2"
+    },
+    {
+      "bytes": 877,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/first-failure-rate-limit.json",
+      "sha256": "d6ccf54e5b1b9d7d35f6d2aec62734ff9ebdd6b3d3c7171182fe208df3938f23"
+    },
+    {
+      "bytes": 643,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/live-process-result.json",
+      "sha256": "f323ff30e8bbce7336ee19378d3eae36edde99a4387cef91fa35a85efde16a0c"
+    },
+    {
+      "bytes": 128,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/live-process-output.log",
+      "sha256": "fb152da0db3af53d67ee25a2281bbe27461a38b945ca14a87da5a72765cf3416"
     }
   ],
   "source_files": [
@@ -129,7 +270,7 @@
     "partition_format": "states/chNNN.json (including letter-suffixed chapters)",
     "seed": "/Users/mfrieson/Developer/statecivics-statute-ingestion/ks-fiscal-local-kansas-statutes.json"
   },
-  "status": "READY_FOR_INDEPENDENT_COORDINATOR_QC",
+  "status": "LOCAL_API_429_FAIL_STOPPED_NOT_COMPLETE",
   "ticket": "WAVE-140",
   "verification": {
     "cases": [
@@ -154,11 +295,20 @@
     "skipped": 0,
     "tests": 22
   },
-  "coordinator_qc": {
-    "decision": "PASS WITH NOTES",
-    "proof": "wave-140-coordinator-qc.md",
-    "independent_tests_passed": 22,
-    "skipped": 0,
-    "bulk_activation_authorized": true
+  "historical_wave139_inventory": {
+    "chunks": 99,
+    "documents": 15,
+    "scope": "Historical WAVE-139 baseline before bulk launch, not current inventory."
+  },
+  "paused_live_inventory": {
+    "documents": 579,
+    "versions": 579,
+    "chunks": 1518,
+    "vectors": 1518,
+    "status": "read_only_exact_evidence_and_vectors_verified",
+    "proof": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/paused-checkpoint-preservation-check.json",
+    "proof_sha256": "de147e926071eea59601a44bef724c532b4137d966ef23ca83ecebb2e0e594bc",
+    "preservation_snapshot": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/paused-preservation-baseline.json",
+    "preservation_snapshot_sha256": "74ed9281e7eb93bbf0c04ba30768d34bfaf05390a847f91a9661c05f7e402bb9"
   }
 }

@@ -2036,7 +2036,7 @@
     "owner_ticket": "WAVE-140",
     "worktree": "/Users/mfrieson/Developer/exais-vector-store-law-money",
     "base_commit": "ab86356",
-    "status": "coordinator_accepted_bulk_launch_pending",
+    "status": "paced_launch_pending",
     "ticket": "tickets/WAVE-140-kansas-statute-full-rollout.md",
     "authorization": "Owner directs full corpus in existing local Kansas cell; vectorization cost is not a gate.",
     "scope": "Serial resumable operational coordinator over existing runner, full local indexing and exact evidence/recall proof. No API/provider/schema change, OVH deployment or canonical graph claim.",
@@ -2070,6 +2070,51 @@
     },
     "source_package_validation": "10 tests passed, zero skips in0.16s (immutable API image, no network)",
     "coordinator_qc": "wave-140-coordinator-qc.md",
-    "coordinator_qc_decision": "PASS WITH NOTES"
+    "coordinator_qc_decision": "PASS WITH NOTES",
+    "launch_container": "exais-kansas-statute-rollout-wave140",
+    "launch_container_id": "1004765ea9013676bcf0977f558f629b73c1c18d5c943c5e74d1b9f55d9366db",
+    "launch_code_commit": "eb1d181162738db9e4620b7bbc4e59f554ca522b",
+    "checkpointed_records_before_pause": 575,
+    "paused_live_inventory": {
+      "documents": 579,
+      "chunks": 1518
+    },
+    "verification_artifacts": {
+      "historical_self_check_verifier": "verify-live-2b45dfd082007bba86c940fc330e18b3669efec1e8a858e5e9b3a65bf0aa6cbc.py",
+      "current": {
+        "verify-live.py": {
+          "sha256": "c6aaf4d5a988fc3a7e6b9df44a1222b42c81fd6aa5b7a4d9678a84829980322f",
+          "frozen_copy": "verify-live-c6aaf4d5a988fc3a7e6b9df44a1222b42c81fd6aa5b7a4d9678a84829980322f.py"
+        },
+        "run-verifier.py": {
+          "sha256": "182cf9b0b6cf17fffae9392e9330e94687c3a05aefda16abab85fa14882d520e",
+          "frozen_copy": "run-verifier-182cf9b0b6cf17fffae9392e9330e94687c3a05aefda16abab85fa14882d520e.py"
+        },
+        "run-recall.py": {
+          "sha256": "5e97d00db673b676851d41d82bae47d1af85cb727a12ff1b14fe262047e24e03",
+          "frozen_copy": "run-recall-5e97d00db673b676851d41d82bae47d1af85cb727a12ff1b14fe262047e24e03.py"
+        },
+        "recall-cases.json": {
+          "sha256": "09089d7e8a7cf1842cd27e5430333a5c4695d40fe1bf576d89caf523205ec539",
+          "frozen_copy": "recall-cases-09089d7e8a7cf1842cd27e5430333a5c4695d40fe1bf576d89caf523205ec539.json"
+        }
+      }
+    },
+    "resolved_blocker": "WAVE-141"
+  },
+  "statute_rollout_pacing_increment": {
+    "owner_ticket": "WAVE-141",
+    "status": "complete",
+    "ticket": "tickets/WAVE-141-kansas-statute-rollout-pacing.md",
+    "scope": "Monotonic caller pacing110upserts/minute and reviewed checkpoint transfer; unchanged API limit120, runtime/provider/source behavior.",
+    "base_commit": "eb1d181",
+    "edit_sequence": "implementation and transferplan -> independentQC -> commit -> W140pacedactivation",
+    "implementation_files": [
+      "scripts/release/kansas-statute-rollout.py",
+      "tests/test_kansas_statute_rollout.py"
+    ],
+    "proof": "wave-141-pacing-proof.md",
+    "independent_qc": "wave-141-pacing-qc.md",
+    "qc_decision": "PASS WITH NOTES"
   }
 }

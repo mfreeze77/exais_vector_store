@@ -145,7 +145,8 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-137 Kansas Statute Document Ingestion — offline implementation complete](./WAVE-137-kansas-statute-document-ingestion.md)
 - [WAVE-138 Kansas Statute Local Canary — complete, QC PASS WITH NOTES](./WAVE-138-kansas-statute-local-canary.md)
 - [WAVE-139 Kansas Statute Chapter Handoff — complete, QC PASS WITH NOTES](./WAVE-139-kansas-statute-chapter-handoff.md)
-- [WAVE-140 Kansas Statute Full Rollout — in progress, existing local Kansas cell](./WAVE-140-kansas-statute-full-rollout.md)
+- [WAVE-140 Kansas Statute Full Rollout — paced activation ready](./WAVE-140-kansas-statute-full-rollout.md)
+- [WAVE-141 Kansas Statute Rollout Pacing — complete, QC PASS WITH NOTES](./WAVE-141-kansas-statute-rollout-pacing.md)
 
 For the corrected StateCivics ownership, read
 [the unified law-and-money handoff](../docs/STATECIVICS_LAW_MONEY_ALIGNMENT.md).

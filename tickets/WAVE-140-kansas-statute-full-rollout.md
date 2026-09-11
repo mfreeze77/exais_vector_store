@@ -1,6 +1,6 @@
 # WAVE-140: Index the approved full Kansas statute corpus
 
-Status: in progress; coordinator QC PASS WITH NOTES; bulk launch pending. Dependency: WAVE-139 complete (ab86356, QC PASS WITH NOTES). Owner: ExAIS. Parent: WAVE-132.
+Status: in progress; coordinator QC PASS WITH NOTES; bulk paused after a 429 at 575 checkpointed records; WAVE-141 owns caller pacing before continuation. Dependency: WAVE-139 complete (ab86356, QC PASS WITH NOTES). Owner: ExAIS. Parent: WAVE-132.
 
 ## Outcome
 

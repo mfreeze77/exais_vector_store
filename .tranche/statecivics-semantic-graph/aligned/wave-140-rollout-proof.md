@@ -99,7 +99,9 @@ Their paths/hashes and the actual loaded consumer pins appear in the JSON proof.
 
 The operational root is
 `/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout`.
-`coordinator-launch-command.json` in its parent is **prepared, not executed**.
+`coordinator-launch-command.json` remains the immutable reviewed pre-launch
+artifact. `live-launch.json` separately records its actual execution; the approved
+command was not rewritten after launch.
 It selects the immutable existing API image, a hash-named frozen coordinator
 mounted at `/app/scripts/release/kansas-statute-rollout.py`, the existing local
 Docker network, explicit Kansas headers, read-only input mounts and `--apply`.
@@ -118,8 +120,8 @@ python scripts/release/kansas-statute-rollout.py \
   --operator-root /operator/rollout --api http://api:8080
 ```
 
-Default is plan-only. After QC, the prepared named-container command adds
-`--apply`. Monitor `rollout/progress.json` for per-record progress and inspect the
+Default is plan-only. The QC-approved named-container command used for this live
+run adds `--apply`. Monitor `rollout/progress.json` for per-record progress and inspect the
 named container; process status and progress must both be considered. During
 initial preflight there is no active chapter yet. Stop and resume commands:
 
@@ -136,10 +138,15 @@ change pins or erase state to bypass a reported failure.
 
 ## Remaining gates
 
-Coordinator QC has passed. Launch/monitoring, all 28,812 live documents / 83,258 chunks,
+Coordinator QC has passed and the first run launched, then fail-stopped at the
+local API limit. Pacing review/activation under WAVE-141, continued monitoring,
+all 28,812 live documents / 83,258 chunks,
 per-chapter and exclusion checks, all exact source bindings, prior-version/vector
 preservation, fiscal/runtime preservation, dense recall and final live QC remain
-required. Root owns the separate bounded streaming live verifier. Current
-15-document/99-chunk inventory is the WAVE-139 accepted baseline; this coordinator
-phase has made no live mutation. Graph creation and legal-effectiveness findings
-remain separate work.
+required. Root owns the separate bounded streaming live verifier. WAVE-139
+provided the historical 15-document/99-chunk baseline. After the first run stopped,
+root verified the actual paused inventory: **579 documents, 579 indexed versions,
+1,518 exact-source chunks and 1,518 Voyage-4/1024 vectors**. All initial identities
+and vectors survived. The full paused snapshot is retained for comparison after
+the paced run; no full-corpus completion is claimed. Graph creation and
+legal-effectiveness findings remain separate work.
