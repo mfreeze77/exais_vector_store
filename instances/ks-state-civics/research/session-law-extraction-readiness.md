@@ -97,12 +97,15 @@ provisions and versions.
 
 ### Runtime locator resolution gap
 
-The paragraphs below describe the earlier inspected boundary. A subsequent
-upstream commit `668ca412` added first-write selection checks; the [alignment follow-up](../../../.tranche/statecivics-semantic-graph/aligned/wave-133-locator-convention-alignment-proof.md)
-records its actual line origin and the remaining missing-hash, duplicate-marker
-and empty-selection gaps. The manager reports 453 passed, 66 skipped and zero
-failures; ExAIS has not independently rerun that upstream gate. The commit alone
-does not establish real-span persistence or completed integration.
+The paragraphs below describe the earlier inspected boundary. Upstream commit
+`668ca412` added first-write selection checks; the [alignment follow-up](../../../.tranche/statecivics-semantic-graph/aligned/wave-133-locator-convention-alignment-proof.md)
+records its actual line origin and the missing-hash, duplicate-marker and
+empty-selection gaps found then. Commit `37f5b1c9` addresses those three findings;
+see the bounded [upstream recheck](../../../.tranche/statecivics-semantic-graph/aligned/wave-133-upstream-locator-recheck-proof.md).
+The manager reports 453 passed, 66 skipped and zero failures; ExAIS has not
+independently rerun that upstream gate. Caller text retrieval and bound
+verification metadata remain open; these commits alone do not establish
+real-span persistence or completed integration.
 
 Upstream `SourceSpanRegistration` validates the shape/order of page and line
 integers. `source_artifact_service.py:224` (`register_span`) checks revision

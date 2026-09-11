@@ -204,3 +204,17 @@ publication and evidence class. The eventual adapter must preserve the agreed
 state and its bound derivation; absent legacy metadata and unsupported resolvers
 cannot imply an exact verified citation. No new upstream schema or production
 registration behavior is implemented in this ExAIS increment.
+
+Upstream follow-up `37f5b1c9` closes the three reviewed helper gaps from
+`668ca412`: missing recorded text hash, duplicate page markers and empty
+page/character selections. The [bounded recheck](../.tranche/statecivics-semantic-graph/aligned/wave-133-upstream-locator-recheck-proof.md)
+records actual consumer-side verification separately from the manager-reported
+453 passed / 66 skipped upstream gate. The two remaining span tasks are
+authoritative-text retrieval/passing in the fiscal-fact caller and bound
+locator-verification metadata; broader canonical export and live integration
+acceptance remain open. This follow-up changes documentation/proof only and
+does not start another ticket or rerun the unchanged ExAIS runtime suite.
+Independent [documentation/proof QC](../.tranche/statecivics-semantic-graph/aligned/wave-133-upstream-recheck-qc.md)
+returned **PASS WITH NOTES**, including confirmation of the separately measured
+Markdown-ingestion coordinate gap recorded for WAVE-134 planning. No runtime
+files changed in this follow-up.

@@ -56,6 +56,19 @@ The Prior Art anchors distinguish existing code from the missing behavior. Sourc
 
 Follow [the agreed law-and-money handoff](../docs/STATECIVICS_LAW_MONEY_ALIGNMENT.md). Preserve existing canonical owners, native contract shapes and record-level evidence requirements.
 
+Before a bulk retained-Markdown run, address the measured source-coordinate
+gap in [the semantic/graph metadata handoff](../instances/ks-state-civics/research/semantic-graph-metadata.md).
+The current text branch selects `markdown_docs_v1`; switching to the existing
+PDF-Markdown chunker also does not preserve the CPU `<!-- page N -->` format.
+Review `chunking.py:markdown_heading_chunks`, `pdf_markdown_external_chunks`,
+`split_oversized`, and `ingestion.py:IngestionService.ingest_now` before choosing
+a bounded source-specific path. Assign any shared chunker edit explicitly in
+the build contract before implementation; no global chunker behavior change is
+authorized by this planning note. Propagate exact revision/page/range mapping
+through search-result hydration, keep tags outside retained bytes, and confirm
+the effective embedding profile. The real Book 2 lapse must map to page 358;
+whole-book line metadata or the observed erroneous page 214 cannot pass.
+
 Use the shared-owner map in [build-contract.json](../.tranche/statecivics-semantic-graph/aligned/build-contract.json) and look up affected files/symbols in [stack.index.json](../.tranche/statecivics-semantic-graph/aligned/stack.index.json). These are local planning artifacts; their signatures describe future work unless marked existing. Runtime must not depend on worktree paths or these planning files.
 
 ## Deliverables
