@@ -1,6 +1,6 @@
 # WAVE-142 Bounded Retry For The Embedding Request
 
-Status: in progress; QC round 3 FAIL (proof gaps only, no behavioural defect), owner rulings R-B6..R-B12 applied, awaiting QC round 4. Owner: ExAIS. Dependency: WAVE-140 (defect recorded, deliberately not fixed there).
+Status: complete; QC round 4 PASS with five deliberate reds executed and restored. Owner: ExAIS. Dependency: WAVE-140 (defect recorded, deliberately not fixed there).
 
 ## Why this is a new ticket, not WAVE-141
 
@@ -297,3 +297,70 @@ batcher.
 27 tests. Suite **1356 → 1383** passed; 144 skipped and the 31 pre-existing
 statute-rollout errors unchanged. The +27 derived two ways: suite delta and the
 file alone; `--collect-only` 27, `grep -c '^def test_'` 27.
+
+
+## QC round 4 — PASS
+
+Executed in the pinned image `sha256:e7271b65b055`, not traced. QC ran main's
+baseline itself: branch **1383 passed / 144 skipped / 31 errors**, main **1356 /
+144 / 31**, delta exactly +27. The 31 errors are pre-existing setup failures
+(`SVS_STATUTE_EXPORT_ROOT is required`) in files this diff does not touch.
+
+QC ran **five** deliberate reds rather than the one required, each restored:
+
+| broken | result |
+|---|---|
+| R-B11: `wall_now` → `time.time()` | 2 failed; produced `Retry-After 2313253504.7s` — the round-2 bug reappearing on cue |
+| R-B9: emit the log in the except branch | 2 failed; log line followed by "retry deadline reached, giving up" — the false claim the ruling forbids |
+| R-B8/R-B12: make both eager | 2 failed |
+| R-B7: restore `from None` | 1 failed |
+| R-B6: record the reference | 1 failed |
+
+QC also checked the blast radius of the new exception type across every `embed()`
+caller — `retrieval.py:394`, `ingestion.py:408`, `maintenance.py:186`,
+`model_gateway/main.py:105`. None catches `httpx.ConnectError`,
+`TimeoutException` or `HTTPStatusError` around `embed()`, so
+`EmbeddingRetryExhausted` replacing a transport error changes no existing
+classification.
+
+## Follow-ups, not fixed here
+
+**1. The retry also applies to the interactive query path, and this ticket did not
+analyse it.** `packages/svs_common/svs_common/retrieval.py:394` calls
+`provider.embed([query], …, input_type="query")` through the same Voyage provider.
+Confirmed arithmetic: with `timeout=120` per request and a 300s deadline checked
+*before* each retry, a query embedding can occupy ~360s (120 + 120 + 120, the
+third attempt blowing the deadline) where it previously failed at 120s. `embed()`
+exposes no way to pass a shorter deadline for interactive use. This ticket's
+entire justification is a 31,000-document ingestion run; a search box has a
+different latency budget. **Needs its own ticket before anyone tunes search
+latency.**
+
+**2. The double-bill classification is narrower than the double-bill risk.**
+`POSSIBLE_DOUBLE_BILL_ERRORS` is `(httpx.ReadTimeout,)`, faithful to the owner's
+F6 text. But `httpx.ReadError` and `httpx.RemoteProtocolError` also occur *after*
+the request was fully sent and carry the same "may already have been processed and
+billed" risk — yet they are retried up to 5 times with no `possible_double_bill`
+line and no charge against the timeout cap. A gap in the decision's coverage, not
+a deviation from it, but it weakens "so spend stays auditable". `ConnectTimeout`
+is correctly excluded — no connection means no billing.
+
+**3. `Retry-After` is honoured on 429 only and is never jittered.** A 503 carrying
+`Retry-After` falls through to exponential backoff and ignores the server. And
+when honoured, `delay = retry_after` verbatim, so N concurrent workers given the
+same value all retry on the same instant — the thundering herd the jitter exists
+to prevent.
+
+**4. The four new settings are absent from `.env.example` and
+`.env.production.example`**, unlike `MARKER_MAX_ATTEMPTS`, the sibling convention
+this ticket cites as its naming model.
+
+**5. This file's original `## Changes` and first `## Test` sections are stale.**
+They name `embedding_retry_max_total_wait_sec` (60.0), which no longer exists;
+they claim exhaustion re-raises the original transport error, which F4 reversed;
+and they cite 7 cases / 1363 passed. Later sections supersede all three. Read this
+ticket as append-only history, not as a description of the final state — the
+final state is the round-4 table above.
+
+**6. The default jitter path has no coverage** — every test injects `jitter`, so
+`random.uniform(0, ceiling)` is never exercised.
