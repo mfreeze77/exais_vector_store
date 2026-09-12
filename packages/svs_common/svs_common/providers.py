@@ -423,6 +423,12 @@ class EmbeddingRetryExhausted(Exception):
         )
 
 
+def _resolve(value):
+    """R-B8: batch_id and batch_tokens are callables so the happy path never
+    pays for a log line that only a read-timeout retry ever emits."""
+    return value() if callable(value) else value
+
+
 def _is_retryable_status(status_code: int) -> bool:
     """429 and 5xx only. Every other 4xx is the caller's to handle."""
     return status_code == 429 or 500 <= status_code <= 599
@@ -473,7 +479,7 @@ async def post_embedding_with_retry(
     headers: dict[str, str],
     json_payload: dict[str, Any],
     provider: str,
-    batch_id: str = 'unknown',
+    batch_id: Callable[[], str] | str = 'unknown',
     batch_tokens: Callable[[], int] | int | None = None,
     max_attempts: int | None = None,
     backoff_sec: float | None = None,
@@ -486,9 +492,15 @@ async def post_embedding_with_retry(
 ) -> httpx.Response:
     """POST an embedding request, retrying transport failures, 429 and 5xx.
 
-    Bounded three ways: attempt count, a wall-clock deadline measured from the
-    first attempt and covering request time as well as sleep (F2), and a separate
-    cap on read-timeout retries because those may already have been billed (F6).
+    Two clocks, and they are not the same kind (R-B10):
+      * the deadline is a DURATION measured on the MONOTONIC clock, from the
+        first attempt, covering request time as well as sleep;
+      * Retry-After HTTP-dates are absolute instants compared on the injected
+        WALL clock.
+    Conflating them is what turned a 2-second Retry-After into 1.79 billion.
+
+    Bounded three ways: attempt count, the deadline above, and a separate cap on
+    read-timeout retries because those may already have been billed upstream.
 
     Exhausting any bound raises EmbeddingRetryExhausted, the same shape for a
     transport failure and for a persistent 429/5xx alike (F4).
@@ -515,6 +527,7 @@ async def post_embedding_with_retry(
 
     for attempt in range(1, attempts + 1):
         retry_after: float | None = None
+        pending_double_bill: tuple[int, int] | None = None
         try:
             response = await client.post(url, headers=headers, json=json_payload)
             if not _is_retryable_status(response.status_code):
@@ -534,15 +547,13 @@ async def post_embedding_with_retry(
                 if timeout_retries > timeout_cap:
                     logger.warning(
                         'embedding request to %s exhausted its read-timeout allowance '
-                        '(%d) on batch %s; giving up', provider, timeout_cap, batch_id)
+                        '(%d) on batch %s; giving up', provider, timeout_cap, _resolve(batch_id))
                     raise EmbeddingRetryExhausted(
                         provider, attempt, last_cause, last_status, last_body) from exc
-                tokens = batch_tokens() if callable(batch_tokens) else batch_tokens
-                logger.warning(
-                    'possible_double_bill: retrying a read timeout for %s batch=%s '
-                    'tokens=%s timeout_retry=%d/%d - the upstream request may already '
-                    'have been processed and billed',
-                    provider, batch_id, tokens, timeout_retries, timeout_cap)
+                # R-B9: the log line is emitted further down, only once the attempt
+                # and deadline checks have passed, so it never claims a retry that
+                # will not happen.
+                pending_double_bill = (timeout_retries, timeout_cap)
 
         if attempt >= attempts:
             logger.warning('embedding request to %s failed after %d/%d attempts (%s); giving up',
@@ -572,14 +583,24 @@ async def post_embedding_with_retry(
                     'embedding request to %s got 429 with Retry-After %.1fs, longer than '
                     'the %.1fs left of the retry deadline; not retrying',
                     provider, retry_after, remaining)
+                # no `from last_error`: on this path last_error is provably None
+                # (the status branch clears it), so `from None` would only suppress
+                # a caller's context for nothing.
                 raise EmbeddingRetryExhausted(
                     provider, attempt,
                     f'Retry-After {retry_after:.1f}s exceeds the {remaining:.1f}s remaining',
-                    last_status, last_body) from last_error
+                    last_status, last_body)
             delay = retry_after
         else:
             # clamp the computed backoff to what is left rather than abandoning (F3)
             delay = min(pick(base * (2 ** (attempt - 1))), remaining)
+        if pending_double_bill is not None:
+            done, cap = pending_double_bill
+            logger.warning(
+                'possible_double_bill: retrying a read timeout for %s batch=%s '
+                'tokens=%s timeout_retry=%d/%d - the upstream request may already '
+                'have been processed and billed',
+                provider, _resolve(batch_id), _resolve(batch_tokens), done, cap)
         logger.warning('embedding request to %s failed on attempt %d/%d (%s); retrying in %.2fs',
                        provider, attempt, attempts, last_cause, delay)
         await do_sleep(delay)
@@ -604,18 +625,17 @@ class VoyageEmbeddingProvider:
                 payload: dict[str, Any] = {'model': model, 'input': batch, 'output_dimension': dimensions}
                 if input_type:
                     payload['input_type'] = input_type
-                # a stable, non-secret id for this exact batch, so a
-                # possible_double_bill log line can be reconciled against spend
-                batch_id = hashlib.sha256(
-                    '\x00'.join(batch).encode('utf-8')).hexdigest()[:16]
                 resp = await post_embedding_with_retry(
                     client,
                     'https://api.voyageai.com/v1/embeddings',
                     headers={'Authorization': f'Bearer {api_key}'},
                     json_payload=payload,
                     provider=self.provider,
-                    batch_id=batch_id,
-                    # lazy: only a read-timeout retry ever reads it (QC finding 7)
+                    # R-B8: both lazy. A stable, non-secret id for this exact
+                    # batch, computed only when a read-timeout retry needs to log
+                    # it, so the happy path pays for neither.
+                    batch_id=lambda b=batch: hashlib.sha256(
+                        '\x00'.join(b).encode('utf-8')).hexdigest()[:16],
                     batch_tokens=lambda b=batch: sum(
                         estimate_embedding_tokens(text) for text in b),
                 )

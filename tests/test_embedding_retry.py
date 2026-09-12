@@ -12,6 +12,7 @@ across httpx.ConnectError and httpx.ReadTimeout).
 from __future__ import annotations
 
 import asyncio
+import copy
 
 import httpx
 import pytest
@@ -70,7 +71,11 @@ class _FakeClient:
         return False
 
     async def post(self, url, *, headers=None, json=None):
-        self.requests.append({"url": url, "headers": headers, "json": json})
+        # R-B6: a DEEP COPY. Recording the reference made the replay-identity
+        # assertion compare one dict with itself, so it stayed true even after
+        # in-place mutation between attempts.
+        self.requests.append({"url": url, "headers": headers,
+                              "json": copy.deepcopy(json)})
         if not self.outcomes:
             raise AssertionError(
                 f"unscripted request #{len(self.requests)} - more retries than the test expected")
@@ -239,12 +244,15 @@ def test_rb1_http_date_in_the_past_sleeps_zero():
     async def _record(d):
         slept.append(d)
 
-    wall = 1_700_000_000.0
+    # R-B11: the wall clock is pinned in the year 2100 and the date is 60s BEFORE
+    # it - so the date is in the REAL future. An implementation ignoring the
+    # injected clock would compute a large positive sleep and fail here.
+    wall = 4_102_444_800.0            # 2100-01-01
     client = _FakeClient([("status", (429, {"Retry-After": formatdate(wall - 60, usegmt=True)})),
                           ("ok", 1)])
     _call(client, max_attempts=3, backoff_sec=30.0, deadline_sec=600.0,
           sleep=_record, clock=lambda: 633_122.0, wall_clock=lambda: wall)
-    assert slept == [0.0], "a date already past means do not wait"
+    assert slept == [0.0], f"a date already past on the INJECTED clock means do not wait: {slept}"
 
 
 def test_rb2_retry_after_longer_than_the_remaining_deadline_does_not_retry():
@@ -393,3 +401,112 @@ def test_config_defaults_are_read_when_not_passed(monkeypatch):
             jitter=lambda c: 0.0))
     from svs_common.config import get_settings
     assert len(client.requests) == get_settings().embedding_max_attempts
+
+
+# === round 4 rulings ========================================================
+
+def test_rb6_the_fake_records_a_copy_so_replay_identity_is_real():
+    """R-B6: recording the reference made the replay assertion a self-comparison.
+
+    Mutating the payload in place between attempts must now be visible.
+    """
+    payload = {"input": ["a", "b"]}
+
+    class _MutatingClient(_FakeClient):
+        async def post(self, url, *, headers=None, json=None):
+            # `finally`, because attempt 1 raises ConnectError out of super():
+            # the mutation has to land between the two recordings either way.
+            try:
+                return await super().post(url, headers=headers, json=json)
+            finally:
+                json["input"] = ["MUTATED"]
+
+    client = _MutatingClient([("raise", httpx.ConnectError("x")), ("ok", 1)])
+    asyncio.run(post_embedding_with_retry(
+        client, URL, headers={}, json_payload=payload, provider="voyage",
+        sleep=_never_sleep, jitter=lambda c: c, max_attempts=3))
+    assert client.requests[0]["json"] != client.requests[1]["json"], \
+        "the deep copy must expose an in-place mutation between attempts"
+
+
+def test_rb7_raising_from_inside_an_except_block_preserves_context():
+    """R-B7: `from None` at the R-B2 site would suppress a caller's context."""
+    client = _FakeClient([("status", (429, {"Retry-After": "600"}))])
+    try:
+        raise RuntimeError("the caller was already handling this")
+    except RuntimeError:
+        with pytest.raises(EmbeddingRetryExhausted) as err:
+            _call(client, max_attempts=3, backoff_sec=1.0, deadline_sec=30.0,
+                  clock=lambda: 0.0)
+    assert isinstance(err.value.__context__, RuntimeError), err.value.__context__
+    assert err.value.__suppress_context__ is False
+
+
+def test_rb8_a_successful_batch_never_computes_the_batch_digest(monkeypatch):
+    """R-B8: batch_id is lazy; the happy path must not pay for it."""
+    calls: list[int] = []
+    real_sha256 = providers_mod.hashlib.sha256
+
+    def _spy(data=b""):
+        calls.append(1)
+        return real_sha256(data)
+
+    monkeypatch.setattr(providers_mod.hashlib, "sha256", _spy)
+    client = _FakeClient([("ok", 2)])
+    _install(monkeypatch, client)
+    asyncio.run(VoyageEmbeddingProvider(api_key="k").embed(
+        ["a", "b"], model="voyage-4", dimensions=2))
+    assert calls == [], "a clean request must never compute the batch digest"
+
+
+def test_rb9_a_timeout_on_the_final_attempt_logs_no_double_bill(caplog):
+    """R-B9: the line must mean a retry WILL happen."""
+    client = _FakeClient([("raise", httpx.ReadTimeout("timed out"))])
+    with caplog.at_level("WARNING"):
+        with pytest.raises(EmbeddingRetryExhausted):
+            _call(client, max_attempts=1, max_timeout_retries=2)
+    assert not [r for r in caplog.records if "possible_double_bill" in r.getMessage()], \
+        "no retry happened, so nothing may have been double billed"
+
+
+def test_rb9_a_timeout_with_the_deadline_blown_logs_no_double_bill(caplog):
+    client = _FakeClient([("raise", httpx.ReadTimeout("timed out"))] * 3)
+    with caplog.at_level("WARNING"):
+        with pytest.raises(EmbeddingRetryExhausted):
+            _call(client, max_attempts=5, deadline_sec=0.0, clock=lambda: 0.0)
+    assert not [r for r in caplog.records if "possible_double_bill" in r.getMessage()], \
+        "the deadline stopped the retry, so no re-bill was risked"
+
+
+def test_rb12_a_successful_batch_adds_no_extra_token_estimation(monkeypatch):
+    """R-B12 / round-2 finding 7: batch_tokens was eager.
+
+    `estimate_embedding_tokens` is legitimately called by WAVE-131's batcher to
+    plan batches, so "never called" is the wrong claim. Laziness means the happy
+    path adds NO calls beyond the batcher's, while a read-timeout retry does.
+    """
+    def _count(outcomes):
+        calls: list[str] = []
+        real = providers_mod.estimate_embedding_tokens
+
+        def _spy(text):
+            calls.append(text)
+            return real(text)
+
+        mp = pytest.MonkeyPatch()
+        try:
+            mp.setattr(providers_mod, "estimate_embedding_tokens", _spy)
+            client = _FakeClient(outcomes)
+            mp.setattr(providers_mod.httpx, "AsyncClient", lambda **kw: client)
+            mp.setattr(providers_mod.asyncio, "sleep", _never_sleep)
+            asyncio.run(VoyageEmbeddingProvider(api_key="k").embed(
+                ["a", "b"], model="voyage-4", dimensions=2))
+        finally:
+            mp.undo()
+        return len(calls)
+
+    clean = _count([("ok", 2)])
+    timed_out = _count([("raise", httpx.ReadTimeout("timed out")), ("ok", 2)])
+    assert timed_out > clean, (
+        f"the timeout path must pay for the token estimate and the clean path must "
+        f"not: clean={clean} timed_out={timed_out}")

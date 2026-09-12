@@ -87,7 +87,9 @@ class Settings(BaseSettings):
     marker_retry_backoff_sec: int = 5
     embedding_max_attempts: int = 5
     embedding_retry_backoff_sec: float = 1.0
-    # wall clock from the first attempt, covering request time AND sleep (F2)
+    # a DURATION on the monotonic clock, from the first attempt, covering request
+    # time as well as sleep. Retry-After HTTP-dates use the wall clock instead;
+    # the two are deliberately different clocks (R-B10).
     embedding_retry_deadline_sec: float = 300.0
     # a ReadTimeout may already have been processed and billed upstream (F6)
     embedding_max_timeout_retries: int = 2

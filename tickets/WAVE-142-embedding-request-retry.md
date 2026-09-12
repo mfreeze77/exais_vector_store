@@ -1,6 +1,6 @@
 # WAVE-142 Bounded Retry For The Embedding Request
 
-Status: in progress; QC round 2 FAIL, owner rulings R-B1..R-B5 applied, awaiting QC round 3. Owner: ExAIS. Dependency: WAVE-140 (defect recorded, deliberately not fixed there).
+Status: in progress; QC round 3 FAIL (proof gaps only, no behavioural defect), owner rulings R-B6..R-B12 applied, awaiting QC round 4. Owner: ExAIS. Dependency: WAVE-140 (defect recorded, deliberately not fixed there).
 
 ## Why this is a new ticket, not WAVE-141
 
@@ -233,3 +233,67 @@ pass by that coincidence again. Verified against the real clock after the fix:
 21 tests. Suite **1356 → 1377** passed; 144 skipped and the 31 pre-existing
 statute-rollout errors unchanged. The +21 derived two ways: suite delta and the
 file alone; collect-only reports 21 and `grep -c '^def test_'` reports 21.
+
+
+## Owner rulings on QC round 3, recorded verbatim
+
+QC round 3 found **no behavioural defect in the retry logic** — only proof gaps
+and one dead-code recurrence.
+
+> R-B6 _FakeClient records copy.deepcopy of the payload. Assert the replay identity
+> against the copy. Prove the test goes red by mutating the payload in place between
+> attempts.
+>
+> R-B7 Remove "from None" at the R-B2 raise site; last_error is provably None there,
+> so there is nothing to chain. Test: raise the helper from inside an except block
+> and assert __context__ is preserved.
+>
+> R-B8 Compute batch_id lazily, inside the read-timeout branch only. Test: fully
+> successful batch never calls the digest (spy on hashlib or the helper).
+>
+> R-B9 Emit possible_double_bill only after the attempt-limit and deadline checks
+> pass, so the line means a retry WILL happen. Test: read timeout on the final
+> permitted attempt logs nothing at WARNING and raises exhausted.
+>
+> R-B10 Docstrings and config comments: "deadline is a duration measured on the
+> monotonic clock; Retry-After HTTP-dates are compared on the injected wall clock".
+> Say exactly that, once, at the helper.
+>
+> R-B11 Make the past-date test sensitive: inject wall_now far in the future (year
+> 2100) with the date 5s before it; ignoring the injection would then produce a
+> large positive sleep and the test must fail. Keep the sibling.
+>
+> R-B12 R-B5(7): whatever finding 7 was, it now has a proving test or it is
+> reverted. Name it in the ticket.
+
+### Ruling → proving test
+
+| ruling | proving test |
+|---|---|
+| R-B6 | `test_rb6_the_fake_records_a_copy_so_replay_identity_is_real` — and proven red by reverting the fake to record the reference |
+| R-B7 | `test_rb7_raising_from_inside_an_except_block_preserves_context` |
+| R-B8 | `test_rb8_a_successful_batch_never_computes_the_batch_digest` |
+| R-B9 | `test_rb9_a_timeout_on_the_final_attempt_logs_no_double_bill`, `test_rb9_a_timeout_with_the_deadline_blown_logs_no_double_bill` |
+| R-B10 | not a test — the helper docstring now names both clocks and what each measures; the config comment matches |
+| R-B11 | `test_rb1_http_date_in_the_past_sleeps_zero`, wall clock pinned to 2100-01-01 so the date is in the REAL future |
+| R-B12 | `test_rb12_a_successful_batch_adds_no_extra_token_estimation` |
+
+### Two tests that failed first and taught something
+
+**R-B6's proof harness was wrong on the first run.** It mutated the payload after
+`super().post()`, but attempt 1 raises `ConnectError` out of `super()`, so the
+mutation never executed and both recordings were identical. Moved into a `finally`.
+
+**R-B12 was asserted as "never called", which is false.**
+`estimate_embedding_tokens` is legitimately called by WAVE-131's batcher to plan
+batches, regardless of this ticket's lambda. Laziness means the happy path adds
+**no calls beyond the batcher's**, so the test now measures clean vs timed-out and
+asserts the timeout path is strictly greater. The first version would have been a
+false red; asserting zero would have been asserting something untrue about the
+batcher.
+
+### Counts
+
+27 tests. Suite **1356 → 1383** passed; 144 skipped and the 31 pre-existing
+statute-rollout errors unchanged. The +27 derived two ways: suite delta and the
+file alone; `--collect-only` 27, `grep -c '^def test_'` 27.
