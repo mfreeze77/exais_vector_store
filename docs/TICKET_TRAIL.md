@@ -73,6 +73,45 @@ WAVE-126 adds the cell-owned Grant graph profile extension to EPIC-004. See
 remaining canonical-export/runtime activation gates. Existing civics graph
 behavior is unchanged; a tested disabled profile is not a populated grant graph.
 
+- SVS-039 Kansas statutes corpus ingestion — implemented via WAVE-137 through
+  WAVE-141 for the full retained K.S.A. corpus in the local `ks-fiscal-local`
+  cell, store `vs_daafbc5d7aa54b23b3f10392`. WAVE-137 prepared bounded offline
+  documents with exact coordinates; WAVE-138 activated a six-document canary;
+  WAVE-139 verified the full 85-chapter export and chapter-by-chapter replay;
+  WAVE-141 added caller pacing under the unchanged 120/minute API limit; WAVE-140
+  indexed the corpus. Completed 2026-09-11T22:34:29Z with **28,812 indexable
+  documents, 83,258 chunks, 83,258 embeddings and 28,812 versions**, every
+  chapter exact against `INDEX.json`, no document holding a second version across
+  nine attempts, and the 2,267 non-indexable source records preserved in custody.
+  Acceptance passed on 53 preregistered cases across 34 chapters, dense-only and
+  unreranked: 48 passed, zero blocking, five non-blocking retrieval-quality
+  findings, and 530 returned slices re-verified against custody bytes with zero
+  verification failures. Qdrant holds 83,858 points in a **shared** collection —
+  83,258 statute plus 600 belonging to the fiscal store — so a parity check
+  against statute chunks alone reports a 600-point surplus that does not exist.
+  This is the local cell only: `productionReady: false`, OVH unverified, and
+  GraphRAG readiness is not claimed. One open service defect gates any
+  full-corpus re-run — the ingest path has no retry around the embeddings call,
+  so a single transient outbound failure kills an entire run; this wave needed
+  nine attempts.
+
+WAVE-127, WAVE-128, WAVE-129 and WAVE-131 are ingestion correctness fixes and
+source packaging carried on existing EPIC-004 items rather than new ones:
+WAVE-127 made the pre-extraction guard read-only and fixed fiscal store
+resolution; WAVE-128 narrowed upload transaction scope, which had held a
+transaction across the Marker call; WAVE-129 added the Kansas fiscal documents
+source package; WAVE-131 batched embedding requests under the 300,000-token cap
+with a strict vector/chunk ordering contract, making the 16 largest fiscal
+documents indexable for the first time. WAVE-130 is historical documentation
+proof whose key v1 requirements are superseded.
+
+**Not implemented, and not to be read as delivered:** the fiscal law-and-money
+GraphRAG line is open. WAVE-132 is *reopened* pending real fiscal data to govern
+design and acceptance; WAVE-133 and WAVE-134 are *in progress* with upstream
+integration pending; WAVE-135 and WAVE-136 are *proposed*. No canonical
+provision/action linking, typed traversal or graph runtime is delivered by the
+statute corpus above.
+
 ## EPIC-005 Model gateway/router
 
 - SVS-040 Vectorization mode registry — scaffolded; routed multimodal
