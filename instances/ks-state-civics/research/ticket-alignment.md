@@ -37,9 +37,11 @@ The manager's reuse direction stands, with the actual schema shapes recorded:
   owns the bounded compatible extension/mapping with KS-605 instead of inventing
   a separate publication policy or mislabeling subjects.
 
-The ongoing K.S.A. harvest continues independently. The old pre-harvest canary
-draft is superseded. Retained Session Laws support the appropriation milestone;
-current statutes contribute standing authority, definitions and lineage.
+The K.S.A. harvest is complete; the [retained-corpus audit](statute-harvest-handoff.md)
+records corrected filter and history-count denominators. The old pre-harvest
+canary draft stays superseded. Retained Session Laws support the appropriation
+milestone; current statutes contribute standing authority, definitions and
+unresolved lineage. Acquisition does not complete the canonical export.
 
 ## Handoff and verification
 

@@ -1,0 +1,64 @@
+{
+  "recorded_at": "2026-09-10T17:37:33.155554+00:00",
+  "scope": "planning artifacts only",
+  "exais_base_commit": "bb7e575016ed398a6f9379d6bddf4bda0ca8639f",
+  "statecivics_inspected_commit": "4cc4c262e3bf736c2140c833e55b3b13a8730aa5",
+  "artifact_sha256": {
+    "intent.md": "0bffd8dc49296c01594810dbf79efcb099063218a39b987e406d53e4dc4e6afd",
+    "project-alignment.md": "921d624d1fbeaa1f2a71df3c7224b36c7953162231929ddb08cabf0a065eafe4",
+    "tickets.base.json": "5a68299c3100f1867104abfedcc14087d9be926141d96ad86ed96830c6c40a35",
+    "tickets.enriched.json": "7dd8b7d00a98236afc654806b70427a2dc06f91649a141bf04cfc334ba029bda",
+    "build-contract.json": "fee51a27bf67e8e868b6821d8be0db58f468393f5493715b0df32f13b348cea5",
+    "stack.index.json": "4e10400430c7e0f8cddc9a00b00e8ffb99aaf62b273c46f65322ef5d18c16556"
+  },
+  "deterministic_gates": [
+    {
+      "stage": 1,
+      "command": "python3 .codex/skills/ticket-tranche/scripts/gate_check.py --stage 1 --artifact .tranche/kansas-fiscal-graphrag/tickets.base.json",
+      "passed": true,
+      "findings": []
+    },
+    {
+      "stage": 2,
+      "command": "python3 .codex/skills/ticket-tranche/scripts/gate_check.py --stage 2 --artifact .tranche/kansas-fiscal-graphrag/tickets.enriched.json --prev .tranche/kansas-fiscal-graphrag/tickets.base.json --repo-root .",
+      "passed": true,
+      "findings": []
+    },
+    {
+      "stage": 3,
+      "command": "python3 .codex/skills/ticket-tranche/scripts/gate_check.py --stage 3 --artifact .tranche/kansas-fiscal-graphrag/build-contract.json --prev .tranche/kansas-fiscal-graphrag/tickets.enriched.json --index .tranche/kansas-fiscal-graphrag/stack.index.json --repo-root .",
+      "passed": true,
+      "findings": []
+    }
+  ],
+  "critic_gates": {
+    "1": {
+      "verdict": "PASS",
+      "findings": []
+    },
+    "2": {
+      "verdict": "PASS",
+      "findings": []
+    },
+    "3": {
+      "verdict": "PASS",
+      "findings": []
+    }
+  },
+  "corrective_reruns": {
+    "stage_1": 0,
+    "stage_2": 1,
+    "stage_3": 1
+  },
+  "user_context_updates": 1,
+  "retained_ticket_ids": [
+    "T-001",
+    "T-002",
+    "T-003",
+    "T-004",
+    "T-005"
+  ],
+  "runtime_implementation": false,
+  "live_activation": false,
+  "committed": false
+}

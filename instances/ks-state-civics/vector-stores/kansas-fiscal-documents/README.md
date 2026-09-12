@@ -9,6 +9,13 @@ resolution status, and publication decisions remain in StateCivics canonical
 tables. Retrieval may locate a passage and return its official citation; it
 must never decide that two fiscal dimensions are the same.
 
+The [unified law-and-money handoff](../../../../docs/STATECIVICS_LAW_MONEY_ALIGNMENT.md)
+records the agreed upstream owners and correction tickets. KS-650 extends the
+existing document exporter with a second entity/relationship record kind;
+WAVE-133 through WAVE-136 consume typed structured/document evidence and prove
+real answers. Raw CSV ingestion remains outside this narrative lane. Provision
+identity comes from KS-600, while source spans retain their evidence role.
+
 Related instance research: [law-and-money backbone](../../research/law-and-money-backbone.md)
 records the open-source comparison and the classification, aggregation, and
 provision-evidence responsibilities agreed with the StateCivics developer manager.
@@ -108,3 +115,19 @@ all pass.
 API persistence, vector indexing, repeat-run zero mutation, and recall remain
 gated even though the representative Marker extraction and table-fidelity proof
 now pass.
+
+## Fiscal law-and-money GraphRAG
+
+WAVE-132 adds a fiscal handler and the explicit `fiscal_relationships` search
+lens for enacted provisions, appropriations, accounts, agencies, funds, and
+supporting documents. It is enabled only by an exact fiscal cell/store profile
+and a current reviewed graph run; semantic search remains independent.
+
+The disabled template is `graph/profile.example.yaml`. It is separate from the
+cell's court profile. The publisher adapter, staged load, and evaluation commands
+are documented in [the operator path](../../../../docs/FISCAL_GRAPH_OPERATOR.md).
+WAVE-132 remains reopened. KS-650 must extend the existing StateCivics exporter;
+WAVE-133 through WAVE-136 must replace the provisional PDF/chunk assumptions
+and prove real-source answers before activation. The current adapter envelope is
+not an upstream contract requirement. Synthetic runtime proof grants no source
+publication approval.

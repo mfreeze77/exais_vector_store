@@ -1,0 +1,168 @@
+{
+  "changed_files": [
+    "scripts/release/kansas-statute-rollout.py",
+    "tests/test_kansas_statute_rollout.py"
+  ],
+  "full_rollout_complete": false,
+  "launch": {
+    "container_name": "exais-kansas-statute-rollout-wave140-paced",
+    "executed": false,
+    "prepared_command": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/paced-launch-command.json",
+    "required_image_sha256": "e7271b65b0554f29c5378a0f39a9a2e5e3e4f46fc710138328ef4cf8515627c5",
+    "required_next_gate": "Independent WAVE-141 QC before activation under WAVE-140"
+  },
+  "new_coordinator_sha256": "3fd29bddec86366a5d5fb002558ab84bdf7c42c97d28596fc369b516bc5b1580",
+  "offline_plan": {
+    "api_calls": 0,
+    "chapters": 85,
+    "duration_seconds": 26.923243792029098,
+    "exit_code": 0,
+    "expected_chunks": 83258,
+    "expected_documents": 28812,
+    "network": "none",
+    "note": "28,235 upserts include two remaining exporter refreshes; current live accepted partial count is 579 documents, leaving 28,233 new documents.",
+    "planned": {
+      "noop": 2844,
+      "remove": 0,
+      "upsert": 28235
+    },
+    "records": 31079
+  },
+  "old_coordinator_sha256": "80923ec4623a39a49634e15c844baf01341d360f30393fa26e72ef055756c3b1",
+  "pacing_activated": false,
+  "pacing_policy": {
+    "catch_up": false,
+    "kind": "monotonic_serial_upsert_starts_v1",
+    "max_upserts_per_minute": 110,
+    "minimum_interval_seconds": 0.55,
+    "stop_poll_seconds": 0.1
+  },
+  "preservation_baseline": {
+    "chunks": 1518,
+    "documents": 579,
+    "owner": "root separate read-only live verifier",
+    "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/paused-preservation-baseline.json",
+    "sha256": "74ed9281e7eb93bbf0c04ba30768d34bfaf05390a847f91a9661c05f7e402bb9"
+  },
+  "raw_artifacts": [
+    {
+      "bytes": 3072,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/prepare-paced-transfer.py",
+      "sha256": "df0f675adfb31832bc3bdc067ff2d82f24e81cc4e317afc9bc953db83cfe1786"
+    },
+    {
+      "bytes": 19234,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout-paced/checkpoint-transfer.json",
+      "sha256": "b58919f2d5a1b08202b9d6b1714a280902b870b05b2e8759a0f70c82edc8570b"
+    },
+    {
+      "bytes": 8034,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout-paced/inputs.lock.json",
+      "sha256": "ee5b5595d2d167d5564caf8def7e68995a596615b2d7f086ed3a132ef9509769"
+    },
+    {
+      "bytes": 28087,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout-paced/plan-7e7b6d82d27744edb8e3de115e381fbc.json",
+      "sha256": "cbf51244a51e96f5be5ae7732acfcaf1917907f2a1dc133bbb0798180b9e3dfb"
+    },
+    {
+      "bytes": 1574,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/paced-plan-command.json",
+      "sha256": "82c73029598cc8d5c617b0897676b817ec9c1b3b6808f5ff14ff92a3aae78ee1"
+    },
+    {
+      "bytes": 104,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/paced-plan-execution.json",
+      "sha256": "434c1d04aa2a182652c345f3c6df59e700eb5dc1b8aa1a0e0ce3f8b4b516adb2"
+    },
+    {
+      "bytes": 175,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/paced-plan-output.log",
+      "sha256": "4351e19f879683e02e75556b49cf8cdafa067662334edb9596532f94deb4c46b"
+    },
+    {
+      "bytes": 3296,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/paced-launch-command.json",
+      "sha256": "706aa74316e3adfddf6aabb71851b3a6a2b8abaf7fa8f1f37d9c3deba4c18cd0"
+    },
+    {
+      "bytes": 1296,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/pacing-test-command.json",
+      "sha256": "17a5501cf55a6092870281d9522332dd2ff03d2e9721bcc6a34109e25c257aa9"
+    },
+    {
+      "bytes": 3781,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/pacing-tests.xml",
+      "sha256": "b9abddaa627ffce0c3a622b09aea6e8659c8e718231e77524e8cfa149b14130b"
+    },
+    {
+      "bytes": 181,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/pacing-tests.log",
+      "sha256": "8004ddf2f392010179d55579e2751c160508260aeaf06e538a5bc4e41c8b70f9"
+    },
+    {
+      "bytes": 104,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/pacing-test-execution.json",
+      "sha256": "1fb97bfb218e8f41fc6f9630d26929db7f573791f8be9bce94a122313db447bf"
+    },
+    {
+      "bytes": 17827,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/coordinator-3fd29bddec86366a5d5fb002558ab84bdf7c42c97d28596fc369b516bc5b1580.py",
+      "sha256": "3fd29bddec86366a5d5fb002558ab84bdf7c42c97d28596fc369b516bc5b1580"
+    }
+  ],
+  "scope": "Caller pacing and explicit checkpoint transfer only; unchanged deployed API/worker/provider/limiter/index/source",
+  "status": "IMPLEMENTATION_PASS_PENDING_INDEPENDENT_QC",
+  "tests": {
+    "api_calls": "isolated HTTP doubles only",
+    "coverage": [
+      "short bursts bounded to 110 starts/minute",
+      "slow operations cannot earn catch-up burst credits",
+      "stop-aware 0.1-second wait steps",
+      "noops/replay do not wait",
+      "no second real preview after pacing stop",
+      "pacing policy bound in lock/progress",
+      "old resume lock remains rejected",
+      "all existing real-input preparation/scope/recovery/idempotency tests"
+    ],
+    "duration_seconds": 27.64,
+    "network": "none",
+    "passed": 27,
+    "real_inputs_required": true,
+    "skipped": 0
+  },
+  "ticket": "WAVE-141",
+  "transfer": {
+    "classification": "explicit reviewed consumer upgrade; not identical-command resume",
+    "every_file_byte_identical": true,
+    "new_inputs_lock_sha256": "ee5b5595d2d167d5564caf8def7e68995a596615b2d7f086ed3a132ef9509769",
+    "new_root": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout-paced",
+    "old_root": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout",
+    "old_root_unchanged": true,
+    "original_w139_seed_unchanged": true,
+    "records_copied": 575,
+    "source_artifact_hashes": {
+      "inputs.lock.json": "8cba3d427492011af63c59d56ae6199aadf04698b5518301d390ddf355466723",
+      "progress.json": "2e4ad73dba081de4548b61972b3ca56192371f1b5f77e7958cbdfd2501bf3c57",
+      "states/ch001.json": "b2eeb8cb5a2dc0a377df75560d79458e7d66a5c71ed21bb0d589339155b480dc",
+      "states/ch002.json": "9a88530c23543698ee075db6fb140647dd54f11985156ae90a0e68752313b100",
+      "states/ch003.json": "24d0ca02ecbc55ffd410fb6fd3134218fd394d637f729ef47689d71223e30c36"
+    },
+    "state_files_copied": 3,
+    "subsequent_resume": "same new frozen command and exact new lock pins"
+  },
+  "trigger": {
+    "api_limit_per_minute": 120,
+    "checkpointed_records": 575,
+    "failed_chapter": "003",
+    "failed_source": "K.S.A. 3-319",
+    "local_api_status": 429
+  },
+  "independent_qc": {
+    "decision": "PASS WITH NOTES",
+    "proof": "wave-141-pacing-qc.md",
+    "tests_passed": 27,
+    "skipped": 0,
+    "seconds": 26.23
+  }
+}

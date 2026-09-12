@@ -6,6 +6,7 @@ from typing import Any, Literal
 
 from .query_planner import KANSAS_CIVICS_LEGAL_PROFILE_ID
 from .grant_graph import GRANT_CORPUS_KIND, GRANT_GRAPH_HANDLER_ID, GRANT_RELATIONS
+from .fiscal_graph import FISCAL_CORPUS_KIND, FISCAL_GRAPH_HANDLER_ID, FISCAL_RELATIONS
 
 
 SearchLensKind = Literal["semantic", "graph"]
@@ -66,6 +67,26 @@ SEARCH_LENS_REGISTRY: tuple[SearchLensDefinition, ...] = (
             "Requires an explicitly bound cell profile and an exact gip_generation_id equality filter.",
             "Canonical approvals are asserted by the authorized publisher, not independently verified by ExAIS.",
             "Coverage counts describe the loaded store, not completeness of the requested generation or grant corpus.",
+        ),
+    ),
+    SearchLensDefinition(
+        id="fiscal_relationships",
+        label="Law and Money Relationships",
+        description="Follow cited enacted provisions, appropriations, agencies, funds, accounts, and supporting budget documents.",
+        kind="graph",
+        corpus_kinds=(FISCAL_CORPUS_KIND,),
+        requires_graph=True,
+        graph_profile_id=FISCAL_GRAPH_HANDLER_ID,
+        handler_id=FISCAL_GRAPH_HANDLER_ID,
+        relation_types=FISCAL_RELATIONS,
+        input_schema=_object_schema({
+            "relationship": {"type": "string", "enum": ["all", *FISCAL_RELATIONS]},
+            "derivation_run_id": {"type": "string", "format": "uuid"},
+        }, required=("derivation_run_id",)),
+        caveats=(
+            "Requires the exact currently served derivation run; graph selection does not filter document files.",
+            "One hop through reviewed publisher assertions; authority does not establish expenditure or payment.",
+            "Counts describe the selected graph generation, not complete fiscal coverage.",
         ),
     ),
     SearchLensDefinition(
@@ -214,6 +235,8 @@ def corpus_kind_for_vector_store(attributes: dict[str, Any] | None, query_planne
         or corpus in {"topeka_municipal_code", "topeka-code", "topeka_code"}
     ):
         return TOPEKA_CORPUS_KIND
+    if corpus == FISCAL_CORPUS_KIND:
+        return FISCAL_CORPUS_KIND
     if query_planner_profile_id == KANSAS_CIVICS_LEGAL_PROFILE_ID:
         return None
     if corpus == GRANT_CORPUS_KIND:

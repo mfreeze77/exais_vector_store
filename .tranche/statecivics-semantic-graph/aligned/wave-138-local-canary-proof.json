@@ -1,0 +1,480 @@
+{
+  "api_container_network_url": "http://api:8080",
+  "api_host": "http://127.0.0.1:28085",
+  "api_ready": {
+    "db": true,
+    "qdrant": true,
+    "ready": true
+  },
+  "apply": {
+    "removed": 0,
+    "unchanged": 2,
+    "upserted": 4
+  },
+  "approved_records": 6,
+  "build_context": {
+    "archive_bytes": 7925760,
+    "archive_sha256": "e05ba853c98db8118b73409d392ccb065e83817fff855d1b912bb82c14d948d3",
+    "commit": "f0114e0bd956f45214f9b3dd4135d1bd400f36af",
+    "migration_diff": []
+  },
+  "business_instance_id": "biz_ks_state_civics",
+  "canonical_graphrag_activated": false,
+  "commit": "f0114e0bd956f45214f9b3dd4135d1bd400f36af",
+  "compose_project": "exais-vector-store-ks-fiscal-local",
+  "custody_namespace": "kansas_statutes",
+  "embedding": {
+    "dimensions": 1024,
+    "finite_nonzero_vectors": true,
+    "indexed_chunks": 62,
+    "matching_scoped_payloads": true,
+    "model": "voyage-4",
+    "postgres_fts_present": true,
+    "profile": "voyage_4_docs_1024",
+    "provider": "voyage",
+    "qdrant_points_verified": 62,
+    "usage_events": 4
+  },
+  "environment_preserved": true,
+  "excluded_documents": [
+    {
+      "reason": "empty_body",
+      "section": "60-3401"
+    },
+    {
+      "reason": "inline_history_only",
+      "section": "41-214"
+    }
+  ],
+  "fiscal_before_equals_after": true,
+  "fiscal_inventory": {
+    "chunks": {
+      "count": 13179,
+      "sha256": "f03127dd9f8f6b6f9a08e9bf8a07a0d3ac53dfcf21a706d29c15eb4c5ac397e3",
+      "corrected_count": 13180,
+      "correction": "the 13179 recorded here is a miscount; the store measures 13180 by three independent methods and its newest updated_at is still 2026-09-10T08:50:57Z, predating this document. 13180 is the baseline. Nothing was added and nothing is to be restored.",
+      "corrected_at": "2026-09-12",
+      "original_value_retained": 13179
+    },
+    "documents": {
+      "count": 69,
+      "sha256": "69650f8f27124a4b70b3cecdf58e8ee0ee3d472daedb50610b1b5f7157c113d4"
+    },
+    "files": {
+      "count": 69,
+      "sha256": "8896f88aa4e55a21a87b8ee3edf0fd7cd8a3129ad79fb47ba29969cea0620cd8"
+    },
+    "versions": {
+      "count": 69,
+      "sha256": "7f8d1df85421b72d8fae2e815d803d87578d61109dbd5a92a215d2ee64453dc3"
+    }
+  },
+  "harvest_manifest_sha256": "17bed3eec5f0946de1e2f5126b84b8637d9aa4b910199f98fe4c9f3e3eb207a2",
+  "image_test_result": {
+    "passed": 128,
+    "seconds": 14.24,
+    "skipped": 0
+  },
+  "images": {
+    "api": {
+      "architecture": "arm64",
+      "created": "2026-09-11T14:07:20.091709836Z",
+      "id": "sha256:e7271b65b0554f29c5378a0f39a9a2e5e3e4f46fc710138328ef4cf8515627c5",
+      "reference": "exais-ks-fiscal/api:wave138-f0114e0"
+    },
+    "worker": {
+      "architecture": "arm64",
+      "created": "2026-09-11T14:08:39.318702012Z",
+      "id": "sha256:d66e0316f93ca4bc7493ec135063747b122e7dc8a8f321530066e3aa2bacc387",
+      "reference": "exais-ks-fiscal/worker:wave138-f0114e0"
+    }
+  },
+  "independent_qc": "wave-138-local-canary-qc.md",
+  "indexed_documents": [
+    {
+      "chunks": 2,
+      "document_id": "doc_d1e8c84ff60840b782e7be7b",
+      "section": "1-204",
+      "sha256": "7f8cf97c69746dc7358a227f75b695f3d04a360fa986d72311c76b0e4646fba8",
+      "source_url": "https://ksrevisor.gov/statutes/chapters/ch01/001_002_0004.html",
+      "version_id": "docv_ba32dfdef29942708361a210"
+    },
+    {
+      "chunks": 2,
+      "document_id": "doc_d9586930129a4e5cb87781a2",
+      "section": "2-303",
+      "sha256": "5501388fc2e8da55cef32d49d15e7f5f14c0b20341d43e9f46d8c4cb381c7d02",
+      "source_url": "https://ksrevisor.gov/statutes/chapters/ch02/002_003_0003.html",
+      "version_id": "docv_fa51bc80390c4e20a34eecc9"
+    },
+    {
+      "chunks": 7,
+      "document_id": "doc_b68c91e8f15b4bfc83c9a508",
+      "section": "73-201",
+      "sha256": "0fdec938ba323916318c69b107d963e153cbe6e2965d70db4b5f58fe9651ce15",
+      "source_url": "https://ksrevisor.gov/statutes/chapters/ch73/073_002_0001.html",
+      "version_id": "docv_a0854ca4cd8b4270a78cfb09"
+    },
+    {
+      "chunks": 51,
+      "document_id": "doc_d617f17950484ff7b2aaa702",
+      "section": "79-3606",
+      "sha256": "bfb19a7c558c635450563964c1571fa3dcd99756494aea82c6fa2b54b7e4c4f7",
+      "source_url": "https://ksrevisor.gov/statutes/chapters/ch79/079_036_0006.html",
+      "version_id": "docv_2f399342778e4bd090944cfd"
+    }
+  ],
+  "infrastructure_container_ids_preserved": true,
+  "input_export_bytes": 10954,
+  "input_export_sha256": "c9a06920795b47d92c8d336395ab94c459fa8404e029a92708444d06276ea3a7",
+  "knowledge_base_id": "kb_ks_civics",
+  "local_proof_only": true,
+  "logical_instance": "ks-state-civics",
+  "marker_actual_values_preserved": {
+    "api_max_attempts": 1,
+    "timeout_seconds_both": 14400,
+    "worker_max_attempts": 2
+  },
+  "old_application_image_ids": {
+    "api": "sha256:965b02f21d310304f767cc9e34b24c22814089fb7e19d867d0286aac9e483895",
+    "worker": "sha256:051d7ee8c29476d61e361995956829766223759c1e2be181b9ea6d98b92dcd8d"
+  },
+  "ovh_activated": false,
+  "physical_cell": "ks-fiscal-local",
+  "ports_and_volumes_preserved": true,
+  "production_ready": false,
+  "provider_http_evidence": {
+    "captured_api_image": "sha256:e7271b65b0554f29c5378a0f39a9a2e5e3e4f46fc710138328ef4cf8515627c5",
+    "counts": {
+      "Voyage embeddings HTTP 200": 12,
+      "compatibility search HTTP 200": 4,
+      "document ingestion HTTP 200": 4,
+      "ingestion preview HTTP 200": 4,
+      "native search HTTP 200": 4
+    },
+    "endpoint": "https://api.voyageai.com/v1/embeddings",
+    "events": [
+      "ingestion preview HTTP 200",
+      "Voyage embeddings HTTP 200",
+      "document ingestion HTTP 200",
+      "ingestion preview HTTP 200",
+      "Voyage embeddings HTTP 200",
+      "document ingestion HTTP 200",
+      "ingestion preview HTTP 200",
+      "Voyage embeddings HTTP 200",
+      "document ingestion HTTP 200",
+      "ingestion preview HTTP 200",
+      "Voyage embeddings HTTP 200",
+      "document ingestion HTTP 200",
+      "Voyage embeddings HTTP 200",
+      "compatibility search HTTP 200",
+      "Voyage embeddings HTTP 200",
+      "compatibility search HTTP 200",
+      "Voyage embeddings HTTP 200",
+      "compatibility search HTTP 200",
+      "Voyage embeddings HTTP 200",
+      "compatibility search HTTP 200",
+      "Voyage embeddings HTTP 200",
+      "native search HTTP 200",
+      "Voyage embeddings HTTP 200",
+      "native search HTTP 200",
+      "Voyage embeddings HTTP 200",
+      "native search HTTP 200",
+      "Voyage embeddings HTTP 200",
+      "native search HTTP 200"
+    ],
+    "request_headers_or_credentials_captured": false
+  },
+  "queue": [
+    {
+      "count": 3,
+      "status": "completed"
+    }
+  ],
+  "raw_artifacts": [
+    {
+      "bytes": 20288,
+      "path": ".release/cells/ks-fiscal-local/wave-138/baseline.json",
+      "sha256": "45392d32c5cded6b833511f9d18a0be1032374779132fb42bc1158ceabe84b62"
+    },
+    {
+      "bytes": 20601,
+      "path": ".release/cells/ks-fiscal-local/wave-138/upgraded.json",
+      "sha256": "3cbcb28c4f59533457a9429737bb3850241734df21b747692872ec306ca952bf"
+    },
+    {
+      "bytes": 21654,
+      "path": ".release/cells/ks-fiscal-local/wave-138/final.json",
+      "sha256": "7bea6e5520a2922ac29d67b78662e10fcd91d3276d7c3a7453d6136ed8469a9e"
+    },
+    {
+      "bytes": 199,
+      "path": ".release/cells/ks-fiscal-local/wave-138/build-context.json",
+      "sha256": "bd23729e52b2e386e722b0cf556a70339491d9ee31dda711c71f67b16e9eb406"
+    },
+    {
+      "bytes": 477,
+      "path": ".release/cells/ks-fiscal-local/wave-138/application-images.json",
+      "sha256": "54e4f7759cd8dcf0349031025b5b937b18a9649b0b1091087bbcbfd2ff785a64"
+    },
+    {
+      "bytes": 6198,
+      "path": ".release/cells/ks-fiscal-local/wave-138/compose-baseline.json",
+      "sha256": "47da14dbcbd1b0290defeba6e4cb1f02296a7f26c0db00e7710605fd9aea1ab0"
+    },
+    {
+      "bytes": 241,
+      "path": ".release/cells/ks-fiscal-local/wave-138/application.override.yml",
+      "sha256": "40ecef362c4e80ef84cb1587e293865da82976a74f3975083ae0363bd2ddc0e8"
+    },
+    {
+      "bytes": 241,
+      "path": ".release/cells/ks-fiscal-local/wave-138/rollback.override.yml",
+      "sha256": "4085f1eae4dc0747907d49dd79a776461643bd9d4fa68b49d39906c41f2bac30"
+    },
+    {
+      "bytes": 727,
+      "path": ".release/cells/ks-fiscal-local/wave-138/activate.sh",
+      "sha256": "b80af9333695f1dd3becceb6d6fc1df857221635a8fc2b99f994d5c405e315d3"
+    },
+    {
+      "bytes": 724,
+      "path": ".release/cells/ks-fiscal-local/wave-138/rollback.sh",
+      "sha256": "98f608d4c75d52212220a408bc4609b175951d809914cae1f6a75c6efaff5694"
+    },
+    {
+      "bytes": 1393,
+      "path": ".release/cells/ks-fiscal-local/wave-138/apply-command.sh",
+      "sha256": "08b6afeabe7b1d325833e8a2a4b4a284eaacb1a1c76aa14fc51ce3f110dd7410"
+    },
+    {
+      "bytes": 1394,
+      "path": ".release/cells/ks-fiscal-local/wave-138/replay-command.sh",
+      "sha256": "ea47d5b178fafb80c4677ffd9141f9b217b1468385e01283f090fb4e7566546c"
+    },
+    {
+      "bytes": 10954,
+      "path": ".release/cells/ks-fiscal-local/wave-138/approved-export.jsonl",
+      "sha256": "c9a06920795b47d92c8d336395ab94c459fa8404e029a92708444d06276ea3a7"
+    },
+    {
+      "bytes": 1681,
+      "path": ".release/cells/ks-fiscal-local/wave-138/apply-proof.json",
+      "sha256": "b83707d4a0244f9ba135ed11bc77d507431f67f837255566e9c74e2cb7f02961"
+    },
+    {
+      "bytes": 1677,
+      "path": ".release/cells/ks-fiscal-local/wave-138/replay-proof.json",
+      "sha256": "bc374f5a37b0869f59d1842afd5283f5708ec97da7416cc7d5b2fe46499eb7c0"
+    },
+    {
+      "bytes": 2635,
+      "path": ".release/cells/ks-fiscal-local/wave-138/statute-state.json",
+      "sha256": "bfb88ed4beb8a5b66b8e1d9586346069da212ed77b79062742275fed2143d85d"
+    },
+    {
+      "bytes": 826,
+      "path": ".release/cells/ks-fiscal-local/wave-138/statute-store.json",
+      "sha256": "629711a5b6d711ae86c7cf488c8781c8f6a402cfa2e464edf224eef2485adb3d"
+    },
+    {
+      "bytes": 1122638,
+      "path": ".release/cells/ks-fiscal-local/wave-138/statute-db-applied.json",
+      "sha256": "8126c7ddba0dc892981c8542ae1d56eeb7972455f535593565de08d178b0f959"
+    },
+    {
+      "bytes": 1122638,
+      "path": ".release/cells/ks-fiscal-local/wave-138/statute-db-replayed.json",
+      "sha256": "8126c7ddba0dc892981c8542ae1d56eeb7972455f535593565de08d178b0f959"
+    },
+    {
+      "bytes": 504745,
+      "path": ".release/cells/ks-fiscal-local/wave-138/semantic-recall.json",
+      "sha256": "ea73faa4ea2c9f0eea2a4fdc9086a9057b68bfc7e72dfd849a8357ce139e6d3d"
+    },
+    {
+      "bytes": 455807,
+      "path": ".release/cells/ks-fiscal-local/wave-138/native-recall.json",
+      "sha256": "4a399c2e06ac9afb7fb5cae8a95c253ba7afe067b5d5a817ce741813bd438590"
+    },
+    {
+      "bytes": 38767,
+      "path": ".release/cells/ks-fiscal-local/wave-138/coordinate-checks.json",
+      "sha256": "0af8365cec5d51babfd7d9ebe8875b9d14f17c848087824a7c42969865ac5fde"
+    },
+    {
+      "bytes": 9109,
+      "path": ".release/cells/ks-fiscal-local/wave-138/retrieval-audits.json",
+      "sha256": "f118c310e60cb2c19fdf517c2e6270f6212e81fb114de5b3a09fd680bedec424"
+    },
+    {
+      "bytes": 1384,
+      "path": ".release/cells/ks-fiscal-local/wave-138/provider-http-evidence.json",
+      "sha256": "23004eee7d5171c247f92a7ed9ef10c87933db97c39a6674dab24bd4694ba43d"
+    },
+    {
+      "bytes": 19873,
+      "path": ".release/cells/ks-fiscal-local/wave-138/image-tests.xml",
+      "sha256": "073b364be5033d2d29e99c827fd061cddc036c2d721bb0697bf595bb771c73a6"
+    },
+    {
+      "bytes": 262,
+      "path": ".release/cells/ks-fiscal-local/wave-138/image-tests.log",
+      "sha256": "65f57d2555941675470061d11d653772dcd2cd31a705e83df2bbb11cf30afc00"
+    },
+    {
+      "bytes": 3656,
+      "path": ".release/cells/ks-fiscal-local/wave-138/snapshot.py",
+      "sha256": "271c0e4ffe3b5b86f9a39bd0fddf667d378b92805065db0413fc742fab5a010a"
+    },
+    {
+      "bytes": 2700,
+      "path": ".release/cells/ks-fiscal-local/wave-138/deploy.py",
+      "sha256": "2a1567caada883e4fbeffb716634fd824477229ab653feb96274c83c8924fc9c"
+    },
+    {
+      "bytes": 1609,
+      "path": ".release/cells/ks-fiscal-local/wave-138/create-store.py",
+      "sha256": "455e3d7c981a3a0a65bd0090efdf575340c1859180f3b2831696aa86d01b09a9"
+    },
+    {
+      "bytes": 2099,
+      "path": ".release/cells/ks-fiscal-local/wave-138/run-canary.py",
+      "sha256": "47d6f1e71585e62117e7a6110872c886c4609e5b35f51276692e558b057582d0"
+    },
+    {
+      "bytes": 3464,
+      "path": ".release/cells/ks-fiscal-local/wave-138/statute-db-check.py",
+      "sha256": "38d676dfe33858ea64e40fb4eebb9c17f53d0380425b081babc1d1902cafc26b"
+    },
+    {
+      "bytes": 1622,
+      "path": ".release/cells/ks-fiscal-local/wave-138/semantic-recall.py",
+      "sha256": "713437610a13bd6633e6cd387be2030e00353f0ef69e5368038a0b6b98afe0ac"
+    },
+    {
+      "bytes": 3929,
+      "path": ".release/cells/ks-fiscal-local/wave-138/verify-evidence.py",
+      "sha256": "24418c46922206545e8fb4c5d5a0e4327f8b19c7a5a88c8bcdd450e60a1c07da"
+    }
+  ],
+  "recall": [
+    {
+      "dense_weight": 1.0,
+      "expected_section": "1-204",
+      "first_hit": {
+        "char_end": 1060,
+        "char_start": 232,
+        "chunk_id": "chk_ed9e1d076d784454920da9d6",
+        "line_end": 9,
+        "line_start": 7,
+        "section": "1-204",
+        "source_revision_id": "01a08f05-f914-70a4-9401-fa19bb9a62d5",
+        "source_sha256": "7f8cf97c69746dc7358a227f75b695f3d04a360fa986d72311c76b0e4646fba8",
+        "source_url": "https://ksrevisor.gov/statutes/chapters/ch01/001_002_0004.html",
+        "statute_region": "statute_body",
+        "text_sha256": "523ae943e62088a0d4fa36a2307061dc1b6ff59d9249a363cea8d0ff969d7351"
+      },
+      "native_audit_id": "aud_e957f6c76a7d4719943eb274",
+      "query": "Where do penalties collected by the accounting licensing board go, and what authorizes withdrawals?",
+      "rank": 1,
+      "reranker": "none",
+      "returned_hits_verified": 5,
+      "sparse_weight": 0.0
+    },
+    {
+      "dense_weight": 1.0,
+      "expected_section": "2-303",
+      "first_hit": {
+        "char_end": 326,
+        "char_start": 210,
+        "chunk_id": "chk_e564a543230c4269bb3bcebc",
+        "line_end": 9,
+        "line_start": 7,
+        "section": "2-303",
+        "source_revision_id": "01a08f05-f91e-77bf-b605-287517efb9d0",
+        "source_sha256": "5501388fc2e8da55cef32d49d15e7f5f14c0b20341d43e9f46d8c4cb381c7d02",
+        "source_url": "https://ksrevisor.gov/statutes/chapters/ch02/002_003_0003.html",
+        "statute_region": "statute_body",
+        "text_sha256": "239666e66ae708fa136a85e9691d1f9ee92e0c1aedc807b02a64628b6e3a9d97"
+      },
+      "native_audit_id": "aud_b4158602891548669ac32f47",
+      "query": "Can county fair money fund prizes for speed contests?",
+      "rank": 1,
+      "reranker": "none",
+      "returned_hits_verified": 5,
+      "sparse_weight": 0.0
+    },
+    {
+      "dense_weight": 1.0,
+      "expected_section": "73-201",
+      "first_hit": {
+        "char_end": 7313,
+        "char_start": 5879,
+        "chunk_id": "chk_75a4b3c35cf74d7dbf676acf",
+        "line_end": 61,
+        "line_start": 44,
+        "section": "73-201",
+        "source_revision_id": "01a08f05-f92e-7501-9867-950458be82d8",
+        "source_sha256": "0fdec938ba323916318c69b107d963e153cbe6e2965d70db4b5f58fe9651ce15",
+        "source_url": "https://ksrevisor.gov/statutes/chapters/ch73/073_002_0001.html",
+        "statute_region": "statute_body",
+        "text_sha256": "ec7774210c38cc5272c9be82b20a2c4080ee40fa9fba7680bcf2b0020a551ca7"
+      },
+      "native_audit_id": "aud_932b26d711304aadb1147cca",
+      "query": "Do military veterans receive a hiring preference for jobs in state or local government?",
+      "rank": 1,
+      "reranker": "none",
+      "returned_hits_verified": 5,
+      "sparse_weight": 0.0
+    },
+    {
+      "dense_weight": 1.0,
+      "expected_section": "79-3606",
+      "first_hit": {
+        "char_end": 20541,
+        "char_start": 17031,
+        "chunk_id": "chk_821c0ba9989f42e8b1122d13",
+        "line_end": 53,
+        "line_start": 46,
+        "section": "79-3606",
+        "source_revision_id": "01a08f05-f935-77fd-8aaf-aeb353ebe163",
+        "source_sha256": "bfb19a7c558c635450563964c1571fa3dcd99756494aea82c6fa2b54b7e4c4f7",
+        "source_url": "https://ksrevisor.gov/statutes/chapters/ch79/079_036_0006.html",
+        "statute_region": "statute_body",
+        "text_sha256": "bda1e72796c8aeea49bb9891355b8f0c2a6baa946486055e2456cefe72452586"
+      },
+      "native_audit_id": "aud_7c366b3ad48f442aa00acef9",
+      "query": "Which farm equipment purchases escape retail sales tax, and are replacement parts included?",
+      "rank": 1,
+      "reranker": "none",
+      "returned_hits_verified": 5,
+      "sparse_weight": 0.0
+    }
+  ],
+  "recorded_at_utc": "2026-09-11T14:29:51.974645+00:00",
+  "replay": {
+    "removed": 0,
+    "unchanged": 6,
+    "upserted": 0
+  },
+  "replay_database_versions_chunks_embeddings_vectors_and_ingestion_usage_unchanged": true,
+  "retrieval_api_boundary": {
+    "compatibility": "/v1/vector_stores/{id}/search decorates text with citation markers and returns document attributes; do not hash the decorated string as source text",
+    "native": "/api/v1/retrieval/search returns exact text and chunk metadata coordinates"
+  },
+  "retrieval_audits_verified": 8,
+  "retrieved_chunk_coordinates_verified": 20,
+  "schema_revision": [
+    {
+      "version_num": "004_wave125_caller_identity"
+    }
+  ],
+  "status": "local_canary_verified_independent_qc_pass_with_notes",
+  "stored_chunk_coordinates_verified": 62,
+  "tenant_id": "ten_ks_state_civics",
+  "ticket": "WAVE-138",
+  "user_id": "usr_ks_state_civics_admin",
+  "vector_store_id": "vs_daafbc5d7aa54b23b3f10392",
+  "worker_healthy": true
+}

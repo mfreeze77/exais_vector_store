@@ -4,6 +4,9 @@ Instance declaration: [instance.yaml](instance.yaml).
 
 ## Research and agreed direction
 
+- [Completed K.S.A. harvest and ingestion handoff](research/statute-harvest-handoff.md)
+  — verified retained-file counts, duplicate history denominators and the
+  content-based triage required before statute embeddings.
 - [Corrected tickets and handoff](research/ticket-alignment.md)
   — the unified StateCivics/ExAIS ownership map and active planning artifacts.
 - [Law-and-money backbone: open-source research](research/law-and-money-backbone.md)
@@ -19,6 +22,8 @@ Instance declaration: [instance.yaml](instance.yaml).
 
 ## Vector stores
 
+- [Kansas statutes](vector-stores/kansas-statutes/README.md) — retained-corpus
+  preparation and custody-export consumer; live activation pending.
 - [Kansas fiscal documents](vector-stores/kansas-fiscal-documents/README.md)
 - [Kansas court decisions](vector-stores/kansas-court-decisions/README.md)
 - [Topeka municipal code](vector-stores/topeka-municipal-code/README.md)

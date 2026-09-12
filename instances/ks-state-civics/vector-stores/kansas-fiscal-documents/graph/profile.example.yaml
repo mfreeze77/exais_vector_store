@@ -1,0 +1,16 @@
+# Operator template: replace the pending store ID with the actual fiscal store.
+# Mount this file only in the State Civics fiscal API deployment and set
+# SVS_CELL_GRAPH_PROFILE_PATH to that absolute in-container path.
+# The existing State Civics court graph manifest is a different profile.
+schema_version: svs.cell-graph.v1
+profile_id: ks-state-civics.kansas-fiscal-documents.v1
+handler_id: kansas_fiscal_law_money_graph_v1
+corpus_kind: kansas_fiscal_documents
+binding:
+  tenant_id: ten_ks_state_civics
+  business_instance_id: biz_ks_state_civics
+  vector_store_ids:
+    - vs_kansas_fiscal_documents_pending
+enabled: false
+max_expansions: 3
+max_hops: 1

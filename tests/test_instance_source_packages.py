@@ -29,7 +29,7 @@ def test_ks_civics_source_package_validates_in_production():
         production=True,
     )
 
-    assert len(packages) == 4
+    assert len(packages) == 5
     assert issues == []
     package = next(item for item in packages if item.source_slug == "kscourts-decisions")
     assert package.vector_store_slug == "kansas-court-decisions"

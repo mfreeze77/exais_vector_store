@@ -1,0 +1,410 @@
+{
+  "code_head": "872f7e23441a7bdf8cd2d7b5fc981004fca79610",
+  "coordinates": {
+    "canonical_graph_claims": false,
+    "convention": "zero-based end-exclusive Unicode code points; one-based inclusive LF-delimited lines; no invented page coordinates",
+    "exact_chunk_slice_and_text_hash": true,
+    "retrieved_chunks_verified": 10,
+    "source_bytes_sha256_verified": true,
+    "stored_chunks_verified": 99
+  },
+  "execution": [
+    {
+      "chapter": "007",
+      "duration_seconds": 13.126451958087273,
+      "exit_code": 0,
+      "input_sha256": "8b85996a9c6948ed07fb5581e0fa8df4a9ba0b35e14bf0a874c57d94bd306537",
+      "phase": "apply",
+      "started_unix": 1789139850.488359,
+      "state_after_sha256": "59d76476e075c8c5a1b9746ffe3f8bc47998431ee8aa14236a2bb39b0e4fb21e",
+      "state_before_sha256": "bfb88ed4beb8a5b66b8e1d9586346069da212ed77b79062742275fed2143d85d",
+      "voyage_requests_after": 17,
+      "voyage_requests_before": 12,
+      "voyage_requests_delta": 5
+    },
+    {
+      "chapter": "011",
+      "duration_seconds": 13.71958612499293,
+      "exit_code": 0,
+      "input_sha256": "a2e7060b0376a7b58dea9a162a37eacc77e5d8e93066bbe8ed6da5b83f0c623a",
+      "phase": "apply",
+      "started_unix": 1789139895.820758,
+      "state_after_sha256": "b64003f370c161c45c6dc5384951ea787242cba56be6446b12327099755d5c2d",
+      "state_before_sha256": "59d76476e075c8c5a1b9746ffe3f8bc47998431ee8aa14236a2bb39b0e4fb21e",
+      "voyage_requests_after": 23,
+      "voyage_requests_before": 17,
+      "voyage_requests_delta": 6
+    },
+    {
+      "chapter": "007",
+      "duration_seconds": 11.058841667021625,
+      "exit_code": 0,
+      "input_sha256": "8b85996a9c6948ed07fb5581e0fa8df4a9ba0b35e14bf0a874c57d94bd306537",
+      "phase": "replay",
+      "started_unix": 1789139928.6211681,
+      "state_after_sha256": "b64003f370c161c45c6dc5384951ea787242cba56be6446b12327099755d5c2d",
+      "state_before_sha256": "b64003f370c161c45c6dc5384951ea787242cba56be6446b12327099755d5c2d",
+      "voyage_requests_after": 23,
+      "voyage_requests_before": 23,
+      "voyage_requests_delta": 0
+    },
+    {
+      "chapter": "011",
+      "duration_seconds": 11.036082167061977,
+      "exit_code": 0,
+      "input_sha256": "a2e7060b0376a7b58dea9a162a37eacc77e5d8e93066bbe8ed6da5b83f0c623a",
+      "phase": "replay",
+      "started_unix": 1789139939.7496362,
+      "state_after_sha256": "b64003f370c161c45c6dc5384951ea787242cba56be6446b12327099755d5c2d",
+      "state_before_sha256": "b64003f370c161c45c6dc5384951ea787242cba56be6446b12327099755d5c2d",
+      "voyage_requests_after": 23,
+      "voyage_requests_before": 23,
+      "voyage_requests_delta": 0
+    }
+  ],
+  "input_audit": {
+    "auditor_result": "PASS_INPUT_BYTES_WITH_NONBLOCKING_LABEL_GUARD_FINDING",
+    "chunks": 83258,
+    "exclusions": 2267,
+    "history_edges": "unresolved source metadata, no canonical edges",
+    "indexable_documents": 28812,
+    "path": ".tranche/statecivics-semantic-graph/aligned/statute-chapter-export-audit-summary.json",
+    "records": 31079,
+    "sha256": "e4cffd67e94f8eaed865474d89e491237c887c8ae0b4dcea456c748f81cd90c5",
+    "tranches": 85
+  },
+  "limitations": [
+    "Full rollout awaits independent QC and WAVE-140.",
+    "No current-law determination, canonical statute/provision/action identities, or resolved History graph edges.",
+    "Latent upstream display-label substring validation finding is manager-owned; audited delivered custody/corpus joins are valid.",
+    "Reexport live proof calls only the actual read-only selector with existing verified content hash/context; it does not submit chapter001 or write an ingestion."
+  ],
+  "live": {
+    "added_chunks": 37,
+    "added_documents": 11,
+    "api": "http://127.0.0.1:28085",
+    "cell": "ks-fiscal-local",
+    "chunks_after_007": 84,
+    "chunks_before": 62,
+    "chunks_final": 99,
+    "documents_after_007": 9,
+    "documents_before": 4,
+    "documents_final": 15,
+    "embedding_profile": "voyage_4_docs_1024",
+    "graph_enabled": false,
+    "new_exclusions": 3,
+    "production_ready": false,
+    "profile": "statecivics_statute_markdown_v1",
+    "runner_api": "http://api:8080",
+    "vector_dimensions": 1024,
+    "vector_store_id": "vs_daafbc5d7aa54b23b3f10392"
+  },
+  "live_code_revision": "f0114e0",
+  "preservation": {
+    "all_prior_document_version_chunk_embedding_ids": true,
+    "all_prior_vector_fingerprints": true,
+    "fiscal_snapshot": {
+      "chunks": {
+        "count": 13179,
+        "sha256": "f03127dd9f8f6b6f9a08e9bf8a07a0d3ac53dfcf21a706d29c15eb4c5ac397e3",
+        "corrected_count": 13180,
+        "correction": "the 13179 recorded here is a miscount; the store measures 13180 by three independent methods and its newest updated_at is still 2026-09-10T08:50:57Z, predating this document. 13180 is the baseline. Nothing was added and nothing is to be restored.",
+        "corrected_at": "2026-09-12",
+        "original_value_retained": 13179
+      },
+      "documents": {
+        "count": 69,
+        "sha256": "69650f8f27124a4b70b3cecdf58e8ee0ee3d472daedb50610b1b5f7157c113d4"
+      },
+      "files": {
+        "count": 69,
+        "sha256": "8896f88aa4e55a21a87b8ee3edf0fd7cd8a3129ad79fb47ba29969cea0620cd8"
+      },
+      "versions": {
+        "count": 69,
+        "sha256": "7f8d1df85421b72d8fae2e815d803d87578d61109dbd5a92a215d2ee64453dc3"
+      }
+    },
+    "original_canary_state": true,
+    "replay_db_and_qdrant_snapshot_byte_identical": true,
+    "runtime_configuration_fingerprints": true,
+    "schema_revision": [
+      {
+        "version_num": "004_wave125_caller_identity"
+      }
+    ]
+  },
+  "provider": {
+    "actual_dense_query_requests": 2,
+    "actual_successful_ingestion_batch_requests": 11,
+    "billed_tokens": "not returned by current retained application evidence; not estimated",
+    "cost": "not evaluated; not a rollout gate",
+    "ingestion_duration_seconds": 26.846038083080202,
+    "replay_requests": 0
+  },
+  "raw_evidence": [
+    {
+      "bytes": 21654,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/baseline.json",
+      "sha256": "7bea6e5520a2922ac29d67b78662e10fcd91d3276d7c3a7453d6136ed8469a9e"
+    },
+    {
+      "bytes": 2793,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/ch007-apply-execution.json",
+      "sha256": "0d7a9d6919dd681533eb10dd28ae9cda6bd6554098f1dd54105f7d77fa5e91dc"
+    },
+    {
+      "bytes": 1658,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/ch007-apply.json",
+      "sha256": "a2cc22d75ce55f370faa630a1cba0bea9976d7cf4f2b97bdf477bef09b0063ef"
+    },
+    {
+      "bytes": 1658,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/ch007-apply.log",
+      "sha256": "a2cc22d75ce55f370faa630a1cba0bea9976d7cf4f2b97bdf477bef09b0063ef"
+    },
+    {
+      "bytes": 2314,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/ch007-replay-execution.json",
+      "sha256": "82a361fa70cb07176f061288571934b982e4534ce6c2b804e0eb52a61ebda43a"
+    },
+    {
+      "bytes": 1653,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/ch007-replay.json",
+      "sha256": "1a6217eaddd711e07d93aef57867428c9107a6ed9c34217265e108194cc9b756"
+    },
+    {
+      "bytes": 1653,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/ch007-replay.log",
+      "sha256": "1a6217eaddd711e07d93aef57867428c9107a6ed9c34217265e108194cc9b756"
+    },
+    {
+      "bytes": 2888,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/ch011-apply-execution.json",
+      "sha256": "6b812ec6c20f06af780123fa037c65dac04f4f53afd62254edb385b2bdcb2bfa"
+    },
+    {
+      "bytes": 2030,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/ch011-apply.json",
+      "sha256": "07d5f19cf4c41879b84b50137bf03a0f62d9eb57d468e8d5049d93887465cffc"
+    },
+    {
+      "bytes": 2030,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/ch011-apply.log",
+      "sha256": "07d5f19cf4c41879b84b50137bf03a0f62d9eb57d468e8d5049d93887465cffc"
+    },
+    {
+      "bytes": 2314,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/ch011-replay-execution.json",
+      "sha256": "a036459cfbaa32084535e7105d78c0bd398c11ed8b90461ea855bb4db332c9d0"
+    },
+    {
+      "bytes": 2024,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/ch011-replay.json",
+      "sha256": "f9ca60f7df751c2b713f1d7eeeabede27345ec702160dc9f99c00050dca24330"
+    },
+    {
+      "bytes": 2024,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/ch011-replay.log",
+      "sha256": "f9ca60f7df751c2b713f1d7eeeabede27345ec702160dc9f99c00050dca24330"
+    },
+    {
+      "bytes": 57634,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/coordinate-checks.json",
+      "sha256": "93f05b4bfe145a5592b39e7f971c6a89dd69f96fc89480add2a00e02e3399641"
+    },
+    {
+      "bytes": 1248132,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/db-after-007.json",
+      "sha256": "0d496f390ff22b56e41f5e08eec44525d3938af6222b29040c833ccb6139956a"
+    },
+    {
+      "bytes": 1333882,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/db-after-011.json",
+      "sha256": "78c185b7876f76fe3d9f83a92d103bac6bdac0c5afc44b48188c1d00425bc6b3"
+    },
+    {
+      "bytes": 1123871,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/db-baseline.json",
+      "sha256": "251a6a8ac9dad8fb26e2583c78651d0ad2e4cf6d210d6f8b4a9222f219b80a13"
+    },
+    {
+      "bytes": 1333882,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/db-replayed.json",
+      "sha256": "78c185b7876f76fe3d9f83a92d103bac6bdac0c5afc44b48188c1d00425bc6b3"
+    },
+    {
+      "bytes": 21656,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/final.json",
+      "sha256": "28e9ea2ab5b40820c5408d787c4d2d359b4131b95086173677d73337d548210b"
+    },
+    {
+      "bytes": 68196,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/native-recall.json",
+      "sha256": "8c080f17342c2b2f7692e8cb57eb6743c4c4690b73b65e03a598ec9df7027050"
+    },
+    {
+      "bytes": 1413,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/provider-http-evidence.json",
+      "sha256": "1f6c85e9e0da148d102d9c43d58068dfead80fecc33dad13a822360283e41fc0"
+    },
+    {
+      "bytes": 791,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/reexport-dedupe-readonly.json",
+      "sha256": "47500fd9d954bed7487e465ac301d3e57f226217cb26f39562613a225b4c0edf"
+    },
+    {
+      "bytes": 4788,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/reexport-dedupe-readonly.py",
+      "sha256": "b27fa2963aae3103e2998601ce05c50cbc09a9d7efa19c2e0f34f1fafbd56fbe"
+    },
+    {
+      "bytes": 1515,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/retrieval-audits.json",
+      "sha256": "566f5a394c907fef43a6bf1deccd0358aca73c1c355d8d2e27594224f446fb5e"
+    },
+    {
+      "bytes": 3514,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/run-chapter.py",
+      "sha256": "f767a6504865bf5b7af5484c9c03ac129d857d8617620e1df693c349c61bfe76"
+    },
+    {
+      "bytes": 2635,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/seed-state.json",
+      "sha256": "bfb88ed4beb8a5b66b8e1d9586346069da212ed77b79062742275fed2143d85d"
+    },
+    {
+      "bytes": 3656,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/snapshot.py",
+      "sha256": "271c0e4ffe3b5b86f9a39bd0fddf667d378b92805065db0413fc742fab5a010a"
+    },
+    {
+      "bytes": 5407,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/state-after-007.json",
+      "sha256": "59d76476e075c8c5a1b9746ffe3f8bc47998431ee8aa14236a2bb39b0e4fb21e"
+    },
+    {
+      "bytes": 8947,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/state-after-011.json",
+      "sha256": "b64003f370c161c45c6dc5384951ea787242cba56be6446b12327099755d5c2d"
+    },
+    {
+      "bytes": 3588,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/statute-db-check.py",
+      "sha256": "86e107b3067de03c8753cc100bfe926dd0befe739a0bcb321943af4dc91f6cb3"
+    },
+    {
+      "bytes": 181,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/tranche-tests.log",
+      "sha256": "1c9d2990e85b25d9d953cb88e246bd044bd46dd342d00bb23e12fd4b4e4aa1a9"
+    },
+    {
+      "bytes": 6187,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/tranche-tests.xml",
+      "sha256": "44567b975c872c3017590ac1211ec4f679ced88766d8a6988540b34ec16b021b"
+    },
+    {
+      "bytes": 4295,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/verify-evidence.py",
+      "sha256": "bdf1036751d582b20eb8e9a7b517611b62cdd8f2898960e0c360ee07cd83cde0"
+    },
+    {
+      "bytes": 781,
+      "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-139/verify-retrieval-audit.py",
+      "sha256": "d4486f7099ae4e99bfa6611320b7b00679da46b2eb5817d3493a51737426c37d"
+    }
+  ],
+  "recall": [
+    {
+      "dense_weight": 1.0,
+      "expected_section": "7-127",
+      "first_hit": {
+        "char_end": 2118,
+        "char_start": 266,
+        "chunk_id": "chk_3f2f6d81925342b8af68164d",
+        "line_end": 15,
+        "line_start": 7,
+        "section": "7-127",
+        "source_revision_id": "01a090f3-bad6-77e8-8df8-6ad59c622f06",
+        "source_sha256": "980caf2d575a399d17bef3c21caa04bd6af32eced1f276336fe84646003efe37",
+        "source_url": "https://ksrevisor.gov/statutes/chapters/ch07/007_001_0027.html",
+        "statute_region": "statute_body",
+        "text_sha256": "44d6de0a09b1d2a70e53c5073081245b347eb3d44e6c3ae0a0031d4194732c2f"
+      },
+      "native_audit_id": "aud_5da61959de1c41fea6e9bddf",
+      "query": "Can the highest state court require would-be lawyers to provide fingerprints for a nationwide criminal background check?",
+      "rank": 1,
+      "reranker": "none",
+      "returned_hits_verified": 5,
+      "sparse_weight": 0.0
+    },
+    {
+      "dense_weight": 1.0,
+      "expected_section": "11-210",
+      "first_hit": {
+        "char_end": 479,
+        "char_start": 208,
+        "chunk_id": "chk_49a9cb3038cd40dabf9e7cbc",
+        "line_end": 9,
+        "line_start": 7,
+        "section": "11-210",
+        "source_revision_id": "01a090f3-efae-7389-8022-7ad46d201076",
+        "source_sha256": "de3701d4cbdeeb13c8b4d5fbea1fb78dffe0a3e66d80c1df891120f3b289b020",
+        "source_url": "https://ksrevisor.gov/statutes/chapters/ch11/011_002_0010.html",
+        "statute_region": "statute_body",
+        "text_sha256": "b784b2d9c5d7b93e9ea8d93dda5010c2b5cbb38536737f0f35b5d9b394888f22"
+      },
+      "native_audit_id": "aud_a48c6cba091d43d5a73f015b",
+      "query": "When a local government seeks a grant, is it restricted to one official population count or can it use any available census figures?",
+      "rank": 1,
+      "reranker": "none",
+      "returned_hits_verified": 5,
+      "sparse_weight": 0.0
+    }
+  ],
+  "reexport_dedupe": {
+    "content_hash_sha256": "7f8cf97c69746dc7358a227f75b695f3d04a360fa986d72311c76b0e4646fba8",
+    "evidence_context_unchanged": true,
+    "new_export_digest": "c08f490dca30081297dba7043ba8d7b3b90b8641b163bd54bd379e97498282c0",
+    "new_exporter_commit": "63ae57b9221ed7a8eaf44ac57622b7025aea556e",
+    "old_export_digest": "e7e36d781af1d16a97928d2eecbd3aa53511848ba694ec1e48abb4a4a4537200",
+    "old_exporter_commit": "a54590b3b3ec8de064ae2b59ed620290750d2d4f",
+    "provider_calls": 0,
+    "read_only": true,
+    "selector": "IngestionService._find_exact_duplicate",
+    "source_identity": "12c6db31c11074d9f01cdd85c90a3d6a6c0c51b1c063c207938cbcce46e59ef0",
+    "source_revision_id": "01a08f05-f914-70a4-9401-fa19bb9a62d5",
+    "stored_document_id": "doc_d1e8c84ff60840b782e7be7b",
+    "stored_version_id": "docv_ba32dfdef29942708361a210"
+  },
+  "remaining": {
+    "chapter_tranches_not_applied": 83,
+    "chunks_not_indexed": 83159,
+    "exclusions_not_processed": 2262,
+    "records_not_in_shared_state": 31059,
+    "substantive_documents_not_indexed": 28797
+  },
+  "scope": "Existing consumer proof and actual chapter 007/011 ingestion only; no deployment or production code changes",
+  "state": {
+    "omitted_canary_and_chapter_entries_preserved": true,
+    "original_canary_unchanged": true,
+    "path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/ks-fiscal-local-kansas-statutes.json",
+    "record_count": 20,
+    "serialized_lock_path": "/Users/mfrieson/Developer/statecivics-statute-ingestion/ks-fiscal-local-kansas-statutes.lock",
+    "sha256": "b64003f370c161c45c6dc5384951ea787242cba56be6446b12327099755d5c2d"
+  },
+  "status": "IMPLEMENTATION_PROOF_PASS_PENDING_INDEPENDENT_QC",
+  "tests": {
+    "duration_seconds": 11.62,
+    "files": [
+      "tests/test_kansas_statute_tranches.py",
+      "tests/test_kansas_statute_ingest.py",
+      "tests/test_ingestion_metadata_refresh.py"
+    ],
+    "http_doubles": "isolated test-only; explicit withdrawal never sent live",
+    "new_characterizations": 4,
+    "passed": 39,
+    "skipped": 0
+  },
+  "ticket": "WAVE-139"
+}

@@ -1,8 +1,8 @@
 from __future__ import annotations
 from datetime import datetime
 from enum import IntEnum
-from typing import Any, Literal, get_args
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, RootModel, field_validator, model_validator
+from typing import Annotated, Any, Literal, get_args
+from pydantic import AfterValidator, BaseModel, BeforeValidator, ConfigDict, Field, PrivateAttr, RootModel, field_validator, model_validator
 from .openai_metadata import validate_openai_metadata
 from .secrets import parse_secret_reference
 
@@ -1731,6 +1731,283 @@ class ContextCitation(BaseModel):
     source_chunk_id: str | None = None
     neighbor_offset: int | None = None
     parent_heading_path: list[str] = Field(default_factory=list)
+
+
+# WAVE-133 offline foundation. These are internal shape checks, not the KS-650
+# producer contract, publication decisions, or API response/request extensions.
+# The historical graph loader and ContextCitation deliberately do not use them.
+class _FiscalOfflineModel(BaseModel):
+    model_config = ConfigDict(extra='forbid', strict=True, frozen=True, revalidate_instances='always')
+
+
+def _fiscal_opaque_text(value: str) -> str:
+    if not value.strip() or any(ord(char) < 32 or ord(char) == 127 for char in value):
+        raise ValueError('fiscal reference must be nonblank and contain no control characters')
+    return value
+
+
+FiscalOpaqueText = Annotated[str, Field(min_length=1, max_length=256), AfterValidator(_fiscal_opaque_text)]
+FiscalSha256 = Annotated[str, Field(pattern=r'^[0-9a-f]{64}$')]
+
+
+def _fiscal_description(value: str) -> str:
+    if not value.strip():
+        raise ValueError('fiscal description must not be blank')
+    return value
+
+
+FiscalDescription = Annotated[str, Field(min_length=1, max_length=2048), AfterValidator(_fiscal_description)]
+
+
+def _fiscal_json_object(value: str) -> str:
+    """Preserve opaque upstream keys in a small immutable, canonical JSON value."""
+    import json
+    import math
+
+    if len(value.encode('utf-8')) > 16384:
+        raise ValueError('fiscal opaque JSON exceeds 16384 bytes')
+
+    def pairs(items):
+        result = {}
+        for key, item in items:
+            if key in result:
+                raise ValueError('fiscal opaque JSON contains duplicate keys')
+            result[key] = item
+        return result
+
+    def invalid_constant(_):
+        raise ValueError('fiscal opaque JSON requires finite numbers')
+
+    try:
+        parsed = json.loads(value, object_pairs_hook=pairs, parse_constant=invalid_constant)
+    except (RecursionError, OverflowError) as exc:
+        raise ValueError('fiscal opaque JSON is too deeply nested') from exc
+    if not isinstance(parsed, dict):
+        raise ValueError('fiscal opaque JSON must be an object')
+    pending = [(parsed, 0)]
+    count = 0
+    while pending:
+        item, depth = pending.pop()
+        count += 1
+        if depth > 8 or count > 1024:
+            raise ValueError('fiscal opaque JSON exceeds depth or item limit')
+        if isinstance(item, float) and not math.isfinite(item):
+            raise ValueError('fiscal opaque JSON requires finite numbers')
+        if isinstance(item, dict):
+            pending.extend((child, depth + 1) for child in item.values())
+        elif isinstance(item, list):
+            pending.extend((child, depth + 1) for child in item)
+    return json.dumps(parsed, ensure_ascii=False, sort_keys=True, separators=(',', ':'), allow_nan=False)
+
+
+FiscalOpaqueJsonObject = Annotated[str, Field(max_length=16384), AfterValidator(_fiscal_json_object)]
+
+
+def _fiscal_tuple(value):
+    # Permit JSON arrays while refusing generators, sets and coercive iterables.
+    if type(value) not in (tuple, list):
+        raise ValueError('fiscal collection must be an array or tuple')
+    return tuple(value)
+
+
+class FiscalCanonicalReference(_FiscalOfflineModel):
+    """Opaque supplied upstream identity/revision; never derived from a locator."""
+    type: FiscalOpaqueText
+    id: FiscalOpaqueText
+    revision_or_hash: FiscalOpaqueText
+
+
+class FiscalProjectionScope(_FiscalOfflineModel):
+    tenant_id: FiscalOpaqueText
+    business_instance_id: FiscalOpaqueText
+    vector_store_id: Annotated[str, Field(pattern=r'^vs_[A-Za-z0-9_-]{1,124}$')]
+
+
+class FiscalStructuredRecordLocator(_FiscalOfflineModel):
+    # A logical CSV data record, excluding its header; not a physical line/page.
+    kind: Literal['csv_record'] = 'csv_record'
+    data_record_1based: Annotated[int, Field(ge=1, le=100000)]
+    header_records: Literal[1] = 1
+    # Optional parser diagnostic, not the logical record identity or a page.
+    # A physical line consumes at least one byte in the verifier's <=16 MiB CSV.
+    # Keep this local bound independent of the artifact module (which imports us).
+    physical_line_end_1based: Annotated[int, Field(ge=1, le=16 * 1024 * 1024)] | None = None
+    selected_columns: Annotated[tuple[FiscalOpaqueText, ...], BeforeValidator(_fiscal_tuple), Field(max_length=256)] = ()
+
+    @field_validator('header_records', mode='before')
+    @classmethod
+    def _strict_header_count(cls, value):
+        if type(value) is not int:
+            raise ValueError('header_records must be an integer')
+        return value
+
+    @field_validator('selected_columns')
+    @classmethod
+    def _distinct_columns(cls, value):
+        if len(value) != len(set(value)):
+            raise ValueError('selected columns must be distinct')
+        return value
+
+    @model_validator(mode='after')
+    def _physical_line_bound(self):
+        if (self.physical_line_end_1based is not None and
+                self.physical_line_end_1based < self.data_record_1based + self.header_records):
+            raise ValueError('physical line end cannot precede the data record plus header')
+        return self
+
+
+class _FiscalSourceEvidence(_FiscalOfflineModel):
+    source_revision_id: FiscalOpaqueText
+    source_content_hash_sha256: FiscalSha256
+    # Unknown parsed/extraction identity stays unknown. A later eligible adapter
+    # must enforce the actual KS-650 prerequisites before this can be served.
+    extraction_revision_id: FiscalOpaqueText | None = None
+    extraction_content_hash_sha256: FiscalSha256 | None = None
+    citation_url: Annotated[str, Field(min_length=1, max_length=2048)] | None = None
+
+    @model_validator(mode='after')
+    def _paired_extraction(self):
+        if (self.extraction_revision_id is None) != (self.extraction_content_hash_sha256 is None):
+            raise ValueError('extraction revision and hash must be supplied together')
+        return self
+
+    @field_validator('citation_url')
+    @classmethod
+    def _public_url_shape(cls, value):
+        from urllib.parse import urlsplit
+        if value is not None:
+            parsed = urlsplit(value)
+            if (parsed.scheme not in {'http', 'https'} or not parsed.hostname or
+                    parsed.username is not None or parsed.password is not None or
+                    any(char.isspace() or ord(char) < 32 for char in value)):
+                raise ValueError('citation URL must be an HTTP(S) URL without credentials')
+        return value
+
+
+class FiscalStructuredRecordEvidence(_FiscalSourceEvidence):
+    evidence_kind: Literal['structured_record'] = 'structured_record'
+    locator: FiscalStructuredRecordLocator
+    # Existing audit digest: canonical {headers: [...], values: [...]} JSON.
+    raw_record_sha256: FiscalSha256
+    observation_id: FiscalOpaqueText | None = None
+    parser_revision: FiscalOpaqueText | None = None
+
+
+class FiscalDocumentSpanEvidence(_FiscalSourceEvidence):
+    evidence_kind: Literal['document_span'] = 'document_span'
+    source_span_id: FiscalOpaqueText
+    span_type: FiscalOpaqueText
+    # Exact upstream SourceSpan.locator keys are not a new ExAIS taxonomy.
+    locator_json: FiscalOpaqueJsonObject
+    content_hash_sha256: FiscalSha256
+    document_id: FiscalOpaqueText | None = None
+    chunk_id: FiscalOpaqueText | None = None
+
+    @model_validator(mode='after')
+    def _document_binding_shape(self):
+        if self.locator_json == '{}':
+            raise ValueError('document span requires a nonempty exact locator')
+        if self.chunk_id is not None and self.document_id is None:
+            raise ValueError('a chunk binding requires its document identity')
+        return self
+
+
+FiscalSourceEvidence = Annotated[
+    FiscalStructuredRecordEvidence | FiscalDocumentSpanEvidence,
+    Field(discriminator='evidence_kind'),
+]
+
+
+class FiscalEvidenceCitation(_FiscalOfflineModel):
+    """Native evidence shape, distinct from ContextCitation; not service-ready."""
+    canonical_reference: FiscalCanonicalReference
+    evidence: FiscalSourceEvidence
+
+
+class FiscalProjectionNode(_FiscalOfflineModel):
+    projection_id: Annotated[str, Field(pattern=r'^fiscal2:node:[0-9a-f]{64}$')]
+    canonical_reference: FiscalCanonicalReference
+    description: FiscalDescription | None = None
+    # Opaque supplied canonical values, including null subunit/effective dates.
+    structured_fields_json: FiscalOpaqueJsonObject = '{}'
+    evidence: Annotated[tuple[FiscalSourceEvidence, ...], BeforeValidator(_fiscal_tuple), Field(min_length=1, max_length=20)]
+
+
+class FiscalProjectionEdge(_FiscalOfflineModel):
+    projection_id: Annotated[str, Field(pattern=r'^fiscal2:edge:[0-9a-f]{64}$')]
+    canonical_reference: FiscalCanonicalReference
+    relationship_type: FiscalOpaqueText
+    source_node_id: Annotated[str, Field(pattern=r'^fiscal2:node:[0-9a-f]{64}$')]
+    target_node_id: Annotated[str, Field(pattern=r'^fiscal2:node:[0-9a-f]{64}$')]
+    # An explicit assertion only. Membership in a joint run never generates edges.
+    context_json: FiscalOpaqueJsonObject = '{}'
+    evidence: Annotated[tuple[FiscalSourceEvidence, ...], BeforeValidator(_fiscal_tuple), Field(min_length=1, max_length=20)]
+
+
+class FiscalProjectionCounts(_FiscalOfflineModel):
+    nodes: Annotated[int, Field(ge=0, le=256000)]
+    edges: Annotated[int, Field(ge=0, le=512000)]
+    descriptions: Annotated[int, Field(ge=0, le=256000)]
+
+    @model_validator(mode='after')
+    def _descriptor_count(self):
+        if self.descriptions > self.nodes:
+            raise ValueError('description count cannot exceed node count')
+        return self
+
+
+class FiscalProjectionBatch(_FiscalOfflineModel):
+    schema_version: Literal['exais.fiscal-projection.offline.v1'] = 'exais.fiscal-projection.offline.v1'
+    scope: FiscalProjectionScope
+    partition_id: FiscalOpaqueText
+    expected_counts: FiscalProjectionCounts
+    content_hash: FiscalSha256
+    nodes: Annotated[tuple[FiscalProjectionNode, ...], BeforeValidator(_fiscal_tuple), Field(max_length=1000)]
+    edges: Annotated[tuple[FiscalProjectionEdge, ...], BeforeValidator(_fiscal_tuple), Field(max_length=2000)]
+
+
+class FiscalProjectionPartition(_FiscalOfflineModel):
+    partition_id: FiscalOpaqueText
+    content_hash: FiscalSha256
+    expected_counts: FiscalProjectionCounts
+
+
+class FiscalProjectionManifest(_FiscalOfflineModel):
+    schema_version: Literal['exais.fiscal-projection-manifest.offline.v1'] = 'exais.fiscal-projection-manifest.offline.v1'
+    manifest_id: FiscalOpaqueText
+    scope: FiscalProjectionScope
+    snapshot_reference: FiscalCanonicalReference
+    source_revision_set_hash_sha256: FiscalSha256
+    derivation_run_ids: Annotated[tuple[FiscalOpaqueText, ...], BeforeValidator(_fiscal_tuple), Field(max_length=256)] = ()
+    profile_ids: Annotated[tuple[FiscalOpaqueText, ...], BeforeValidator(_fiscal_tuple), Field(max_length=32)] = ()
+    partitions: Annotated[tuple[FiscalProjectionPartition, ...], BeforeValidator(_fiscal_tuple), Field(min_length=1, max_length=256)]
+    total_expected_counts: FiscalProjectionCounts
+    content_hash: FiscalSha256
+
+    @field_validator('derivation_run_ids', 'profile_ids')
+    @classmethod
+    def _distinct_refs(cls, value):
+        if len(value) != len(set(value)):
+            raise ValueError('manifest references must be distinct')
+        return value
+
+
+class FiscalEntityResult(_FiscalOfflineModel):
+    """Internal native entity representation; intentionally not a ChunkRecord."""
+    canonical_reference: FiscalCanonicalReference
+    description: FiscalDescription | None = None
+    structured_fields_json: FiscalOpaqueJsonObject = '{}'
+    evidence: Annotated[tuple[FiscalEvidenceCitation, ...], BeforeValidator(_fiscal_tuple), Field(min_length=1, max_length=20)]
+    snapshot_reference: FiscalCanonicalReference
+    manifest_id: FiscalOpaqueText
+    score: Annotated[float, Field(allow_inf_nan=False)] | None = None
+
+    @model_validator(mode='after')
+    def _citation_subjects(self):
+        if any(citation.canonical_reference != self.canonical_reference for citation in self.evidence):
+            raise ValueError('entity citation canonical subject does not match its result')
+        return self
+
 
 class ContextPackResponse(BaseModel):
     query: str
