@@ -55,6 +55,67 @@ Follow [the agreed law-and-money handoff](../docs/STATECIVICS_LAW_MONEY_ALIGNMEN
 
 Use the shared-owner map in [build-contract.json](../.tranche/statecivics-semantic-graph/aligned/build-contract.json) and look up affected files/symbols in [stack.index.json](../.tranche/statecivics-semantic-graph/aligned/stack.index.json). These are local planning artifacts; their signatures describe future work unless marked existing. Runtime must not depend on worktree paths or these planning files.
 
+### 2026-09-12 — P5-PLAN lane B: vocabulary, version dispatch, KS-650 adapter
+
+Verified against StateCivics `e94a894e`, which moved to `1de6312e` mid-session.
+
+**Vocabulary.** `FISCAL_RELATIONS` (fiscal_graph.py:32) has five names, *none with
+a producer*. A repo-wide sweep found no script, fixture, artifact, DB seed or
+dump that ever emitted one; they exist only as the constant, the `_ENDPOINTS` map
+(:50), prose in CELL_GRAPH_PROFILES.md, and runtime-synthesised test literals
+(fiscal_graph_test_support.py:44, test_fiscal_graph_artifact.py:67).
+`kansas-fiscal-graphrag.py` echoes operator input and generates nothing; the only
+recorded edge count, 5, is a rolled-back synthetic PostgreSQL transaction. A owns
+canonical identity and edges, so B adopts A's four names verbatim; B's five
+survive only as `derived` with a producer, and none qualifies now.
+
+| B relation | A canonical edge | Ruling |
+|---|---|---|
+| `contains_appropriation` | `action_relies_on_provision` | Nearest match but **not** a rename: direction reversed, containment != reliance. A's name wins. |
+| `targets_account` | — | No counterpart; A v1 has no `budget_account`. Retire. |
+| `account_of_agency` / `account_in_fund` | — | Retire. |
+| `documented_by` | — | A's entity branch carries no document identity by design. Retire. |
+| — | `action_enacted_by_bill_version` | New; B holds this as node attribute `fiscal_bill_version_id`, not an edge. |
+| — | `provision_supersedes_provision`, `action_supersedes_action` | New; B has no supersession vocabulary. |
+
+Edge-name intersection is empty. Node types intersect on `appropriation_action`
+only — a **collision, not a match**: B keys it by span/chunk binding, A by
+`(entity_logical_id, entity_revision)`. A's `provision_reference` is likewise not
+B's `enacted_provision` (ledger vs SourceSpan UUID). Merge neither.
+
+**Version dispatch.** Beside the constants at fiscal_graph_artifact.py:27-28 add
+`ENTITY_PROJECTION_SCHEMA_VERSION = "statecivics.entity-projection-record.v1"` and
+`ENTITY_ARTIFACT_MANIFEST_VERSION = "exais.fiscal-entity-graph-artifact.v1"`, and
+dispatch on `(record_kind, record_version)` read from those two keys alone,
+mirroring the guards at :387 and :507 — raise on unknown, no fallback, no default.
+
+**Adapter.** `build_fiscal_graph_artifact` cannot be extended — A's B1 manifest is
+a different shape (JSONL records, no envelope, no `derivation_run`, no chunk
+evidence). Add a sibling `build_entity_projection_artifact`. Reuse
+`validate_vector_store_id`; extend `_eligible` for A's four eligibility fields;
+**do not call `_bind_evidence`** (entity records have no chunk). New:
+`_entity_node_key` keying `(logical_id, revision)`, `_entity_edge` for the four
+types, `validate_built_entity_artifact`. Description text embedded ONLY from A's
+`description.text`; `ingestion.action == "remove"` becomes a removal.
+
+It must NOT derive edges from similarity, section labels or account-label
+normalization; invent a `logical_document_id` (A omits it deliberately, yet
+`fiscal_logical_document_id` is a required sha256 today); read the prohibited joins
+(`vector_similarity`, `fuzzy_name_match`, `code_suffix_match_without_context`,
+`llm_assertion`); or require `fiscal_year`, which A's entity records lack.
+
+Tests: unknown kind/version refused with no fallback; `(logical_id, revision)`
+identity and the `appropriation_action` collision; all four edge types plus
+rejection of a fifth; tombstone carries no entity/description/derivation;
+description bytes equal A's and never synthesised; no chunk binding attempted; a
+target outside the batch (B raises on dangling today — decide and pin that).
+
+**Spend (P5-BUILD).** Tests use a fake embedding provider: zero tokens. One real
+end-to-end run only — at most 20 fixture descriptions, each capped at 600 chars by
+`compact_description`, into the new entity store, cell `ks-fiscal-local` only:
+~3,000 embedding tokens (20 x ~150) plus ~200 for a recall probe, so **under
+5,000 tokens in one request**, far below the 300k per-request cap.
+
 ## Deliverables
 
 - [packages/svs_common/svs_common/fiscal_graph.py](../packages/svs_common/svs_common/fiscal_graph.py) — Own v2 identity, evidence, relation, partition and manifest validation. Shared file owner: WAVE-133. Edit sequence: WAVE-133 → WAVE-134 → WAVE-135.

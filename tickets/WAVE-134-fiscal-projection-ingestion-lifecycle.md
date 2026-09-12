@@ -71,6 +71,63 @@ whole-book line metadata or the observed erroneous page 214 cannot pass.
 
 Use the shared-owner map in [build-contract.json](../.tranche/statecivics-semantic-graph/aligned/build-contract.json) and look up affected files/symbols in [stack.index.json](../.tranche/statecivics-semantic-graph/aligned/stack.index.json). These are local planning artifacts; their signatures describe future work unless marked existing. Runtime must not depend on worktree paths or these planning files.
 
+### 2026-09-12 — P5-PLAN lane B: entity-projection ingestion
+
+**Dispatch site.** `kansas-fiscal-document-ingest.py` has no record dispatch
+today: `load_manifest` (:300) calls `_validate_record` (:137) unconditionally,
+and that function's first act is a required-field loop that includes
+`logical_document_id` — the one field A's entity branch deliberately omits.
+`record_kind` appears zero times in the script (confirmed by grep count and by
+an AST walk of the loop's literal tuple). An A B1 manifest therefore fails today
+with `manifest line N: missing logical_document_id`, which is a shape error
+masquerading as a data error.
+
+The dispatch belongs at the top of the per-line loop in `load_manifest`, before
+`_validate_record`: read `record_kind`/`record_version` from the line and route
+to `_validate_record` (untagged) or a new `_validate_entity_record` (tagged),
+raising on any other kind or version with no fallback. Keep the two record kinds
+in separate id-uniqueness namespaces — the existing `logical_ids` set cannot be
+reused, because entity identity is `(entity_logical_id, entity_revision)` and
+`export_record_id` is the only field the two branches share.
+
+**Store id.** Entity projections go to a NEW vector store, never
+`vs_kansas_fiscal_documents_pending`, `vs_kansas_statutes_pending` or any
+document collection. Proposed: `vs_ks_fiscal_entities_v1` (slug
+`kansas-fiscal-entities`), its own source package and its own `source.lock.json`
+pinned to the **entity** branch digest.
+
+A new store id is NOT sufficient, and this is the round's sharpest finding.
+`svs_biz_ks_state_civics_voyage_4_docs_1024` is a **Qdrant collection**, not a
+store id, and `QdrantAdapter.collection_name` (qdrant_adapter.py:40) derives it
+from `business_instance_id` + `embedding_profile_id` + index-version suffix —
+`vector_store_id` is not an input. A new store on the same instance with
+`voyage_4_docs_1024` lands its points in exactly the shared collection that the
+instruction forbids, beside the 83,858 statute + fiscal document points. Keeping
+entity points out of it requires a **distinct embedding profile**, e.g.
+`voyage_4_entities_1024`, giving `svs_biz_ks_state_civics_voyage_4_entities_1024`.
+That is an owner decision: it is a new profile, not a rename.
+
+**Lifecycle.** `ingestion.action == "remove"` DELETES the point; it does not
+write a tombstone. A's removal record is identity-minimal by construction (no
+`entity`, no `description`, no `derivation`), so there is nothing to retain and
+retaining a shell would be a fabricated record. The tombstone lives upstream in
+A's ledger, where `lifecycle.state` and `replaced_by` are columns; B's store
+holds current state only. Mirror the existing `updatePolicy`: removal-first,
+dry-run required. `lifecycle.removal_required` must agree with the action, as
+`_validate_record` already enforces for documents (:233).
+
+**Idempotency.** Extend `ingest_idempotency_key` (:530) rather than adding a
+second scheme: key on `(vector_store_id, entity_logical_id, entity_revision,
+action, record_digest_sha256)`. `record_digest_sha256` already covers A's
+description text and template hashes, so a re-export that changes nothing
+re-plans as a noop, and a changed description re-embeds exactly once. Do not key
+on `export_record_id` alone — A derives it from entity kind, logical id,
+revision and exporter version, so an exporter version bump would re-embed the
+whole store for no semantic change.
+
+**Spend.** See WAVE-133's note: fake embedding provider in tests, one real run of
+at most 20 descriptions in `ks-fiscal-local`, under 5,000 tokens total.
+
 ## Deliverables
 
 - [scripts/release/kansas-fiscal-document-ingest.py](../scripts/release/kansas-fiscal-document-ingest.py) — Single upstream manifest consumer gains explicit record dispatch. Shared file owner: WAVE-134. Edit sequence: WAVE-134.
