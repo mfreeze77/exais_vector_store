@@ -105,7 +105,7 @@
     },
     "fullRollout": {
       "ticket": "WAVE-140",
-      "status": "paced_launch_pending",
+      "status": "complete",
       "expectedIndexedDocuments": 28812,
       "expectedIndexedChunks": 83258,
       "remainingNewDocumentsAfterStage": 28797,
@@ -116,9 +116,9 @@
       "costIsNotAnApprovalGate": true,
       "coordinatorQc": "PASS WITH NOTES",
       "coordinatorQcProof": ".tranche/statecivics-semantic-graph/aligned/wave-140-coordinator-qc.md",
-      "container": "exais-kansas-statute-rollout-wave140",
-      "consumerCommit": "eb1d181162738db9e4620b7bbc4e59f554ca522b",
-      "coordinatorSha256": "80923ec4623a39a49634e15c844baf01341d360f30393fa26e72ef055756c3b1",
+      "container": "exais-kansas-statute-rollout-wave140-paced",
+      "consumerCommit": "87fbe41",
+      "coordinatorSha256": "3fd29bddec86366a5d5fb002558ab84bdf7c42c97d28596fc369b516bc5b1580",
       "checkpointedRecordsBeforePause": 575,
       "pacingTicket": "WAVE-141",
       "pacingQc": "PASS WITH NOTES",
@@ -127,7 +127,38 @@
       "pausedInventory": {
         "documents": 579,
         "chunks": 1518
-      }
+      },
+      "completedAt": "2026-09-11T22:34:29Z",
+      "containerExitCode": 0,
+      "completedChapters": 85,
+      "attempts": 9,
+      "documents": 28812,
+      "chunks": 83258,
+      "embeddings": 83258,
+      "versions": 28812,
+      "perChapterMatchesIndex": true,
+      "qdrantPoints": 83858,
+      "qdrantCollectionShared": "svs_biz_ks_state_civics_voyage_4_docs_1024 holds 83,258 statute + 600 fiscal",
+      "acceptance": {
+        "verdict": "PASS",
+        "cases": 53,
+        "passed": 48,
+        "rank1": 38,
+        "withinRank5": 47,
+        "blocking": 0,
+        "retrievalQualityFindings": [
+          "2-303",
+          "12-520",
+          "16-1909",
+          "19-3309",
+          "59-2118"
+        ],
+        "slicesVerifiedAgainstCustody": 530,
+        "verificationFailures": 0,
+        "caseSetSha256": "d0be6835ad0fd7e1de6d1c0e4e7b40f65050ff69370b382e29a1aa951bbf9eaf",
+        "decisionRuleSha256": "cc50b63246133beef36ce85365c9524099851e926f02ac68e1e9a784ff708c79"
+      },
+      "openDefect": "no retry around the embeddings call; one transient outbound failure kills the run. Nine attempts were needed. Not fixed in WAVE-140; gates any full-corpus re-run."
     }
   }
 }

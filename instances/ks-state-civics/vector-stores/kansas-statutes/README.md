@@ -142,7 +142,11 @@ passed with notes. The first full run stopped at the existing API rate limit aft
 records. [WAVE-141](../../../../tickets/WAVE-141-kansas-statute-rollout-pacing.md)
 added reviewed caller pacing at up to 110 upserts/minute;
 the verified paused inventory contains 579 documents and 1,518 chunks;
-progress is retained at `/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout/progress.json`.
+the paced run completed 2026-09-11T22:34:29Z in `exais-kansas-statute-rollout-wave140-paced` (exit 0, 85/85 chapters, nine attempts).
+The store holds **28,812 documents / 83,258 chunks / 83,258 embeddings**, every
+chapter exact against `INDEX.json`; acceptance PASS (48/53, 0 blocking, 530 slices
+re-verified against custody with 0 failures).
+Progress is retained at `/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout-paced/progress.json`.
 Full live verification is still required before reporting corpus completion.
 
 ## Evidence versus search

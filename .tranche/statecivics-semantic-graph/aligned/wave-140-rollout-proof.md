@@ -1,9 +1,73 @@
-# WAVE-140 coordinator proof — QC accepted, bulk launch pending
+# WAVE-140 rollout proof — complete
 
-The coordinator is implemented and verified. **No full-corpus application has
-started.** This proof accepts neither live rollout completion nor GraphRAG
-readiness. [Independent coordinator QC](wave-140-coordinator-qc.md) passed with notes before activation; final live
-verification and QC remain later requirements of WAVE-140.
+The reviewed WAVE-141 caller pacer passed independent QC and was committed at
+`87fbe41`. The full rollout **completed 2026-09-11T22:34:29Z**, container exit 0,
+`status: completed`, 85 of 85 chapters, in
+`exais-kansas-statute-rollout-wave140-paced`, using the explicitly transferred
+`rollout-paced` checkpoints and unchanged API image/limit. Transfer, frozen code,
+seed and image hashes were reverified before launch and the image pin was
+reverified after each of two API restarts. Final live verification and the
+acceptance run are recorded below. Independent QC remains required; **GraphRAG
+readiness is not claimed and production readiness is not claimed** — this is the
+local cell only, `productionReady: false`, OVH unverified.
+
+It took **nine attempts and eight replays**. Resume is idempotent: completed
+chapters replay as `unchanged` in ~20s, and across all nine attempts not one
+document acquired a second version.
+
+## Final live verification
+
+| | Expected | Actual |
+|---|---:|---:|
+| Indexable documents | 28,812 | **28,812** |
+| Active chunks | 83,258 | **83,258** |
+| Embeddings | == chunks | **83,258** |
+| Document versions | == documents | **28,812** |
+| Documents with >1 version | 0 | **0** |
+| Per-chapter vs `INDEX.json` | exact | **all 85 exact** |
+
+Qdrant **83,858** points in `svs_biz_ks_state_civics_voyage_4_docs_1024`. The
+collection is **shared**: 83,258 statute + 600 fiscal (the fiscal store's other
+12,580 chunks are in the openai collection). Comparing against statute chunks
+alone reports a 600-point surplus that does not exist.
+
+`indexed_vectors_count` 80,020, a stable 3,838 short. Structural, not loss:
+`indexing_threshold` is 20,000, so a smaller segment is never HNSW-indexed and is
+served by exact brute force — deterministic, and more accurate than HNSW. Nothing
+in the search path sets `indexed_only`.
+
+Fiscal inventory intact: 69 documents / 13,180 chunks, newest `updated_at` still
+2026-09-10T08:50:57Z. The 2,267 non-indexable source records remain in custody.
+
+## Acceptance — PASS
+
+53 preregistered cases across 34 chapters, dense-only and unreranked (confirmed in
+the audit events for all 53). **48 passed**, 38 at rank 1, 47 within rank 5.
+**0 blocking** — every miss's expected document is present in the store. Five
+non-blocking retrieval-quality findings, recorded with their top-three hits:
+2-303, 12-520, 16-1909, 19-3309, 59-2118.
+
+**530 returned slices re-verified against custody bytes** — content hash, source
+revision id, citation URL, character span, line span, text hash and both
+coordinate conventions re-derived. **0 verification failures.**
+
+Case set sha256 `d0be6835…`, decision rule sha256 `cc50b632…`, both preregistered
+before any result existed. No aggregate recall rate is published: 53 cases cannot
+distinguish 90% from 96%.
+
+The original attempt remains preserved: it checkpointed 575 records, completed
+chapters 001/002, and exited 2 at K.S.A. 3-319 when the local API's 120/minute
+counter returned HTTP 429. No automatic retry ran. WAVE-141 added caller pacing
+and an independently reviewed checkpoint transfer, not an API-limit change.
+
+Early paced checks pass: 3-319 now has one indexed version and two exact
+retained-text chunks. A read-only comparison confirms every paused **579 document,
+579 version, 1,518 chunk/embedding identity and vector fingerprint** is unchanged.
+Three complete API minute windows held **84, 98 and 102 ingestion calls**, all
+below the unchanged 120/minute limit; exact HTTP status matching found zero
+ingestion 429s after paced launch. The remaining corpus is still being monitored.
+`paced-live-launch.json` separately records actual execution of the immutable
+reviewed `paced-launch-command.json`; its pre-launch artifact is not rewritten.
 
 Changed files: `scripts/release/kansas-statute-rollout.py`,
 `tests/test_kansas_statute_rollout.py`, this proof and its
@@ -42,7 +106,7 @@ finish both its preview and ingestion requests before stopping. Restart uses the
 and stable idempotency keys; it does not contain an automatic retry loop. If a
 response is lost after acceptance, server idempotency/dedupe remains authoritative.
 
-## Executed proof
+## Historical coordinator preparation proof
 
 The standalone plan ran in the immutable deployed API image with the coordinator
 mounted read-only, all inputs mounted read-only, and **network disabled**. Exit 0
@@ -95,7 +159,7 @@ are retained under
 Their paths/hashes and the actual loaded consumer pins appear in the JSON proof.
 `git diff --check` passes. No source bytes or large responses were added to Git.
 
-## Reviewed launch and recovery commands
+## Historical first-attempt launch and recovery commands
 
 The operational root is
 `/Users/mfrieson/Developer/statecivics-statute-ingestion/wave-140/rollout`.
@@ -139,7 +203,7 @@ change pins or erase state to bypass a reported failure.
 ## Remaining gates
 
 Coordinator QC has passed and the first run launched, then fail-stopped at the
-local API limit. Pacing review/activation under WAVE-141, continued monitoring,
+local API limit. WAVE-141 pacing review and activation are complete. Continued monitoring,
 all 28,812 live documents / 83,258 chunks,
 per-chapter and exclusion checks, all exact source bindings, prior-version/vector
 preservation, fiscal/runtime preservation, dense recall and final live QC remain
@@ -150,3 +214,12 @@ root verified the actual paused inventory: **579 documents, 579 indexed versions
 and vectors survived. The full paused snapshot is retained for comparison after
 the paced run; no full-corpus completion is claimed. Graph creation and
 legal-effectiveness findings remain separate work.
+
+## Active paced operation
+
+The active output root is durable `wave-140/rollout-paced/`. Monitor its
+`progress.json` and container `exais-kansas-statute-rollout-wave140-paced`.
+The earlier command examples describe the preserved original attempt. For the
+active job, use the paced container name for inspect/stop/start. This activation
+is an explicit reviewed consumer upgrade; subsequent resumes use the new frozen
+command and unchanged pins. No full completion is claimed while it runs.
