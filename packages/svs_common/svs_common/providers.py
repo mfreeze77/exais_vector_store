@@ -428,8 +428,17 @@ def _is_retryable_status(status_code: int) -> bool:
     return status_code == 429 or 500 <= status_code <= 599
 
 
-def _parse_retry_after(value: str | None, now: float) -> float | None:
-    """Seconds, or an HTTP-date. Returns None when absent or unparseable (F5)."""
+def _parse_retry_after(value: str | None, wall_now: float) -> float | None:
+    """Seconds, or an HTTP-date. Returns None when absent or unparseable.
+
+    R-B1: the date form MUST be measured against a WALL clock. Round 2 subtracted
+    `time.monotonic()` - seconds since boot - from a Unix epoch timestamp, which
+    turned a 2-second Retry-After into 1,788,551,590 seconds. The round-2 test
+    passed only because it pinned the fake clock to 0.0, which coincides with the
+    Unix epoch: `5.0 - 0.0 == 5.0` was true for the wrong reason. `wall_now` is
+    injected separately from the monotonic deadline clock so no test can pass by
+    that coincidence again.
+    """
     if not value:
         return None
     raw = value.strip()
@@ -445,7 +454,7 @@ def _parse_retry_after(value: str | None, now: float) -> float | None:
     if when is None:
         return None
     try:
-        return max(0.0, when.timestamp() - now)
+        return max(0.0, when.timestamp() - wall_now)
     except (OverflowError, OSError, ValueError):
         return None
 
@@ -465,7 +474,7 @@ async def post_embedding_with_retry(
     json_payload: dict[str, Any],
     provider: str,
     batch_id: str = 'unknown',
-    batch_tokens: int | None = None,
+    batch_tokens: Callable[[], int] | int | None = None,
     max_attempts: int | None = None,
     backoff_sec: float | None = None,
     deadline_sec: float | None = None,
@@ -473,6 +482,7 @@ async def post_embedding_with_retry(
     sleep: Callable[[float], Awaitable[None]] | None = None,
     jitter: Callable[[float], float] | None = None,
     clock: Callable[[], float] | None = None,
+    wall_clock: Callable[[], float] | None = None,
 ) -> httpx.Response:
     """POST an embedding request, retrying transport failures, 429 and 5xx.
 
@@ -493,6 +503,8 @@ async def post_embedding_with_retry(
     # full jitter: uniform in [0, delay]; keeps concurrent callers from re-colliding
     pick = jitter or (lambda ceiling: random.uniform(0, ceiling))
     now = clock or time.monotonic
+    # separate from `now` on purpose (R-B1): one is monotonic, one is epoch
+    wall_now = wall_clock or time.time
 
     started = now()
     timeout_retries = 0
@@ -513,12 +525,10 @@ async def post_embedding_with_retry(
             last_error = None
             if response.status_code == 429:
                 retry_after = _parse_retry_after(
-                    getattr(response, 'headers', {}).get('Retry-After'), now())
+                    getattr(response, 'headers', {}).get('Retry-After'), wall_now())
         except RETRYABLE_TRANSPORT_ERRORS as exc:
             last_cause = f'{type(exc).__name__}: {exc}'
             last_error = exc
-            last_status = None
-            last_body = None
             if isinstance(exc, POSSIBLE_DOUBLE_BILL_ERRORS):
                 timeout_retries += 1
                 if timeout_retries > timeout_cap:
@@ -527,30 +537,49 @@ async def post_embedding_with_retry(
                         '(%d) on batch %s; giving up', provider, timeout_cap, batch_id)
                     raise EmbeddingRetryExhausted(
                         provider, attempt, last_cause, last_status, last_body) from exc
+                tokens = batch_tokens() if callable(batch_tokens) else batch_tokens
                 logger.warning(
                     'possible_double_bill: retrying a read timeout for %s batch=%s '
                     'tokens=%s timeout_retry=%d/%d - the upstream request may already '
                     'have been processed and billed',
-                    provider, batch_id, batch_tokens, timeout_retries, timeout_cap)
+                    provider, batch_id, tokens, timeout_retries, timeout_cap)
 
         if attempt >= attempts:
             logger.warning('embedding request to %s failed after %d/%d attempts (%s); giving up',
                            provider, attempt, attempts, last_cause)
-            raise EmbeddingRetryExhausted(
-                provider, attempt, last_cause, last_status, last_body) from last_error
+            exhausted = EmbeddingRetryExhausted(
+                provider, attempt, last_cause, last_status, last_body)
+            if last_error is not None:
+                raise exhausted from last_error
+            raise exhausted
 
         remaining = deadline - (now() - started)
         if remaining <= 0:
             logger.warning(
                 'embedding request to %s failed on attempt %d/%d (%s); retry deadline '
                 '%.1fs reached, giving up', provider, attempt, attempts, last_cause, deadline)
-            raise EmbeddingRetryExhausted(
-                provider, attempt, last_cause, last_status, last_body) from last_error
+            exhausted = EmbeddingRetryExhausted(
+                provider, attempt, last_cause, last_status, last_body)
+            if last_error is not None:
+                raise exhausted from last_error
+            raise exhausted
 
-        # Retry-After wins over the computed backoff when the server supplied one (F5).
-        delay = retry_after if retry_after is not None else pick(base * (2 ** (attempt - 1)))
-        # clamp to what is left rather than abandoning the attempt (F3)
-        delay = min(delay, remaining)
+        if retry_after is not None:
+            # R-B2: the server named a wait longer than our whole remaining budget.
+            # Clamping would retry inside a window it explicitly closed, so stop.
+            if retry_after > remaining:
+                logger.warning(
+                    'embedding request to %s got 429 with Retry-After %.1fs, longer than '
+                    'the %.1fs left of the retry deadline; not retrying',
+                    provider, retry_after, remaining)
+                raise EmbeddingRetryExhausted(
+                    provider, attempt,
+                    f'Retry-After {retry_after:.1f}s exceeds the {remaining:.1f}s remaining',
+                    last_status, last_body) from last_error
+            delay = retry_after
+        else:
+            # clamp the computed backoff to what is left rather than abandoning (F3)
+            delay = min(pick(base * (2 ** (attempt - 1))), remaining)
         logger.warning('embedding request to %s failed on attempt %d/%d (%s); retrying in %.2fs',
                        provider, attempt, attempts, last_cause, delay)
         await do_sleep(delay)
@@ -586,7 +615,9 @@ class VoyageEmbeddingProvider:
                     json_payload=payload,
                     provider=self.provider,
                     batch_id=batch_id,
-                    batch_tokens=sum(estimate_embedding_tokens(text) for text in batch),
+                    # lazy: only a read-timeout retry ever reads it (QC finding 7)
+                    batch_tokens=lambda b=batch: sum(
+                        estimate_embedding_tokens(text) for text in b),
                 )
                 if resp.status_code == 400 and _is_token_cap_rejection(resp):
                     raise _EmbeddingRequestTooLarge()

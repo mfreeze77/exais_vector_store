@@ -1,6 +1,6 @@
 # WAVE-142 Bounded Retry For The Embedding Request
 
-Status: in progress; QC round 1 FAIL, owner decisions F1-F6 applied, awaiting QC round 2. Owner: ExAIS. Dependency: WAVE-140 (defect recorded, deliberately not fixed there).
+Status: in progress; QC round 2 FAIL, owner rulings R-B1..R-B5 applied, awaiting QC round 3. Owner: ExAIS. Dependency: WAVE-140 (defect recorded, deliberately not fixed there).
 
 ## Why this is a new ticket, not WAVE-141
 
@@ -163,3 +163,73 @@ convention. Suite before **1356 passed / 144 skipped / 31 errors**; after **1371
 144 / 31**. The +15 derived two ways: suite delta (1371-1356) and the file alone
 (15 passed). The 31 errors are pre-existing in the statute-rollout tests and
 unchanged in count.
+
+
+## Owner rulings on QC round 2, recorded verbatim
+
+> R-B1 F5 date form: parse Retry-After HTTP-dates against an injectable WALL clock,
+> separate from the monotonic clock; result clamped to [0, remaining]. Test with
+> wall_now fixed and a date 2s ahead → sleep 2; a date in the past → sleep 0.
+>
+> R-B2 Retry-After larger than the remaining deadline → do not retry; raise the
+> exhausted exception immediately with status 429 and the Retry-After value in the
+> message. Test it.
+>
+> R-B3 F1(a): keep, rename to what it proves (usage counted once, one vector per
+> input, identical replayed payload). F1(b): add the missing assertion that usage
+> was not accumulated. The wrap-widening proof is withdrawn; leave both outcomes
+> pasted in the ticket as the record of why.
+>
+> R-B4 QC finding 6: one test through the real embed() path with a fake client,
+> asserting the possible_double_bill line carries the batch id and token count of
+> the batch actually sent. Never batch=unknown tokens=None.
+>
+> R-B5 QC findings 2, 3, 5, 7, 8: fix every one whose fix stays inside the single
+> call site plus tests. For each, one line: finding → fix → proving test. Any
+> finding whose fix would widen scope: list under "declined, needs a ticket".
+
+The owner also withdrew the F1 widening proof: **"The widening proof I ordered is
+structurally impossible today because nothing retryable can happen after usage
+accumulates, so I withdraw it."** Both experiment outcomes stay above as the record.
+
+### The round-2 defect, stated plainly
+
+`_parse_retry_after` subtracted `time.monotonic()` from a Unix epoch timestamp. A
+`Retry-After` date two seconds out computed **1,788,551,590 seconds**, which the
+clamp turned into the entire remaining deadline — strictly worse than the F5
+behaviour it replaced. The test passed only because it pinned the fake clock to
+`0.0`, which coincides with the Unix epoch, making `5.0 - 0.0 == 5.0` true for the
+wrong reason. The wall clock is now injected separately from the monotonic one, and
+both R-B1 tests pin it to 1,700,000,000 against a monotonic 633,122 so no test can
+pass by that coincidence again. Verified against the real clock after the fix:
+**1.05s**.
+
+### Finding → fix → proving test
+
+| finding | fix | proving test |
+|---|---|---|
+| R-B1 epoch/monotonic mix | `wall_clock` injected separately from `clock` | `test_rb1_http_date_is_measured_against_the_wall_clock_not_the_monotonic_one`, `test_rb1_http_date_in_the_past_sleeps_zero` |
+| R-B2 Retry-After > remaining | do not retry; raise with 429 and the value | `test_rb2_retry_after_longer_than_the_remaining_deadline_does_not_retry` |
+| R-B3 F1(a) misnamed | renamed, docstring says it does not prove the wrap boundary | `test_retried_batch_counts_usage_once_returns_one_vector_per_input_and_replays_identically` |
+| R-B3 F1(b) missing clause | spy on `accumulate_embedding_usage`, assert never called | `test_f1b_unparseable_200_is_not_retried_and_usage_is_not_accumulated` |
+| R-B4 / QC6 unexercised wiring | test drives the real `embed()` and recomputes the expected id and tokens | `test_rb4_double_bill_log_carries_the_real_batch_id_and_tokens_through_embed` |
+| QC2 bisect test non-discriminating | assert the SPLIT — first request carries both inputs, a later one a strict subset | `test_400_token_cap_still_reaches_the_bisect_path` |
+| QC5 give-up WARNING untested | assert the read-timeout-allowance line | `test_qc5_giving_up_on_the_timeout_allowance_is_logged` |
+| QC7 eager token count | `batch_tokens` is now a callable, read only on a timeout retry | covered by R-B4's test |
+| QC8 `from None` suppressed context | raise bare when there is no cause | `test_qc8_status_exhaustion_does_not_suppress_context` |
+| QC8 later error wiped the status | stop clearing `last_status`/`last_body` on a transport error | `test_qc8_a_final_transport_error_keeps_the_earlier_status_for_diagnosis` |
+
+### Declined, needs a ticket
+
+- **QC round-2 finding 4** is resolved by R-B2 rather than declined.
+- **Retry for the other providers** (OpenAI, Cohere, GenericEndpoint) stays out of
+  scope: no observed failures, and widening the call sites is the shape this ticket
+  was told to avoid.
+- **`caplog` capture depends on the repo's pytest logging config**, which differs
+  between the pinned image and a bare venv. Not fixable inside this call site.
+
+### Counts
+
+21 tests. Suite **1356 → 1377** passed; 144 skipped and the 31 pre-existing
+statute-rollout errors unchanged. The +21 derived two ways: suite delta and the
+file alone; collect-only reports 21 and `grep -c '^def test_'` reports 21.
