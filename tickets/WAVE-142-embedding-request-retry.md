@@ -1,6 +1,6 @@
 # WAVE-142 Bounded Retry For The Embedding Request
 
-Status: complete; QC round 4 PASS with five deliberate reds executed and restored. Owner: ExAIS. Dependency: WAVE-140 (defect recorded, deliberately not fixed there).
+Status: complete; QC round 4 PASS with five deliberate reds executed and restored. landed_by: 55a91fd5 Owner: ExAIS. Dependency: WAVE-140 (defect recorded, deliberately not fixed there).
 
 ## Why this is a new ticket, not WAVE-141
 
