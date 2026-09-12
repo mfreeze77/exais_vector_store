@@ -1,5 +1,5 @@
 from __future__ import annotations
-import hashlib, json, math
+import asyncio, hashlib, json, logging, math, random, time
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Any
@@ -8,6 +8,8 @@ import httpx
 from .config import get_settings
 from .provider_probe import health_allows_routing, normalize_health_status
 from .schemas import EmbeddingData, EmbeddingResponse, ExpertChatMessage, RerankResponse, RerankResult
+
+logger = logging.getLogger(__name__)
 
 class EmbeddingProvider(Protocol):
     async def embed(self, texts: list[str], model: str, dimensions: int, input_type: str | None = None) -> EmbeddingResponse: ...
@@ -367,6 +369,195 @@ class OpenAIEmbeddingProvider:
         data = [EmbeddingData(embedding=vector, index=index) for index, vector in enumerate(vectors)]
         return EmbeddingResponse(data=data, model=response_model, provider=self.provider, dimensions=dimensions, usage=usage)
 
+# --- WAVE-142: bounded retry for the embedding HTTP request -------------------
+# A single dropped TCP connect ended a 31,000-document run (WAVE-140: nine
+# attempts, eight replays, five fatal errors in 13,272 calls across two classes -
+# httpx.ConnectError and httpx.ReadTimeout). This retries the request, nothing else.
+#
+# Deliberately narrow. It wraps ONLY `client.post`, not the surrounding `send`
+# closure, because `send` also calls `accumulate_embedding_usage` and parses the
+# body: retrying across those would double-count usage. Applied at one call site,
+# the Voyage provider, because that is the only provider with observed failures.
+#
+# A 400 token-cap rejection reaches the caller untouched so `embed_in_order` can
+# bisect; it is not a transport failure and is never retried.
+#
+# OWNER DECISION 2026-09-12 on a ReadTimeout (F6): a read timeout means the request
+# may already have been processed and billed upstream, so retrying it can double-bill
+# at the vendor. We retry it anyway, at most `embedding_max_timeout_retries` times
+# per batch, and log each at WARNING as `possible_double_bill` with the batch id and
+# token count so spend stays auditable. Rationale, verbatim: "a dead 31k run costs
+# more than one re-billed batch."
+
+RETRYABLE_TRANSPORT_ERRORS = (
+    httpx.ConnectError,
+    httpx.ConnectTimeout,
+    httpx.ReadTimeout,
+    httpx.WriteTimeout,
+    httpx.PoolTimeout,
+    httpx.ReadError,
+    httpx.WriteError,
+    httpx.RemoteProtocolError,
+)
+
+# a ReadTimeout is the subset that may already have been billed upstream
+POSSIBLE_DOUBLE_BILL_ERRORS = (httpx.ReadTimeout,)
+
+
+class EmbeddingRetryExhausted(Exception):
+    """One failure shape for an exhausted retry, transport or status alike (F4).
+
+    Carries the last status and body snippet when the final attempt was an HTTP
+    failure; chains the transport error as __cause__ when it was a transport one.
+    """
+
+    def __init__(self, provider: str, attempts: int, cause: str,
+                 status_code: int | None = None, body_snippet: str | None = None):
+        self.provider = provider
+        self.attempts = attempts
+        self.status_code = status_code
+        self.body_snippet = body_snippet
+        super().__init__(
+            f'{provider} embedding request failed after {attempts} attempt(s): {cause}'
+            + (f' (HTTP {status_code}: {body_snippet})' if status_code is not None else '')
+        )
+
+
+def _is_retryable_status(status_code: int) -> bool:
+    """429 and 5xx only. Every other 4xx is the caller's to handle."""
+    return status_code == 429 or 500 <= status_code <= 599
+
+
+def _parse_retry_after(value: str | None, now: float) -> float | None:
+    """Seconds, or an HTTP-date. Returns None when absent or unparseable (F5)."""
+    if not value:
+        return None
+    raw = value.strip()
+    try:
+        return max(0.0, float(raw))
+    except ValueError:
+        pass
+    try:
+        from email.utils import parsedate_to_datetime
+        when = parsedate_to_datetime(raw)
+    except (TypeError, ValueError, IndexError):
+        return None
+    if when is None:
+        return None
+    try:
+        return max(0.0, when.timestamp() - now)
+    except (OverflowError, OSError, ValueError):
+        return None
+
+
+def _body_snippet(response: Any, limit: int = 200) -> str:
+    try:
+        return (response.text or '')[:limit]
+    except Exception:  # noqa: BLE001 - a snippet is best-effort diagnostics
+        return ''
+
+
+async def post_embedding_with_retry(
+    client: httpx.AsyncClient,
+    url: str,
+    *,
+    headers: dict[str, str],
+    json_payload: dict[str, Any],
+    provider: str,
+    batch_id: str = 'unknown',
+    batch_tokens: int | None = None,
+    max_attempts: int | None = None,
+    backoff_sec: float | None = None,
+    deadline_sec: float | None = None,
+    max_timeout_retries: int | None = None,
+    sleep: Callable[[float], Awaitable[None]] | None = None,
+    jitter: Callable[[float], float] | None = None,
+    clock: Callable[[], float] | None = None,
+) -> httpx.Response:
+    """POST an embedding request, retrying transport failures, 429 and 5xx.
+
+    Bounded three ways: attempt count, a wall-clock deadline measured from the
+    first attempt and covering request time as well as sleep (F2), and a separate
+    cap on read-timeout retries because those may already have been billed (F6).
+
+    Exhausting any bound raises EmbeddingRetryExhausted, the same shape for a
+    transport failure and for a persistent 429/5xx alike (F4).
+    """
+    settings = get_settings()
+    attempts = max(1, int(max_attempts if max_attempts is not None else settings.embedding_max_attempts))
+    base = backoff_sec if backoff_sec is not None else settings.embedding_retry_backoff_sec
+    deadline = deadline_sec if deadline_sec is not None else settings.embedding_retry_deadline_sec
+    timeout_cap = (max_timeout_retries if max_timeout_retries is not None
+                   else settings.embedding_max_timeout_retries)
+    do_sleep = sleep or asyncio.sleep
+    # full jitter: uniform in [0, delay]; keeps concurrent callers from re-colliding
+    pick = jitter or (lambda ceiling: random.uniform(0, ceiling))
+    now = clock or time.monotonic
+
+    started = now()
+    timeout_retries = 0
+    last_cause = 'no attempt made'
+    last_error: BaseException | None = None
+    last_status: int | None = None
+    last_body: str | None = None
+
+    for attempt in range(1, attempts + 1):
+        retry_after: float | None = None
+        try:
+            response = await client.post(url, headers=headers, json=json_payload)
+            if not _is_retryable_status(response.status_code):
+                return response
+            last_status = response.status_code
+            last_body = _body_snippet(response)
+            last_cause = f'HTTP {response.status_code}'
+            last_error = None
+            if response.status_code == 429:
+                retry_after = _parse_retry_after(
+                    getattr(response, 'headers', {}).get('Retry-After'), now())
+        except RETRYABLE_TRANSPORT_ERRORS as exc:
+            last_cause = f'{type(exc).__name__}: {exc}'
+            last_error = exc
+            last_status = None
+            last_body = None
+            if isinstance(exc, POSSIBLE_DOUBLE_BILL_ERRORS):
+                timeout_retries += 1
+                if timeout_retries > timeout_cap:
+                    logger.warning(
+                        'embedding request to %s exhausted its read-timeout allowance '
+                        '(%d) on batch %s; giving up', provider, timeout_cap, batch_id)
+                    raise EmbeddingRetryExhausted(
+                        provider, attempt, last_cause, last_status, last_body) from exc
+                logger.warning(
+                    'possible_double_bill: retrying a read timeout for %s batch=%s '
+                    'tokens=%s timeout_retry=%d/%d - the upstream request may already '
+                    'have been processed and billed',
+                    provider, batch_id, batch_tokens, timeout_retries, timeout_cap)
+
+        if attempt >= attempts:
+            logger.warning('embedding request to %s failed after %d/%d attempts (%s); giving up',
+                           provider, attempt, attempts, last_cause)
+            raise EmbeddingRetryExhausted(
+                provider, attempt, last_cause, last_status, last_body) from last_error
+
+        remaining = deadline - (now() - started)
+        if remaining <= 0:
+            logger.warning(
+                'embedding request to %s failed on attempt %d/%d (%s); retry deadline '
+                '%.1fs reached, giving up', provider, attempt, attempts, last_cause, deadline)
+            raise EmbeddingRetryExhausted(
+                provider, attempt, last_cause, last_status, last_body) from last_error
+
+        # Retry-After wins over the computed backoff when the server supplied one (F5).
+        delay = retry_after if retry_after is not None else pick(base * (2 ** (attempt - 1)))
+        # clamp to what is left rather than abandoning the attempt (F3)
+        delay = min(delay, remaining)
+        logger.warning('embedding request to %s failed on attempt %d/%d (%s); retrying in %.2fs',
+                       provider, attempt, attempts, last_cause, delay)
+        await do_sleep(delay)
+
+    raise AssertionError('unreachable')  # pragma: no cover
+
+
 class VoyageEmbeddingProvider:
     provider = 'voyage'
     def __init__(self, api_key: str | None = None):
@@ -384,10 +575,18 @@ class VoyageEmbeddingProvider:
                 payload: dict[str, Any] = {'model': model, 'input': batch, 'output_dimension': dimensions}
                 if input_type:
                     payload['input_type'] = input_type
-                resp = await client.post(
+                # a stable, non-secret id for this exact batch, so a
+                # possible_double_bill log line can be reconciled against spend
+                batch_id = hashlib.sha256(
+                    '\x00'.join(batch).encode('utf-8')).hexdigest()[:16]
+                resp = await post_embedding_with_retry(
+                    client,
                     'https://api.voyageai.com/v1/embeddings',
                     headers={'Authorization': f'Bearer {api_key}'},
-                    json=payload,
+                    json_payload=payload,
+                    provider=self.provider,
+                    batch_id=batch_id,
+                    batch_tokens=sum(estimate_embedding_tokens(text) for text in batch),
                 )
                 if resp.status_code == 400 and _is_token_cap_rejection(resp):
                     raise _EmbeddingRequestTooLarge()

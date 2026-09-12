@@ -85,6 +85,12 @@ class Settings(BaseSettings):
     marker_poll_interval_sec: int = 3
     marker_max_attempts: int = 2
     marker_retry_backoff_sec: int = 5
+    embedding_max_attempts: int = 5
+    embedding_retry_backoff_sec: float = 1.0
+    # wall clock from the first attempt, covering request time AND sleep (F2)
+    embedding_retry_deadline_sec: float = 300.0
+    # a ReadTimeout may already have been processed and billed upstream (F6)
+    embedding_max_timeout_retries: int = 2
     voyage_api_key: str | None = None
     cohere_api_key: str | None = None
     jina_api_key: str | None = None
