@@ -173,7 +173,8 @@ def test_main_validates_custody_before_store_lookup_or_credentials(setup, tmp_pa
         harvest_manifest=tmp_path/'harvest.json', harvest_root=tmp_path/'corpus', harvest_manifest_sha256=harvest.manifest_sha256,
         allow_create_vector_store=False, apply=True, vector_store_id='vs_statutes', manifest=manifest.path,
         instance_slug='ks-state-civics', state=tmp_path/'state.json', custody_root=custody,
-        source_page_chunking_profile=None)
+        source_page_chunking_profile=None,
+        contract_schema=Path(__file__).parent/'fixtures'/'statecivics-retrieval-export-record.e94a894e.json')
     monkeypatch.setattr(ingest, 'parse_args', lambda: args)
     monkeypatch.setattr(ingest, 'default_headers', lambda **k: pytest.fail('read credentials before custody validation'))
     monkeypatch.setattr(ingest, 'ensure_vector_store', lambda **k: pytest.fail('called API before custody validation'))

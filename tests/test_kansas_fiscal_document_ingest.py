@@ -448,3 +448,51 @@ def test_idempotency_key_changes_with_desired_record_not_export_clock(ingest):
         logical_document_id="9" * 64,
     )
     assert ingest.ingest_idempotency_key("vs_fiscal", other_identity) != first
+
+
+# --- WAVE-133 contract pin enforcement ---------------------------------------
+
+CONTRACT_FIXTURE = Path(__file__).parent / "fixtures" / "statecivics-retrieval-export-record.e94a894e.json"
+
+
+def test_ingest_accepts_the_pinned_document_branch(ingest, tmp_path):
+    """Enforcement reads the schema it is handed, not one it fetches."""
+    content = b"%PDF-1.7\nFiscal report"
+    manifest_path = tmp_path / "manifest.jsonl"
+    _write_manifest(manifest_path, [_record(ingest, content)])
+
+    manifest = ingest.load_manifest(manifest_path, contract_schema=CONTRACT_FIXTURE)
+    assert len(manifest.records) == 1
+    assert ingest.verify_contract_pin(CONTRACT_FIXTURE) == ingest.DOCUMENT_BRANCH_SHA256
+
+
+def test_ingest_refuses_a_changed_document_branch(ingest, tmp_path):
+    content = b"%PDF-1.7\nFiscal report"
+    manifest_path = tmp_path / "manifest.jsonl"
+    _write_manifest(manifest_path, [_record(ingest, content)])
+
+    schema = json.loads(CONTRACT_FIXTURE.read_text())
+    schema["$defs"]["legacy_document_record"]["properties"]["custody_uri"] = {"type": "integer"}
+    changed = tmp_path / "changed.json"
+    changed.write_text(json.dumps(schema))
+
+    with pytest.raises(ingest.ContractPinError, match="document branch digest mismatch"):
+        ingest.load_manifest(manifest_path, contract_schema=changed)
+
+
+def test_document_ingest_survives_entity_branch_changes(ingest, tmp_path):
+    """The whole point of splitting the pin: B1's byte-stability stays bought."""
+    content = b"%PDF-1.7\nFiscal report"
+    manifest_path = tmp_path / "manifest.jsonl"
+    _write_manifest(manifest_path, [_record(ingest, content)])
+
+    schema = json.loads(CONTRACT_FIXTURE.read_text())
+    schema["$defs"]["entity_relationship"]["properties"]["relationship_type"]["enum"].append(
+        "action_supersedes_provision"
+    )
+    schema["$defs"]["entity_kind_version_gate"]["description"] = "reworded"
+    moved = tmp_path / "entity-moved.json"
+    moved.write_text(json.dumps(schema))
+
+    manifest = ingest.load_manifest(manifest_path, contract_schema=moved)
+    assert len(manifest.records) == 1

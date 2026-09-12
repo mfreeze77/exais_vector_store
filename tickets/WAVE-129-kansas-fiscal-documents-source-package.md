@@ -19,6 +19,17 @@ The producer contract is pinned to StateCivics commit
 `4a8cab323f73f360b4bfec2e361c3737f434c4bb` and retrieval-export contract SHA
 `78a3de138cdb534831df034bc66f6a6a2bf7ec3f5d6d573efedf2b50d7a7f32b`.
 
+**Superseded 2026-09-12 by WAVE-133.** That bare whole-file digest is the
+schema as it stood at StateCivics `b3f5c09170c66453097bcd4fb44c6eb2b9031f39`;
+re-derive it with `git show
+b3f5c09170c66453097bcd4fb44c6eb2b9031f39:contracts/civic-impact/retrieval-export-record.schema.json
+| shasum -a 256`. It has not matched upstream since KS-650 split the contract
+into a document branch and an entity branch, and nothing in this repository ever
+computed it. The live pin is now per-branch and enforced at ingestion: see
+`contractPin` in the two `source.lock.json` files and
+`packages/svs_common/svs_common/statecivics_contract_pin.py`. This paragraph is
+kept as the historical record of what WAVE-129 pinned, not as a current pin.
+
 ## Scope
 
 - Add stable connector-owned `source_identity` to ExAIS ingestion.

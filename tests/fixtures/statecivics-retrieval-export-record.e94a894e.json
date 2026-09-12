@@ -1,0 +1,1114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://statecivics.ai/contracts/civic-impact/retrieval-export-record.schema.json",
+  "title": "StateCivics Retrieval Export Record",
+  "description": "One document projected from the StateCivics custody ledger into a retrieval plane. This is a controlled projection of an already-registered source revision, never a second harvest: the checksum, custody URI and citation URL all come from the ledger, so a retrieval hit can always be traced back to the exact revision a canonical fact cites. A retrieval chunk may support a decision; it may never become the decision.",
+  "$comment": "TWO RECORD KINDS, dispatched on tag presence. An UNTAGGED record is a legacy document record and is validated by exactly the schema that was here before this branch existed. A TAGGED record must be {record_kind: entity_projection, record_version: 1}; the gate subschema checks those two fields alone, so an unknown kind or version fails before any entity field is read. Adding a kind means adding a branch here, never widening the document branch.",
+  "if": {
+    "type": "object",
+    "required": ["record_kind"]
+  },
+  "then": { "$ref": "#/$defs/entity_projection_envelope" },
+  "else": { "$ref": "#/$defs/legacy_document_record" },
+  "$defs": {
+    "legacy_document_record": {
+      "description": "The document record exactly as it stood before the entity branch. additionalProperties is false, so a tagged record can never fall through into this branch even if the dispatch above were removed.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "export_record_id",
+        "logical_document_id",
+        "source_revision_id",
+        "content_hash_sha256",
+        "custody_uri",
+        "custody_status",
+        "citation_url",
+        "publisher",
+        "jurisdiction",
+        "artifact_type",
+        "record_digest_algorithm",
+        "record_digest_sha256",
+        "exporter",
+        "lifecycle",
+        "redistribution",
+        "ingestion"
+      ],
+      "properties": {
+        "export_record_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Deterministic identifier for this export record. Re-exporting the same revision with the same exporter version must produce the same value."
+        },
+        "logical_document_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Stable identity across revisions: the canonical SHA-256 of jurisdiction, source_family, and artifact logical_key. The full artifact identity prevents equal local keys from colliding across publishers or jurisdictions."
+        },
+        "source_revision_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The exact registered revision exported. Not the custody key: two revisions may hold identical bytes and remain distinct evidence."
+        },
+        "revision_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "content_hash_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "The ledger's recorded hash. The retrieval plane must verify retrieved bytes against this before indexing; a mismatch means custody and the ledger disagree and nothing may be indexed."
+        },
+        "custody_uri": {
+          "type": ["string", "null"],
+          "pattern": "^civic-custody://[a-z0-9_-]+/[0-9a-f]{2}/[0-9a-f]{64}$",
+          "description": "Portable content-addressed custody key for storage and replay. Required for upsert. It may be null for remove because broken or revoked custody must never prevent deletion of material indexed earlier. Never a filesystem path."
+        },
+        "custody_status": {
+          "type": "string",
+          "enum": ["metadata_only", "retained", "retained_restricted", "unavailable", "withdrawn"],
+          "description": "The source revision's custody state. Only unrestricted retained custody may be upserted; every other value converges the retrieval plane by removing any prior indexed copy."
+        },
+        "citation_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https?://",
+          "description": "The official public URL a human should be shown as the source. Retrieval surfaces cite this, never the custody URI, which is internal."
+        },
+        "retrieval_url": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "description": "The URL actually fetched, when it differs from the citation URL (query strings, cache busters, download endpoints)."
+        },
+        "publisher": { "type": "string", "minLength": 1 },
+        "jurisdiction": { "type": "string", "minLength": 1 },
+        "artifact_type": {
+          "$ref": "https://statecivics.ai/contracts/civic-impact/source-artifact.schema.json#/properties/artifact_type",
+          "description": "From the source-artifact vocabulary. Determines what may be exported at all: narrative and explanatory documents are appropriate for retrieval; raw transaction extracts are not."
+        },
+        "record_digest_algorithm": {
+          "const": "statecivics-canonical-json-v1",
+          "description": "UTF-8 JSON encoded with sorted keys, separators ',' and ':', and ensure_ascii=false after omitting record_digest_sha256 and exporter.exported_at. Those omissions avoid a circular hash and keep repeat exports deterministic. This field is top-level so WAVE-117 can name record_digest_sha256 directly as checksumField."
+        },
+        "record_digest_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 under record_digest_algorithm. It covers every other exported field except exporter.exported_at, so lifecycle, rights, citation, and content changes all produce a manifest diff."
+        },
+        "mime_type": { "type": ["string", "null"] },
+        "byte_size": { "type": ["integer", "null"], "minimum": 0 },
+        "title": { "type": ["string", "null"] },
+        "effective_period": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "published_at": { "type": ["string", "null"], "format": "date-time" },
+            "effective_from": { "type": ["string", "null"], "format": "date-time" },
+            "effective_to": { "type": ["string", "null"], "format": "date-time" },
+            "as_of_date": { "type": ["string", "null"], "format": "date" },
+            "fiscal_year": { "type": ["integer", "null"] }
+          }
+        },
+        "exporter": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version", "code_commit"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "version": { "type": "string", "minLength": 1 },
+            "code_commit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$",
+              "description": "Full commit sha of the exporter that produced this record. A short or absent sha cannot be replayed."
+            },
+            "exported_at": { "type": ["string", "null"], "format": "date-time" }
+          }
+        },
+        "lifecycle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "removal_required"],
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": ["current", "superseded", "corrected", "withdrawn"],
+              "description": "Correction and removal semantics are explicit rather than implied by absence. A retrieval plane that only ever receives additions cannot honour a correction, and silently keeps serving withdrawn material."
+            },
+            "supersedes_export_record_id": {
+              "type": ["string", "null"],
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "superseded_by_export_record_id": {
+              "type": ["string", "null"],
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "reason": {
+              "type": ["string", "null"],
+              "description": "Required in practice for corrected and withdrawn; states why, so the retrieval plane can explain a removal rather than a document merely vanishing."
+            },
+            "removal_required": {
+              "type": "boolean",
+              "description": "True when this record directs the consumer to delete indexed chunks for logical_document_id, not merely stop returning them."
+            }
+          }
+        },
+        "redistribution": {
+          "type": "string",
+          "enum": ["full", "excerpt_and_metadata", "metadata_only", "restricted", "unknown"],
+          "description": "Carried from the artifact. A retrieval plane must not surface more than this permits, and must not index at all when the value is restricted or unknown."
+        },
+        "license_profile": { "type": ["string", "null"] },
+        "ingestion": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "How the consumer must ingest. API-only by contract: an exporter never writes to a retrieval store's database, object store or index directly.",
+          "required": ["mode", "action", "recall_evaluation_required"],
+          "properties": {
+            "mode": { "const": "api_only" },
+            "action": {
+              "enum": ["upsert", "remove"],
+              "description": "This is a desired-state instruction. Current content with full redistribution and unrestricted retained custody is upserted. Every other state removes the indexed logical document, idempotently, so a rights or custody downgrade cannot leave yesterday's chunks searchable."
+            },
+            "target_instance_slug": { "type": ["string", "null"] },
+            "target_vector_store_slug": { "type": ["string", "null"] },
+            "recall_evaluation_required": {
+              "type": "boolean",
+              "description": "True for upsert: an export is not complete until the consumer has produced a recall proof. Reachability is not recall. False for removal, where there is no content to retrieve."
+            }
+          }
+        },
+        "metadata": { "type": "object" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "lifecycle": {
+                "properties": { "state": { "const": "current" } },
+                "required": ["state"]
+              },
+              "redistribution": { "const": "full" },
+              "custody_status": { "const": "retained" }
+            },
+            "required": ["lifecycle", "redistribution", "custody_status"]
+          },
+          "then": {
+            "properties": {
+              "lifecycle": {
+                "properties": { "removal_required": { "const": false } }
+              },
+              "ingestion": {
+                "properties": {
+                  "action": { "const": "upsert" },
+                  "recall_evaluation_required": { "const": true }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "lifecycle": {
+                    "properties": { "state": { "const": "current" } },
+                    "required": ["state"]
+                  }
+                },
+                "required": ["lifecycle"]
+              },
+              {
+                "anyOf": [
+                {
+                  "properties": {
+                    "redistribution": {
+                      "enum": ["excerpt_and_metadata", "metadata_only", "restricted", "unknown"]
+                    }
+                  },
+                  "required": ["redistribution"]
+                },
+                {
+                  "properties": {
+                    "custody_status": {
+                      "enum": ["metadata_only", "retained_restricted", "unavailable", "withdrawn"]
+                    }
+                  },
+                  "required": ["custody_status"]
+                }
+                ]
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "lifecycle": {
+                "properties": { "removal_required": { "const": true } }
+              },
+              "ingestion": {
+                "properties": {
+                  "action": { "const": "remove" },
+                  "recall_evaluation_required": { "const": false }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "lifecycle": {
+                "properties": {
+                  "state": { "enum": ["superseded", "corrected", "withdrawn"] }
+                },
+                "required": ["state"]
+              }
+            },
+            "required": ["lifecycle"]
+          },
+          "then": {
+            "properties": {
+              "lifecycle": {
+                "properties": { "removal_required": { "const": true } }
+              },
+              "ingestion": {
+                "properties": {
+                  "action": { "const": "remove" },
+                  "recall_evaluation_required": { "const": false }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "ingestion": {
+                "properties": { "action": { "const": "upsert" } },
+                "required": ["action"]
+              }
+            },
+            "required": ["ingestion"]
+          },
+          "then": {
+            "properties": {
+              "custody_uri": { "type": "string" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "lifecycle": {
+                "properties": { "state": { "enum": ["corrected", "withdrawn"] } },
+                "required": ["state"]
+              }
+            },
+            "required": ["lifecycle"]
+          },
+          "then": {
+            "properties": {
+              "lifecycle": {
+                "required": ["reason"],
+                "properties": { "reason": { "type": "string", "minLength": 1 } }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "lifecycle": {
+                "properties": { "state": { "enum": ["superseded", "corrected"] } },
+                "required": ["state"]
+              }
+            },
+            "required": ["lifecycle"]
+          },
+          "then": {
+            "properties": {
+              "lifecycle": {
+                "required": ["superseded_by_export_record_id"],
+                "properties": {
+                  "superseded_by_export_record_id": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "entity_projection_envelope": {
+      "description": "A TAGGED record. The kind/version gate is the first subschema and the only one an unknown record ever reaches: entity fields live behind it, so an unknown record_kind or record_version fails before any field access.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/entity_kind_version_gate"
+        },
+        {
+          "$ref": "#/$defs/entity_projection_record"
+        }
+      ]
+    },
+    "entity_kind_version_gate": {
+      "description": "Kind and version only. Nothing here reads an entity field, so an unknown kind or version is refused on its own terms rather than producing a cascade of field errors from a branch that should never have been entered.",
+      "type": "object",
+      "required": [
+        "record_kind",
+        "record_version"
+      ],
+      "properties": {
+        "record_kind": {
+          "const": "entity_projection"
+        },
+        "record_version": {
+          "const": 1
+        }
+      }
+    },
+    "entity_projection_record": {
+      "description": "One canonical fiscal entity revision, selected from a DECLARED as-of snapshot. It deliberately carries no logical_document_id: an entity is not a document, and inventing a document identity for it would collide with the document branch's uniqueness rule.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "record_kind",
+        "record_version",
+        "export_record_id",
+        "entity_type",
+        "entity_logical_id",
+        "entity_revision",
+        "jurisdiction",
+        "as_of",
+        "relationships",
+        "eligibility",
+        "record_digest_algorithm",
+        "record_digest_sha256",
+        "exporter",
+        "lifecycle",
+        "ingestion"
+      ],
+      "properties": {
+        "record_kind": {
+          "const": "entity_projection"
+        },
+        "record_version": {
+          "const": 1
+        },
+        "export_record_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Deterministic id over entity kind, logical id, revision and exporter version."
+        },
+        "entity_type": {
+          "type": "string",
+          "enum": [
+            "provision_reference",
+            "appropriation_action"
+          ]
+        },
+        "entity_logical_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "The row's OWN logical identity: provision_reference_logical_id, or appropriation_action_id. Never minted by the exporter."
+        },
+        "entity_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The row's own revision column. Together with entity_logical_id this is the stable logical identity the manifest keys on."
+        },
+        "jurisdiction": {
+          "type": "string",
+          "minLength": 1
+        },
+        "as_of": {
+          "$ref": "#/$defs/as_of_snapshot"
+        },
+        "entity": {
+          "type": "object",
+          "description": "The full KS-600 contract payload, by $ref, selected on entity_type."
+        },
+        "relationships": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/entity_relationship"
+          }
+        },
+        "description": {
+          "$ref": "#/$defs/compact_description"
+        },
+        "derivation": {
+          "$ref": "#/$defs/native_derivation"
+        },
+        "eligibility": {
+          "$ref": "#/$defs/entity_eligibility"
+        },
+        "record_digest_algorithm": {
+          "const": "statecivics-canonical-json-v1"
+        },
+        "record_digest_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "exporter": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "version",
+            "code_commit"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "code_commit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "exported_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            }
+          }
+        },
+        "lifecycle": {
+          "$ref": "#/$defs/entity_lifecycle"
+        },
+        "ingestion": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "action",
+            "recall_evaluation_required"
+          ],
+          "properties": {
+            "mode": {
+              "const": "api_only"
+            },
+            "action": {
+              "type": "string",
+              "enum": [
+                "upsert",
+                "remove"
+              ]
+            },
+            "target_instance_slug": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "target_vector_store_slug": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "recall_evaluation_required": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "description": "An upsert carries the whole entity; a tombstone must not.",
+          "if": {
+            "properties": {
+              "ingestion": {
+                "properties": {
+                  "action": {
+                    "const": "upsert"
+                  }
+                },
+                "required": [
+                  "action"
+                ]
+              }
+            },
+            "required": [
+              "ingestion"
+            ]
+          },
+          "then": {
+            "required": [
+              "entity",
+              "description",
+              "derivation"
+            ]
+          }
+        },
+        {
+          "description": "IDENTITY-MINIMAL REMOVAL. A tombstone names what to delete and why, and nothing else. It carries no entity payload, no description and no derivation, so it validates for a revision whose custody bytes are gone or were never readable.",
+          "if": {
+            "properties": {
+              "ingestion": {
+                "properties": {
+                  "action": {
+                    "const": "remove"
+                  }
+                },
+                "required": [
+                  "action"
+                ]
+              }
+            },
+            "required": [
+              "ingestion"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "entity"
+                  ]
+                },
+                {
+                  "required": [
+                    "description"
+                  ]
+                },
+                {
+                  "required": [
+                    "derivation"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "lifecycle": {
+                "required": [
+                  "state",
+                  "reason",
+                  "replaced_by",
+                  "removal_required"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "description": "The payload must be the KS-600 contract named by entity_type.",
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "entity_type": {
+                    "const": "provision_reference"
+                  }
+                },
+                "required": [
+                  "entity_type"
+                ]
+              },
+              {
+                "required": [
+                  "entity"
+                ]
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "entity": {
+                "$ref": "https://statecivics.ai/contracts/civic-impact/provision-reference.schema.json"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "entity_type": {
+                    "const": "appropriation_action"
+                  }
+                },
+                "required": [
+                  "entity_type"
+                ]
+              },
+              {
+                "required": [
+                  "entity"
+                ]
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "entity": {
+                "$ref": "https://statecivics.ai/contracts/civic-impact/appropriation-action.schema.json"
+              }
+            }
+          }
+        },
+        {
+          "description": "A provision carries exactly one kind of edge: supersession of another provision. There is no provision->action edge in v1 -- the action side owns that FK.",
+          "if": {
+            "properties": {
+              "entity_type": {
+                "const": "provision_reference"
+              }
+            },
+            "required": [
+              "entity_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "relationships": {
+                "items": {
+                  "properties": {
+                    "relationship_type": {
+                      "const": "provision_supersedes_provision"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "An action carries only the three edges its own columns support.",
+          "if": {
+            "properties": {
+              "entity_type": {
+                "const": "appropriation_action"
+              }
+            },
+            "required": [
+              "entity_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "relationships": {
+                "items": {
+                  "properties": {
+                    "relationship_type": {
+                      "enum": [
+                        "action_relies_on_provision",
+                        "action_enacted_by_bill_version",
+                        "action_supersedes_action"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "as_of_snapshot": {
+      "description": "The DECLARED as-of. It is an explicit operator parameter recorded in the manifest, never inferred. A latest-year heuristic is barred: `declared` has no false value, so a record that was not selected under a stated as-of cannot be expressed.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "as_of_date",
+        "declared",
+        "snapshot_id"
+      ],
+      "properties": {
+        "as_of_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "declared": {
+          "const": true
+        },
+        "snapshot_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      }
+    },
+    "entity_relationship": {
+      "description": "A typed edge backed by a stored foreign key on the row itself. CROSSWALK POLICY (contracts/civic-impact/kansas-source-registry.yaml, crosswalk_policy): `basis` is pinned to exact_shared_identifier, the strongest entry in evidence_order, because every v1 edge is a column value rather than an inference. The same policy's prohibited_as_sole_public_join list -- vector_similarity, fuzzy_name_match, code_suffix_match_without_context, llm_assertion -- is unreachable here by construction: there is no basis value that would admit one, so no edge may be derived from similarity, label equality or section-number equality.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relationship_type",
+        "basis",
+        "target"
+      ],
+      "properties": {
+        "relationship_type": {
+          "type": "string",
+          "enum": [
+            "action_relies_on_provision",
+            "action_enacted_by_bill_version",
+            "provision_supersedes_provision",
+            "action_supersedes_action"
+          ]
+        },
+        "basis": {
+          "const": "exact_shared_identifier"
+        },
+        "target": {
+          "type": "object"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "relationship_type": {
+                "enum": [
+                  "action_relies_on_provision",
+                  "provision_supersedes_provision"
+                ]
+              }
+            },
+            "required": [
+              "relationship_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "$ref": "#/$defs/target_provision_revision"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "relationship_type": {
+                "const": "action_enacted_by_bill_version"
+              }
+            },
+            "required": [
+              "relationship_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "$ref": "#/$defs/target_bill_version"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "relationship_type": {
+                "const": "action_supersedes_action"
+              }
+            },
+            "required": [
+              "relationship_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "$ref": "#/$defs/target_action_revision"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "target_provision_revision": {
+      "description": "The provision-reference composite key, exactly as appropriation-action.schema.json and provision-reference.schema.json name it.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provision_reference_logical_id",
+        "provision_reference_revision"
+      ],
+      "properties": {
+        "provision_reference_logical_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "provision_reference_revision": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "target_bill_version": {
+      "description": "The integer surrogate foreign key to bill_versions(id). An evidence coordinate, not an identity.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bill_version_id"
+      ],
+      "properties": {
+        "bill_version_id": {
+          "type": "integer"
+        }
+      }
+    },
+    "target_action_revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "appropriation_action_id",
+        "appropriation_action_revision"
+      ],
+      "properties": {
+        "appropriation_action_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "appropriation_action_revision": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "compact_description": {
+      "description": "One deterministic compact sentence. `inputs` is a closed list of source label/alias/context fields, so a description cannot be built from an amount or a CSV row; the template hash and the input hash together make the text reproducible and auditable.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "template_id",
+        "template_sha256",
+        "input_sha256",
+        "inputs"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        },
+        "template_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "template_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "input_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "inputs": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "display_label",
+              "heading_text",
+              "instrument_type",
+              "instrument_version_label",
+              "provision_path",
+              "action_type",
+              "period_label",
+              "jurisdiction"
+            ]
+          }
+        }
+      }
+    },
+    "native_derivation": {
+      "description": "Derivation inputs and outputs AS STORED. A normalized hash is only ever an explicitly named lossless adapter; `hash_adapter` says which one ran, and none_stored_as_is means the bytes are the ledger's own.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "derivation_id",
+        "input_set_hash_sha256",
+        "output_set_hash_sha256",
+        "hash_adapter"
+      ],
+      "properties": {
+        "derivation_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "input_set_hash_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "output_set_hash_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "hash_adapter": {
+          "type": "string",
+          "enum": [
+            "none_stored_as_is",
+            "statecivics-ordered-set-sha256-v1"
+          ]
+        }
+      }
+    },
+    "entity_eligibility": {
+      "description": "The row's OWN review and publication columns, copied. The exporter never sets, defaults or fabricates any of these: a row that does not already say reviewed or published is not exported at all, so only those two values can appear. publication_allowed is null for an appropriation action, which has no such column.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "human_reviewed",
+        "review_level",
+        "publication_allowed"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "reviewed",
+            "published"
+          ]
+        },
+        "human_reviewed": {
+          "type": "boolean"
+        },
+        "review_level": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publication_allowed": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      }
+    },
+    "entity_lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "removal_required"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "current",
+            "superseded",
+            "withdrawn"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "replaced_by": {
+          "description": "The revision that replaces this one, or null when nothing does.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/replacement_reference"
+            }
+          ]
+        },
+        "removal_required": {
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "description": "A superseded or withdrawn revision is always a removal, and always states why.",
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "superseded",
+                  "withdrawn"
+                ]
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "required": [
+              "reason",
+              "replaced_by"
+            ],
+            "properties": {
+              "removal_required": {
+                "const": true
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "current"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "removal_required": {
+                "const": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    "replacement_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entity_logical_id",
+        "entity_revision"
+      ],
+      "properties": {
+        "entity_logical_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "entity_revision": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}
