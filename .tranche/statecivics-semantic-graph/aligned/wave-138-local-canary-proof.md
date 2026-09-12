@@ -186,3 +186,5 @@ separate work. Independent QC passed; the updated source declarations also pass
 kansas-statutes --production --json` in the new API image (one package, zero
 issues). That flag validates declaration rules; it does not change the explicit
 non-production status.
+
+> **Correction (2026-09-12):** the fiscal chunk count above is a miscount. The store measures **13,180** chunks by three independent methods — via `documents`, via `chunks.vector_store_id`, and via `embeddings` — and its newest `updated_at` is still 2026-09-10T08:50:57Z, so nothing has written to it since before this document was produced. Treat **13,180** as the baseline. Nothing was added and nothing is to be restored; the original figure is left in place above as the point-in-time record.

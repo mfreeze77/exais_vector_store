@@ -152,3 +152,5 @@ indexed; 31,059 records are not in shared state. No canonical legal graph,
 current-law adjudication or appropriation edge is claimed. The input auditor's
 latent upstream substring-label guard finding remains manager-owned; all delivered
 custody/corpus joins in this pinned batch passed exact verification.
+
+> **Correction (2026-09-12):** the fiscal chunk count above is a miscount. The store measures **13,180** chunks by three independent methods — via `documents`, via `chunks.vector_store_id`, and via `embeddings` — and its newest `updated_at` is still 2026-09-10T08:50:57Z, so nothing has written to it since before this document was produced. Treat **13,180** as the baseline. Nothing was added and nothing is to be restored; the original figure is left in place above as the point-in-time record.
