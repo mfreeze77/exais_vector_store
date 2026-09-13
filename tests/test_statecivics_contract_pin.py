@@ -399,11 +399,18 @@ def _tracked_python_files() -> list[Path]:
         cwd=REPO, capture_output=True, text=True, check=True,
     ).stdout
     paths = {REPO / name for name in listing.split("\0") if name}
-    # tests/ is excluded by SCOPE, not by name-matching a caller: the suite
-    # deliberately calls the consumer both with and without a schema to prove
-    # both behaviours, and a test is not a runner that could appear in
-    # enforcedAt. Every other tracked path is in scope.
-    return sorted(p for p in paths if "tests" not in p.relative_to(REPO).parts and p.is_file())
+    # The repository's OWN suite -- the top-level tests/ directory -- is
+    # excluded by SCOPE, not by name-matching a caller: it deliberately calls
+    # the consumer both with and without a schema to prove both behaviours, and
+    # it is not a runner that could appear in enforcedAt. The exclusion is
+    # anchored at parts[0] because that is exactly what the justification
+    # covers; a tests/ directory nested anywhere else (a connector's suite, a
+    # vendored package's suite) belongs to some other component and is in scope
+    # like every other tracked path.
+    return sorted(
+        p for p in paths
+        if p.relative_to(REPO).parts[0] != "tests" and p.is_file()
+    )
 
 
 _SCOPE_BOUNDARIES = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
@@ -583,9 +590,56 @@ class _Module:
     def call_sites(self) -> list[dict]:
         """Every call to a function named ``load_manifest``, each carrying the
         resolved file of the module it actually reaches."""
+        self._block_on_unresolved_references()
         found: list[dict] = []
         self._walk(self.tree.body, (), found)
         return found
+
+    def _block_on_unresolved_references(self) -> None:
+        """Block on every reference to the consumer function that is not the
+        callee of a call this walker can resolve.
+
+        This is the COMPLEMENT of what ``_classify`` handles, computed rather
+        than listed. ``_classify`` can follow exactly two syntactic shapes --
+        ``load_manifest(...)`` and ``alias.load_manifest(...)`` -- so every
+        other way the function object can travel to a call site is, by
+        construction, a shape the walker does not resolve, and is therefore
+        ``Unclassified``. The rule is "any reference, minus resolved call
+        position": it names no spelling, exempts no file, and has no branch for
+        ``functools.partial`` or any other particular idiom, so a rebinding
+        nobody has thought of yet blocks the first time it is written.
+
+        The complement is taken over the WHOLE module tree, not the statements
+        ``_walk`` descends into, because a reference needs no scope resolution
+        to be dangerous: a decorator, a default argument, a lambda body and a
+        comprehension can all carry the function object out of sight.
+        """
+        resolved_call_position = {
+            id(node.func)
+            for node in ast.walk(self.tree)
+            if isinstance(node, ast.Call)
+            and _callee_name(node.func) == CONSUMER_FUNCTION
+        }
+        for node in ast.walk(self.tree):
+            if id(node) in resolved_call_position:
+                continue
+            if isinstance(node, ast.Attribute) and node.attr == CONSUMER_FUNCTION:
+                shape = "an attribute reference outside call position"
+            elif (isinstance(node, ast.Name) and node.id == CONSUMER_FUNCTION
+                    and isinstance(node.ctx, ast.Load)):
+                shape = "a bare name load outside call position"
+            elif (isinstance(node, ast.Subscript)
+                    and isinstance(node.slice, ast.Constant)
+                    and node.slice.value == CONSUMER_FUNCTION):
+                shape = f"a subscript by the constant {CONSUMER_FUNCTION!r}"
+            else:
+                continue
+            raise Unclassified(
+                f"{self.path}:{node.lineno}: {CONSUMER_FUNCTION} appears as "
+                f"{shape}. The function object can be bound to another name and "
+                "called where the walker never sees it, so whether that call "
+                "passes contract_schema cannot be decided statically."
+            )
 
     def _walk(self, body, envs, found) -> None:
         envs = envs + (_scope_env(body),)
@@ -688,8 +742,44 @@ def test_every_load_manifest_caller_enforces_the_pin() -> None:
     2. ``contractPin.enforcedAt`` equals the discovered caller set exactly, in
        both directions and in every file that declares it. A fourth caller
        fails this with no human updating a list; so does a stale entry.
-    3. A call site the walker cannot classify raises ``Unclassified`` and fails
-       the test. Breaking the checker blocks; it never quietly passes.
+    3. Anything the walker cannot classify raises ``Unclassified`` and fails
+       the test, so breaking the checker blocks rather than quietly passing.
+       Concretely, and no more broadly than this:
+
+       DETECTED, because each one mentions ``load_manifest`` literally in the
+       source and is therefore visible to a syntactic rule --
+
+       * a call the walker cannot resolve to a module file (the alias is an
+         imported module, the callee is a non-name expression, the factory
+         loads more than one module);
+       * ``getattr(mod, "load_manifest")``;
+       * a call whose ``contract_schema`` might be hidden in a ``**kwargs``
+         splat;
+       * ANY reference to the name outside resolved call position -- an
+         attribute, a bare name load, or a subscript by the string literal.
+         That is the complement of the two shapes ``_classify`` follows, so
+         alias assignment, ``functools.partial``, a dispatch table and
+         ``runpy.run_path(...)["load_manifest"]`` all land here without being
+         named anywhere in this file.
+
+       NOT DETECTED, and deliberately not claimed --
+
+       * a callee reached through a name that is never written literally
+         (``getattr(mod, "load_" + "manifest")``, ``table[key]()`` for a
+         computed ``key``, ``exec`` of generated source): there is nothing in
+         the AST to match;
+       * anything outside the scope of `_tracked_python_files` -- this repo's
+         own top-level ``tests/``, git-ignored trees, non-Python runners, and
+         any caller living in another repository;
+       * whether the value passed as ``contract_schema`` is the RIGHT schema.
+         This proves an argument is passed, not that it is correct.
+
+       The residual risk this leaves is bounded, and is the reason the check is
+       worth having rather than a claim that it is sufficient: the consumer
+       hard-refuses a missing schema at RUNTIME, so a caller this walker misses
+       still cannot ingest unverified. What it would do is ship CI-green and
+       die on an operator's first invocation -- round two's failure mode, which
+       is what this check exists to catch before an operator does.
     """
     sites = discover_load_manifest_call_sites()
     assert sites, "the walker found no load_manifest calls at all; it is broken"

@@ -59,6 +59,8 @@ Use the shared-owner map in [build-contract.json](../.tranche/statecivics-semant
 
 Verified at StateCivics `e94a894e`; pin re-computed and landed at `314beafe`.
 
+`314beafe` is a LABEL FOR THE FILE'S CONTENT, not a claim about A's tip: `git -C <A> show <commit>:contracts/civic-impact/retrieval-export-record.schema.json` is sha256 `899b541a8ba03431e0a129c09a8a3733b2d43057e4bb260b8bdb010dece2e8a7` at `314beafe`, at `9f8ed9b3` (the KS-650 B1.2 merge, which touched no path under `contracts/`) and at A's current main `38258704` alike — so the pin is correct and the label is merely older than A's tip.
+
 **Vocabulary.** `FISCAL_RELATIONS` (fiscal_graph.py:32) has five names, *none with
 a producer*. A repo-wide sweep found no script, fixture, artifact, DB seed or
 dump that ever emitted one; they exist only as the constant, the `_ENDPOINTS` map
@@ -199,7 +201,16 @@ That call site is excluded because its `ingest` alias resolves to
 resolution, not by any filename special case. A call site the walker cannot
 resolve raises `Unclassified` and fails the test; a broken checker blocks.
 
-Discovered set, five call sites, three of them the fiscal consumer's:
+The discovered set is not recorded here. It is enumerated by
+`tests/test_statecivics_contract_pin.py::test_every_load_manifest_caller_enforces_the_pin`,
+which walks the tracked source and fails if the declarations disagree with what
+it finds. Run that test for the current set; a count written into this ticket
+would be a second, unchecked copy of exactly the list this mechanism exists to
+stop maintaining by hand.
+
+The table below is an ILLUSTRATION of the shape of that output, kept because it
+shows why the `kscourts` sites are excluded by resolution rather than by name.
+Nothing checks its line numbers, and they will drift.
 
 | call site | resolved callee | enforced |
 | --- | --- | --- |

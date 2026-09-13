@@ -81,7 +81,11 @@ python scripts/release/kansas-fiscal-marker-handoff.py \
 That command plans only. Append `--apply` to fetch persisted content and write
 the local handoff package. `--contract-schema` is required on the plan too: this
 runner reads the same desired-state manifest the document consumer reads, so it
-is one of the three enforcement points listed in `contractPin.enforcedAt`. It has no Marker client or RunPod path, so this is
+appears in `contractPin.enforcedAt`. That list is not maintained by hand and is
+not counted here:
+`tests/test_statecivics_contract_pin.py::test_every_load_manifest_caller_enforces_the_pin`
+derives the enforcement points from the source and fails if the declaration and
+the discovered callers disagree in either direction. It has no Marker client or RunPod path, so this is
 reuse of the original extraction, not another extraction charge. StateCivics
 may parse its tables into candidate observations, but it must independently
 resolve dimensions and publication status.
