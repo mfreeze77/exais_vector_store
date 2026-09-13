@@ -13,6 +13,11 @@ from svs_common.fiscal_marker_handoff import build_marker_handoff
 
 ROOT = Path(__file__).resolve().parents[2]
 ADAPTER = ROOT / "scripts" / "release" / "kansas-fiscal-document-ingest.py"
+CONTRACT_FIXTURE = (
+    Path(__file__).resolve().parents[1]
+    / "fixtures"
+    / "statecivics-retrieval-export-record.314beafe.json"
+)
 STATECIVICS_REPO = Path(os.getenv("STATECIVICS_REPO", "")).resolve()
 pytestmark = pytest.mark.skipif(
     not os.getenv("STATECIVICS_REPO") or not (STATECIVICS_REPO / "src").is_dir(),
@@ -90,6 +95,9 @@ def test_real_statecivics_export_is_accepted_by_fiscal_adapter_cli(
             str(state),
             "--vector-store-id",
             "vs_contract_proof",
+            # WAVE-133 made the contract pin mandatory on every entrypoint.
+            "--contract-schema",
+            str(CONTRACT_FIXTURE),
         ],
         cwd=ROOT,
         capture_output=True,
