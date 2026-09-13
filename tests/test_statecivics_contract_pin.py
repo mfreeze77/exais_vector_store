@@ -338,6 +338,60 @@ def test_historical_digests_are_reproducible_at_their_recorded_commit() -> None:
     ]
 
 
+#: R-P24. The fixture's own provenance. Everything else in this module is
+#: computed FROM the fixture, so if the fixture is not the upstream file at the
+#: pinned commit, every number below it is internally consistent and externally
+#: meaningless.
+FIXTURE_SHA256 = "899b541a8ba03431e0a129c09a8a3733b2d43057e4bb260b8bdb010dece2e8a7"
+UPSTREAM_CONTRACT_PATH = "contracts/civic-impact/retrieval-export-record.schema.json"
+
+
+def test_the_fixture_is_the_upstream_contract_at_the_pinned_commit() -> None:
+    """R-P24. B's fixture IS A's file at the pinned commit, byte for byte, and
+    that commit is really on A's history.
+
+    Read through ``git show``, never through A's worktree: a worktree read is
+    exactly what went stale and misled two people. ``SVS_STATECIVICS_REPO``
+    unset is a FAILURE, not a skip (R-P5) -- a provenance check that evaporates
+    on CI while reporting green is worse than no provenance check.
+    """
+    import hashlib
+
+    upstream = statecivics_repo()
+    commit = PINNED_CONTRACT_COMMIT
+
+    blob = subprocess.run(
+        ["git", "-C", str(upstream), "show", f"{commit}:{UPSTREAM_CONTRACT_PATH}"],
+        capture_output=True, check=True,
+    ).stdout
+    local = FIXTURE.read_bytes()
+
+    assert hashlib.sha256(blob).hexdigest() == FIXTURE_SHA256, (
+        f"{UPSTREAM_CONTRACT_PATH} at {commit} is not the file this pin was "
+        "computed from"
+    )
+    assert hashlib.sha256(local).hexdigest() == FIXTURE_SHA256, (
+        f"{FIXTURE.name} no longer hashes to the recorded fixture digest"
+    )
+    assert local == blob, (
+        f"{FIXTURE.name} is not byte-identical to {UPSTREAM_CONTRACT_PATH} at "
+        f"{commit}; the pin is computed from a file upstream does not have"
+    )
+
+    # A digest proves the bytes; it does not prove the commit is real history.
+    # A commit that is not an ancestor of `main` is a dangling or abandoned
+    # object, and pinning to one is how a pin outlives the work it pinned.
+    ancestry = subprocess.run(
+        ["git", "-C", str(upstream), "merge-base", "--is-ancestor", commit, "main"],
+        capture_output=True,
+    )
+    assert ancestry.returncode == 0, (
+        f"{commit} is not an ancestor of StateCivics main; the contract pin "
+        f"does not point at landed upstream history (git said: "
+        f"{ancestry.stderr.decode().strip()!r})"
+    )
+
+
 def test_every_pinned_digest_travels_with_its_commit(contract) -> None:
     """A digest without its commit is how 78a3de13... misled two people."""
     assert set(PINNED_BRANCH_COMMIT) == {"document", "entity", "dispatch"}
@@ -620,16 +674,51 @@ def _scope_env(body: list[ast.stmt], parameters=()) -> dict[str, list[_Binding]]
     return env
 
 
-def _lookup(name: str, envs: tuple[dict[str, list[_Binding]], ...], where) -> ast.AST:
+class _Scope:
+    """One scope in a chain, and WHAT KIND of scope it is.
+
+    The kind is load-bearing because Python's name resolution is not "every
+    enclosing block". A ``class`` body is a scope, but it is NOT part of the
+    enclosing chain any nested ``def`` searches: a method does not see the
+    names its class body binds. Round six pushed class-body bindings into
+    method scopes, so the walker's scope order was not Python's IN BOTH
+    DIRECTIONS -- a class attribute could resolve a method's alias to the wrong
+    module (a confident wrong answer), and a class attribute bound twice could
+    refuse a method the language would have resolved cleanly (a false refusal).
+    """
+
+    __slots__ = ("env", "kind")
+
+    def __init__(self, env: dict[str, list[_Binding]], kind: str) -> None:
+        self.env = env
+        self.kind = kind
+
+
+def _push(envs: tuple[_Scope, ...], env, kind: str) -> tuple[_Scope, ...]:
+    """The chain a new ``def``/``class`` scope actually searches.
+
+    Python: local scope, then enclosing FUNCTION scopes, then module, then
+    builtins. Class scopes never appear in that chain, not even for a class
+    nested directly inside another class, so entering ANY new scope drops every
+    class scope already on the chain before appending the new one. Code written
+    DIRECTLY in a class body does see that class's own bindings, which is
+    exactly the innermost entry this returns.
+    """
+    return tuple(scope for scope in envs if scope.kind != "class") + (_Scope(env, kind),)
+
+
+def _lookup(name: str, envs: tuple[_Scope, ...], where) -> ast.AST:
     """R-P17. Resolve ``name`` to the ONE binding that is provably its binding.
 
     The multiplicity refusal fires HERE, for the name actually being resolved,
     never while the env is built. Building it at env-build time would block
     every module that rebinds any ordinary variable -- a loop accumulator, a
     reassigned counter -- and the check would be useless. Measured over the
-    tracked tree, this placement gives zero false positives.
+    tracked tree, this placement gives zero false positives; at env-build time
+    the identical rule blocks 122 of the 152 tracked modules.
     """
-    for env in envs:
+    for scope in envs:
+        env = scope.env
         if _OPAQUE in env:
             lines = sorted({binding.lineno for binding in env[_OPAQUE]})
             raise Unclassified(
@@ -637,8 +726,8 @@ def _lookup(name: str, envs: tuple[dict[str, list[_Binding]], ...], where) -> as
                 f"executes generated source (lines {lines}); no name in it is "
                 "provably bound once"
             )
-    for env in reversed(envs):
-        bindings = env.get(name)
+    for scope in reversed(envs):
+        bindings = scope.env.get(name)
         if not bindings:
             continue
         if len(bindings) > 1:
@@ -729,11 +818,15 @@ class _Module:
     def __init__(self, path: Path) -> None:
         self.path = path.resolve()
         self.tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        self.defines_consumer_function = any(
-            isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
-            and node.name == CONSUMER_FUNCTION
-            for node in self.tree.body
-        )
+        # R-P22. There is no precomputed factory table and no
+        # `defines_consumer_function` flag. Both were resolution facts decided
+        # at construction time, away from the names actually being resolved:
+        # the table was indexed by callee name with no check that the name was
+        # still bound to the function that filled it in, and the flag answered
+        # "does this module define load_manifest at top level?" for a call site
+        # whose own scope chain might bind the name to something else entirely.
+        # Every such fact is now derived inside `_module_identity`, for the one
+        # name being resolved, at the moment it is resolved.
         # R-P10. The ONE record of what the classifier actually looked at.
         # `_block_on_unresolved_references` complements against this and
         # nothing else, so there is no second predicate to keep in step.
@@ -744,7 +837,6 @@ class _Module:
         self.namespace_writes = [
             node for node in ast.walk(self.tree) if _is_namespace_write(node)
         ]
-        self.factories = self._module_factories()
 
     def module_env(self) -> dict[str, list[_Binding]]:
         env = _scope_env(self.tree.body)
@@ -755,62 +847,189 @@ class _Module:
             ]
         return env
 
-    def _module_factories(self) -> dict[str, Path]:
-        """Functions that load and return a module from an explicit file.
+    def _module_scope(self) -> tuple[_Scope, ...]:
+        return (_Scope(self.module_env(), "module"),)
 
-        ``_load_ingest_command()`` and ``load_ingest_module()`` differ only in
-        name; both are recognised by what they DO -- build a spec from a file
-        path -- so a fourth one with any name is recognised too.
+    # ------------------------------------------------------------------
+    # R-P22. THE CHOKE POINT.
+    #
+    # Every call site that becomes a module identity passes through
+    # `_module_identity` and through nothing else. Six rounds failed because
+    # the defect kept relocating to whichever enumerated surface the previous
+    # round had not hardened -- callers, then spellings, then traversals, then
+    # alias binding, then the resolution paths the refusal happened to be
+    # wired into. The answer is not a seventh enumeration. It is a BOUND: three
+    # forms are accepted, each stated in full below, and every other program
+    # raises `Unclassified`. A form is accepted only when every name in its
+    # chain is bound exactly once under the R-P16 binding visitor, applied AT
+    # RESOLUTION TIME to the names actually being resolved.
+    # ------------------------------------------------------------------
+
+    def _module_identity(self, node: ast.Call, envs) -> tuple[Path, str]:
+        """The file the module reached by ``node``'s callee was loaded from.
+
+        Raises `Unclassified` for every program outside the three forms. There
+        is deliberately no fallback branch: a program the walker cannot place
+        in a form is refused, never guessed at.
         """
-        module_env = self.module_env()
-        factories: dict[str, Path] = {}
-        for node in self.tree.body:
-            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                continue
-            envs = (module_env, _scope_env(node.body, _parameters(node)))
-            targets = set()
-            for sub in ast.walk(node):
-                target = _spec_target(sub, envs, self.path)
-                if target is not None:
-                    targets.add(target)
-            if len(targets) == 1:
-                factories[node.name] = next(iter(targets))
-            elif len(targets) > 1:
-                raise Unclassified(
-                    f"{self.path}: {node.name}() loads more than one module "
-                    f"({sorted(str(t) for t in targets)}); its return value is ambiguous"
-                )
-        return factories
-
-    def _resolve_module_name(self, name: str, envs) -> Path:
-        """Resolve a name bound to a module object to the FILE it was loaded
-        from. Name equality is never consulted; only the spec target is."""
-        bound = _lookup(name, envs, self.path)
+        func = node.func
+        if isinstance(func, ast.Name):
+            return self._form_one(node, envs)
+        if not isinstance(func, ast.Attribute):
+            raise Unclassified(
+                f"{self.path}:{node.lineno}: {CONSUMER_FUNCTION} is called "
+                "through neither a bare name nor an attribute of a name"
+            )
+        if not isinstance(func.value, ast.Name):
+            raise Unclassified(
+                f"{self.path}:{node.lineno}: {CONSUMER_FUNCTION} is called on a "
+                "non-name expression; its module cannot be resolved"
+            )
+        alias = func.value.id
+        bound = _lookup(alias, envs, self.path)
         if isinstance(bound, (ast.Import, ast.ImportFrom)):
             raise Unclassified(
-                f"{name!r} is an imported module; its file identity is not "
-                "statically resolvable here"
+                f"{self.path}:{node.lineno}: {alias!r} is an imported module; "
+                "its file identity is not statically resolvable here"
             )
-        if isinstance(bound, ast.Call):
-            callee = _callee_name(bound.func)
-            if callee in self.factories:
-                return self.factories[callee]
-            if callee == "module_from_spec" and bound.args:
-                spec_argument = bound.args[0]
-                if isinstance(spec_argument, ast.Name):
-                    spec_node = _lookup(spec_argument.id, envs, self.path)
-                else:
-                    spec_node = spec_argument
-                target = _spec_target(spec_node, envs, self.path)
-                if target is not None:
-                    return target
-            target = _spec_target(bound, envs, self.path)
-            if target is not None:
-                return target
+        if not isinstance(bound, ast.Call):
+            raise Unclassified(
+                f"{self.path}:{node.lineno}: {alias!r} is not bound to a call, "
+                f"so it is neither form 2 nor form 3: {ast.dump(bound)[:110]}"
+            )
+        if _callee_name(bound.func) == "module_from_spec":
+            return self._form_three(alias, bound, envs)
+        if isinstance(bound.func, ast.Name):
+            return self._form_two(alias, bound.func.id, node, envs)
         raise Unclassified(
-            f"{name!r} is bound to an expression the walker cannot resolve to a "
-            f"module file: {ast.dump(bound)[:120]}"
+            f"{self.path}:{node.lineno}: {alias!r} is bound to a call of "
+            f"{ast.dump(bound.func)[:80]}, which is neither a module-scope "
+            "factory name (form 2) nor module_from_spec (form 3)"
         )
+
+    # --- form 1 -------------------------------------------------------------
+
+    def _form_one(self, node: ast.Call, envs) -> tuple[Path, str]:
+        """A bare ``load_manifest(...)`` that provably reaches THIS module's own
+        top-level definition of that name.
+
+        The name is resolved through the ordinary scope chain, so a local
+        ``from ... import load_manifest``, a parameter, a ``for`` target or any
+        other shadowing binding is found FIRST and refused -- it is not the
+        module's top-level ``def``. Round six's bare-call branch consulted no
+        environment at all: it asked only whether the module had a top-level
+        ``def`` of the name somewhere, and answered `self.path` for a call that
+        a shadowing binding sent somewhere else entirely.
+        """
+        binding = _lookup(CONSUMER_FUNCTION, envs, self.path)
+        if not (isinstance(binding, (ast.FunctionDef, ast.AsyncFunctionDef))
+                and binding.name == CONSUMER_FUNCTION
+                and any(binding is statement for statement in self.tree.body)):
+            raise Unclassified(
+                f"{self.path}:{node.lineno}: bare {CONSUMER_FUNCTION}() does "
+                "not resolve to a top-level def of that name in this module; "
+                f"the name is bound here by {ast.dump(binding)[:100]}"
+            )
+        return self.path, "form 1 (bare call in the defining module)"
+
+    # --- form 2 -------------------------------------------------------------
+
+    def _form_two(self, alias: str, factory: str, node: ast.Call, envs) -> tuple[Path, str]:
+        """``alias = factory()`` where ``factory`` is a module-scope, UNDECORATED
+        ``def`` with exactly one spec target.
+
+        Every clause is checked here, at resolution time, for this factory
+        name. Round six read a table built at construction time and indexed it
+        by callee name, so a factory name REBOUND after its ``def``
+        (``_load_fiscal = _load_other``) still answered with the def's target,
+        and a DECORATED factory -- whose decorator may return anything at all
+        -- answered with the target of a body that no longer runs.
+        """
+        definition = _lookup(factory, self._module_scope(), self.path)
+        if not isinstance(definition, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            raise Unclassified(
+                f"{self.path}:{node.lineno}: {alias!r} is bound to {factory}(), "
+                f"but {factory!r} is not bound at module scope to a def: "
+                f"{ast.dump(definition)[:100]}"
+            )
+        if not any(definition is statement for statement in self.tree.body):
+            raise Unclassified(
+                f"{self.path}:{node.lineno}: {factory!r} is not defined at "
+                "module scope, so what the call reaches is ambiguous"
+            )
+        if definition.decorator_list:
+            raise Unclassified(
+                f"{self.path}:{definition.lineno}: {factory!r} is decorated "
+                f"({len(definition.decorator_list)} decorator(s)), so its "
+                "return value is the decorator's, not its body's, and the "
+                "module it yields cannot be read from the body"
+            )
+        target = self._sole_spec_target(definition)
+        return target, f"form 2 (alias {alias!r} <- {factory}() -> spec target)"
+
+    def _sole_spec_target(self, definition) -> Path:
+        """The ONE file ``definition`` builds a module spec from.
+
+        Resolution time, for this one function: nothing is computed for the
+        other functions in the module, so a sibling helper that happens to
+        build two specs cannot refuse a caller that never touches it.
+        """
+        envs = _push(self._module_scope(),
+                     _scope_env(definition.body, _parameters(definition)), "function")
+        targets = set()
+        for sub in ast.walk(definition):
+            target = _spec_target(sub, envs, self.path)
+            if target is not None:
+                targets.add(target)
+        if len(targets) != 1:
+            raise Unclassified(
+                f"{self.path}:{definition.lineno}: {definition.name}() builds "
+                f"{len(targets)} module spec(s) "
+                f"({sorted(str(t) for t in targets)}); its return value is not "
+                "provably one module"
+            )
+        return next(iter(targets))
+
+    # --- form 3 -------------------------------------------------------------
+
+    def _form_three(self, alias: str, bound: ast.Call, envs) -> tuple[Path, str]:
+        """``alias = module_from_spec(X)`` with ``X = spec_from_file_location(...)``.
+
+        The INLINE spelling of form 2, with no factory function to name. It is
+        required, not a convenience: `scripts/release/kansas-statute-rollout.py`
+        binds its consumer alias exactly this way, and it is a real fiscal
+        enforcement point. Every name in the chain -- the alias, the spec name,
+        and whatever the path argument reads -- goes through `_lookup`, so each
+        must be bound exactly once under the same discipline.
+        """
+        if len(bound.args) != 1 or bound.keywords:
+            raise Unclassified(
+                f"{self.path}:{bound.lineno}: module_from_spec is called with "
+                f"{len(bound.args)} positional and {len(bound.keywords)} keyword "
+                "argument(s); form 3 accepts exactly one positional spec"
+            )
+        argument = bound.args[0]
+        if not isinstance(argument, ast.Name):
+            raise Unclassified(
+                f"{self.path}:{bound.lineno}: module_from_spec's argument is "
+                "not a name bound to a spec, so the spec cannot be resolved "
+                "through the binding visitor"
+            )
+        spec_node = _lookup(argument.id, envs, self.path)
+        if not (isinstance(spec_node, ast.Call)
+                and _callee_name(spec_node.func) == "spec_from_file_location"):
+            raise Unclassified(
+                f"{self.path}:{bound.lineno}: {argument.id!r} is not bound to a "
+                f"spec_from_file_location(...) call: {ast.dump(spec_node)[:100]}"
+            )
+        target = _spec_target(spec_node, envs, self.path)
+        if target is None:
+            raise Unclassified(
+                f"{self.path}:{bound.lineno}: the spec bound to {argument.id!r} "
+                "has no resolvable file target"
+            )
+        return target, (f"form 3 (alias {alias!r} <- module_from_spec"
+                        f"({argument.id}) -> spec target)")
 
     def call_sites(self) -> list[dict]:
         """Every call to a function named ``load_manifest``, each carrying the
@@ -821,7 +1040,7 @@ class _Module:
         # fills in IS the exemption set the blocker then complements. If
         # `_walk` raises part way, the record is partial and MORE references
         # block -- the check fails toward blocking either way.
-        self._visit_body(self.tree.body, (self.module_env(),), found)
+        self._visit_body(self.tree.body, self._module_scope(), found)
         self._block_on_unresolved_references()
         return found
 
@@ -867,17 +1086,25 @@ class _Module:
                 "passes contract_schema cannot be decided statically."
             )
 
-    def _walk(self, body, envs, found, scope=None) -> None:
-        """Walk a scope's ``body``. ``envs`` is the ENCLOSING scope chain.
+    def _walk(self, node, envs, found) -> None:
+        """Walk the body of the ``def``/``class`` ``node`` opens.
 
-        ``scope`` is the ``def`` whose body this is, when there is one, so its
-        PARAMETERS seed the env it opens. Without them a parameter named like a
-        module-level alias would fall through to the module env and resolve to
-        the wrong module -- a confident wrong answer, the very thing R-P16
-        exists to convert into a refusal.
+        A ``def``'s PARAMETERS seed the env it opens: without them a parameter
+        named like a module-level alias would fall through to the module env
+        and resolve to the wrong module -- a confident wrong answer, the very
+        thing R-P16 exists to convert into a refusal.
+
+        The new chain comes from `_push`, which applies Python's rule that a
+        ``class`` scope is not part of the chain any nested scope searches.
         """
-        parameters = () if scope is None else _parameters(scope)
-        self._visit_body(body, envs + (_scope_env(body, parameters),), found)
+        if isinstance(node, ast.ClassDef):
+            self._visit_body(
+                node.body, _push(envs, _scope_env(node.body), "class"), found)
+        else:
+            self._visit_body(
+                node.body,
+                _push(envs, _scope_env(node.body, _parameters(node)), "function"),
+                found)
 
     def _visit_body(self, body, envs, found) -> None:
         for statement in body:
@@ -902,7 +1129,7 @@ class _Module:
                 # boundary, so inner bindings do not leak outward.
                 for outer in _definition_time_expressions(node):
                     self._visit(outer, envs, found)
-                self._walk(node.body, envs, found, node if not isinstance(node, ast.ClassDef) else None)
+                self._walk(node, envs, found)
             elif isinstance(node, ast.Call):
                 site = self._classify(node, envs)
                 if site is not None:
@@ -937,22 +1164,9 @@ class _Module:
         # but cannot name; that shape was blocked in round four and must stay
         # blocked. Executed: see test_the_name_as_a_string_blocks[dict-dispatch].
         self.classified_call_funcs.add(id(func))
-        if isinstance(func, ast.Attribute):
-            if not isinstance(func.value, ast.Name):
-                raise Unclassified(
-                    f"{self.path}:{node.lineno}: load_manifest is called on a "
-                    "non-name expression; its module cannot be resolved"
-                )
-            target = self._resolve_module_name(func.value.id, envs)
-            how = f"alias {func.value.id!r} -> importlib spec target"
-        else:
-            if not self.defines_consumer_function:
-                raise Unclassified(
-                    f"{self.path}:{node.lineno}: bare load_manifest() in a module "
-                    "that does not define it"
-                )
-            target = self.path
-            how = "bare call inside the defining module"
+        # R-P22. The ONE way a call site becomes a module identity. There is no
+        # second branch, here or anywhere else, that can answer this question.
+        target, how = self._module_identity(node, envs)
         keywords = {kw.arg for kw in node.keywords}
         if None in keywords and "contract_schema" not in keywords:
             raise Unclassified(
@@ -1213,11 +1427,55 @@ def _declared_enforced_at() -> dict[str, list[str]]:
 
 
 def test_every_load_manifest_caller_enforces_the_pin() -> None:
-    """The walker resolves a call only when its callee is a bare name the
-    module under inspection defines, or a name bound exactly once in an
-    enclosing scope to a call that loads a module from an explicit file, in
-    scope order. Everything else raises ``Unclassified``. It proves a schema
-    argument is passed, not that the schema is correct.
+    """Every caller of the fiscal document consumer passes a contract schema.
+
+    The walker resolves exactly three forms, listed below; every other
+    reference raises `Unclassified`. It proves a schema argument is passed, not
+    that the schema is correct.
+
+    THE THREE FORMS. In all three, every name in the chain must be bound
+    EXACTLY ONCE by the R-P16 binding visitor -- which counts every form Python
+    binds a name with -- in Python's own scope chain, where a class body is
+    never part of the chain a nested ``def`` searches:
+
+      1. ``load_manifest(...)`` written bare, where the name resolves through
+         that scope chain to an undecorated top-level ``def load_manifest`` in
+         the module under inspection. Identity: that module's own file.
+
+      2. ``alias.load_manifest(...)`` where ``alias`` is bound to ``factory()``,
+         ``factory`` is bound at module scope to an UNDECORATED top-level
+         ``def``, and that def builds exactly one ``spec_from_file_location``
+         target. Identity: that target.
+
+      3. ``alias.load_manifest(...)`` where ``alias`` is bound to
+         ``module_from_spec(X)`` and ``X`` is bound to a
+         ``spec_from_file_location(...)`` call whose path argument the pathlib
+         evaluator can resolve. The inline spelling of form 2, with no factory
+         function. Identity: that target.
+
+    NOT DETECTED. Each of these was EXECUTED against this walker and is not
+    caught; the runtime refusal below is what covers them:
+
+      * ``getattr(mod, "load_" + "manifest")`` -- the name is computed, so the
+        R-P12 string rule never sees the literal.
+      * ``NAME = "load_manifest"`` then ``getattr(mod, NAME)`` -- the literal is
+        bound to a variable, outside the call's own arguments.
+      * a computed dispatch key, and ``"".join([...])`` spelling the name.
+      * ``exec``/``eval`` of generated source. (In the module under inspection
+        this is a module-wide refusal; in ANOTHER module it is invisible.)
+      * ``ingest.__dict__["load_" + "manifest"]`` and ``vars()`` subscripted by
+        a computed key.
+      * cross-module namespace mutation -- module A rebinding a name inside
+        module B.
+      * anything outside ``_tracked_python_files``: an untracked or ignored
+        file, a notebook, a shell heredoc.
+      * schema CORRECTNESS. The walker proves an argument is passed. Whether it
+        names the right contract is `verify_contract`'s job, not this one's.
+
+    The residual risk this leaves is bounded and is checked by execution in
+    ``test_the_consumer_refuses_a_missing_schema_at_runtime``: the consumer
+    REFUSES a missing schema at runtime, so a caller the walker misses cannot
+    ingest unverified -- it dies on its first invocation.
     """
     sites = discover_load_manifest_call_sites()
     assert sites, "the walker found no load_manifest calls at all; it is broken"

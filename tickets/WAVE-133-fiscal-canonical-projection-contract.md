@@ -206,6 +206,36 @@ That call site is excluded because its `ingest` alias resolves to
 resolution, not by any filename special case. A call site the walker cannot
 resolve raises `Unclassified` and fails the test; a broken checker blocks.
 
+**R-P22 — the walker is BOUNDED, not hardened.** Six QC rounds failed, and the
+defect relocated every time, always to "a check whose scope is something
+someone enumerated": which callers, then which spellings count as a call, then
+which traversal feeds the exemption set, then flow-insensitive alias binding,
+then which resolution paths the refusal was wired into. Hardening an unbounded
+surface does not terminate; bounding it does. There is now ONE choke point,
+`_Module._module_identity`, and every call site that becomes a module identity
+passes through it and through nothing else — the precomputed factory table and
+the `defines_consumer_function` flag, both of which answered resolution
+questions at construction time away from the names being resolved, are deleted.
+It accepts three forms and refuses every other program: a bare call resolving
+through Python's scope chain to the module's own undecorated top-level `def`; an
+alias bound to an undecorated module-scope factory with exactly one spec target;
+and the inline `module_from_spec(spec_from_file_location(...))` spelling, which
+`kansas-statute-rollout.py` uses and which has no factory function. Every name in
+every chain must be bound exactly once under the R-P16 binding visitor, checked
+at resolution time. The scope chain is now Python's: a class body is not part of
+the chain a nested `def` searches, so a class attribute can neither resolve a
+method's alias to the wrong module nor refuse one the language resolves cleanly.
+The three forms, and the shapes that are NOT detected, are listed in that test's
+own docstring — a list of what the checker cannot see is a specification, not a
+cache, and it changes only when the checker is deliberately strengthened.
+
+**R-P26 — what this check is for.** The walker is an EARLY WARNING, not the
+guard. The guard is the consumer's runtime refusal of a missing schema, executed
+by `test_the_consumer_refuses_a_missing_schema_at_runtime`: a caller the walker
+misses cannot ingest unverified, it dies on its first invocation. The residual
+risk the three forms leave is therefore a new runner failing loudly on day one,
+not an unverified ingestion.
+
 The discovered set is not recorded here. It is enumerated by
 `tests/test_statecivics_contract_pin.py::test_every_load_manifest_caller_enforces_the_pin`,
 which walks the tracked source and fails if the declarations disagree with what
