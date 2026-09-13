@@ -236,6 +236,43 @@ written under it. Two of the three were executed in the unsafe direction, where
 the call really does reach the fiscal consumer unpinned and the walker reported
 another module and said nothing at all.
 
+**Final QC found FOUR more, all closed in-round.** Every one was in the UNSAFE
+direction: the walker named a non-fiscal module, the gate stayed GREEN, and the
+program at runtime reached the fiscal consumer's `load_manifest` with no
+`contract_schema` — proven each time by running it and catching
+`FiscalIngestError: --contract-schema is required`.
+
+* **F1 — the factory name was resolved against a fabricated scope chain.** The
+  ALIAS binding was made flow-sensitive in round five; the FACTORY NAME it
+  points at was not, because `_form_two` passed a hardcoded `self._module_scope()`
+  instead of the `envs` it was handed. A local `_load_other = _load_fiscal`, or a
+  parameter default `def run(_load_other=_load_fiscal)`, was invisible. Fixed by
+  resolving the factory name through `envs`, which is what that function's own
+  docstring had already claimed it did.
+* **F2 — a lambda and a comprehension never went through `_push`.** Class scopes
+  were dropped correctly for a `def` body and for nothing else, so inside a
+  class body both kept resolving against the class attribute that Python skips.
+  This also refutes `_scope_env`'s own argument that recording lambda parameters
+  and comprehension targets in the enclosing scope can only OVER-count and
+  therefore only refuse: inside a class body it UNDER-counted, hiding the module
+  binding Python actually uses. Fixed by giving both their own scope through
+  `_push`; the correct answer there is not a refusal but the fiscal consumer,
+  which is what turns the gate red.
+* **F3 — `from X import *` was never counted.** `_scope_env`'s ImportFrom arm
+  binds `alias.asname or alias.name.split(".")[0]`, which for a star is the
+  literal `"*"`, so a module that defines `load_manifest` and then star-imports
+  over it still showed exactly one binding and was granted form 1. Fixed by
+  treating a star import as unattributable, like an `exec` or a namespace-mapping
+  write: the module resolves nothing. Zero tracked in-scope files use `import *`,
+  so the false-positive cost is 0.
+* **F4 — `Path.resolve()` does not canonicalise case.** This filesystem is
+  case-insensitive, so `Kansas-Fiscal-Document-Ingest.py` and
+  `kansas-fiscal-document-ingest.py` are one file that importlib loads
+  identically, while `==` on the two `Path`s is False — and `is_fiscal_consumer`
+  was a bare `==`. Fixed by comparing filesystem identity with
+  `os.path.samefile`, falling back to path equality for a target that does not
+  exist (a non-existent path cannot be the consumer, which does exist).
+
 The three forms, and the shapes that are NOT detected, are listed in that test's
 own docstring — a list of what the checker cannot see is a specification, not a
 cache, and it changes only when the checker is deliberately strengthened.

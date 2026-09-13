@@ -469,6 +469,36 @@ def _tracked_python_files() -> list[Path]:
 
 _SCOPE_BOUNDARIES = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
 
+#: Scopes Python opens for an EXPRESSION. `_visit` descends into these
+#: explicitly, with their own scope pushed through `_push`, so that class
+#: scopes drop for them exactly as they do for a `def`.
+_COMPREHENSIONS = (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)
+_EXPRESSION_SCOPES = (ast.Lambda,) + _COMPREHENSIONS
+
+
+def _same_file(left: Path, right: Path) -> bool:
+    """Filesystem IDENTITY, not path-string equality.
+
+    R-P26/F4. ``Path.resolve()`` resolves symlinks but does NOT canonicalise
+    case, and this tree lives on a case-insensitive filesystem. So
+    ``scripts/release/Kansas-Fiscal-Document-Ingest.py`` and
+    ``scripts/release/kansas-fiscal-document-ingest.py`` are THE SAME FILE --
+    ``os.path.samefile`` says so, and importlib loads the same bytes from
+    either -- while ``==`` on the two ``Path`` objects is False. Comparing the
+    strings let a real caller of the fiscal consumer present itself as some
+    other module and pass the gate in silence.
+
+    A target that does not exist cannot be the consumer, because the consumer
+    does exist; ``samefile`` raises ``OSError`` in that case rather than
+    answering, so the fallback is plain equality, which keeps a non-existent
+    spec target from crashing the walker while still answering False for
+    everything that is not literally the consumer's own path.
+    """
+    try:
+        return os.path.samefile(left, right)
+    except OSError:
+        return left == right
+
 
 def _scope_nodes(statement: ast.AST):
     """``statement`` and every descendant that shares its scope.
@@ -521,6 +551,27 @@ def _add_reaching_declarations(env, body, declaration, label) -> None:
         if isinstance(node, declaration):
             for name in node.names:
                 env.setdefault(name, []).append(_Binding(node, node.lineno, label))
+
+
+def _visit_nodes(node: ast.AST):
+    """``node`` and every descendant ``_visit`` should classify in THIS scope.
+
+    ``_scope_nodes`` with one addition: it also stops at a lambda or a
+    comprehension. Those open real scopes, and ``_visit`` descends into them
+    explicitly so their own env goes on through ``_push`` -- which is what
+    makes an enclosing CLASS scope drop for them, exactly as it does for a
+    ``def``.
+
+    Binding COLLECTION (``_scope_env``) deliberately keeps using
+    ``_scope_nodes``, which does NOT stop here, so a lambda parameter or a
+    comprehension target is still counted in the enclosing scope as well. That
+    over-counting only ever refuses, and it is retained.
+    """
+    yield node
+    if isinstance(node, _SCOPE_BOUNDARIES + _EXPRESSION_SCOPES):
+        return
+    for child in ast.iter_child_nodes(node):
+        yield from _visit_nodes(child)
 
 
 def _definition_time_expressions(node: ast.AST):
@@ -585,6 +636,17 @@ _OPAQUE = "*namespace-write*"
 
 
 def _is_namespace_write(node: ast.AST) -> bool:
+    # R-P26/F3. `from X import *` binds every public name X exports, and which
+    # names those are is a property of ANOTHER module at import time. It is not
+    # attributable to any one name here -- which is the definition of this
+    # guard -- and `_scope_env`'s ImportFrom arm could not see it at all: for a
+    # star the alias node's `name` is the literal "*", so it bound a name
+    # spelled "*" and left `load_manifest` looking bound exactly once. A module
+    # that defines `load_manifest` and then star-imports over it was granted
+    # form 1 while Python called somebody else's function.
+    if isinstance(node, ast.ImportFrom):
+        if any(alias.name == "*" for alias in node.names):
+            return True
     if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
         if node.func.id in _EXECUTORS:
             return True
@@ -761,9 +823,9 @@ def _lookup(name: str, envs: tuple[_Scope, ...], where) -> ast.AST:
         if _OPAQUE in env:
             lines = sorted({binding.lineno for binding in env[_OPAQUE]})
             raise Unclassified(
-                f"{where}: the module writes into its own namespace mapping or "
-                f"executes generated source (lines {lines}); no name in it is "
-                "provably bound once"
+                f"{where}: the module writes into its own namespace mapping, "
+                f"executes generated source, or star-imports (lines {lines}); "
+                "no name in it is provably bound once"
             )
     for scope in reversed(envs):
         bindings = scope.env.get(name)
@@ -988,17 +1050,36 @@ class _Module:
         ``def`` with exactly one spec target.
 
         Every clause is checked here, at resolution time, for this factory
-        name. Round six read a table built at construction time and indexed it
-        by callee name, so a factory name REBOUND after its ``def``
+        name, IN THE SCOPE CHAIN THE CALL SITE ACTUALLY HAS. Round six read a
+        table built at construction time and indexed it by callee name, so a
+        factory name REBOUND after its ``def``
         (``_load_fiscal = _load_other``) still answered with the def's target,
         and a DECORATED factory -- whose decorator may return anything at all
         -- answered with the target of a body that no longer runs.
+
+        R-P26/F1. This then resolved the factory name against a FABRICATED
+        chain -- ``self._module_scope()``, hardcoded -- rather than the ``envs``
+        it was handed. The ALIAS binding was flow-sensitive; the factory name
+        the alias pointed at was not, so a LOCAL rebinding of the factory name
+        was invisible:
+
+            def main():
+                _load_other = _load_fiscal
+                ingest = _load_other()
+                return ingest.load_manifest(Path("m"))
+
+        Every stated precondition of form 2 held, the walker answered
+        ``kscourts-ingest.py``, and the call reached the fiscal consumer, which
+        raised ``--contract-schema is required``. A parameter default
+        (``def run(_load_other=_load_fiscal)``) did the same. Resolving through
+        ``envs`` finds the local binding first; it is not a module-level ``def``,
+        so it refuses.
         """
-        definition = _lookup(factory, self._module_scope(), self.path)
+        definition = _lookup(factory, envs, self.path)
         if not isinstance(definition, (ast.FunctionDef, ast.AsyncFunctionDef)):
             raise Unclassified(
                 f"{self.path}:{node.lineno}: {alias!r} is bound to {factory}(), "
-                f"but {factory!r} is not bound at module scope to a def: "
+                f"but in this scope chain {factory!r} is not bound to a def: "
                 f"{ast.dump(definition)[:100]}"
             )
         if not any(definition is statement for statement in self.tree.body):
@@ -1023,7 +1104,7 @@ class _Module:
         # a function that builds a decoy spec and hands back something else.
         mentioned = self._sole_spec_target(definition, factory_envs)
         returned = self._factory_return_target(definition, factory_envs)
-        if mentioned != returned:
+        if not _same_file(mentioned, returned):
             raise Unclassified(
                 f"{self.path}:{definition.lineno}: {factory}() builds a spec "
                 f"for {mentioned} but returns the module loaded from "
@@ -1245,8 +1326,10 @@ class _Module:
         handed to ``_classify``, which records the ones it commits to; the
         blocker's exemption set is that record and nothing else.
         """
-        for node in _scope_nodes(node_or_expression):
-            if isinstance(node, _SCOPE_BOUNDARIES):
+        for node in _visit_nodes(node_or_expression):
+            if isinstance(node, _EXPRESSION_SCOPES):
+                self._visit_expression_scope(node, envs, found)
+            elif isinstance(node, _SCOPE_BOUNDARIES):
                 # R-P11. A decorator, a parameter default, an annotation and a
                 # class base all execute where the `def`/`class` is WRITTEN, at
                 # definition time, so they are visited with the enclosing
@@ -1262,6 +1345,69 @@ class _Module:
                 site = self._classify(node, envs)
                 if site is not None:
                     found.append(site)
+
+    def _visit_expression_scope(self, node, envs, found) -> None:
+        """A lambda or a comprehension: its own scope, pushed through ``_push``.
+
+        R-P26/F2. ``_push`` already dropped class scopes when entering a
+        ``def``, which is Python's rule -- but a lambda and a comprehension
+        never went through ``_push`` at all, so inside a CLASS BODY they kept
+        resolving against the class scope Python skips:
+
+            ingest = _load_fiscal()
+
+            class Runner:
+                ingest = _load_other()
+                results = [ingest.load_manifest(Path("m")) for _ in range(1)]
+
+        Python evaluates that comprehension in a scope whose parent chain is
+        module-only, so the call reaches the FISCAL consumer. The walker
+        answered ``kscourts-ingest.py`` and the gate stayed green. The lambda
+        twin behaved identically.
+
+        This also corrects the reasoning ``_scope_env`` records for itself:
+        counting a lambda parameter or comprehension target in the ENCLOSING
+        scope over-counts, and over-counting refuses -- true in a module or
+        function body, but NOT inside a class body, where the enclosing entry
+        the walker consulted was the class scope. There it UNDER-counted,
+        hiding the module-level binding Python actually uses. Routing these
+        scopes through ``_push`` is what makes that argument sound again.
+
+        Definition-time sub-expressions keep the ENCLOSING chain: a lambda's
+        parameter defaults, and a comprehension's FIRST iterable, are evaluated
+        where the expression is written, not inside the scope it opens.
+        """
+        if isinstance(node, ast.Lambda):
+            for default in (*node.args.defaults, *node.args.kw_defaults):
+                if default is not None:
+                    self._visit(default, envs, found)
+            env: dict[str, list[_Binding]] = {}
+            for argument in _parameters(node):
+                env.setdefault(argument.arg, []).append(
+                    _Binding(argument, argument.lineno, "lambda parameter"))
+            self._visit(node.body, _push(envs, env, "function"), found)
+            return
+
+        generators = node.generators
+        # Python evaluates the FIRST iterable in the enclosing scope.
+        if generators:
+            self._visit(generators[0].iter, envs, found)
+        env = {}
+        for generator in generators:
+            for name in _bound_names(generator.target):
+                env.setdefault(name.id, []).append(
+                    _Binding(generator.target, name.lineno, "comprehension target"))
+        inner = _push(envs, env, "function")
+        for index, generator in enumerate(generators):
+            if index:
+                self._visit(generator.iter, inner, found)
+            for condition in generator.ifs:
+                self._visit(condition, inner, found)
+        if isinstance(node, ast.DictComp):
+            self._visit(node.key, inner, found)
+            self._visit(node.value, inner, found)
+        else:
+            self._visit(node.elt, inner, found)
 
     def _classify(self, node: ast.Call, envs) -> dict | None:
         func = node.func
@@ -1310,7 +1456,7 @@ class _Module:
             "lineno": node.lineno,
             "resolved_callee": target,
             "resolution": how,
-            "is_fiscal_consumer": target == FISCAL_CONSUMER,
+            "is_fiscal_consumer": _same_file(target, FISCAL_CONSUMER),
             "passes_contract_schema": passes_schema,
         }
 
@@ -1661,6 +1807,148 @@ def test_a_form_must_yield_the_module_it_names(shape, tmp_path) -> None:
         _Module(module_path).call_sites()
 
 
+_FINAL_QC = {
+    # F1 -- the factory NAME resolved against a fabricated chain.
+    "F1-factory-rebound-in-a-local-scope": (
+        "def main():\n"
+        "    _load_other = _load_fiscal\n"
+        "    ingest = _load_other()\n"
+        '    return ingest.load_manifest(Path("m"))\n'
+        "\n\n"
+        "main()\n"
+    ),
+    "F1-factory-rebound-by-a-parameter-default": (
+        "def run(_load_other=_load_fiscal):\n"
+        "    ingest = _load_other()\n"
+        '    return ingest.load_manifest(Path("m"))\n'
+        "\n\n"
+        "run()\n"
+    ),
+    # F3 -- a star import rebinds the consumer name without being counted.
+    "F3-star-import-over-the-defining-module": (
+        "def load_manifest(path, *, contract_schema=None):\n"
+        "    return path\n"
+        "\n\n"
+        "from some_shim import *\n"
+        "\n"
+        'load_manifest(Path("m"))\n'
+    ),
+}
+
+
+@pytest.mark.parametrize("shape", sorted(_FINAL_QC), ids=sorted(_FINAL_QC))
+def test_final_qc_confident_wrong_answers_now_refuse(shape, tmp_path) -> None:
+    """R-P26/F1,F3. Found by final QC, each proven by running the program.
+
+    In every one of these the walker named a NON-fiscal module, the gate stayed
+    GREEN, and the call reached the fiscal consumer's ``load_manifest`` with no
+    ``contract_schema`` -- which refused at runtime with
+    ``--contract-schema is required``. Every stated precondition of the form
+    held; the walker's answer was simply wrong.
+
+    F1: the ALIAS binding was flow-sensitive, but the FACTORY NAME it pointed
+    at was resolved against a hardcoded module scope, so a local rebinding --
+    by assignment or by parameter default -- was invisible.
+
+    F3: ``_scope_env``'s ImportFrom arm bound ``alias.asname or
+    alias.name.split(".")[0]``, which for a star import is the literal ``"*"``.
+    The module still showed ``load_manifest`` bound exactly once and form 1 was
+    granted, while Python's star import had rebound it.
+    """
+    (tmp_path / _TARGET_CONSUMER).write_text(
+        "def load_manifest(path, *, contract_schema=None):\n    return path\n"
+    )
+    (tmp_path / "other-consumer.py").write_text(
+        "def load_manifest(path):\n    return path\n"
+    )
+    module_path = tmp_path / f"qc_{shape.replace('-', '_')}.py"
+    module_path.write_text(_REACHING_PREAMBLE + _FINAL_QC[shape])
+
+    with pytest.raises(Unclassified):
+        _Module(module_path).call_sites()
+
+
+_CLASS_SCOPE_IS_SKIPPED = {
+    "comprehension": (
+        "ingest = _load_fiscal()\n"
+        "\n\n"
+        "class Runner:\n"
+        "    ingest = _load_other()\n"
+        '    results = [ingest.load_manifest(Path("m")) for _ in range(1)]\n'
+    ),
+    "lambda": (
+        "ingest = _load_fiscal()\n"
+        "\n\n"
+        "class Runner:\n"
+        "    ingest = _load_other()\n"
+        '    go = (lambda: ingest.load_manifest(Path("m")))()\n'
+    ),
+}
+
+
+@pytest.mark.parametrize("shape", sorted(_CLASS_SCOPE_IS_SKIPPED),
+                         ids=sorted(_CLASS_SCOPE_IS_SKIPPED))
+def test_a_class_body_is_invisible_inside_a_lambda_or_comprehension(
+        shape, tmp_path) -> None:
+    """R-P26/F2. ``_push`` dropped class scopes for a ``def`` and nothing else.
+
+    A lambda and a comprehension open scopes of their own, and Python skips the
+    class body for them exactly as it does for a method -- so the calls below
+    reach the MODULE-level ``ingest``, the fiscal consumer, which refused at
+    runtime with ``--contract-schema is required``. Neither expression went
+    through ``_push``, so both resolved against the class attribute and the
+    walker reported a non-fiscal module while the gate stayed green.
+
+    The correct answer is not a refusal, it is the FISCAL consumer -- and with
+    no schema passed, that is what turns the gate red.
+    """
+    (tmp_path / _TARGET_CONSUMER).write_text(
+        "def load_manifest(path, *, contract_schema=None):\n    return path\n"
+    )
+    (tmp_path / "other-consumer.py").write_text(
+        "def load_manifest(path):\n    return path\n"
+    )
+    module_path = tmp_path / f"classscope_{shape}.py"
+    module_path.write_text(_REACHING_PREAMBLE + _CLASS_SCOPE_IS_SKIPPED[shape])
+
+    sites = _Module(module_path).call_sites()
+    assert len(sites) == 1, sites
+    assert sites[0]["resolved_callee"] == (tmp_path / _TARGET_CONSUMER).resolve(), (
+        "the class attribute resolved a scope Python skips"
+    )
+    assert not sites[0]["passes_contract_schema"]
+
+
+def test_module_identity_is_filesystem_identity_not_a_path_string(tmp_path) -> None:
+    """R-P26/F4. ``Path.resolve()`` does not canonicalise case.
+
+    On this case-insensitive filesystem a caller can spell the consumer's
+    filename with different capitalisation: importlib loads the same bytes,
+    ``os.path.samefile`` says it is the same file, and ``Path.__eq__`` says it
+    is not. ``is_fiscal_consumer`` was a bare ``==``, so a real caller of the
+    fiscal consumer presented itself as some other module and passed in
+    silence.
+    """
+    assert _same_file(FISCAL_CONSUMER, FISCAL_CONSUMER)
+
+    cased = FISCAL_CONSUMER.with_name(
+        "-".join(part.capitalize() for part in FISCAL_CONSUMER.stem.split("-"))
+        + FISCAL_CONSUMER.suffix
+    )
+    assert cased.name == "Kansas-Fiscal-Document-Ingest.py", cased.name
+    # Only meaningful where the filesystem really is case-insensitive.
+    if not cased.exists():
+        pytest.skip(f"{cased.name} does not resolve; filesystem is case-sensitive")
+    assert cased != FISCAL_CONSUMER, "the two spellings are equal as paths"
+    assert cased.resolve() != FISCAL_CONSUMER, "Path.resolve() canonicalised case"
+    assert _same_file(cased, FISCAL_CONSUMER), "samefile did not see one file"
+
+    # A target that does not exist must not crash the walker, and is not the
+    # consumer.
+    missing = tmp_path / "never-written.py"
+    assert not _same_file(missing, FISCAL_CONSUMER)
+
+
 def test_the_consumer_refuses_a_missing_schema_at_runtime() -> None:
     """The residual risk claimed in the docstring below, executed.
 
@@ -1716,21 +2004,30 @@ def test_every_load_manifest_caller_enforces_the_pin() -> None:
     reference raises `Unclassified`. It proves a schema argument is passed, not
     that the schema is correct.
 
-    THE THREE FORMS. In all three, every name in the chain must be bound
+    THE THREE FORMS. In all three, EVERY name in the chain must be bound
     EXACTLY ONCE by the R-P16 binding visitor -- which counts every form Python
     binds a name with, including a ``global``/``nonlocal`` rebinding declared
-    in a NESTED scope -- in Python's own scope chain, where a class body is
-    never part of the chain a nested ``def`` searches:
+    in a NESTED scope -- resolved through PYTHON'S OWN SCOPE CHAIN AT THE CALL
+    SITE. A class body is never part of the chain a nested scope searches, and
+    a lambda and a comprehension open scopes of their own, so a class attribute
+    is invisible inside them too. A module containing a star import, a write
+    into its own namespace mapping, or an ``exec``/``eval`` resolves nothing at
+    all: none of those can be attributed to a single name.
+
+    Identity is compared by FILESYSTEM IDENTITY (``os.path.samefile``), not by
+    path string: this tree is on a case-insensitive filesystem, where two
+    spellings that differ only in case are one file.
 
       1. ``load_manifest(...)`` written bare, where the name resolves through
          that scope chain to an undecorated top-level ``def load_manifest`` in
          the module under inspection. Identity: that module's own file.
 
-      2. ``alias.load_manifest(...)`` where ``alias`` is bound to ``factory()``,
-         ``factory`` is bound at module scope to an UNDECORATED top-level
-         ``def`` that builds exactly one ``spec_from_file_location`` target AND
-         RETURNS the module loaded from that same target, on every return in
-         its own scope. Identity: that target.
+      2. ``alias.load_manifest(...)`` where ``alias`` is bound to ``factory()``
+         and ``factory`` resolves through that SAME scope chain to an
+         UNDECORATED top-level ``def`` that builds exactly one
+         ``spec_from_file_location`` target AND RETURNS the module loaded from
+         that same target, on every return in its own scope. Identity: that
+         target.
 
       3. ``alias.load_manifest(...)`` where ``alias`` is bound to
          ``module_from_spec(X)`` and ``X`` is bound to a
@@ -1746,14 +2043,24 @@ def test_every_load_manifest_caller_enforces_the_pin() -> None:
       * ``NAME = "load_manifest"`` then ``getattr(mod, NAME)`` -- the literal is
         bound to a variable, outside the call's own arguments.
       * a computed dispatch key, and ``"".join([...])`` spelling the name.
-      * ``exec``/``eval`` of generated source. (In the module under inspection
-        this is a module-wide refusal; in ANOTHER module it is invisible.)
+      * ``exec``/``eval`` of generated source, a write into a namespace
+        mapping, and ``from X import *``. (In the module under inspection each
+        of these is a module-wide REFUSAL; in ANOTHER module it is invisible.)
       * ``ingest.__dict__["load_" + "manifest"]`` and ``vars()`` subscripted by
         a computed key.
       * cross-module namespace mutation -- module A rebinding a name inside
         module B.
       * anything outside ``_tracked_python_files``: an untracked or ignored
         file, a notebook, a shell heredoc.
+      * a spec target that does not EXIST when the walker runs -- a path
+        built at runtime, or a file generated later. ``os.path.samefile``
+        cannot answer for a missing path, so identity falls back to path
+        equality there; a case-variant spelling of a not-yet-existing consumer
+        would compare unequal.
+      * two case-variant spellings of the SAME file inside one factory. The
+        spec-target set counts them as two targets, so the factory refuses
+        rather than resolving -- a refusal, not a wrong answer, but recorded
+        here because it is not the behaviour the clause reads as promising.
       * schema CORRECTNESS. The walker proves an argument is passed. Whether it
         names the right contract is `verify_contract`'s job, not this one's.
 
