@@ -133,13 +133,17 @@ packages, and a test asserts no superseded digest is ever pinned live.
 was actually superseded within the day is `da242fd8…`, and `d5248a54…` is the
 live one. Logged as the chain actually is.)
 
-**Finding 1 — a pin enforced on one of two real paths.**
+**Finding 1 — a pin enforced on some of the real paths.**
 `kansas-statute-rollout.py:92` called `load_manifest` with no schema, and
 enforcement was `if contract_schema is not None`. That file contained zero
 contract references while the same `source.yaml` declared it as
 `chapterTranches.rolloutRunner` for 85 tranches / 31,079 records. `contract_schema`
-is now REQUIRED and refuses by naming the entrypoint that omitted it; both
-entrypoints pass a schema and `enforcedAt` lists both.
+is now REQUIRED and refuses by naming the entrypoint that omitted it. The
+callers are no longer counted by hand here or anywhere else: they are
+enumerated by
+`tests/test_statecivics_contract_pin.py::test_every_load_manifest_caller_enforces_the_pin`,
+and `enforcedAt` must equal what that test discovers. (Round two still wrote
+"two"; the real number was three. See the round-three entry below.)
 
 **Finding 2 — the semantic digest was wrong and is deleted (R-P2).** JSON Schema
 property names share a namespace with annotation keywords, so stripping keys
@@ -165,6 +169,64 @@ artifact, DB seed or dump ever emitted one. The adapter is a sibling
 `build_entity_projection_artifact`, not an extension of
 `build_fiscal_graph_artifact`. Ingestion dispatches on `record_kind` BEFORE
 `_validate_record`'s `logical_document_id` requirement.
+
+### 2026-09-13 — pin round 3: the caller list becomes a construction
+
+**R-P7 — the third runner, and why there will not be a fourth surprise.**
+Round two's QC found `kansas-fiscal-marker-handoff.py:267` calling
+`load_manifest` with no schema. It is a real runner: `source.yaml:121` and
+`source.lock.json:77` of the fiscal source package declare it a `runner`, and
+`instances/ks-state-civics/vector-stores/kansas-fiscal-documents/README.md:72`
+documents its invocation. Because the new refusal is unconditional, that script
+returned 1 on EVERY invocation, plan included, and
+`tests/test_kansas_fiscal_marker_handoff.py::test_plan_makes_no_api_call_or_write`
+was red. It now takes `--contract-schema`, passes it through with
+`entrypoint="kansas-fiscal-marker-handoff.py"`, and refuses by naming itself.
+
+The list of callers is no longer written down anywhere as an assertion. Round
+one listed one runner while a second ran unpinned; round two listed two while a
+third ran unpinned. A hand-maintained list is the defect, not the remedy, so
+`test_every_load_manifest_caller_enforces_the_pin` walks the tracked Python
+source with `ast`, resolves every call to a function named `load_manifest` to
+the FILE its callee actually lives in — following the importlib
+`spec_from_file_location` target behind each module alias — and requires
+`contractPin.enforcedAt` to equal the discovered set exactly, in both
+directions, in all four declaring files. Name matching would be wrong here:
+`scripts/release/kscourts-ingest.py:73` defines an unrelated function of the
+same name, and `scripts/release/kscourts-decrypted-marker-retry.py:97` calls it.
+That call site is excluded because its `ingest` alias resolves to
+`scripts/release/kscourts-ingest.py`, which is not the fiscal consumer — by
+resolution, not by any filename special case. A call site the walker cannot
+resolve raises `Unclassified` and fails the test; a broken checker blocks.
+
+Discovered set, five call sites, three of them the fiscal consumer's:
+
+| call site | resolved callee | enforced |
+| --- | --- | --- |
+| `scripts/release/kansas-fiscal-document-ingest.py:991` | itself | yes |
+| `scripts/release/kansas-fiscal-marker-handoff.py:278` | `kansas-fiscal-document-ingest.py` | yes |
+| `scripts/release/kansas-statute-rollout.py:92` | `kansas-fiscal-document-ingest.py` | yes |
+| `scripts/release/kscourts-decrypted-marker-retry.py:97` | `kscourts-ingest.py` | n/a, different module |
+| `scripts/release/kscourts-ingest.py:931` | itself | n/a, different module |
+
+**R-P8 — the rollout suite is workstation-bound, and stays that way.** No pin
+and no INDEX hash was loosened. `tests/test_kansas_statute_rollout.py` requires
+`SVS_STATUTE_EXPORT_ROOT`, `SVS_STATUTE_CORPUS_ROOT`, `SVS_STATUTE_CUSTODY_ROOT`
+and `SVS_STATUTE_ROLLOUT_SEED`, all pointing at retained local corpora. Without
+them `pytest -q tests/test_kansas_statute_rollout.py` is 3 failed / 27 errors,
+zero skipped, by design — `required()` asserts "retained-input proof must not
+skip" — because a skipped retained-input proof is indistinguishable from a
+passing one on a machine that has no corpus. With the four variables set the
+same command ran 30 passed, zero skipped here.
+
+**R-P9 — "gate" is never a bare word.** Every claim below names the exact
+command it came from. `./scripts/run_gate.sh statewide` is repo A's statewide
+gate, takes no arguments, and returns 164 failed / 18 errors on A's `main`; it
+is compared BY COUNT against the same command on a branch, never by exit code,
+because its exit code is non-zero in both states. Anything narrower is named as
+an explicit path, e.g.
+`pytest -q tests/test_statecivics_contract_pin.py`. B has no `scripts/run_gate.sh`.
+
 
 ## Deliverables
 
@@ -208,7 +270,22 @@ pytest -q tests/test_fiscal_graph.py tests/test_fiscal_graph_artifact.py tests/t
 
 Structured-only entities, independent legal identity, typed directed lineage, coexisting partitions and complete manifest accounting.
 
-StateCivics commands must use scripts/run_gate.sh statewide; no host dependency installs. ExAIS pytest commands run inside its existing configured test/container environment; PostgreSQL proof needs explicitly disposable SVS_FISCAL_GRAPH_TEST_DATABASE_URL and cannot count skipped tests as passed. Real-source product acceptance is separate from synthetic tests.
+R-P9: name the exact command, never the word "gate" alone. StateCivics commands
+must use `./scripts/run_gate.sh statewide` (repo A, no arguments; 164 failed / 18
+errors on A's `main`, compared BY COUNT against the same command on the branch,
+never by exit code). Narrower runs are named as explicit paths. No host
+dependency installs.
+
+R-P8: `pytest -q tests/test_kansas_statute_rollout.py` is workstation-bound. It
+requires `SVS_STATUTE_EXPORT_ROOT`, `SVS_STATUTE_CORPUS_ROOT`,
+`SVS_STATUTE_CUSTODY_ROOT` and `SVS_STATUTE_ROLLOUT_SEED`, and ERRORS without
+them by design rather than skipping, because a skipped retained-input proof
+reads identically to a passing one: 3 failed / 27 errors, zero skipped, unset;
+30 passed, zero skipped with the four set.
+No pin and no INDEX hash may be loosened to make it run elsewhere.
+
+`pytest -q tests/test_statecivics_contract_pin.py` requires
+`SVS_STATECIVICS_REPO` and likewise fails, never skips, without it. ExAIS pytest commands run inside its existing configured test/container environment; PostgreSQL proof needs explicitly disposable SVS_FISCAL_GRAPH_TEST_DATABASE_URL and cannot count skipped tests as passed. Real-source product acceptance is separate from synthetic tests.
 
 ## Risks
 

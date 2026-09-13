@@ -8,12 +8,15 @@ independently, and ingestion refuses a branch it was not pinned against.
 
 from __future__ import annotations
 
+import ast
 import copy
 import json
 import os
+import subprocess
 from pathlib import Path
 
 import pytest
+import yaml
 
 from svs_common.statecivics_contract_pin import (
     DISPATCH_SHA256,
@@ -253,11 +256,17 @@ def test_declared_pin_matches_the_enforced_constants(package: Path) -> None:
         assert value in text
     assert "semanticSha256" not in text
 
-    # R-P1: BOTH real entrypoints must be declared as enforcing.
-    for entrypoint in ("scripts/release/kansas-fiscal-document-ingest.py --contract-schema",
-                       "scripts/release/kansas-statute-rollout.py --contract-schema"):
-        assert entrypoint in text
-        assert entrypoint in pin["enforcedAt"]
+    # R-P1/R-P7: enforcedAt is NOT checked against a list written here. A
+    # hardcoded list of entrypoints is the defect that recurred twice -- it was
+    # true when written and silently wrong once a third runner appeared. The
+    # declaration is checked for exact set equality against the callers
+    # discovered in the source by
+    # test_every_load_manifest_caller_enforces_the_pin below; all this asserts
+    # is that the two files agree with each other and that the list is present.
+    assert pin["enforcedAt"], "contractPin declares no enforcement point"
+    assert set(pin["enforcedAt"]) == set(
+        yaml.safe_load(text)["source"]["connector"]["contractPin"]["enforcedAt"]
+    )
 
 
 @pytest.mark.parametrize("package", SOURCE_PACKAGES, ids=lambda p: p.parent.parent.parent.name)
@@ -351,3 +360,361 @@ def test_superseded_entity_pin_is_kept_as_a_commit_digest_pair() -> None:
     live = {DOCUMENT_BRANCH_SHA256, ENTITY_BRANCH_SHA256, DISPATCH_SHA256}
     for _branch, _commit, digest in SUPERSEDED_BRANCH_SHA256:
         assert digest not in live, "a superseded digest is still pinned live"
+
+
+# --- R-P7: the enforcement points are DISCOVERED, never enumerated ------------
+#
+# A hand-maintained list of the document consumer's callers went stale twice.
+# Round one listed one entrypoint while a second ran unpinned; round two listed
+# two while a third, kansas-fiscal-marker-handoff.py, ran unpinned. The fix is a
+# construction: walk the tracked source, resolve every call to the consumer's
+# load_manifest BY MODULE IDENTITY, and require the declaration to equal what
+# was found. Nothing below names a caller, and nothing below skips one.
+
+FISCAL_CONSUMER = (REPO / "scripts" / "release" / "kansas-fiscal-document-ingest.py").resolve()
+CONSUMER_FUNCTION = "load_manifest"
+PIN_FLAG = "--contract-schema"
+
+
+class Unclassified(Exception):
+    """The walker could not decide which module a call site reaches.
+
+    This is never swallowed. A check that breaks must fail toward blocking, so
+    an unresolvable call site fails the test rather than being skipped: the one
+    thing worse than an unenforced caller is an unenforced caller the checker
+    silently declined to look at.
+    """
+
+
+def _tracked_python_files() -> list[Path]:
+    """Every Python file this repository would ship or review.
+
+    ``--cached`` is what is committed, ``--others --exclude-standard`` is what a
+    developer has added but not yet committed; together they are the source
+    tree. Ignored trees (vendored upstream research checkouts) are not B's
+    source and cannot become a runner.
+    """
+    listing = subprocess.run(
+        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard", "*.py"],
+        cwd=REPO, capture_output=True, text=True, check=True,
+    ).stdout
+    paths = {REPO / name for name in listing.split("\0") if name}
+    # tests/ is excluded by SCOPE, not by name-matching a caller: the suite
+    # deliberately calls the consumer both with and without a schema to prove
+    # both behaviours, and a test is not a runner that could appear in
+    # enforcedAt. Every other tracked path is in scope.
+    return sorted(p for p in paths if "tests" not in p.relative_to(REPO).parts and p.is_file())
+
+
+_SCOPE_BOUNDARIES = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+
+
+def _scope_nodes(statement: ast.AST):
+    """``statement`` and every descendant that shares its scope.
+
+    A nested def is yielded but never entered, so a function's own bindings
+    never leak into the enclosing scope and cannot resolve a name that is not
+    actually visible at a call site.
+    """
+    yield statement
+    if isinstance(statement, _SCOPE_BOUNDARIES):
+        return
+    for child in ast.iter_child_nodes(statement):
+        yield from _scope_nodes(child)
+
+
+def _scope_env(body: list[ast.stmt]) -> dict[str, ast.AST]:
+    env: dict[str, ast.AST] = {}
+    for statement in body:
+        for node in _scope_nodes(statement):
+            if isinstance(node, ast.Assign) and node.value is not None:
+                for target in node.targets:
+                    if isinstance(target, ast.Name):
+                        env[target.id] = node.value
+            elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name) and node.value:
+                env[node.target.id] = node.value
+            elif isinstance(node, (ast.Import, ast.ImportFrom)):
+                for alias in node.names:
+                    env[alias.asname or alias.name.split(".")[0]] = node
+    return env
+
+
+def _lookup(name: str, envs: tuple[dict[str, ast.AST], ...]) -> ast.AST:
+    for env in reversed(envs):
+        if name in env:
+            return env[name]
+    raise Unclassified(f"name {name!r} is not bound in any enclosing scope")
+
+
+def _callee_name(func: ast.AST) -> str:
+    if isinstance(func, ast.Attribute):
+        return func.attr
+    if isinstance(func, ast.Name):
+        return func.id
+    return ""
+
+
+def _eval_path(node: ast.AST, envs: tuple[dict[str, ast.AST], ...], own: Path):
+    """Symbolically evaluate a path-valued expression.
+
+    Understands exactly the pathlib vocabulary this tree uses to point at
+    another script. Anything else raises, which blocks.
+    """
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    if isinstance(node, ast.Name):
+        return _eval_path(_lookup(node.id, envs), envs, own)
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Div):
+        left = _eval_path(node.left, envs, own)
+        right = _eval_path(node.right, envs, own)
+        if not isinstance(left, Path):
+            raise Unclassified("path division on a non-path left operand")
+        return left / right
+    if isinstance(node, ast.Attribute) and node.attr == "parent":
+        return Path(_eval_path(node.value, envs, own)).parent
+    if isinstance(node, ast.Subscript):
+        value = node.value
+        index = node.slice
+        if (isinstance(value, ast.Attribute) and value.attr == "parents"
+                and isinstance(index, ast.Constant) and isinstance(index.value, int)):
+            return Path(_eval_path(value.value, envs, own)).parents[index.value]
+        raise Unclassified("unsupported subscript in a path expression")
+    if isinstance(node, ast.Call):
+        func = node.func
+        if (isinstance(func, ast.Name) and func.id == "Path" and len(node.args) == 1
+                and isinstance(node.args[0], ast.Name) and node.args[0].id == "__file__"):
+            return own
+        if isinstance(func, ast.Attribute):
+            base = _eval_path(func.value, envs, own)
+            if func.attr == "resolve":
+                return Path(base).resolve()
+            if func.attr == "absolute":
+                return Path(base).absolute()
+            if func.attr == "with_name" and len(node.args) == 1:
+                return Path(base).parent / _eval_path(node.args[0], envs, own)
+            if func.attr == "joinpath":
+                result = Path(base)
+                for argument in node.args:
+                    result = result / _eval_path(argument, envs, own)
+                return result
+        raise Unclassified(f"unsupported call in a path expression: {ast.dump(node)[:90]}")
+    raise Unclassified(f"unsupported path expression: {ast.dump(node)[:90]}")
+
+
+def _spec_target(node: ast.AST, envs, own: Path) -> Path | None:
+    """If ``node`` is ``spec_from_file_location(name, target)``, return target."""
+    if not isinstance(node, ast.Call) or _callee_name(node.func) != "spec_from_file_location":
+        return None
+    if len(node.args) < 2:
+        raise Unclassified("spec_from_file_location without a file argument")
+    return Path(_eval_path(node.args[1], envs, own)).resolve()
+
+
+class _Module:
+    """One source file, and the module identity of every name it binds."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = path.resolve()
+        self.tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        self.defines_consumer_function = any(
+            isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name == CONSUMER_FUNCTION
+            for node in self.tree.body
+        )
+        self.factories = self._module_factories()
+
+    def _module_factories(self) -> dict[str, Path]:
+        """Functions that load and return a module from an explicit file.
+
+        ``_load_ingest_command()`` and ``load_ingest_module()`` differ only in
+        name; both are recognised by what they DO -- build a spec from a file
+        path -- so a fourth one with any name is recognised too.
+        """
+        module_env = _scope_env(self.tree.body)
+        factories: dict[str, Path] = {}
+        for node in self.tree.body:
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            envs = (module_env, _scope_env(node.body))
+            targets = set()
+            for sub in ast.walk(node):
+                target = _spec_target(sub, envs, self.path)
+                if target is not None:
+                    targets.add(target)
+            if len(targets) == 1:
+                factories[node.name] = next(iter(targets))
+            elif len(targets) > 1:
+                raise Unclassified(
+                    f"{self.path}: {node.name}() loads more than one module "
+                    f"({sorted(str(t) for t in targets)}); its return value is ambiguous"
+                )
+        return factories
+
+    def _resolve_module_name(self, name: str, envs) -> Path:
+        """Resolve a name bound to a module object to the FILE it was loaded
+        from. Name equality is never consulted; only the spec target is."""
+        bound = _lookup(name, envs)
+        if isinstance(bound, (ast.Import, ast.ImportFrom)):
+            raise Unclassified(
+                f"{name!r} is an imported module; its file identity is not "
+                "statically resolvable here"
+            )
+        if isinstance(bound, ast.Call):
+            callee = _callee_name(bound.func)
+            if callee in self.factories:
+                return self.factories[callee]
+            if callee == "module_from_spec" and bound.args:
+                spec_argument = bound.args[0]
+                if isinstance(spec_argument, ast.Name):
+                    spec_node = _lookup(spec_argument.id, envs)
+                else:
+                    spec_node = spec_argument
+                target = _spec_target(spec_node, envs, self.path)
+                if target is not None:
+                    return target
+            target = _spec_target(bound, envs, self.path)
+            if target is not None:
+                return target
+        raise Unclassified(
+            f"{name!r} is bound to an expression the walker cannot resolve to a "
+            f"module file: {ast.dump(bound)[:120]}"
+        )
+
+    def call_sites(self) -> list[dict]:
+        """Every call to a function named ``load_manifest``, each carrying the
+        resolved file of the module it actually reaches."""
+        found: list[dict] = []
+        self._walk(self.tree.body, (), found)
+        return found
+
+    def _walk(self, body, envs, found) -> None:
+        envs = envs + (_scope_env(body),)
+        for statement in body:
+            for node in _scope_nodes(statement):
+                if isinstance(node, _SCOPE_BOUNDARIES):
+                    self._walk(node.body, envs, found)
+                elif isinstance(node, ast.Call):
+                    site = self._classify(node, envs)
+                    if site is not None:
+                        found.append(site)
+
+    def _classify(self, node: ast.Call, envs) -> dict | None:
+        func = node.func
+        if (_callee_name(func) == "getattr" and len(node.args) >= 2
+                and isinstance(node.args[1], ast.Constant)
+                and node.args[1].value == CONSUMER_FUNCTION):
+            raise Unclassified(
+                f"{self.path}:{node.lineno}: load_manifest is reached through "
+                "getattr; the callee cannot be resolved statically"
+            )
+        if _callee_name(func) != CONSUMER_FUNCTION:
+            return None
+        if isinstance(func, ast.Attribute):
+            if not isinstance(func.value, ast.Name):
+                raise Unclassified(
+                    f"{self.path}:{node.lineno}: load_manifest is called on a "
+                    "non-name expression; its module cannot be resolved"
+                )
+            target = self._resolve_module_name(func.value.id, envs)
+            how = f"alias {func.value.id!r} -> importlib spec target"
+        else:
+            if not self.defines_consumer_function:
+                raise Unclassified(
+                    f"{self.path}:{node.lineno}: bare load_manifest() in a module "
+                    "that does not define it"
+                )
+            target = self.path
+            how = "bare call inside the defining module"
+        keywords = {kw.arg for kw in node.keywords}
+        if None in keywords and "contract_schema" not in keywords:
+            raise Unclassified(
+                f"{self.path}:{node.lineno}: contract_schema may be hidden in a "
+                "**kwargs splat; the call cannot be judged statically"
+            )
+        schema = next((kw.value for kw in node.keywords if kw.arg == "contract_schema"), None)
+        passes_schema = schema is not None and not (
+            isinstance(schema, ast.Constant) and schema.value is None
+        )
+        return {
+            "file": self.path,
+            "lineno": node.lineno,
+            "resolved_callee": target,
+            "resolution": how,
+            "is_fiscal_consumer": target == FISCAL_CONSUMER,
+            "passes_contract_schema": passes_schema,
+        }
+
+
+def discover_load_manifest_call_sites() -> list[dict]:
+    sites: list[dict] = []
+    for path in _tracked_python_files():
+        sites.extend(_Module(path).call_sites())
+    return sites
+
+
+def _declared_enforced_at() -> dict[str, list[str]]:
+    """Every contractPin.enforcedAt in every source package, found structurally."""
+    def walk(node, path, out):
+        if isinstance(node, dict):
+            if "enforcedAt" in node:
+                out[path + "/enforcedAt"] = node["enforcedAt"]
+            for key, value in node.items():
+                walk(value, f"{path}/{key}", out)
+        elif isinstance(node, list):
+            for index, value in enumerate(node):
+                walk(value, f"{path}[{index}]", out)
+
+    declarations: dict[str, list[str]] = {}
+    for package in sorted(REPO.glob("instances/*/vector-stores/*/sources/*")):
+        for name, loader in (("source.yaml", yaml.safe_load), ("source.lock.json", json.loads)):
+            document = package / name
+            if not document.exists():
+                continue
+            walk(loader(document.read_text()), str(document.relative_to(REPO)), declarations)
+    return declarations
+
+
+def test_every_load_manifest_caller_enforces_the_pin() -> None:
+    """The enforcement points are computed from the source, not declared.
+
+    Three properties, all of them constructions:
+
+    1. Every call to the fiscal document consumer's ``load_manifest`` passes a
+       ``contract_schema``. The consumer is identified by the FILE a call
+       resolves to -- the importlib ``spec_from_file_location`` target behind
+       the alias -- so ``kscourts-ingest.py``'s unrelated function of the same
+       name is excluded because it resolves elsewhere, not because anything
+       here knows its name.
+    2. ``contractPin.enforcedAt`` equals the discovered caller set exactly, in
+       both directions and in every file that declares it. A fourth caller
+       fails this with no human updating a list; so does a stale entry.
+    3. A call site the walker cannot classify raises ``Unclassified`` and fails
+       the test. Breaking the checker blocks; it never quietly passes.
+    """
+    sites = discover_load_manifest_call_sites()
+    assert sites, "the walker found no load_manifest calls at all; it is broken"
+
+    fiscal = [site for site in sites if site["is_fiscal_consumer"]]
+    assert fiscal, "no caller of the fiscal document consumer was resolved; the walker is broken"
+
+    unpinned = [
+        f"{site['file'].relative_to(REPO)}:{site['lineno']}"
+        for site in fiscal
+        if not site["passes_contract_schema"]
+    ]
+    assert not unpinned, (
+        "these callers of the fiscal document consumer's load_manifest do not "
+        f"pass a contract_schema: {unpinned}"
+    )
+
+    discovered = {
+        f"{site['file'].relative_to(REPO)} {PIN_FLAG}" for site in fiscal
+    }
+    declarations = _declared_enforced_at()
+    assert declarations, "no contractPin.enforcedAt declaration was found to check"
+    for where, declared in sorted(declarations.items()):
+        assert set(declared) == discovered, (
+            f"{where} does not match the callers discovered in the source.\n"
+            f"  declared but not a discovered caller: {sorted(set(declared) - discovered)}\n"
+            f"  a discovered caller but not declared: {sorted(discovered - set(declared))}"
+        )

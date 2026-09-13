@@ -313,10 +313,17 @@ def load_manifest(
     """Load a desired-state manifest. ``contract_schema`` is REQUIRED.
 
     It is a keyword with a ``None`` default only so the refusal can name the
-    entrypoint that omitted it. An optional pin is not a pin: this consumer's
-    two real callers are this script and kansas-statute-rollout.py, and for a
-    while only the first passed a schema while the source package declared the
-    pin as though both did.
+    entrypoint that omitted it. An optional pin is not a pin: for a while only
+    one caller passed a schema while the source package declared the pin as
+    though every caller did.
+
+    This consumer's callers are NOT enumerated here. Any hand-written list of
+    them goes stale silently, which is exactly how this defect survived two
+    rounds. They are discovered instead by
+    ``tests/test_statecivics_contract_pin.py::test_every_load_manifest_caller_enforces_the_pin``,
+    which walks the tracked source tree with ``ast``, resolves each call's
+    callee by module identity, and requires the discovered set to equal the
+    ``contractPin.enforcedAt`` declaration exactly in both directions.
     """
     _validate_source_family(source_family, vector_store_slug)
     if contract_schema is None:

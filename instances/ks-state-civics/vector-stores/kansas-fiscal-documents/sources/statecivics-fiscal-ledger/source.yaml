@@ -48,10 +48,18 @@ source:
         commit: e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a
         sha256: da242fd879b3c124449b6c1ddead558db64d8f0427ade638bf596c8fd1d9f17e
       enforcedBy: packages/svs_common/svs_common/statecivics_contract_pin.py
-      # BOTH real ingestion entrypoints enforce. Listing one while the other ran
-      # unpinned is the defect this pin exists to remove.
+      # EVERY runner that reads a desired-state manifest through the document
+      # consumer enforces. Listing some while another ran unpinned is the defect
+      # this pin exists to remove, and it recurred because this list was
+      # hand-maintained. It is no longer trusted as written: it is checked for
+      # exact set equality against the call sites discovered by walking the
+      # tracked source tree in
+      # tests/test_statecivics_contract_pin.py::test_every_load_manifest_caller_enforces_the_pin.
+      # A fourth caller, or a stale entry here, fails that test with no human
+      # updating a list.
       enforcedAt:
         - scripts/release/kansas-fiscal-document-ingest.py --contract-schema
+        - scripts/release/kansas-fiscal-marker-handoff.py --contract-schema
         - scripts/release/kansas-statute-rollout.py --contract-schema
       enforcedPins:
         document-consumer: [document, dispatch]
@@ -124,6 +132,8 @@ artifactGeneration:
       - scripts/release/kansas-fiscal-marker-handoff.py
       - --manifest
       - ${STATECIVICS_FISCAL_MANIFEST}
+      - --contract-schema
+      - ${STATECIVICS_RETRIEVAL_EXPORT_SCHEMA}
       - --state
       - .release/cells/ks-state-civics/kansas-fiscal-documents/state.json
       - --output-dir

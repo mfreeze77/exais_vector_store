@@ -33,8 +33,10 @@
       "enforcedBy": "packages/svs_common/svs_common/statecivics_contract_pin.py",
       "enforcedAt": [
         "scripts/release/kansas-fiscal-document-ingest.py --contract-schema",
+        "scripts/release/kansas-fiscal-marker-handoff.py --contract-schema",
         "scripts/release/kansas-statute-rollout.py --contract-schema"
       ],
+      "enforcedAtIsDiscovered": "Not hand-maintained. tests/test_statecivics_contract_pin.py::test_every_load_manifest_caller_enforces_the_pin walks the tracked source tree with ast, resolves each load_manifest call to its callee module by importlib spec target rather than by name, and requires this list to equal the discovered caller set exactly in both directions.",
       "enforcedPins": {
         "document-consumer": [
           "document",
