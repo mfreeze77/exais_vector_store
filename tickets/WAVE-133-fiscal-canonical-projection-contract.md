@@ -225,6 +225,17 @@ every chain must be bound exactly once under the R-P16 binding visitor, checked
 at resolution time. The scope chain is now Python's: a class body is not part of
 the chain a nested `def` searches, so a class attribute can neither resolve a
 method's alias to the wrong module nor refuse one the language resolves cleanly.
+Three defects of exactly the class R-P26 anticipates -- a program INSIDE an
+accepted form resolving confidently and wrongly -- were found in-round by
+executing the shape batteries against the new choke point, and closed: a
+`global`/`nonlocal` rebinding declared in a nested scope, invisible to the
+enclosing scope's binding visitor; a factory that builds one spec and RETURNS a
+different module, so what it named and what it yielded came apart; and a
+DECORATED top-level `def load_manifest`, where the name need not reach the body
+written under it. Two of the three were executed in the unsafe direction, where
+the call really does reach the fiscal consumer unpinned and the walker reported
+another module and said nothing at all.
+
 The three forms, and the shapes that are NOT detected, are listed in that test's
 own docstring — a list of what the checker cannot see is a specification, not a
 cache, and it changes only when the checker is deliberately strengthened.

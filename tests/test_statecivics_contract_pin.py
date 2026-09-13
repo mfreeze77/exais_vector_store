@@ -972,6 +972,13 @@ class _Module:
                 "not resolve to a top-level def of that name in this module; "
                 f"the name is bound here by {ast.dump(binding)[:100]}"
             )
+        if binding.decorator_list:
+            raise Unclassified(
+                f"{self.path}:{binding.lineno}: {CONSUMER_FUNCTION} is "
+                f"decorated ({len(binding.decorator_list)} decorator(s)), so "
+                "the name does not necessarily reach the body written under "
+                "it and the module this call lands in cannot be read from it"
+            )
         return self.path, "form 1 (bare call in the defining module)"
 
     # --- form 2 -------------------------------------------------------------
@@ -1006,21 +1013,118 @@ class _Module:
                 "return value is the decorator's, not its body's, and the "
                 "module it yields cannot be read from the body"
             )
-        target = self._sole_spec_target(definition)
-        return target, f"form 2 (alias {alias!r} <- {factory}() -> spec target)"
+        factory_env = _scope_env(definition.body, _parameters(definition))
+        _add_reaching_declarations(
+            factory_env, definition.body, ast.Nonlocal,
+            "nonlocal rebinding declared in a nested scope")
+        factory_envs = _push(self._module_scope(), factory_env, "function")
+        # Two clauses, both required: the factory MENTIONS exactly one module,
+        # and the module it RETURNS is that one. Either alone is satisfiable by
+        # a function that builds a decoy spec and hands back something else.
+        mentioned = self._sole_spec_target(definition, factory_envs)
+        returned = self._factory_return_target(definition, factory_envs)
+        if mentioned != returned:
+            raise Unclassified(
+                f"{self.path}:{definition.lineno}: {factory}() builds a spec "
+                f"for {mentioned} but returns the module loaded from "
+                f"{returned}; what it yields is not what it names"
+            )
+        return returned, f"form 2 (alias {alias!r} <- {factory}() -> spec target)"
 
-    def _sole_spec_target(self, definition) -> Path:
+    def _module_from_spec_target(self, expression, envs, where: str) -> Path:
+        """The file behind ``module_from_spec(X)``, or behind a name bound to one.
+
+        The single implementation of form 3's chain. Form 2 uses it too, on the
+        factory's RETURN value, so "this factory yields that module" is decided
+        by what the factory actually hands back rather than by what it merely
+        mentions.
+        """
+        node = expression
+        if isinstance(node, ast.Name):
+            node = _lookup(node.id, envs, self.path)
+        if not (isinstance(node, ast.Call)
+                and _callee_name(node.func) == "module_from_spec"):
+            raise Unclassified(
+                f"{where}: not a module_from_spec(...) call: "
+                f"{ast.dump(node)[:100]}"
+            )
+        if len(node.args) != 1 or node.keywords:
+            raise Unclassified(
+                f"{where}: module_from_spec is called with {len(node.args)} "
+                f"positional and {len(node.keywords)} keyword argument(s); "
+                "exactly one positional spec is accepted"
+            )
+        argument = node.args[0]
+        if not isinstance(argument, ast.Name):
+            raise Unclassified(
+                f"{where}: module_from_spec's argument is not a name bound to a "
+                "spec, so the spec cannot be resolved through the binding visitor"
+            )
+        spec_node = _lookup(argument.id, envs, self.path)
+        if not (isinstance(spec_node, ast.Call)
+                and _callee_name(spec_node.func) == "spec_from_file_location"):
+            raise Unclassified(
+                f"{where}: {argument.id!r} is not bound to a "
+                f"spec_from_file_location(...) call: {ast.dump(spec_node)[:100]}"
+            )
+        target = _spec_target(spec_node, envs, self.path)
+        if target is None:
+            raise Unclassified(
+                f"{where}: the spec bound to {argument.id!r} has no resolvable "
+                "file target"
+            )
+        return target
+
+    def _factory_return_target(self, definition, envs) -> Path:
+        """The module the factory actually RETURNS.
+
+        R-P26, found in-round. "Builds exactly one spec" is a claim about what
+        a function MENTIONS, not about what it yields, and the two come apart:
+
+            def _decoy():
+                spec = spec_from_file_location("d", <kscourts-ingest.py>)
+                return _fiscal          # built elsewhere, at module scope
+
+        One spec target, undecorated, module-scope, every name bound once --
+        squarely inside accepted form 2 -- and the walker answered
+        `kscourts-ingest.py` for a call that reaches the FISCAL consumer with no
+        pin, then said nothing. A SILENT PASS, the exact outcome this check
+        exists to prevent. Requiring every `return` in the factory's own scope
+        to be form 3 closes it: what the factory hands back is what its
+        identity is.
+        """
+        returns = [node for statement in definition.body
+                   for node in _scope_nodes(statement)
+                   if isinstance(node, ast.Return)]
+        if not returns:
+            raise Unclassified(
+                f"{self.path}:{definition.lineno}: {definition.name}() has no "
+                "return statement in its own scope, so it yields no module"
+            )
+        targets = set()
+        for node in returns:
+            if node.value is None:
+                raise Unclassified(
+                    f"{self.path}:{node.lineno}: {definition.name}() has a bare "
+                    "`return`, so on that path it yields no module"
+                )
+            targets.add(self._module_from_spec_target(
+                node.value, envs, f"{self.path}:{node.lineno}"))
+        if len(targets) != 1:
+            raise Unclassified(
+                f"{self.path}:{definition.lineno}: {definition.name}() returns "
+                f"{len(targets)} different modules "
+                f"({sorted(str(t) for t in targets)})"
+            )
+        return next(iter(targets))
+
+    def _sole_spec_target(self, definition, envs) -> Path:
         """The ONE file ``definition`` builds a module spec from.
 
         Resolution time, for this one function: nothing is computed for the
         other functions in the module, so a sibling helper that happens to
         build two specs cannot refuse a caller that never touches it.
         """
-        factory_env = _scope_env(definition.body, _parameters(definition))
-        _add_reaching_declarations(
-            factory_env, definition.body, ast.Nonlocal,
-            "nonlocal rebinding declared in a nested scope")
-        envs = _push(self._module_scope(), factory_env, "function")
         targets = set()
         for sub in ast.walk(definition):
             target = _spec_target(sub, envs, self.path)
@@ -1047,34 +1151,9 @@ class _Module:
         and whatever the path argument reads -- goes through `_lookup`, so each
         must be bound exactly once under the same discipline.
         """
-        if len(bound.args) != 1 or bound.keywords:
-            raise Unclassified(
-                f"{self.path}:{bound.lineno}: module_from_spec is called with "
-                f"{len(bound.args)} positional and {len(bound.keywords)} keyword "
-                "argument(s); form 3 accepts exactly one positional spec"
-            )
-        argument = bound.args[0]
-        if not isinstance(argument, ast.Name):
-            raise Unclassified(
-                f"{self.path}:{bound.lineno}: module_from_spec's argument is "
-                "not a name bound to a spec, so the spec cannot be resolved "
-                "through the binding visitor"
-            )
-        spec_node = _lookup(argument.id, envs, self.path)
-        if not (isinstance(spec_node, ast.Call)
-                and _callee_name(spec_node.func) == "spec_from_file_location"):
-            raise Unclassified(
-                f"{self.path}:{bound.lineno}: {argument.id!r} is not bound to a "
-                f"spec_from_file_location(...) call: {ast.dump(spec_node)[:100]}"
-            )
-        target = _spec_target(spec_node, envs, self.path)
-        if target is None:
-            raise Unclassified(
-                f"{self.path}:{bound.lineno}: the spec bound to {argument.id!r} "
-                "has no resolvable file target"
-            )
-        return target, (f"form 3 (alias {alias!r} <- module_from_spec"
-                        f"({argument.id}) -> spec target)")
+        target = self._module_from_spec_target(
+            bound, envs, f"{self.path}:{bound.lineno}")
+        return target, f"form 3 (alias {alias!r} <- module_from_spec -> spec target)"
 
     def call_sites(self) -> list[dict]:
         """Every call to a function named ``load_manifest``, each carrying the
@@ -1511,6 +1590,77 @@ def test_a_nested_global_or_nonlocal_rebinding_refuses(shape, tmp_path) -> None:
         _Module(module_path).call_sites()
 
 
+_YIELDS_WHAT_IT_NAMES = {
+    "decorated-consumer-def": (
+        "fiscal = _load_fiscal()\n"
+        "\n\n"
+        "def swap(fn):\n"
+        "    return fiscal\n"
+        "\n\n"
+        "@swap\n"
+        "def load_manifest(path, *, contract_schema=None):\n"
+        "    return path\n"
+        "\n\n"
+        'load_manifest(Path("m"))\n'
+    ),
+    "factory-returns-a-decoy": (
+        "_fiscal_spec = importlib.util.spec_from_file_location(\n"
+        '    "f", Path(__file__).parent / ' + repr(_TARGET_CONSUMER) + ")\n"
+        "_fiscal = importlib.util.module_from_spec(_fiscal_spec)\n"
+        "\n\n"
+        "def _decoy():\n"
+        "    spec = importlib.util.spec_from_file_location(\n"
+        '        "d", Path(__file__).parent / "other-consumer.py")\n'
+        "    return _fiscal\n"
+        "\n\n"
+        "ingest = _decoy()\n"
+        'ingest.load_manifest(Path("m"))\n'
+    ),
+    "factory-returns-an-imported-module": (
+        "import json\n"
+        "\n\n"
+        "def _decoy():\n"
+        "    spec = importlib.util.spec_from_file_location(\n"
+        '        "d", Path(__file__).parent / ' + repr(_TARGET_CONSUMER) + ")\n"
+        "    return json\n"
+        "\n\n"
+        "ingest = _decoy()\n"
+        'ingest.load_manifest(Path("m"))\n'
+    ),
+}
+
+
+@pytest.mark.parametrize("shape", sorted(_YIELDS_WHAT_IT_NAMES),
+                         ids=sorted(_YIELDS_WHAT_IT_NAMES))
+def test_a_form_must_yield_the_module_it_names(shape, tmp_path) -> None:
+    """R-P26. What a program MENTIONS is not what it YIELDS.
+
+    Both shapes here sit squarely inside an accepted form -- undecorated
+    module-scope factory, exactly one spec target, every name bound once -- and
+    both resolved CONFIDENTLY AND WRONGLY before these clauses existed.
+
+    ``factory-returns-a-decoy`` is the unsafe direction, executed: the factory
+    names ``other-consumer.py`` and hands back the FISCAL consumer, so the call
+    really does reach the pinned consumer with no schema and the walker
+    reported another module and said nothing at all.
+
+    ``decorated-consumer-def`` is the same defect on the bare-call path: a
+    decorator can replace the function the ``def`` wrote, so the name no longer
+    reaches the body under it.
+    """
+    (tmp_path / _TARGET_CONSUMER).write_text(
+        "def load_manifest(path, *, contract_schema=None):\n    return path\n"
+    )
+    (tmp_path / "other-consumer.py").write_text(
+        "def load_manifest(path):\n    return path\n"
+    )
+    module_path = tmp_path / f"yields_{shape.replace('-', '_')}.py"
+    module_path.write_text(_REACHING_PREAMBLE + _YIELDS_WHAT_IT_NAMES[shape])
+
+    with pytest.raises(Unclassified):
+        _Module(module_path).call_sites()
+
+
 def test_the_consumer_refuses_a_missing_schema_at_runtime() -> None:
     """The residual risk claimed in the docstring below, executed.
 
@@ -1578,8 +1728,9 @@ def test_every_load_manifest_caller_enforces_the_pin() -> None:
 
       2. ``alias.load_manifest(...)`` where ``alias`` is bound to ``factory()``,
          ``factory`` is bound at module scope to an UNDECORATED top-level
-         ``def``, and that def builds exactly one ``spec_from_file_location``
-         target. Identity: that target.
+         ``def`` that builds exactly one ``spec_from_file_location`` target AND
+         RETURNS the module loaded from that same target, on every return in
+         its own scope. Identity: that target.
 
       3. ``alias.load_manifest(...)`` where ``alias`` is bound to
          ``module_from_spec(X)`` and ``X`` is bound to a
