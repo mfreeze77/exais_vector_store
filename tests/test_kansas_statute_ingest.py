@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 import pytest
-from test_kansas_fiscal_document_ingest import _load_module, _record, _write_manifest, _write_custody
+from test_kansas_fiscal_document_ingest import CONTRACT_FIXTURE, _load_module, _record, _write_manifest, _write_custody
 from test_statecivics_statutes import small_harvest, sha, URL
 from svs_common.statecivics_statutes import preflight_statute_harvest, STATECIVICS_STATUTE_MARKDOWN_PROFILE, StatuteHarvest
 
@@ -22,7 +22,7 @@ def setup(tmp_path):
     record['record_digest_sha256'] = ingest.record_digest(record)
     manifest_path = tmp_path / 'export.jsonl'
     _write_manifest(manifest_path, [record])
-    manifest = ingest.load_manifest(manifest_path, vector_store_slug='kansas-statutes', source_family='kansas-statutes')
+    manifest = ingest.load_manifest(manifest_path, vector_store_slug='kansas-statutes', source_family='kansas-statutes', contract_schema=CONTRACT_FIXTURE)
     custody = tmp_path / 'custody'
     _write_custody(custody, record, text.encode())
     state = {'schema_version': 1, 'vector_store_id': 'vs_statutes', 'records': {}}
@@ -159,7 +159,7 @@ def test_join_and_family_mismatch_fail_before_any_api_effect(setup, tmp_path, mo
     with pytest.raises(ingest.FiscalIngestError, match='explicit'):
         ingest.plan_operations(manifest, custody_root=custody, state=state, statute_harvest=harvest)
     with pytest.raises(ingest.FiscalIngestError, match='slug'):
-        ingest.load_manifest(manifest.path, source_family='kansas-statutes')
+        ingest.load_manifest(manifest.path, source_family='kansas-statutes', contract_schema=CONTRACT_FIXTURE)
     object_path = _write_custody(custody, manifest.records[0], b'wrong')
     original_path = custody / 'kanview' / manifest.records[0]['content_hash_sha256'][:2] / manifest.records[0]['content_hash_sha256']
     original_path.write_bytes(b'wrong')

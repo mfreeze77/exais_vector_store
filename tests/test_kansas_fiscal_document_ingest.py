@@ -11,6 +11,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = ROOT / "scripts" / "release"
 SCRIPT = RELEASE / "kansas-fiscal-document-ingest.py"
+CONTRACT_FIXTURE = Path(__file__).parent / "fixtures" / "statecivics-retrieval-export-record.314beafe.json"
 sys.path.insert(0, str(RELEASE))
 
 
@@ -107,7 +108,7 @@ def test_manifest_verifies_record_digest_and_target(ingest, tmp_path):
     manifest_path = tmp_path / "manifest.jsonl"
     _write_manifest(manifest_path, [record])
 
-    manifest = ingest.load_manifest(manifest_path)
+    manifest = ingest.load_manifest(manifest_path, contract_schema=CONTRACT_FIXTURE)
 
     assert manifest.records == (record,)
     assert manifest.sha256 == hashlib.sha256(manifest_path.read_bytes()).hexdigest()
@@ -115,7 +116,7 @@ def test_manifest_verifies_record_digest_and_target(ingest, tmp_path):
     record["citation_url"] = "https://attacker.invalid/substitution.pdf"
     _write_manifest(manifest_path, [record])
     with pytest.raises(ingest.FiscalIngestError, match="record digest"):
-        ingest.load_manifest(manifest_path)
+        ingest.load_manifest(manifest_path, contract_schema=CONTRACT_FIXTURE)
 
 
 def test_manifest_refuses_stale_upsert_after_rights_change(ingest, tmp_path):
@@ -127,7 +128,7 @@ def test_manifest_refuses_stale_upsert_after_rights_change(ingest, tmp_path):
     _write_manifest(path, [record])
 
     with pytest.raises(ingest.FiscalIngestError, match="action must be remove"):
-        ingest.load_manifest(path)
+        ingest.load_manifest(path, contract_schema=CONTRACT_FIXTURE)
 
 
 def test_manifest_refuses_raw_canonical_table_extracts(ingest, tmp_path):
@@ -139,7 +140,7 @@ def test_manifest_refuses_raw_canonical_table_extracts(ingest, tmp_path):
     _write_manifest(path, [record])
 
     with pytest.raises(ingest.FiscalIngestError, match="not retrieval-exportable"):
-        ingest.load_manifest(path)
+        ingest.load_manifest(path, contract_schema=CONTRACT_FIXTURE)
 
 
 def test_custody_read_verifies_pdf_header_hash_and_size(ingest, tmp_path):
@@ -452,7 +453,6 @@ def test_idempotency_key_changes_with_desired_record_not_export_clock(ingest):
 
 # --- WAVE-133 contract pin enforcement ---------------------------------------
 
-CONTRACT_FIXTURE = Path(__file__).parent / "fixtures" / "statecivics-retrieval-export-record.314beafe.json"
 
 
 def test_ingest_accepts_the_pinned_document_branch(ingest, tmp_path):
@@ -463,7 +463,8 @@ def test_ingest_accepts_the_pinned_document_branch(ingest, tmp_path):
 
     manifest = ingest.load_manifest(manifest_path, contract_schema=CONTRACT_FIXTURE)
     assert len(manifest.records) == 1
-    assert ingest.verify_contract_pin(CONTRACT_FIXTURE) == ingest.DOCUMENT_BRANCH_SHA256
+    pins = ingest.verify_contract_pin(CONTRACT_FIXTURE)
+    assert pins == {"document": ingest.DOCUMENT_BRANCH_SHA256, "dispatch": ingest.DISPATCH_SHA256}
 
 
 def test_ingest_refuses_a_changed_document_branch(ingest, tmp_path):
@@ -476,7 +477,7 @@ def test_ingest_refuses_a_changed_document_branch(ingest, tmp_path):
     changed = tmp_path / "changed.json"
     changed.write_text(json.dumps(schema))
 
-    with pytest.raises(ingest.ContractPinError, match="document branch digest mismatch"):
+    with pytest.raises(ingest.ContractPinError, match="document digest mismatch"):
         ingest.load_manifest(manifest_path, contract_schema=changed)
 
 
@@ -496,3 +497,25 @@ def test_document_ingest_survives_entity_branch_changes(ingest, tmp_path):
 
     manifest = ingest.load_manifest(manifest_path, contract_schema=moved)
     assert len(manifest.records) == 1
+
+
+def test_ingest_requires_a_contract_schema(ingest, tmp_path):
+    """R-P1. An optional pin is not a pin."""
+    manifest_path = tmp_path / "manifest.jsonl"
+    _write_manifest(manifest_path, [_record(ingest, b"%PDF-1.7\nFiscal report")])
+    with pytest.raises(ingest.FiscalIngestError, match="--contract-schema is required"):
+        ingest.load_manifest(manifest_path)
+    with pytest.raises(ingest.FiscalIngestError, match="kansas-statute-rollout.py"):
+        ingest.load_manifest(manifest_path, entrypoint="kansas-statute-rollout.py")
+
+
+def test_ingest_refuses_a_routing_change_alone(ingest, tmp_path):
+    """Both branch subtrees byte-identical; only the dispatch predicate moves."""
+    manifest_path = tmp_path / "manifest.jsonl"
+    _write_manifest(manifest_path, [_record(ingest, b"%PDF-1.7\nFiscal report")])
+    schema = json.loads(CONTRACT_FIXTURE.read_text())
+    schema["then"], schema["else"] = schema["else"], schema["then"]
+    swapped = tmp_path / "swapped.json"
+    swapped.write_text(json.dumps(schema))
+    with pytest.raises(ingest.ContractPinError, match="dispatch digest mismatch"):
+        ingest.load_manifest(manifest_path, contract_schema=swapped)

@@ -25,24 +25,37 @@ source:
     # went stale unnoticed. Each branch is now pinned over the $defs subtree
     # reachable from its own dispatch target, and ingestion recomputes it.
     contractPin:
-      algorithm: sha256-canonical-json-branch-closure-v1
-      # Each branch carries the commit it was computed from; they move separately.
+      algorithm: sha256-canonical-json-subtree-v1
+      # Three literal digests, all enforced. There is deliberately no
+      # annotation-stripped "semantic" digest: JSON Schema property names share a
+      # namespace with annotation keywords, so stripping keys named description or
+      # title also strips the real properties legacy_document_record.properties.title
+      # and entity_projection_record.properties.description -- which made a genuine
+      # constraint change on the enforced branch report as "annotation-only drift".
+      # Each digest carries the commit it was computed from; they move separately.
       documentBranchCommit: 314beafe4f7905f06a2edb7828b0ea8b2976266c
       documentBranchSha256: d3a7212a4873a2f375d451e74ab4d5f11a56ff50bbbeb5a162dae1f8640807e2
       entityBranchCommit: 314beafe4f7905f06a2edb7828b0ea8b2976266c
       entityBranchSha256: d5248a5452389c40a55c844f2e455343b2e24ce3dedff9a9ecac0752eeb28734
-      # The same subtrees with annotation-only keywords removed, so a reworded
-      # description can be told apart from a constraint change.
-      documentBranchSemanticSha256: e75f616af11b97b28e59cb059cdaa55e1763f52f5b0353e6e8d7fa8cfaacbf45
-      entityBranchSemanticSha256: 3ad8f594bae3426944725c2946325c23f32bd8d4a81d201913b080c37ce29bae
+      # The top-level if/then/else routing predicate. A change to routing alone
+      # redirects records between branches while both branch subtrees stay
+      # byte-identical, so it is pinned and enforced on its own.
+      dispatchCommit: 314beafe4f7905f06a2edb7828b0ea8b2976266c
+      dispatchSha256: 03dc178429d04275f7b49a6d4ab9e05ee56bc970a31de78268942eb3de3b7940
       supersededEntityBranch:
         # Prose-only drift: A rewrote two entity-branch descriptions, which moved
-        # this digest and left the semantic digest and both document digests alone.
+        # this digest and left the document branch untouched.
         commit: e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a
         sha256: da242fd879b3c124449b6c1ddead558db64d8f0427ade638bf596c8fd1d9f17e
-      enforcedBranch: document
       enforcedBy: packages/svs_common/svs_common/statecivics_contract_pin.py
-      enforcedAt: scripts/release/kansas-fiscal-document-ingest.py --contract-schema
+      # BOTH real ingestion entrypoints enforce. Listing one while the other ran
+      # unpinned is the defect this pin exists to remove.
+      enforcedAt:
+        - scripts/release/kansas-fiscal-document-ingest.py --contract-schema
+        - scripts/release/kansas-statute-rollout.py --contract-schema
+      enforcedPins:
+        document-consumer: [document, dispatch]
+        entity-consumer: [entity, dispatch]
       # Superseded whole-file digest, kept as a (commit, digest) pair so it
       # stays true: git show b3f5c09170c66453097bcd4fb44c6eb2b9031f39:<contract>
       supersededWholeFile:
@@ -80,6 +93,9 @@ source:
     indexSha256: 65d2424709bb1e54ab7fad9142ceffb6c00f961d463ca78b5dc7c277194f63e0
     producerRevision: 63ae57b9221ed7a8eaf44ac57622b7025aea556e
     rolloutRunner: scripts/release/kansas-statute-rollout.py
+    # Enforces the same contract pin as the document consumer, verified once
+    # before any chapter is read. See contractPin.enforcedAt.
+    rolloutRunnerRequiresContractSchema: true
     rolloutTicket: WAVE-140
     trancheCount: 85
     recordCount: 31079

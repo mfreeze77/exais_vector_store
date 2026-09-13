@@ -116,6 +116,56 @@ end-to-end run only — at most 20 fixture descriptions, each capped at 600 char
 ~3,000 embedding tokens (20 x ~150) plus ~200 for a recall probe, so **under
 5,000 tokens in one request**, far below the 300k per-request cap.
 
+### 2026-09-13 — pin round 2: QC FAIL remediation, and the (commit, digest) chain
+
+QC returned FAIL on two findings, both reproduced here before acting.
+
+**Chain of entity-branch pins, unbroken (R-P6).** `da242fd8…` computed at
+`e94a894e` (B1) was superseded the same day by `d5248a54…`, which A introduced at
+`1de6312e` and which is still the value at `314beafe` (B1 + B1.1, landed_by
+`121083e9`); the contract file is byte-identical across those three. The cause
+was prose: A rewrote two entity-branch descriptions after recording that JSON
+Schema cannot refuse an unknown kind "before any field access". The document
+branch never moved. The superseded pair is carried in
+`statecivics_contract_pin.SUPERSEDED_BRANCH_SHA256` and in all four source
+packages, and a test asserts no superseded digest is ever pinned live.
+(The ruling's wording names `d5248a54…` as the superseded value; the digest that
+was actually superseded within the day is `da242fd8…`, and `d5248a54…` is the
+live one. Logged as the chain actually is.)
+
+**Finding 1 — a pin enforced on one of two real paths.**
+`kansas-statute-rollout.py:92` called `load_manifest` with no schema, and
+enforcement was `if contract_schema is not None`. That file contained zero
+contract references while the same `source.yaml` declared it as
+`chapterTranches.rolloutRunner` for 85 tranches / 31,079 records. `contract_schema`
+is now REQUIRED and refuses by naming the entrypoint that omitted it; both
+entrypoints pass a schema and `enforcedAt` lists both.
+
+**Finding 2 — the semantic digest was wrong and is deleted (R-P2).** JSON Schema
+property names share a namespace with annotation keywords, so stripping keys
+named `description`/`title` also stripped the real properties
+`legacy_document_record.properties.title` (the ENFORCED branch) and
+`entity_projection_record.properties.description`. Tightening `title`, or
+deleting it so `additionalProperties: false` newly rejects every record carrying
+one, was reported as "annotation-only drift" with an unchanged digest. The
+mechanism is removed, not merely unused, and a test fails if it returns.
+
+**Three literal digests, all enforced (R-P3).** `document`, `entity`, and
+`dispatch` — the top-level `if`/`then`/`else` routing predicate. Swapping
+`then`/`else` leaves both branch subtrees byte-identical and sends every untagged
+record to the entity branch, so routing is pinned on its own. Each consumer
+verifies its own branch plus dispatch, never the other branch.
+
+**Approved plan, for P5-BUILD.** B adopts A's four edge names verbatim as
+canonical. All five B relations retire — the constant, the `_ENDPOINTS` entries,
+the prose in CELL_GRAPH_PROFILES.md and the synthesised test literals — on the
+evidence that `git log --all -S` returns exactly one commit (`a587ad9`) for each
+of the five, so none was ever added and later removed, and no producer, fixture,
+artifact, DB seed or dump ever emitted one. The adapter is a sibling
+`build_entity_projection_artifact`, not an extension of
+`build_fiscal_graph_artifact`. Ingestion dispatches on `record_kind` BEFORE
+`_validate_record`'s `logical_document_id` requirement.
+
 ## Deliverables
 
 - [packages/svs_common/svs_common/fiscal_graph.py](../packages/svs_common/svs_common/fiscal_graph.py) — Own v2 identity, evidence, relation, partition and manifest validation. Shared file owner: WAVE-133. Edit sequence: WAVE-133 → WAVE-134 → WAVE-135.

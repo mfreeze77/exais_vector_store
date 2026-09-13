@@ -15,27 +15,40 @@
     "entrypoint": "scripts/operator/export_retrieval_manifest.py",
     "contract": "contracts/civic-impact/retrieval-export-record.schema.json",
     "contractPin": {
-      "algorithm": "sha256-canonical-json-branch-closure-v1",
+      "algorithm": "sha256-canonical-json-subtree-v1",
       "documentBranchCommit": "314beafe4f7905f06a2edb7828b0ea8b2976266c",
       "documentBranchSha256": "d3a7212a4873a2f375d451e74ab4d5f11a56ff50bbbeb5a162dae1f8640807e2",
       "entityBranchCommit": "314beafe4f7905f06a2edb7828b0ea8b2976266c",
       "entityBranchSha256": "d5248a5452389c40a55c844f2e455343b2e24ce3dedff9a9ecac0752eeb28734",
-      "documentBranchSemanticSha256": "e75f616af11b97b28e59cb059cdaa55e1763f52f5b0353e6e8d7fa8cfaacbf45",
-      "entityBranchSemanticSha256": "3ad8f594bae3426944725c2946325c23f32bd8d4a81d201913b080c37ce29bae",
-      "enforcedBranch": "document",
+      "dispatchCommit": "314beafe4f7905f06a2edb7828b0ea8b2976266c",
+      "dispatchSha256": "03dc178429d04275f7b49a6d4ab9e05ee56bc970a31de78268942eb3de3b7940",
+      "dispatchCovers": "the top-level if/then/else routing predicate; a routing change alone redirects records between branches while both branch subtrees stay byte-identical",
+      "noSemanticDigest": "Deliberate. JSON Schema property names share a namespace with annotation keywords, so an annotation-stripped digest also strips legacy_document_record.properties.title and entity_projection_record.properties.description, reporting a real constraint change on the enforced branch as annotation-only drift.",
+      "supersededEntityBranch": {
+        "commit": "e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a",
+        "sha256": "da242fd879b3c124449b6c1ddead558db64d8f0427ade638bf596c8fd1d9f17e",
+        "reason": "Prose-only drift: two entity-branch descriptions were rewritten, moving this digest while the document branch stayed identical.",
+        "readWith": "git show e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a:contracts/civic-impact/retrieval-export-record.schema.json"
+      },
       "enforcedBy": "packages/svs_common/svs_common/statecivics_contract_pin.py",
-      "enforcedAt": "scripts/release/kansas-fiscal-document-ingest.py --contract-schema",
-      "note": "Per-branch digests over the $defs subtree reachable from each dispatch target. The former whole-file contractSha256 pinned both branches at once and nothing computed it.",
+      "enforcedAt": [
+        "scripts/release/kansas-fiscal-document-ingest.py --contract-schema",
+        "scripts/release/kansas-statute-rollout.py --contract-schema"
+      ],
+      "enforcedPins": {
+        "document-consumer": [
+          "document",
+          "dispatch"
+        ],
+        "entity-consumer": [
+          "entity",
+          "dispatch"
+        ]
+      },
       "supersededWholeFile": {
         "commit": "b3f5c09170c66453097bcd4fb44c6eb2b9031f39",
         "sha256": "78a3de138cdb534831df034bc66f6a6a2bf7ec3f5d6d573efedf2b50d7a7f32b",
         "readWith": "git show b3f5c09170c66453097bcd4fb44c6eb2b9031f39:contracts/civic-impact/retrieval-export-record.schema.json | shasum -a 256"
-      },
-      "supersededEntityBranch": {
-        "commit": "e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a",
-        "sha256": "da242fd879b3c124449b6c1ddead558db64d8f0427ade638bf596c8fd1d9f17e",
-        "reason": "Prose-only drift: two entity-branch descriptions were rewritten, moving this digest while the semantic digest and both document digests stayed identical.",
-        "readWith": "git show e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a:contracts/civic-impact/retrieval-export-record.schema.json"
       }
     }
   },

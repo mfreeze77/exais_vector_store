@@ -29,8 +29,8 @@ from svs_common.statecivics_statutes import (
     StatuteHarvest, preflight_statute_harvest, parse_statute_markdown, MAX_DOCUMENT_BYTES,
 )
 from svs_common.statecivics_contract_pin import (
-    DOCUMENT_BRANCH_SHA256, ENTITY_BRANCH_SHA256,
-    ContractPinError, load_contract, verify_branch,
+    DISPATCH_SHA256, DOCUMENT_BRANCH_SHA256, ENTITY_BRANCH_SHA256,
+    ContractPinError, load_contract, verify_branch, verify_contract,
 )
 from topeka_pipeline_common import (
     DEFAULT_CELL,
@@ -288,13 +288,17 @@ def _statute_evidence(record: dict[str, Any], content: bytes, harvest: StatuteHa
 CONSUMED_CONTRACT_BRANCH = "document"
 
 
-def verify_contract_pin(contract_path: Path, *, branch: str = CONSUMED_CONTRACT_BRANCH) -> str:
-    """Refuse to ingest against a contract branch other than the pinned one.
+def verify_contract_pin(contract_path: Path, *, consumer: str = CONSUMED_CONTRACT_BRANCH) -> dict[str, str]:
+    """Refuse to ingest against a contract other than the pinned one.
 
-    The digest is computed from the schema this run was handed, never fetched,
+    Verifies the branch this consumer reads AND the top-level routing predicate
+    that delivers records to it: a routing change alone can redirect a record to
+    the other branch while leaving both branch subtrees byte-identical.
+
+    The digests are computed from the schema this run was handed, never fetched,
     so the check cannot be satisfied by a contract the operator did not supply.
     """
-    return verify_branch(load_contract(contract_path), branch)
+    return verify_contract(load_contract(contract_path), consumer)
 
 
 def load_manifest(
@@ -304,10 +308,23 @@ def load_manifest(
     vector_store_slug: str = DEFAULT_VECTOR_STORE_SLUG,
     source_family: str = "kansas-fiscal-documents",
     contract_schema: Path | None = None,
+    entrypoint: str = "kansas-fiscal-document-ingest.py",
 ) -> LoadedManifest:
+    """Load a desired-state manifest. ``contract_schema`` is REQUIRED.
+
+    It is a keyword with a ``None`` default only so the refusal can name the
+    entrypoint that omitted it. An optional pin is not a pin: this consumer's
+    two real callers are this script and kansas-statute-rollout.py, and for a
+    while only the first passed a schema while the source package declared the
+    pin as though both did.
+    """
     _validate_source_family(source_family, vector_store_slug)
-    if contract_schema is not None:
-        verify_contract_pin(contract_schema)
+    if contract_schema is None:
+        raise FiscalIngestError(
+            f"{entrypoint}: --contract-schema is required; refusing to ingest "
+            f"{path} without verifying the StateCivics contract pin"
+        )
+    verify_contract_pin(contract_schema)
     payload = path.read_bytes()
     if payload and not payload.endswith(b"\n"):
         raise FiscalIngestError(f"{path}: JSONL manifest must end with a newline")

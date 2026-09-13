@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 import pytest
-from test_kansas_fiscal_document_ingest import _load_module, _write_manifest
+from test_kansas_fiscal_document_ingest import CONTRACT_FIXTURE, _load_module, _write_manifest
 from svs_common.chunking import choose_chunker
 from svs_common.ingestion import _page_coordinate_evidence_context
 from svs_common.statecivics_statutes import preflight_statute_harvest, statecivics_statute_markdown_chunks
@@ -42,10 +42,10 @@ def retained():
         path = exports / 'chapters' / entry['file']
         raw = path.read_bytes()
         assert hashlib.sha256(raw).hexdigest() == entry['sha256'] and len(raw) == entry['bytes']
-        manifests[chapter] = ingest.load_manifest(path, vector_store_slug='kansas-statutes', source_family='kansas-statutes')
+        manifests[chapter] = ingest.load_manifest(path, vector_store_slug='kansas-statutes', source_family='kansas-statutes', contract_schema=CONTRACT_FIXTURE)
     canary_raw = (exports / 'kansas-statutes.jsonl').read_bytes()
     assert hashlib.sha256(canary_raw).hexdigest() == 'c9a06920795b47d92c8d336395ab94c459fa8404e029a92708444d06276ea3a7'
-    canary = ingest.load_manifest(exports / 'kansas-statutes.jsonl', vector_store_slug='kansas-statutes', source_family='kansas-statutes')
+    canary = ingest.load_manifest(exports / 'kansas-statutes.jsonl', vector_store_slug='kansas-statutes', source_family='kansas-statutes', contract_schema=CONTRACT_FIXTURE)
     state = ingest.load_state(state_path, vector_store_id=STORE)
     assert len(state['records']) == len(canary.records) == 6
     return ingest, harvest, custody, manifests, canary, state
@@ -124,7 +124,7 @@ def test_test_only_explicit_withdrawal_removes_only_named_document(retained, tmp
     removal['record_digest_sha256'] = ingest.record_digest(removal)
     path = tmp_path/'test-only-withdrawal.jsonl'
     _write_manifest(path, [removal])
-    manifest = ingest.load_manifest(path, vector_store_slug='kansas-statutes', source_family='kansas-statutes')
+    manifest = ingest.load_manifest(path, vector_store_slug='kansas-statutes', source_family='kansas-statutes', contract_schema=CONTRACT_FIXTURE)
     planned = operations(retained, manifest, state)
     assert len(planned) == 1 and planned[0].action == 'remove'
     call_start = len(calls)

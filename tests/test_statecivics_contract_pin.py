@@ -10,24 +10,29 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 from pathlib import Path
 
 import pytest
 
 from svs_common.statecivics_contract_pin import (
+    DISPATCH_SHA256,
     DOCUMENT_BRANCH_SHA256,
     ENTITY_BRANCH_SHA256,
-    DOCUMENT_BRANCH_SEMANTIC_SHA256,
-    ENTITY_BRANCH_SEMANTIC_SHA256,
+    ENFORCED_PINS,
     PINNED_BRANCH_COMMIT,
+    PINNED_BRANCH_SHA256,
     PINNED_CONTRACT_COMMIT,
+    PIN_NAMES,
     SUPERSEDED_BRANCH_SHA256,
     ContractPinError,
     branch_closure,
     branch_digest,
     branch_digests,
+    dispatch_subtree,
     load_contract,
     verify_branch,
+    verify_contract,
 )
 
 FIXTURE = Path(__file__).parent / "fixtures" / "statecivics-retrieval-export-record.314beafe.json"
@@ -43,13 +48,97 @@ def test_pinned_digests_are_reproducible_from_the_pinned_contract(contract) -> N
     assert branch_digests(contract) == {
         "document": DOCUMENT_BRANCH_SHA256,
         "entity": ENTITY_BRANCH_SHA256,
+        "dispatch": DISPATCH_SHA256,
     }
-    assert branch_digests(contract, semantic=True) == {
-        "document": DOCUMENT_BRANCH_SEMANTIC_SHA256,
-        "entity": ENTITY_BRANCH_SEMANTIC_SHA256,
+    assert set(PIN_NAMES) == set(PINNED_BRANCH_SHA256)
+    for name in PIN_NAMES:
+        assert verify_branch(contract, name) == PINNED_BRANCH_SHA256[name]
+
+
+def test_no_semantic_digest_exists(contract) -> None:
+    """R-P2. An annotation-stripped digest cannot tell a constraint change from
+    prose, because JSON Schema property names share a namespace with annotation
+    keywords: legacy_document_record.properties.title is a real constraint on the
+    ENFORCED branch. Calling that change 'annotation-only drift' is the defect
+    class this module removes, so the mechanism is gone, not merely unused."""
+    import svs_common.statecivics_contract_pin as pin
+
+    for gone in ("strip_annotations", "ANNOTATION_KEYWORDS",
+                 "DOCUMENT_BRANCH_SEMANTIC_SHA256", "ENTITY_BRANCH_SEMANTIC_SHA256",
+                 "PINNED_BRANCH_SEMANTIC_SHA256"):
+        assert not hasattr(pin, gone), f"{gone} must not come back"
+    with pytest.raises(TypeError):
+        branch_digest(contract, "document", semantic=True)
+    # The phrase may appear in the module docstring, which explains why the
+    # mechanism was removed. It must not survive anywhere an operator could see
+    # it -- i.e. in any executable statement.
+    import ast
+
+    tree = ast.parse(Path(pin.__file__).read_text())
+    literals = [
+        node.value for node in ast.walk(tree)
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    ]
+    docstrings = {ast.get_docstring(n, clean=False) for n in ast.walk(tree)
+                  if isinstance(n, (ast.Module, ast.FunctionDef, ast.ClassDef))}
+    for text in literals:
+        if "annotation-only drift" in text:
+            assert text in docstrings, "the phrase escaped into a runtime string"
+
+
+def test_property_named_title_is_a_constraint_not_an_annotation(contract) -> None:
+    """The exact collision QC proved by execution. Both mutations are real
+    constraint changes to the enforced document branch and must refuse."""
+    assert "title" in contract["$defs"]["legacy_document_record"]["properties"]
+    assert contract["$defs"]["legacy_document_record"]["additionalProperties"] is False
+
+    tightened = copy.deepcopy(contract)
+    tightened["$defs"]["legacy_document_record"]["properties"]["title"] = {
+        "type": "string", "minLength": 1,
     }
-    assert verify_branch(contract, "document") == DOCUMENT_BRANCH_SHA256
-    assert verify_branch(contract, "entity") == ENTITY_BRANCH_SHA256
+    with pytest.raises(ContractPinError, match="document digest mismatch"):
+        verify_branch(tightened, "document")
+
+    removed = copy.deepcopy(contract)
+    del removed["$defs"]["legacy_document_record"]["properties"]["title"]
+    with pytest.raises(ContractPinError, match="document digest mismatch"):
+        verify_branch(removed, "document")
+
+
+def test_routing_change_alone_is_refused(contract) -> None:
+    """R-P3. Swapping the branches leaves both subtrees byte-identical and sends
+    every untagged record to the entity branch."""
+    assert list(dispatch_subtree(contract)) == ["if", "then", "else"]
+
+    swapped = copy.deepcopy(contract)
+    swapped["then"], swapped["else"] = swapped["else"], swapped["then"]
+    assert branch_digest(swapped, "document") == DOCUMENT_BRANCH_SHA256
+    assert branch_digest(swapped, "entity") == ENTITY_BRANCH_SHA256
+    with pytest.raises(ContractPinError, match="dispatch digest mismatch"):
+        verify_branch(swapped, "dispatch")
+    with pytest.raises(ContractPinError, match="dispatch digest mismatch"):
+        verify_contract(swapped, "document")
+
+    widened = copy.deepcopy(contract)
+    widened["if"]["required"] = ["record_kind", "record_version"]
+    with pytest.raises(ContractPinError, match="dispatch digest mismatch"):
+        verify_branch(widened, "dispatch")
+
+    dropped = copy.deepcopy(contract)
+    del dropped["else"]
+    with pytest.raises(ContractPinError, match="missing top-level routing keys"):
+        branch_digest(dropped, "dispatch")
+
+
+def test_each_consumer_verifies_its_branch_and_the_routing(contract) -> None:
+    assert ENFORCED_PINS == {
+        "document": ("document", "dispatch"),
+        "entity": ("entity", "dispatch"),
+    }
+    assert set(verify_contract(contract, "document")) == {"document", "dispatch"}
+    assert set(verify_contract(contract, "entity")) == {"entity", "dispatch"}
+    with pytest.raises(ContractPinError, match="unknown contract consumer"):
+        verify_contract(contract, "dispatch")
 
 
 def test_branches_are_disjoint_so_neither_pin_can_move_the_other(contract) -> None:
@@ -70,8 +159,7 @@ def test_document_branch_change_is_refused(contract) -> None:
     with pytest.raises(ContractPinError) as excinfo:
         verify_branch(mutated, "document")
     message = str(excinfo.value)
-    assert "document branch digest mismatch" in message
-    assert "CONSTRAINT change" in message
+    assert "document digest mismatch" in message
     assert PINNED_BRANCH_COMMIT["document"] in message
     # The other branch is untouched and still passes.
     assert verify_branch(mutated, "entity") == ENTITY_BRANCH_SHA256
@@ -85,23 +173,9 @@ def test_entity_branch_change_is_refused(contract) -> None:
     with pytest.raises(ContractPinError) as excinfo:
         verify_branch(mutated, "entity")
     message = str(excinfo.value)
-    assert "entity branch digest mismatch" in message
-    assert "CONSTRAINT change" in message
+    assert "entity digest mismatch" in message
     # A document-branch consumer is unaffected by entity-branch work.
     assert verify_branch(mutated, "document") == DOCUMENT_BRANCH_SHA256
-
-
-def test_annotation_only_drift_is_reported_as_such(contract) -> None:
-    """StateCivics did exactly this between e94a894e and 1de6312e, which is why
-    the entity pin was re-computed at 314beafe and the old pair kept."""
-    mutated = copy.deepcopy(contract)
-    mutated["$defs"]["entity_kind_version_gate"]["description"] = "reworded, same constraints"
-    with pytest.raises(ContractPinError) as excinfo:
-        verify_branch(mutated, "entity")
-    message = str(excinfo.value)
-    assert "annotation-only drift" in message
-    assert "CONSTRAINT change" not in message
-    assert branch_digest(mutated, "entity", semantic=True) == ENTITY_BRANCH_SEMANTIC_SHA256
 
 
 def test_missing_branch_and_malformed_contract_are_refused(contract, tmp_path) -> None:
@@ -149,13 +223,15 @@ def test_declared_pin_matches_the_enforced_constants(package: Path) -> None:
     lock = json.loads((package / "source.lock.json").read_text())
     pin = lock["producer"]["contractPin"]
     assert "contractSha256" not in lock["producer"]
-    assert "pinnedCommit" not in pin, "a single commit cannot cover two branches"
+    assert "pinnedCommit" not in pin, "a single commit cannot cover three pins"
     assert pin["documentBranchCommit"] == PINNED_BRANCH_COMMIT["document"]
     assert pin["entityBranchCommit"] == PINNED_BRANCH_COMMIT["entity"]
     assert pin["documentBranchSha256"] == DOCUMENT_BRANCH_SHA256
     assert pin["entityBranchSha256"] == ENTITY_BRANCH_SHA256
-    assert pin["documentBranchSemanticSha256"] == DOCUMENT_BRANCH_SEMANTIC_SHA256
-    assert pin["entityBranchSemanticSha256"] == ENTITY_BRANCH_SEMANTIC_SHA256
+    assert pin["dispatchCommit"] == PINNED_BRANCH_COMMIT["dispatch"]
+    assert pin["dispatchSha256"] == DISPATCH_SHA256
+    assert "documentBranchSemanticSha256" not in pin
+    assert "entityBranchSemanticSha256" not in pin
 
     superseded = pin["supersededEntityBranch"]
     assert (("entity", superseded["commit"], superseded["sha256"])
@@ -163,16 +239,25 @@ def test_declared_pin_matches_the_enforced_constants(package: Path) -> None:
 
     text = (package / "source.yaml").read_text()
     assert "contractSha256:" not in text
+    # R-P4. source.yaml is the human-authored file; a single pinnedCommit there
+    # silently reasserts that one commit covers all three pins.
+    assert "pinnedCommit" not in text
     for value in (
         PINNED_BRANCH_COMMIT["document"],
         PINNED_BRANCH_COMMIT["entity"],
+        PINNED_BRANCH_COMMIT["dispatch"],
         DOCUMENT_BRANCH_SHA256,
         ENTITY_BRANCH_SHA256,
-        DOCUMENT_BRANCH_SEMANTIC_SHA256,
-        ENTITY_BRANCH_SEMANTIC_SHA256,
+        DISPATCH_SHA256,
     ):
         assert value in text
-    assert "--contract-schema" in text
+    assert "semanticSha256" not in text
+
+    # R-P1: BOTH real entrypoints must be declared as enforcing.
+    for entrypoint in ("scripts/release/kansas-fiscal-document-ingest.py --contract-schema",
+                       "scripts/release/kansas-statute-rollout.py --contract-schema"):
+        assert entrypoint in text
+        assert entrypoint in pin["enforcedAt"]
 
 
 @pytest.mark.parametrize("package", SOURCE_PACKAGES, ids=lambda p: p.parent.parent.parent.name)
@@ -195,7 +280,22 @@ HISTORICAL_WHOLE_FILE = {
 }
 HISTORICAL_COMMIT = "b3f5c09170c66453097bcd4fb44c6eb2b9031f39"
 AUDIT = REPO / ".tranche/statecivics-semantic-graph/aligned/statute-real-export-audit.md"
-UPSTREAM = Path("/Users/mfrieson/Dropbox/AI_Projects/exai_projects/Statecivicsai")
+
+
+def statecivics_repo() -> Path:
+    """R-P5. The gate sets SVS_STATECIVICS_REPO. Unset is a FAILURE, never a
+    skip: skipping is how the one check that the historical (commit, digest)
+    pairs are still true would evaporate on CI while still reporting green."""
+    raw = os.environ.get("SVS_STATECIVICS_REPO")
+    if not raw:
+        pytest.fail(
+            "SVS_STATECIVICS_REPO is unset; the historical contract pairs cannot be "
+            "verified. Set it to the StateCivics checkout -- do not skip this test."
+        )
+    repo = Path(raw)
+    if not (repo / ".git").exists():
+        pytest.fail(f"SVS_STATECIVICS_REPO={raw} is not a git checkout")
+    return repo
 
 
 def test_audit_records_its_digests_as_commit_digest_pairs() -> None:
@@ -208,11 +308,12 @@ def test_audit_records_its_digests_as_commit_digest_pairs() -> None:
     assert "WORKTREE-PATH-PROVENANCE" in text
 
 
-@pytest.mark.skipif(not (UPSTREAM / ".git").exists(), reason="StateCivics checkout not present")
 def test_historical_digests_are_reproducible_at_their_recorded_commit() -> None:
     """Re-derive the audit's numbers from git, not from a mutable worktree."""
     import hashlib
     import subprocess
+
+    UPSTREAM = statecivics_repo()
 
     for path, expected in HISTORICAL_WHOLE_FILE.items():
         blob = subprocess.run(
@@ -230,7 +331,7 @@ def test_historical_digests_are_reproducible_at_their_recorded_commit() -> None:
 
 def test_every_pinned_digest_travels_with_its_commit(contract) -> None:
     """A digest without its commit is how 78a3de13... misled two people."""
-    assert set(PINNED_BRANCH_COMMIT) == {"document", "entity"}
+    assert set(PINNED_BRANCH_COMMIT) == {"document", "entity", "dispatch"}
     for branch, commit in PINNED_BRANCH_COMMIT.items():
         assert len(commit) == 40 and int(commit, 16) >= 0
     assert PINNED_CONTRACT_COMMIT == PINNED_BRANCH_COMMIT["document"]
@@ -238,6 +339,7 @@ def test_every_pinned_digest_travels_with_its_commit(contract) -> None:
     assert branch_digests(contract) == {
         "document": DOCUMENT_BRANCH_SHA256,
         "entity": ENTITY_BRANCH_SHA256,
+        "dispatch": DISPATCH_SHA256,
     }
 
 
@@ -246,6 +348,6 @@ def test_superseded_entity_pin_is_kept_as_a_commit_digest_pair() -> None:
         ("entity", "e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a",
          "da242fd879b3c124449b6c1ddead558db64d8f0427ade638bf596c8fd1d9f17e"),
     )
-    live = {DOCUMENT_BRANCH_SHA256, ENTITY_BRANCH_SHA256}
+    live = {DOCUMENT_BRANCH_SHA256, ENTITY_BRANCH_SHA256, DISPATCH_SHA256}
     for _branch, _commit, digest in SUPERSEDED_BRANCH_SHA256:
         assert digest not in live, "a superseded digest is still pinned live"
