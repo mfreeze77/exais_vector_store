@@ -462,26 +462,200 @@ def _definition_time_expressions(node: ast.AST):
         yield node.returns
 
 
-def _scope_env(body: list[ast.stmt]) -> dict[str, ast.AST]:
-    env: dict[str, ast.AST] = {}
+class _Binding:
+    """One place a name is bound, and the node resolution should read for it.
+
+    ``node`` is what the value of the name is, when the form even has one: an
+    ``Assign``'s right-hand side, an ``Import`` statement.  Forms that bind
+    without a statically readable value -- a ``for`` target, a parameter, an
+    ``except`` name -- store the binding statement itself, which every
+    resolver below then refuses.  Refusing is the point: the name is bound, so
+    it must be counted, and it is not resolvable, so it must not resolve.
+    """
+
+    __slots__ = ("node", "lineno", "form")
+
+    def __init__(self, node: ast.AST, lineno: int, form: str) -> None:
+        self.node = node
+        self.lineno = lineno
+        self.form = form
+
+
+# R-P16. A write into the namespace MAPPING rebinds names without any binding
+# target for the visitor below to see, and so does executing generated source.
+# Neither can be attributed to a particular name, so a module containing one
+# resolves nothing at all. This is a module-wide guard rather than a binding
+# form precisely because it is not attributable.
+_NAMESPACE_BUILTINS = frozenset({"globals", "locals", "vars"})
+_EXECUTORS = frozenset({"exec", "eval"})
+_OPAQUE = "*namespace-write*"
+
+
+def _is_namespace_write(node: ast.AST) -> bool:
+    if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+        if node.func.id in _EXECUTORS:
+            return True
+    targets: tuple[ast.AST, ...] = ()
+    if isinstance(node, ast.Assign):
+        targets = tuple(node.targets)
+    elif isinstance(node, (ast.AnnAssign, ast.AugAssign)):
+        targets = (node.target,)
+    elif isinstance(node, ast.Delete):
+        targets = tuple(node.targets)
+    for target in targets:
+        if (isinstance(target, ast.Subscript) and isinstance(target.value, ast.Call)
+                and isinstance(target.value.func, ast.Name)
+                and target.value.func.id in _NAMESPACE_BUILTINS):
+            return True
+    return False
+
+
+def _bound_names(target: ast.AST):
+    """Every ``Name`` a binding target binds. Tuples and stars are UNPACKED.
+
+    ``Attribute`` and ``Subscript`` targets bind no name in this scope; they
+    mutate an object, which is a different question.
+    """
+    if isinstance(target, ast.Name):
+        yield target
+    elif isinstance(target, ast.Starred):
+        yield from _bound_names(target.value)
+    elif isinstance(target, (ast.Tuple, ast.List)):
+        for element in target.elts:
+            yield from _bound_names(element)
+
+
+def _parameters(node: ast.AST):
+    """The ``arg`` nodes a ``def``/``lambda`` binds in the scope it opens."""
+    arguments = node.args
+    for argument in (*arguments.posonlyargs, *arguments.args, *arguments.kwonlyargs,
+                     arguments.vararg, arguments.kwarg):
+        if argument is not None:
+            yield argument
+
+
+def _scope_env(body: list[ast.stmt], parameters=()) -> dict[str, list[_Binding]]:
+    """R-P16/R-P17. Every name this scope binds, and EVERY place it binds it.
+
+    ONE visitor, every binding form Python has: ``Assign``, ``AnnAssign``,
+    ``AugAssign``, ``NamedExpr``, ``Import``/``ImportFrom``, ``for`` targets,
+    ``with ... as``, ``except ... as``, ``def``/``async def``/``class`` names,
+    ``global``/``nonlocal`` declarations, ``match`` captures, and parameters.
+    Tuple and starred targets are unpacked.
+
+    The walk is ``_scope_nodes``, so a rebinding in EITHER arm of an ``if``, in
+    a branch that cannot run, or textually AFTER the call all count. That is
+    what makes flow sensitivity a refusal instead of a guess: the env carries a
+    list per name and ``_lookup`` refuses any name whose list is longer than
+    one, rather than silently keeping whichever binding came last.
+
+    Lambdas and comprehensions open their own scopes, but ``_scope_nodes``
+    walks their bodies as part of THIS scope (they are expressions, not
+    ``_SCOPE_BOUNDARIES``), so a call inside one is resolved against this env.
+    Their parameters and ``for`` targets are therefore recorded HERE, which
+    over-counts a name that is only lambda-local. Over-counting refuses; not
+    counting would resolve ``lambda ingest: ingest.load_manifest(...)`` against
+    an unrelated module-level ``ingest``, which is a wrong answer given
+    confidently. Refusing is the posture.
+    """
+    env: dict[str, list[_Binding]] = {}
+
+    def bind(name: str, node: ast.AST, lineno: int, form: str) -> None:
+        env.setdefault(name, []).append(_Binding(node, lineno, form))
+
+    for argument in parameters:
+        bind(argument.arg, argument, argument.lineno, "parameter")
+
     for statement in body:
         for node in _scope_nodes(statement):
-            if isinstance(node, ast.Assign) and node.value is not None:
+            if isinstance(node, ast.Assign):
                 for target in node.targets:
-                    if isinstance(target, ast.Name):
-                        env[target.id] = node.value
-            elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name) and node.value:
-                env[node.target.id] = node.value
+                    for name in _bound_names(target):
+                        bind(name.id, node.value, name.lineno, "assignment")
+            elif isinstance(node, ast.AnnAssign):
+                value = node.value if node.value is not None else node
+                for name in _bound_names(node.target):
+                    bind(name.id, value, name.lineno, "annotated assignment")
+            elif isinstance(node, ast.AugAssign):
+                for name in _bound_names(node.target):
+                    bind(name.id, node, name.lineno, "augmented assignment")
+            elif isinstance(node, ast.NamedExpr):
+                for name in _bound_names(node.target):
+                    bind(name.id, node.value, name.lineno, "walrus")
             elif isinstance(node, (ast.Import, ast.ImportFrom)):
                 for alias in node.names:
-                    env[alias.asname or alias.name.split(".")[0]] = node
+                    bind(alias.asname or alias.name.split(".")[0], node,
+                         node.lineno, "import")
+            elif isinstance(node, (ast.For, ast.AsyncFor)):
+                for name in _bound_names(node.target):
+                    bind(name.id, node, name.lineno, "for target")
+            elif isinstance(node, (ast.With, ast.AsyncWith)):
+                for item in node.items:
+                    if item.optional_vars is not None:
+                        for name in _bound_names(item.optional_vars):
+                            bind(name.id, node, name.lineno, "with target")
+            elif isinstance(node, ast.ExceptHandler):
+                if node.name:
+                    bind(node.name, node, node.lineno, "except handler")
+            elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                bind(node.name, node, node.lineno, "def/class statement")
+            elif isinstance(node, ast.Global):
+                for name in node.names:
+                    bind(name, node, node.lineno, "global declaration")
+            elif isinstance(node, ast.Nonlocal):
+                for name in node.names:
+                    bind(name, node, node.lineno, "nonlocal declaration")
+            elif isinstance(node, (ast.MatchAs, ast.MatchStar)):
+                if node.name:
+                    bind(node.name, node, node.lineno, "match capture")
+            elif isinstance(node, ast.MatchMapping):
+                if node.rest:
+                    bind(node.rest, node, node.lineno, "match mapping rest")
+            elif isinstance(node, ast.Lambda):
+                for argument in _parameters(node):
+                    bind(argument.arg, argument, argument.lineno, "lambda parameter")
+            elif isinstance(node, ast.comprehension):
+                for name in _bound_names(node.target):
+                    bind(name.id, node.target, name.lineno, "comprehension target")
     return env
 
 
-def _lookup(name: str, envs: tuple[dict[str, ast.AST], ...]) -> ast.AST:
+def _lookup(name: str, envs: tuple[dict[str, list[_Binding]], ...], where) -> ast.AST:
+    """R-P17. Resolve ``name`` to the ONE binding that is provably its binding.
+
+    The multiplicity refusal fires HERE, for the name actually being resolved,
+    never while the env is built. Building it at env-build time would block
+    every module that rebinds any ordinary variable -- a loop accumulator, a
+    reassigned counter -- and the check would be useless. Measured over the
+    tracked tree, this placement gives zero false positives.
+    """
+    for env in envs:
+        if _OPAQUE in env:
+            lines = sorted({binding.lineno for binding in env[_OPAQUE]})
+            raise Unclassified(
+                f"{where}: the module writes into its own namespace mapping or "
+                f"executes generated source (lines {lines}); no name in it is "
+                "provably bound once"
+            )
     for env in reversed(envs):
-        if name in env:
-            return env[name]
+        bindings = env.get(name)
+        if not bindings:
+            continue
+        if len(bindings) > 1:
+            raise Unclassified(
+                f"{where}: {name!r} is bound more than once in its scope "
+                f"(lines {sorted(binding.lineno for binding in bindings)}, as "
+                f"{sorted({binding.form for binding in bindings})}); which "
+                "binding reaches this call is ambiguous"
+            )
+        binding = bindings[0]
+        if binding.form in ("global declaration", "nonlocal declaration"):
+            raise Unclassified(
+                f"{where}:{binding.lineno}: {name!r} is declared "
+                f"{binding.form.split()[0]}, so it is bound somewhere this "
+                "scope cannot see and its value here is ambiguous"
+            )
+        return binding.node
     raise Unclassified(f"name {name!r} is not bound in any enclosing scope")
 
 
@@ -502,7 +676,7 @@ def _eval_path(node: ast.AST, envs: tuple[dict[str, ast.AST], ...], own: Path):
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
         return node.value
     if isinstance(node, ast.Name):
-        return _eval_path(_lookup(node.id, envs), envs, own)
+        return _eval_path(_lookup(node.id, envs, own), envs, own)
     if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Div):
         left = _eval_path(node.left, envs, own)
         right = _eval_path(node.right, envs, own)
@@ -564,7 +738,22 @@ class _Module:
         # `_block_on_unresolved_references` complements against this and
         # nothing else, so there is no second predicate to keep in step.
         self.classified_call_funcs: set[int] = set()
+        # R-P16. Not a binding form -- a namespace-mapping write cannot be
+        # attributed to any one name -- so it is a module-wide guard injected
+        # into the module env and refused at LOOKUP time like everything else.
+        self.namespace_writes = [
+            node for node in ast.walk(self.tree) if _is_namespace_write(node)
+        ]
         self.factories = self._module_factories()
+
+    def module_env(self) -> dict[str, list[_Binding]]:
+        env = _scope_env(self.tree.body)
+        if self.namespace_writes:
+            env[_OPAQUE] = [
+                _Binding(node, node.lineno, "namespace write")
+                for node in self.namespace_writes
+            ]
+        return env
 
     def _module_factories(self) -> dict[str, Path]:
         """Functions that load and return a module from an explicit file.
@@ -573,12 +762,12 @@ class _Module:
         name; both are recognised by what they DO -- build a spec from a file
         path -- so a fourth one with any name is recognised too.
         """
-        module_env = _scope_env(self.tree.body)
+        module_env = self.module_env()
         factories: dict[str, Path] = {}
         for node in self.tree.body:
             if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 continue
-            envs = (module_env, _scope_env(node.body))
+            envs = (module_env, _scope_env(node.body, _parameters(node)))
             targets = set()
             for sub in ast.walk(node):
                 target = _spec_target(sub, envs, self.path)
@@ -596,7 +785,7 @@ class _Module:
     def _resolve_module_name(self, name: str, envs) -> Path:
         """Resolve a name bound to a module object to the FILE it was loaded
         from. Name equality is never consulted; only the spec target is."""
-        bound = _lookup(name, envs)
+        bound = _lookup(name, envs, self.path)
         if isinstance(bound, (ast.Import, ast.ImportFrom)):
             raise Unclassified(
                 f"{name!r} is an imported module; its file identity is not "
@@ -609,7 +798,7 @@ class _Module:
             if callee == "module_from_spec" and bound.args:
                 spec_argument = bound.args[0]
                 if isinstance(spec_argument, ast.Name):
-                    spec_node = _lookup(spec_argument.id, envs)
+                    spec_node = _lookup(spec_argument.id, envs, self.path)
                 else:
                     spec_node = spec_argument
                 target = _spec_target(spec_node, envs, self.path)
@@ -632,7 +821,7 @@ class _Module:
         # fills in IS the exemption set the blocker then complements. If
         # `_walk` raises part way, the record is partial and MORE references
         # block -- the check fails toward blocking either way.
-        self._walk(self.tree.body, (), found)
+        self._visit_body(self.tree.body, (self.module_env(),), found)
         self._block_on_unresolved_references()
         return found
 
@@ -678,9 +867,19 @@ class _Module:
                 "passes contract_schema cannot be decided statically."
             )
 
-    def _walk(self, body, envs, found) -> None:
-        """Walk a scope's ``body``. ``envs`` is the ENCLOSING scope chain."""
-        envs = envs + (_scope_env(body),)
+    def _walk(self, body, envs, found, scope=None) -> None:
+        """Walk a scope's ``body``. ``envs`` is the ENCLOSING scope chain.
+
+        ``scope`` is the ``def`` whose body this is, when there is one, so its
+        PARAMETERS seed the env it opens. Without them a parameter named like a
+        module-level alias would fall through to the module env and resolve to
+        the wrong module -- a confident wrong answer, the very thing R-P16
+        exists to convert into a refusal.
+        """
+        parameters = () if scope is None else _parameters(scope)
+        self._visit_body(body, envs + (_scope_env(body, parameters),), found)
+
+    def _visit_body(self, body, envs, found) -> None:
         for statement in body:
             self._visit(statement, envs, found)
 
@@ -703,7 +902,7 @@ class _Module:
                 # boundary, so inner bindings do not leak outward.
                 for outer in _definition_time_expressions(node):
                     self._visit(outer, envs, found)
-                self._walk(node.body, envs, found)
+                self._walk(node.body, envs, found, node if not isinstance(node, ast.ClassDef) else None)
             elif isinstance(node, ast.Call):
                 site = self._classify(node, envs)
                 if site is not None:
@@ -830,18 +1029,36 @@ def _fixture_module(tmp_path: Path, name: str, source: str) -> tuple[Path, Path]
     return module_path, target.resolve()
 
 
-def _outcome(module_path: Path, target: Path, monkeypatch) -> tuple[str, set[int], set[int]]:
-    """Run the walker over one fixture and report what it did.
+class _Observed:
+    """What one run of the walker over one fixture actually did.
 
-    Returns the outcome and the two sets that R-P10 requires to be the same
-    one: what ``_classify`` was actually handed, and the exemption set the
-    blocker complements against.
+    ``handed_all``     -- every call ``_classify`` was given, by ``id(func)``.
+    ``handed``         -- of those, the ones whose callee NAMES the consumer.
+                          This is the population where being exempt from
+                          blocking is even meaningful, so it is the set R-P18
+                          requires the exemption set to equal.
+    ``exempted``       -- ``_Module.classified_call_funcs``, the record
+                          ``_block_on_unresolved_references`` complements.
+    ``syntactic``      -- every consumer-named call in the fixture's OWN parse,
+                          found independently of the walker. Membership in
+                          ``handed`` is checked against this, so the assertion
+                          does not depend on how many calls a fixture happens
+                          to contain.
     """
-    handed_to_classify: list[int] = []
+
+    __slots__ = ("outcome", "handed_all", "handed", "exempted", "syntactic", "module")
+
+
+def _outcome(module_path: Path, target: Path, monkeypatch) -> _Observed:
+    """Run the walker over one fixture and report what it did."""
+    handed_all: list[int] = []
+    handed_named: list[int] = []
     original = _Module._classify
 
     def spy(self, node, envs):
-        handed_to_classify.append(id(node.func))
+        handed_all.append(id(node.func))
+        if _callee_name(node.func) == CONSUMER_FUNCTION:
+            handed_named.append(id(node.func))
         return original(self, node, envs)
 
 
@@ -856,7 +1073,17 @@ def _outcome(module_path: Path, target: Path, monkeypatch) -> tuple[str, set[int
     else:
         if any(site["resolved_callee"] == target for site in sites):
             outcome = "CLASSIFIED"
-    return outcome, set(handed_to_classify), module.classified_call_funcs
+    observed = _Observed()
+    observed.outcome = outcome
+    observed.handed_all = set(handed_all)
+    observed.handed = set(handed_named)
+    observed.exempted = module.classified_call_funcs
+    observed.syntactic = {
+        id(node.func) for node in ast.walk(module.tree)
+        if isinstance(node, ast.Call) and _callee_name(node.func) == CONSUMER_FUNCTION
+    }
+    observed.module = module
+    return observed
 
 
 @pytest.mark.parametrize("position", sorted(SEVEN_POSITIONS), ids=sorted(SEVEN_POSITIONS))
@@ -871,30 +1098,43 @@ def test_no_position_of_the_same_call_passes_silently(position, tmp_path, monkey
     module_path, target = _fixture_module(
         tmp_path, position.replace("-", "_"), SEVEN_POSITIONS[position]
     )
-    outcome, handed, exempted = _outcome(module_path, target, monkeypatch)
+    seen = _outcome(module_path, target, monkeypatch)
 
-    # (a) R-P10. Nothing is exempt that the classifier was not handed. This is
-    # exactly what round four violated: its exemption set was computed by a
-    # second `ast.walk` and covered these six positions, which `_walk` never
-    # visited, so the set contained ids the classifier had never seen.
-    assert exempted <= handed, (
-        f"{position}: {len(exempted - handed)} call(s) are exempt from blocking "
-        "that the classifier was never handed; a separately computed exemption "
-        "set has come back"
+    # (a) R-P10. Nothing is exempt that the classifier was not handed AT ALL.
+    # This is exactly what round four violated: its exemption set was computed
+    # by a second `ast.walk` and covered these six positions, which `_walk`
+    # never visited, so the set contained ids the classifier had never seen.
+    assert seen.exempted <= seen.handed_all, (
+        f"{position}: {len(seen.exempted - seen.handed_all)} call(s) are exempt "
+        "from blocking that the classifier was never handed; a separately "
+        "computed exemption set has come back"
     )
-    # And here the exemption is precisely the one `ingest.load_manifest` callee
-    # in the fixture -- the preamble's other calls resolve to nothing and are
-    # exempt from nothing.
-    assert len(exempted) == 1, f"{position}: exempted {len(exempted)} callees, expected 1"
+    # (a2) R-P18. MEMBERSHIP, not a count. Every consumer-named call in the
+    # fixture's own parse reached the classifier, and the exemption set is
+    # exactly the calls that reached it -- equal as sets of node ids, in both
+    # directions. A count is fixture-specific and a subset clause is vacuous;
+    # this is neither, and it is what fails if `_walk` stops visiting a
+    # position or if the exemption set is ever computed anywhere else.
+    assert seen.syntactic, f"{position}: the fixture contains no {CONSUMER_FUNCTION} call"
+    assert seen.syntactic <= seen.handed, (
+        f"{position}: {len(seen.syntactic - seen.handed)} {CONSUMER_FUNCTION} "
+        "call(s) present in the fixture's parse were never handed to the "
+        "classifier; the walker does not visit this position"
+    )
+    assert seen.exempted == seen.handed, (
+        f"{position}: the exemption set and the consumer calls the classifier "
+        f"was handed differ by {len(seen.exempted ^ seen.handed)} node(s); the "
+        "blocker is no longer the classifier's complement"
+    )
     # (b) The invariant that holds whether or not `_walk` descends into
     # definition-time expressions: unseen means blocked, never silent.
-    assert outcome != "SILENT", (
+    assert seen.outcome != "SILENT", (
         f"{position}: {_THE_CALL} was neither classified nor blocked. It is the "
         "identical expression that fails in statement position."
     )
     # And, since `_walk` now visits those positions, the stronger result: the
     # call is resolved to its module, not merely refused.
-    assert outcome == "CLASSIFIED", f"{position}: expected CLASSIFIED, got {outcome}"
+    assert seen.outcome == "CLASSIFIED", f"{position}: expected CLASSIFIED, got {seen.outcome}"
 
 
 @pytest.mark.parametrize(
@@ -915,10 +1155,13 @@ def test_the_name_as_a_string_blocks(spelling, tmp_path, monkeypatch) -> None:
     ``operator.attrgetter("load_manifest")`` passed silently.
     """
     module_path, target = _fixture_module(tmp_path, "by_string", spelling + "\n")
-    outcome, handed, exempted = _outcome(module_path, target, monkeypatch)
-    assert exempted <= handed
-    assert not exempted, f"{spelling!r} exempted a callee it could not resolve"
-    assert outcome == "BLOCKED", f"{spelling!r} was not blocked: {outcome}"
+    seen = _outcome(module_path, target, monkeypatch)
+    assert seen.exempted <= seen.handed_all
+    assert seen.exempted == seen.handed, (
+        f"{spelling!r}: the exemption set is no longer the classifier's complement"
+    )
+    assert not seen.exempted, f"{spelling!r} exempted a callee it could not resolve"
+    assert seen.outcome == "BLOCKED", f"{spelling!r} was not blocked: {seen.outcome}"
 
 
 def test_the_consumer_refuses_a_missing_schema_at_runtime() -> None:
@@ -970,80 +1213,11 @@ def _declared_enforced_at() -> dict[str, list[str]]:
 
 
 def test_every_load_manifest_caller_enforces_the_pin() -> None:
-    """The enforcement points are computed from the source, not declared.
-
-    Three properties, all of them constructions:
-
-    1. Every call to the fiscal document consumer's ``load_manifest`` passes a
-       ``contract_schema``. The consumer is identified by the FILE a call
-       resolves to -- the importlib ``spec_from_file_location`` target behind
-       the alias -- so ``kscourts-ingest.py``'s unrelated function of the same
-       name is excluded because it resolves elsewhere, not because anything
-       here knows its name.
-    2. ``contractPin.enforcedAt`` equals the discovered caller set exactly, in
-       both directions and in every file that declares it. A fourth caller
-       fails this with no human updating a list; so does a stale entry.
-    3. Anything the walker cannot classify raises ``Unclassified`` and fails
-       the test, so breaking the checker blocks rather than quietly passing.
-
-       There is exactly ONE traversal, ``_visit``. ``_classify`` records
-       ``id(func)`` for each call it commits to, and
-       ``_block_on_unresolved_references`` blocks on every reference to the
-       name that is not in THAT record. The blocker is the classifier's
-       complement, not a second opinion about the same question, because two
-       predicates maintained separately diverge -- which is precisely how round
-       four exempted decorators and defaults that its classifier never visited.
-
-       DETECTED. Each item below was executed against a fixture module, not
-       reasoned about --
-
-       * every call in the seven positions Python actually evaluates the
-         expression in -- statement, decorator, positional default,
-         keyword-only default, annotation, class base, lambda body -- all
-         resolved to their module file, none silent
-         (``test_no_position_of_the_same_call_passes_silently``);
-       * a call the walker cannot resolve to a module file (the alias is an
-         imported module, the callee is a non-name expression, the factory
-         loads more than one module);
-       * a call whose ``contract_schema`` might be hidden in a ``**kwargs``
-         splat;
-       * the name written as a string literal inside any call's arguments, by
-         exact equality -- which is one rule where there were three names, and
-         blocks ``getattr(mod, "load_manifest")``,
-         ``operator.attrgetter("load_manifest")`` and an inline dispatch table
-         alike (``test_the_name_as_a_string_blocks``);
-       * ANY reference to the name outside a call the classifier resolved --
-         an attribute, a bare name load, or a subscript by the string literal.
-         That is the complement of the classifier's own record, so alias
-         assignment, ``functools.partial``, ``TABLE["load_manifest"]()`` and
-         ``runpy.run_path(...)["load_manifest"]`` all land here without being
-         named anywhere in this file. All four were executed as mutations.
-
-       NOT DETECTED. Claimed no more broadly than this, because each was
-       executed and observed to pass silently --
-
-       * a callee named by a string this walker never sees as a literal in
-         call-argument position: ``getattr(mod, "load_" + "manifest")``, a
-         computed dispatch key, ``exec`` of generated source, and -- the case
-         the string rule does NOT reach -- a literal bound to a variable first,
-         ``NAME = "load_manifest"`` then ``getattr(mod, NAME)``;
-       * anything outside the scope of ``_tracked_python_files``: this repo's
-         own top-level ``tests/`` (excluded by ``parts[0] == "tests"``, because
-         it deliberately calls the consumer both ways), git-ignored trees,
-         non-Python runners, and any caller living in another repository;
-       * whether the value passed as ``contract_schema`` is the RIGHT schema.
-         This proves an argument is PASSED. It does not prove it is correct.
-
-       Nothing broader is claimed. Three previous versions of this list each
-       asserted something false, so every line above names the test or mutation
-       that produced it.
-
-       The residual is bounded, and the bound is executed rather than asserted:
-       the consumer raises ``FiscalIngestError`` when ``contract_schema`` is
-       ``None`` (``test_the_consumer_refuses_a_missing_schema_at_runtime``), so
-       a caller this walker misses still cannot ingest unverified. It would
-       ship CI-green and die on an operator's first invocation -- round two's
-       failure mode, which is what this check exists to catch first.
+    """The walker resolves a call only when its callee is a bare name the
+    module under inspection defines, or a name bound exactly once in an
+    enclosing scope to a call that loads a module from an explicit file, in
+    scope order. Everything else raises ``Unclassified``. It proves a schema
+    argument is passed, not that the schema is correct.
     """
     sites = discover_load_manifest_call_sites()
     assert sites, "the walker found no load_manifest calls at all; it is broken"

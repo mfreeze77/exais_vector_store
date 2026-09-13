@@ -136,7 +136,7 @@ was actually superseded within the day is `da242fd8…`, and `d5248a54…` is th
 live one. Logged as the chain actually is.)
 
 **Finding 1 — a pin enforced on some of the real paths.**
-`kansas-statute-rollout.py:92` called `load_manifest` with no schema, and
+`kansas-statute-rollout.py` called `load_manifest` with no schema, and
 enforcement was `if contract_schema is not None`. That file contained zero
 contract references while the same `source.yaml` declared it as
 `chapterTranches.rolloutRunner` for 85 tranches / 31,079 records. `contract_schema`
@@ -175,11 +175,16 @@ artifact, DB seed or dump ever emitted one. The adapter is a sibling
 ### 2026-09-13 — pin round 3: the caller list becomes a construction
 
 **R-P7 — the third runner, and why there will not be a fourth surprise.**
-Round two's QC found `kansas-fiscal-marker-handoff.py:267` calling
-`load_manifest` with no schema. It is a real runner: `source.yaml:121` and
-`source.lock.json:77` of the fiscal source package declare it a `runner`, and
-`instances/ks-state-civics/vector-stores/kansas-fiscal-documents/README.md:72`
-documents its invocation. Because the new refusal is unconditional, that script
+Round two's QC found `kansas-fiscal-marker-handoff.py` calling `load_manifest`
+with no schema. No call site in this section is cited by line. Round three wrote
+one down and it had already moved by round six; a written-down line number is the
+same defect as a written-down caller list, and this section is about replacing
+written-down caller lists with a construction. Every `load_manifest` call site is
+derived, with its file and line, by
+`tests/test_statecivics_contract_pin.py::test_every_load_manifest_caller_enforces_the_pin`
+— read them from there. `kansas-fiscal-marker-handoff.py` is a real runner: the
+`source.yaml` and `source.lock.json` of the fiscal source package declare it a
+`runner`, and the kansas-fiscal-documents README documents its invocation. Because the new refusal is unconditional, that script
 returned 1 on EVERY invocation, plan included, and
 `tests/test_kansas_fiscal_marker_handoff.py::test_plan_makes_no_api_call_or_write`
 was red. It now takes `--contract-schema`, passes it through with
