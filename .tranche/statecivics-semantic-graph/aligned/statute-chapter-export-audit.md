@@ -124,6 +124,26 @@ Inputs:
 | Pinned harvest manifest | `17bed3eec5f0946de1e2f5126b84b8637d9aa4b910199f98fe4c9f3e3eb207a2` |
 | Retrieval export schema | `78a3de138cdb534831df034bc66f6a6a2bf7ec3f5d6d573efedf2b50d7a7f32b` |
 | Source artifact schema | `f0fdefbe737a320076e848bf840596b290c052a7c6a7e961d6bd51c10d759f65` |
+
+> **Provenance repair, 2026-09-12 (WAVE-133).** The digests above are whole-file
+> SHA-256 values of upstream files as they stood at StateCivics commit
+> `b3f5c09170c66453097bcd4fb44c6eb2b9031f39`. They were recorded as bare digests
+> against a mounted checkout, so they silently stopped matching when KS-650
+> restructured the retrieval-export contract; `retrieval-export-record.schema.json`
+> is `4dc54d40…` at `e94a894e` and `899b541a…` at `1de6312e`. Recorded here as
+> (commit, digest) pairs they stay true forever, and are re-derivable with:
+>
+> ```sh
+> git -C <statecivics-repo> show b3f5c09170c66453097bcd4fb44c6eb2b9031f39:contracts/civic-impact/retrieval-export-record.schema.json | shasum -a 256
+> # 78a3de138cdb534831df034bc66f6a6a2bf7ec3f5d6d573efedf2b50d7a7f32b
+> git -C <statecivics-repo> show b3f5c09170c66453097bcd4fb44c6eb2b9031f39:contracts/civic-impact/source-artifact.schema.json | shasum -a 256
+> # f0fdefbe737a320076e848bf840596b290c052a7c6a7e961d6bd51c10d759f65
+> ```
+>
+> The command blocks below are the historical record of what actually ran and are
+> deliberately left verbatim, including their now-removed worktree mount paths
+> (see `.tranche/WORKTREE-PATH-PROVENANCE.md`). Forward-looking runtime pins live
+> in the source packages' `contractPin`, not here.
 | Registrar source | `5d175238dd1a31c317280a2c33d6ae73c9d7e79a5e25ada873d641ab82c4dafd` |
 | Operator exporter source | `1668587ca7c4446ec71d87114781be303f5c165c104cc62b5c046ffd6ec0285f` |
 | Export service source | `a568a722340619951f98c4728cb2f7102317e60557f1267b3bd9f77629a8b14d` |

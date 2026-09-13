@@ -179,9 +179,12 @@ source ledger retain evidence and derivations. ExAIS indexes scoped projections.
 
 KS tickets are authored in the StateCivics repository; WAVE tickets are authored
 here. The planning handoff originated at
-`/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/`; its canonical
-operational repository is `operator-source://statecivics-ai` at
-`/Users/mfrieson/Dropbox/AI_Projects/exai_projects/Statecivicsai`.
+`/Users/mfrieson/Developer/statecivics-fiscal-graph-plan/tickets/`, a worktree
+removed 2026-09-11; its canonical operational repository is
+`operator-source://statecivics-ai` at
+`/Users/mfrieson/Dropbox/AI_Projects/exai_projects/Statecivicsai`. Other tranche
+artifacts still cite that path and one other removed worktree as a record of
+what ran; see [worktree path provenance](../.tranche/WORKTREE-PATH-PROVENANCE.md).
 New tickets are planned work, not claims of implementation completion.
 
 ## Contract decisions

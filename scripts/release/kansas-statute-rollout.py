@@ -66,7 +66,7 @@ def bounded(path: Path, limit: int) -> bytes:
     return raw
 
 
-def load_index(path: Path, expected_sha256: str) -> tuple[dict, list]:
+def load_index(path: Path, expected_sha256: str, contract_schema: Path) -> tuple[dict, list]:
     raw = bounded(path, 1024 * 1024)
     require(sha(raw) == expected_sha256 == INDEX_SHA256, 'unapproved INDEX hash')
     index = json.loads(raw)
@@ -89,7 +89,10 @@ def load_index(path: Path, expected_sha256: str) -> tuple[dict, list]:
         require(source.parent == path.parent.resolve(), 'chapter path escapes INDEX directory')
         raw = bounded(source, 32 * 1024 * 1024)
         require(sha(raw) == entry.get('sha256') and len(raw) == entry.get('bytes'), 'chapter hash/size mismatch')
-        manifest = consumer.load_manifest(source, vector_store_slug='kansas-statutes', source_family='kansas-statutes')
+        manifest = consumer.load_manifest(source, vector_store_slug='kansas-statutes',
+                                          source_family='kansas-statutes',
+                                          contract_schema=contract_schema,
+                                          entrypoint='kansas-statute-rollout.py')
         require(manifest.sha256 == sha(raw) and len(manifest.records) == entry.get('records'), 'chapter changed or count mismatch')
         for record in manifest.records:
             for key, seen in identities.items():
@@ -151,13 +154,20 @@ class Prepared:
 def prepare(args) -> Prepared:
     require(args.api in ('http://api:8080', 'http://127.0.0.1:28085'), 'unapproved API target')
     require(args.harvest_manifest_sha256 == HARVEST_SHA256, 'unapproved harvest hash')
-    _, manifests = load_index(args.index, args.index_sha256)
+    # Verify the contract pin once, before any chapter is read, so an unpinned
+    # contract cannot get as far as touching custody bytes.
+    require(args.contract_schema is not None,
+            'kansas-statute-rollout.py: --contract-schema is required; refusing to '
+            'plan a rollout without verifying the StateCivics contract pin')
+    contract_pins = consumer.verify_contract_pin(args.contract_schema)
+    _, manifests = load_index(args.index, args.index_sha256, args.contract_schema)
     seeds = partition_seed(args.seed_state, args.seed_state_sha256, manifests)
     pins = {'schema_version': 1, 'index_sha256': args.index_sha256,
             'harvest_sha256': args.harvest_manifest_sha256, 'seed_sha256': args.seed_state_sha256,
             'api': args.api, 'cell': CELL, 'vector_store_id': STORE, 'knowledge_base_id': KB,
             'tenant_id': TENANT, 'business_instance_id': BUSINESS, 'pacing_policy': dict(PACING_POLICY),
             'required_runtime_image_sha256': IMAGE_SHA256, 'consumer_files': code_pins(),
+            'contract_pins': contract_pins,
             'chapters': {e['chapter']: m.sha256 for e, m in manifests}}
     pin_path = args.operator_root / 'inputs.lock.json'
     if pin_path.exists():
@@ -288,7 +298,8 @@ def apply_prepared(args, prepared: Prepared, stop_requested=lambda: False) -> di
 
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    for flag in ('index', 'harvest-manifest', 'harvest-root', 'custody-root', 'seed-state', 'operator-root'):
+    for flag in ('index', 'harvest-manifest', 'harvest-root', 'custody-root', 'seed-state',
+                 'operator-root', 'contract-schema'):
         parser.add_argument('--' + flag, required=True, type=Path)
     for flag in ('index-sha256', 'harvest-manifest-sha256', 'seed-state-sha256'):
         parser.add_argument('--' + flag, required=True)

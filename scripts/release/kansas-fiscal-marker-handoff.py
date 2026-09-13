@@ -8,6 +8,10 @@ handoff package for StateCivics candidate table/cell parsing.
 
 Planning is the default and makes no API calls or writes. Append ``--apply``
 with the exact producer commit after the plan is reviewed.
+
+``--contract-schema`` is REQUIRED on every invocation, plan included: this
+command reads the same desired-state manifest the document consumer reads, so it
+enforces the same StateCivics contract pin and refuses by naming this entrypoint.
 """
 
 from __future__ import annotations
@@ -244,6 +248,13 @@ def write_handoff_package(
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
+    parser.add_argument(
+        "--contract-schema", type=Path,
+        help=("Path to the StateCivics retrieval-export schema this manifest was "
+              "produced against. REQUIRED. It is not argparse-required so the "
+              "refusal names this entrypoint rather than argparse's usage text; "
+              "the document consumer raises when it is omitted."),
+    )
     parser.add_argument("--state", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--code-commit")
@@ -264,7 +275,11 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         ingest = _load_ingest_command()
-        manifest = ingest.load_manifest(args.manifest)
+        manifest = ingest.load_manifest(
+            args.manifest,
+            contract_schema=args.contract_schema,
+            entrypoint="kansas-fiscal-marker-handoff.py",
+        )
         vector_store_id = _state_vector_store_id(args.state)
         state = ingest.load_state(args.state, vector_store_id=vector_store_id)
         records = eligible_pdf_records(manifest)

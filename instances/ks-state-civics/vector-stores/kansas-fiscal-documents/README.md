@@ -71,6 +71,7 @@ page markers, HTML-preserved tables, and image retention.
 ```bash
 python scripts/release/kansas-fiscal-marker-handoff.py \
   --manifest "$STATECIVICS_FISCAL_MANIFEST" \
+  --contract-schema "$STATECIVICS_RETRIEVAL_EXPORT_SCHEMA" \
   --state .release/cells/ks-state-civics/kansas-fiscal-documents/state.json \
   --output-dir .release/cells/ks-state-civics/kansas-fiscal-documents/marker-handoff \
   --code-commit "$EXAIS_CODE_COMMIT" \
@@ -78,7 +79,13 @@ python scripts/release/kansas-fiscal-marker-handoff.py \
 ```
 
 That command plans only. Append `--apply` to fetch persisted content and write
-the local handoff package. It has no Marker client or RunPod path, so this is
+the local handoff package. `--contract-schema` is required on the plan too: this
+runner reads the same desired-state manifest the document consumer reads, so it
+appears in `contractPin.enforcedAt`. That list is not maintained by hand and is
+not counted here:
+`tests/test_statecivics_contract_pin.py::test_every_load_manifest_caller_enforces_the_pin`
+derives the enforcement points from the source and fails if the declaration and
+the discovered callers disagree in either direction. It has no Marker client or RunPod path, so this is
 reuse of the original extraction, not another extraction charge. StateCivics
 may parse its tables into candidate observations, but it must independently
 resolve dimensions and publication status.

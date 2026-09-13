@@ -87,6 +87,26 @@ commit:
 | `contracts/civic-impact/retrieval-export-record.schema.json` | `78a3de138cdb534831df034bc66f6a6a2bf7ec3f5d6d573efedf2b50d7a7f32b` |
 | `contracts/civic-impact/source-artifact.schema.json` | `f0fdefbe737a320076e848bf840596b290c052a7c6a7e961d6bd51c10d759f65` |
 
+> **Provenance repair, 2026-09-12 (WAVE-133).** The digests above are whole-file
+> SHA-256 values of upstream files as they stood at StateCivics commit
+> `b3f5c09170c66453097bcd4fb44c6eb2b9031f39`. They were recorded as bare digests
+> against a mounted checkout, so they silently stopped matching when KS-650
+> restructured the retrieval-export contract; `retrieval-export-record.schema.json`
+> is `4dc54d40…` at `e94a894e` and `899b541a…` at `1de6312e`. Recorded here as
+> (commit, digest) pairs they stay true forever, and are re-derivable with:
+>
+> ```sh
+> git -C <statecivics-repo> show b3f5c09170c66453097bcd4fb44c6eb2b9031f39:contracts/civic-impact/retrieval-export-record.schema.json | shasum -a 256
+> # 78a3de138cdb534831df034bc66f6a6a2bf7ec3f5d6d573efedf2b50d7a7f32b
+> git -C <statecivics-repo> show b3f5c09170c66453097bcd4fb44c6eb2b9031f39:contracts/civic-impact/source-artifact.schema.json | shasum -a 256
+> # f0fdefbe737a320076e848bf840596b290c052a7c6a7e961d6bd51c10d759f65
+> ```
+>
+> The command blocks below are the historical record of what actually ran and are
+> deliberately left verbatim, including their now-removed worktree mount paths
+> (see `.tranche/WORKTREE-PATH-PROVENANCE.md`). Forward-looking runtime pins live
+> in the source packages' `contractPin`, not here.
+
 The standalone audit ran with `--network none --memory 1g --cpus 1`, read-only
 export/corpus/custody/contracts/handoff mounts, and
 `PYTHONDONTWRITEBYTECODE=1`. Existing ARM64 image `ks-test-runner:latest`,

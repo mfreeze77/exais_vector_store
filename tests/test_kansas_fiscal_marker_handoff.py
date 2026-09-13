@@ -15,6 +15,9 @@ from svs_common.fiscal_marker_handoff import (
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = ROOT / "scripts" / "release"
 SCRIPT = RELEASE / "kansas-fiscal-marker-handoff.py"
+CONTRACT_FIXTURE = (
+    Path(__file__).parent / "fixtures" / "statecivics-retrieval-export-record.314beafe.json"
+)
 sys.path.insert(0, str(RELEASE))
 
 
@@ -290,7 +293,9 @@ def test_handoff_package_is_byte_identical_on_repeat(tmp_path: Path) -> None:
     }
 
 
-def test_plan_makes_no_api_call_or_write(tmp_path: Path, monkeypatch, capsys) -> None:
+@pytest.fixture
+def handoff_inputs(tmp_path: Path) -> tuple[Path, Path, Path]:
+    """A real desired-state manifest plus ingestion state for the CLI tests."""
     source = _source_record()
     manifest_path = tmp_path / "manifest.jsonl"
     # The dry-run still uses the production manifest validator. Import its
@@ -338,6 +343,11 @@ def test_plan_makes_no_api_call_or_write(tmp_path: Path, monkeypatch, capsys) ->
         ),
         encoding="utf-8",
     )
+    return manifest_path, state_path, tmp_path / "output"
+
+
+def test_plan_makes_no_api_call_or_write(handoff_inputs, monkeypatch, capsys) -> None:
+    manifest_path, state_path, output_dir = handoff_inputs
     monkeypatch.setattr(
         command,
         "collect_handoff_artifacts",
@@ -349,13 +359,72 @@ def test_plan_makes_no_api_call_or_write(tmp_path: Path, monkeypatch, capsys) ->
             [
                 "--manifest",
                 str(manifest_path),
+                "--contract-schema",
+                str(CONTRACT_FIXTURE),
                 "--state",
                 str(state_path),
                 "--output-dir",
-                str(tmp_path / "output"),
+                str(output_dir),
             ]
         )
         == 0
     )
-    assert not (tmp_path / "output").exists()
+    assert not output_dir.exists()
     assert '"marker_requests": 0' in capsys.readouterr().out
+
+
+def test_plan_refuses_without_a_contract_schema(
+    handoff_inputs, capsys
+) -> None:
+    """This runner reads the same desired-state manifest the document consumer
+    reads, so it is a third enforcement point, not a bystander. Omitting the
+    schema must refuse by naming THIS entrypoint -- and must refuse on the plan,
+    before any manifest byte is interpreted, not only on --apply."""
+    manifest_path, state_path, output_dir = handoff_inputs
+
+    assert (
+        command.main(
+            [
+                "--manifest",
+                str(manifest_path),
+                "--state",
+                str(state_path),
+                "--output-dir",
+                str(output_dir),
+            ]
+        )
+        == 1
+    )
+    captured = capsys.readouterr()
+    assert "kansas-fiscal-marker-handoff.py: --contract-schema is required" in captured.err
+    assert not output_dir.exists()
+
+
+def test_plan_refuses_a_contract_that_is_not_the_pinned_one(
+    handoff_inputs, tmp_path, capsys
+) -> None:
+    """A supplied-but-wrong schema is refused exactly as an omitted one is."""
+    manifest_path, state_path, output_dir = handoff_inputs
+    contract = json.loads(CONTRACT_FIXTURE.read_text())
+    document_branch = contract["$defs"]["legacy_document_record"]
+    document_branch["properties"]["title"]["minLength"] = 1
+    changed = tmp_path / "changed-contract.json"
+    changed.write_text(json.dumps(contract), encoding="utf-8")
+
+    assert (
+        command.main(
+            [
+                "--manifest",
+                str(manifest_path),
+                "--contract-schema",
+                str(changed),
+                "--state",
+                str(state_path),
+                "--output-dir",
+                str(output_dir),
+            ]
+        )
+        == 1
+    )
+    assert "refused:" in capsys.readouterr().err
+    assert not output_dir.exists()

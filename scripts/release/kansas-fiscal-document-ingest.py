@@ -28,6 +28,10 @@ from svs_common.statecivics_statutes import (
     STATECIVICS_STATUTE_MARKDOWN_PROFILE, STATUTE_SOURCE_COLLECTION, STATUTE_EMBEDDING_PROFILE,
     StatuteHarvest, preflight_statute_harvest, parse_statute_markdown, MAX_DOCUMENT_BYTES,
 )
+from svs_common.statecivics_contract_pin import (
+    DISPATCH_SHA256, DOCUMENT_BRANCH_SHA256, ENTITY_BRANCH_SHA256,
+    ContractPinError, load_contract, verify_branch, verify_contract,
+)
 from topeka_pipeline_common import (
     DEFAULT_CELL,
     DEFAULT_KNOWLEDGE_BASE_ID,
@@ -277,14 +281,57 @@ def _statute_evidence(record: dict[str, Any], content: bytes, harvest: StatuteHa
     return dict(found)
 
 
+#: This consumer reads the document branch of the StateCivics retrieval-export
+#: contract and nothing else.  Entity-projection records live behind a separate
+#: branch with a separate pin (WAVE-134); a document run must neither validate
+#: them nor be blocked by changes to them.
+CONSUMED_CONTRACT_BRANCH = "document"
+
+
+def verify_contract_pin(contract_path: Path, *, consumer: str = CONSUMED_CONTRACT_BRANCH) -> dict[str, str]:
+    """Refuse to ingest against a contract other than the pinned one.
+
+    Verifies the branch this consumer reads AND the top-level routing predicate
+    that delivers records to it: a routing change alone can redirect a record to
+    the other branch while leaving both branch subtrees byte-identical.
+
+    The digests are computed from the schema this run was handed, never fetched,
+    so the check cannot be satisfied by a contract the operator did not supply.
+    """
+    return verify_contract(load_contract(contract_path), consumer)
+
+
 def load_manifest(
     path: Path,
     *,
     instance_slug: str = DEFAULT_INSTANCE_SLUG,
     vector_store_slug: str = DEFAULT_VECTOR_STORE_SLUG,
     source_family: str = "kansas-fiscal-documents",
+    contract_schema: Path | None = None,
+    entrypoint: str = "kansas-fiscal-document-ingest.py",
 ) -> LoadedManifest:
+    """Load a desired-state manifest. ``contract_schema`` is REQUIRED.
+
+    It is a keyword with a ``None`` default only so the refusal can name the
+    entrypoint that omitted it. An optional pin is not a pin: for a while only
+    one caller passed a schema while the source package declared the pin as
+    though every caller did.
+
+    This consumer's callers are NOT enumerated here. Any hand-written list of
+    them goes stale silently, which is exactly how this defect survived two
+    rounds. They are discovered instead by
+    ``tests/test_statecivics_contract_pin.py::test_every_load_manifest_caller_enforces_the_pin``,
+    which walks the tracked source tree with ``ast``, resolves each call's
+    callee by module identity, and requires the discovered set to equal the
+    ``contractPin.enforcedAt`` declaration exactly in both directions.
+    """
     _validate_source_family(source_family, vector_store_slug)
+    if contract_schema is None:
+        raise FiscalIngestError(
+            f"{entrypoint}: --contract-schema is required; refusing to ingest "
+            f"{path} without verifying the StateCivics contract pin"
+        )
+    verify_contract_pin(contract_schema)
     payload = path.read_bytes()
     if payload and not payload.endswith(b"\n"):
         raise FiscalIngestError(f"{path}: JSONL manifest must end with a newline")
@@ -898,6 +945,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--harvest-manifest-sha256')
     parser.add_argument("--cell", default=DEFAULT_CELL)
     parser.add_argument("--manifest", type=Path, required=True)
+    parser.add_argument(
+        "--contract-schema", type=Path, required=True,
+        help=("Path to the StateCivics retrieval-export schema this manifest was produced "
+              "against. Its document branch must match the pinned digest; the entity branch "
+              "is pinned separately and is not read here."),
+    )
     parser.add_argument("--custody-root", type=Path, required=True)
     parser.add_argument("--state", type=Path, required=True)
     parser.add_argument("--proof", type=Path)
@@ -940,6 +993,7 @@ def main() -> int:
         instance_slug=args.instance_slug,
         vector_store_slug=args.vector_store_slug,
         source_family=source_family,
+        contract_schema=args.contract_schema,
     )
     vector_store_id = args.vector_store_id or ("vs_kansas_statutes_pending" if source_family == "kansas-statutes" else "vs_kansas_fiscal_documents_pending")
     prepared = None

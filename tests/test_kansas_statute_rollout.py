@@ -23,6 +23,9 @@ def module():
     return result
 
 
+CONTRACT_SCHEMA = Path(__file__).parent / 'fixtures' / 'statecivics-retrieval-export-record.314beafe.json'
+
+
 def required(variable):
     value = os.environ.get(variable)
     assert value, f'{variable} is required; retained-input proof must not skip'
@@ -40,7 +43,8 @@ def retained(tmp_path_factory):
         harvest_manifest=root/'manifests/statute_scrape_20260911_030653.json', harvest_root=root,
         harvest_manifest_sha256=rollout.HARVEST_SHA256, custody_root=required('SVS_STATUTE_CUSTODY_ROOT'),
         seed_state=required('SVS_STATUTE_ROLLOUT_SEED'), seed_state_sha256=rollout.SEED_SHA256,
-        operator_root=tmp_path_factory.mktemp('full-plan'), api='http://api:8080', api_timeout_seconds=1)
+        operator_root=tmp_path_factory.mktemp('full-plan'), api='http://api:8080', api_timeout_seconds=1,
+        contract_schema=CONTRACT_SCHEMA)
     prepared = rollout.prepare(args)
     return rollout, args, prepared
 
@@ -110,7 +114,7 @@ def test_bad_input_fails_before_effects(retained, tmp_path, monkeypatch, case):
     if case == 'index_hash':
         digest = '0'*64
     with pytest.raises(ValueError):
-        rollout.load_index(path, digest)
+        rollout.load_index(path, digest, CONTRACT_SCHEMA)
     assert not (tmp_path/'states').exists()
 
 
@@ -338,3 +342,61 @@ def test_new_pacing_policy_is_pinned_and_old_lock_still_rejected(retained, tmp_p
     with pytest.raises(ValueError, match='pins changed'):
         rollout.prepare(args)
     assert json.loads((tmp_path/'inputs.lock.json').read_text()) == old
+
+
+# --- WAVE-133 R-P1: this entrypoint enforces the contract pin -----------------
+
+def test_rollout_requires_a_contract_schema(tmp_path_factory):
+    """This path ran unpinned while source.yaml declared the pin as enforced.
+    It is the bulk of the live statutes corpus: 85 tranches, 31,079 records."""
+    rollout = module()
+    exports = required('SVS_STATUTE_EXPORT_ROOT')
+    args = SimpleNamespace(index=exports/'chapters/INDEX.json', index_sha256=rollout.INDEX_SHA256,
+        harvest_manifest=required('SVS_STATUTE_CORPUS_ROOT')/'manifests/statute_scrape_20260911_030653.json',
+        harvest_root=required('SVS_STATUTE_CORPUS_ROOT'),
+        harvest_manifest_sha256=rollout.HARVEST_SHA256, custody_root=required('SVS_STATUTE_CUSTODY_ROOT'),
+        seed_state=required('SVS_STATUTE_ROLLOUT_SEED'), seed_state_sha256=rollout.SEED_SHA256,
+        operator_root=tmp_path_factory.mktemp('no-schema'), api='http://api:8080',
+        api_timeout_seconds=1, contract_schema=None)
+    with pytest.raises(Exception) as excinfo:
+        rollout.prepare(args)
+    assert 'contract' in str(excinfo.value).lower()
+
+
+def test_rollout_refuses_a_changed_document_branch(tmp_path_factory, tmp_path):
+    rollout = module()
+    from svs_common.statecivics_contract_pin import ContractPinError
+    schema = json.loads(CONTRACT_SCHEMA.read_text())
+    schema['$defs']['legacy_document_record']['properties']['title'] = {'type': 'string', 'minLength': 1}
+    changed = tmp_path/'changed.json'
+    changed.write_text(json.dumps(schema))
+    exports = required('SVS_STATUTE_EXPORT_ROOT')
+    args = SimpleNamespace(index=exports/'chapters/INDEX.json', index_sha256=rollout.INDEX_SHA256,
+        harvest_manifest=required('SVS_STATUTE_CORPUS_ROOT')/'manifests/statute_scrape_20260911_030653.json',
+        harvest_root=required('SVS_STATUTE_CORPUS_ROOT'),
+        harvest_manifest_sha256=rollout.HARVEST_SHA256, custody_root=required('SVS_STATUTE_CUSTODY_ROOT'),
+        seed_state=required('SVS_STATUTE_ROLLOUT_SEED'), seed_state_sha256=rollout.SEED_SHA256,
+        operator_root=tmp_path_factory.mktemp('bad-schema'), api='http://api:8080',
+        api_timeout_seconds=1, contract_schema=changed)
+    with pytest.raises(ContractPinError, match='document digest mismatch'):
+        rollout.prepare(args)
+
+
+def test_rollout_refuses_a_routing_change_alone(tmp_path_factory, tmp_path):
+    """Both branch subtrees stay byte-identical; only the routing moves."""
+    rollout = module()
+    from svs_common.statecivics_contract_pin import ContractPinError
+    schema = json.loads(CONTRACT_SCHEMA.read_text())
+    schema['then'], schema['else'] = schema['else'], schema['then']
+    swapped = tmp_path/'swapped.json'
+    swapped.write_text(json.dumps(schema))
+    exports = required('SVS_STATUTE_EXPORT_ROOT')
+    args = SimpleNamespace(index=exports/'chapters/INDEX.json', index_sha256=rollout.INDEX_SHA256,
+        harvest_manifest=required('SVS_STATUTE_CORPUS_ROOT')/'manifests/statute_scrape_20260911_030653.json',
+        harvest_root=required('SVS_STATUTE_CORPUS_ROOT'),
+        harvest_manifest_sha256=rollout.HARVEST_SHA256, custody_root=required('SVS_STATUTE_CUSTODY_ROOT'),
+        seed_state=required('SVS_STATUTE_ROLLOUT_SEED'), seed_state_sha256=rollout.SEED_SHA256,
+        operator_root=tmp_path_factory.mktemp('swapped'), api='http://api:8080',
+        api_timeout_seconds=1, contract_schema=swapped)
+    with pytest.raises(ContractPinError, match='dispatch digest mismatch'):
+        rollout.prepare(args)
