@@ -57,7 +57,7 @@ Use the shared-owner map in [build-contract.json](../.tranche/statecivics-semant
 
 ### 2026-09-12 — P5-PLAN lane B: vocabulary, version dispatch, KS-650 adapter
 
-Verified against StateCivics `e94a894e`, which moved to `1de6312e` mid-session.
+Verified at StateCivics `e94a894e`; pin re-computed and landed at `314beafe`.
 
 **Vocabulary.** `FISCAL_RELATIONS` (fiscal_graph.py:32) has five names, *none with
 a producer*. A repo-wide sweep found no script, fixture, artifact, DB seed or

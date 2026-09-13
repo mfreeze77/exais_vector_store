@@ -452,7 +452,7 @@ def test_idempotency_key_changes_with_desired_record_not_export_clock(ingest):
 
 # --- WAVE-133 contract pin enforcement ---------------------------------------
 
-CONTRACT_FIXTURE = Path(__file__).parent / "fixtures" / "statecivics-retrieval-export-record.e94a894e.json"
+CONTRACT_FIXTURE = Path(__file__).parent / "fixtures" / "statecivics-retrieval-export-record.314beafe.json"
 
 
 def test_ingest_accepts_the_pinned_document_branch(ingest, tmp_path):

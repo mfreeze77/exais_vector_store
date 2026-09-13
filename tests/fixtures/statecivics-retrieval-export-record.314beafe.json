@@ -338,7 +338,7 @@
       ]
     },
     "entity_projection_envelope": {
-      "description": "A TAGGED record. The kind/version gate is the first subschema and the only one an unknown record ever reaches: entity fields live behind it, so an unknown record_kind or record_version fails before any field access.",
+      "description": "A TAGGED record. The kind/version gate is listed first and is sufficient on its own to refuse an unknown kind or version. First does not mean only: every member of this allOf is evaluated, so a refusal here may be accompanied by errors from the entity subschema. The before-any-field-access property is enforced in code by entity_projection.classify_record, not by this document.",
       "allOf": [
         {
           "$ref": "#/$defs/entity_kind_version_gate"
@@ -349,7 +349,7 @@
       ]
     },
     "entity_kind_version_gate": {
-      "description": "Kind and version only. Nothing here reads an entity field, so an unknown kind or version is refused on its own terms rather than producing a cascade of field errors from a branch that should never have been entered.",
+      "description": "Kind and version only. This subschema constrains record_kind and record_version and nothing else, so an unknown value is refused HERE on its own terms. It does NOT follow that a validator reports only this failure: JSON Schema has no evaluation order, so the sibling entity subschema in the enclosing allOf is also evaluated and an unknown record_version additionally produces missing-property errors from a branch that should never have applied. Ordering is a guarantee only code can make, and the code that makes it is entity_projection.classify_record, which decides the kind from these two keys alone; tests/unit/civic_impact/test_entity_projection_contract.py proves that with an access-recording mapping.",
       "type": "object",
       "required": [
         "record_kind",

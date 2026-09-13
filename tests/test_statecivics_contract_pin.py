@@ -19,7 +19,9 @@ from svs_common.statecivics_contract_pin import (
     ENTITY_BRANCH_SHA256,
     DOCUMENT_BRANCH_SEMANTIC_SHA256,
     ENTITY_BRANCH_SEMANTIC_SHA256,
+    PINNED_BRANCH_COMMIT,
     PINNED_CONTRACT_COMMIT,
+    SUPERSEDED_BRANCH_SHA256,
     ContractPinError,
     branch_closure,
     branch_digest,
@@ -28,7 +30,7 @@ from svs_common.statecivics_contract_pin import (
     verify_branch,
 )
 
-FIXTURE = Path(__file__).parent / "fixtures" / "statecivics-retrieval-export-record.e94a894e.json"
+FIXTURE = Path(__file__).parent / "fixtures" / "statecivics-retrieval-export-record.314beafe.json"
 
 
 @pytest.fixture(scope="module")
@@ -70,7 +72,7 @@ def test_document_branch_change_is_refused(contract) -> None:
     message = str(excinfo.value)
     assert "document branch digest mismatch" in message
     assert "CONSTRAINT change" in message
-    assert PINNED_CONTRACT_COMMIT in message
+    assert PINNED_BRANCH_COMMIT["document"] in message
     # The other branch is untouched and still passes.
     assert verify_branch(mutated, "entity") == ENTITY_BRANCH_SHA256
 
@@ -90,7 +92,8 @@ def test_entity_branch_change_is_refused(contract) -> None:
 
 
 def test_annotation_only_drift_is_reported_as_such(contract) -> None:
-    """StateCivics 1de6312e did exactly this to the entity branch."""
+    """StateCivics did exactly this between e94a894e and 1de6312e, which is why
+    the entity pin was re-computed at 314beafe and the old pair kept."""
     mutated = copy.deepcopy(contract)
     mutated["$defs"]["entity_kind_version_gate"]["description"] = "reworded, same constraints"
     with pytest.raises(ContractPinError) as excinfo:
@@ -146,16 +149,23 @@ def test_declared_pin_matches_the_enforced_constants(package: Path) -> None:
     lock = json.loads((package / "source.lock.json").read_text())
     pin = lock["producer"]["contractPin"]
     assert "contractSha256" not in lock["producer"]
-    assert pin["pinnedCommit"] == PINNED_CONTRACT_COMMIT
+    assert "pinnedCommit" not in pin, "a single commit cannot cover two branches"
+    assert pin["documentBranchCommit"] == PINNED_BRANCH_COMMIT["document"]
+    assert pin["entityBranchCommit"] == PINNED_BRANCH_COMMIT["entity"]
     assert pin["documentBranchSha256"] == DOCUMENT_BRANCH_SHA256
     assert pin["entityBranchSha256"] == ENTITY_BRANCH_SHA256
     assert pin["documentBranchSemanticSha256"] == DOCUMENT_BRANCH_SEMANTIC_SHA256
     assert pin["entityBranchSemanticSha256"] == ENTITY_BRANCH_SEMANTIC_SHA256
 
+    superseded = pin["supersededEntityBranch"]
+    assert (("entity", superseded["commit"], superseded["sha256"])
+            in SUPERSEDED_BRANCH_SHA256)
+
     text = (package / "source.yaml").read_text()
     assert "contractSha256:" not in text
     for value in (
-        PINNED_CONTRACT_COMMIT,
+        PINNED_BRANCH_COMMIT["document"],
+        PINNED_BRANCH_COMMIT["entity"],
         DOCUMENT_BRANCH_SHA256,
         ENTITY_BRANCH_SHA256,
         DOCUMENT_BRANCH_SEMANTIC_SHA256,
@@ -216,3 +226,26 @@ def test_historical_digests_are_reproducible_at_their_recorded_commit() -> None:
     assert hashlib.sha256(current).hexdigest() != HISTORICAL_WHOLE_FILE[
         "contracts/civic-impact/retrieval-export-record.schema.json"
     ]
+
+
+def test_every_pinned_digest_travels_with_its_commit(contract) -> None:
+    """A digest without its commit is how 78a3de13... misled two people."""
+    assert set(PINNED_BRANCH_COMMIT) == {"document", "entity"}
+    for branch, commit in PINNED_BRANCH_COMMIT.items():
+        assert len(commit) == 40 and int(commit, 16) >= 0
+    assert PINNED_CONTRACT_COMMIT == PINNED_BRANCH_COMMIT["document"]
+    # The pinned commit must be the one the fixture actually came from.
+    assert branch_digests(contract) == {
+        "document": DOCUMENT_BRANCH_SHA256,
+        "entity": ENTITY_BRANCH_SHA256,
+    }
+
+
+def test_superseded_entity_pin_is_kept_as_a_commit_digest_pair() -> None:
+    assert SUPERSEDED_BRANCH_SHA256 == (
+        ("entity", "e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a",
+         "da242fd879b3c124449b6c1ddead558db64d8f0427ade638bf596c8fd1d9f17e"),
+    )
+    live = {DOCUMENT_BRANCH_SHA256, ENTITY_BRANCH_SHA256}
+    for _branch, _commit, digest in SUPERSEDED_BRANCH_SHA256:
+        assert digest not in live, "a superseded digest is still pinned live"

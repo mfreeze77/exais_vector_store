@@ -24,11 +24,25 @@ BRANCH_ROOTS: dict[str, str] = {
     "entity": "entity_projection_envelope",
 }
 
-#: Digests computed from StateCivics at commit e94a894e (KS-650 slice B1).
-#: Recompute with :func:`branch_digests`; never hand-edit.
-PINNED_CONTRACT_COMMIT = "e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a"
+#: A digest is meaningless without the commit it was computed from -- that is
+#: precisely how the superseded whole-file ``78a3de13...`` misled two people in
+#: one day.  Every pinned digest below therefore travels with its commit, and
+#: the branches carry their commits separately because they move separately.
+#:
+#: Computed from StateCivics main at 314beafe (KS-650 B1 + B1.1, landed_by
+#: 121083e9).  Recompute with :func:`branch_digests`; never hand-edit.
+PINNED_BRANCH_COMMIT: dict[str, str] = {
+    "document": "314beafe4f7905f06a2edb7828b0ea8b2976266c",
+    "entity": "314beafe4f7905f06a2edb7828b0ea8b2976266c",
+}
+
+#: Both branches happen to be pinned at the same commit today.  Prefer
+#: ``PINNED_BRANCH_COMMIT[branch]``; this stays only for messages that name one
+#: contract revision, and is valid only while the two agree.
+PINNED_CONTRACT_COMMIT = PINNED_BRANCH_COMMIT["document"]
+
 DOCUMENT_BRANCH_SHA256 = "d3a7212a4873a2f375d451e74ab4d5f11a56ff50bbbeb5a162dae1f8640807e2"
-ENTITY_BRANCH_SHA256 = "da242fd879b3c124449b6c1ddead558db64d8f0427ade638bf596c8fd1d9f17e"
+ENTITY_BRANCH_SHA256 = "d5248a5452389c40a55c844f2e455343b2e24ce3dedff9a9ecac0752eeb28734"
 
 PINNED_BRANCH_SHA256: dict[str, str] = {
     "document": DOCUMENT_BRANCH_SHA256,
@@ -37,9 +51,7 @@ PINNED_BRANCH_SHA256: dict[str, str] = {
 
 #: The same subtrees with annotation-only keywords removed.  A rewritten
 #: ``description`` moves the digest above but not this one, so the pair tells an
-#: operator whether a refusal is prose churn or a real contract change.  This is
-#: not hypothetical: StateCivics 1de6312e rewrote two entity-branch descriptions
-#: hours after B1 landed, moving ENTITY_BRANCH_SHA256 and nothing else.
+#: operator whether a refusal is prose churn or a real contract change.
 DOCUMENT_BRANCH_SEMANTIC_SHA256 = "e75f616af11b97b28e59cb059cdaa55e1763f52f5b0353e6e8d7fa8cfaacbf45"
 ENTITY_BRANCH_SEMANTIC_SHA256 = "3ad8f594bae3426944725c2946325c23f32bd8d4a81d201913b080c37ce29bae"
 
@@ -47,6 +59,20 @@ PINNED_BRANCH_SEMANTIC_SHA256: dict[str, str] = {
     "document": DOCUMENT_BRANCH_SEMANTIC_SHA256,
     "entity": ENTITY_BRANCH_SEMANTIC_SHA256,
 }
+
+#: Superseded pins, kept as (commit, digest) pairs so they stay true rather than
+#: quietly ceasing to be.  Each is re-derivable with ``git show <commit>:<path>``.
+#:
+#: The entity branch moved once, and for prose only: between e94a894e and
+#: 1de6312e StateCivics rewrote two entity-branch descriptions, which moved the
+#: annotated entity digest and left the semantic entity digest and BOTH document
+#: digests untouched.  A whole-file hash could not have told those apart; that
+#: distinction is the whole reason this module exists.  The contract file has
+#: been byte-identical from 1de6312e through 314beafe.
+SUPERSEDED_BRANCH_SHA256: tuple[tuple[str, str, str], ...] = (
+    ("entity", "e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a",
+     "da242fd879b3c124449b6c1ddead558db64d8f0427ade638bf596c8fd1d9f17e"),
+)
 
 #: Keywords that annotate without constraining.  Draft 2020-12 treats these as
 #: carrying no validation effect.
@@ -147,9 +173,10 @@ def verify_branch(schema: dict[str, Any], branch: str, *, expected: str | None =
     )
     raise ContractPinError(
         f"StateCivics contract {branch} branch digest mismatch: expected {want}, "
-        f"computed {got}. This is {kind}. Pinned contract commit "
-        f"{PINNED_CONTRACT_COMMIT}; semantic digest expected {semantic_want}, "
-        f"computed {semantic_got}. Re-pin deliberately or hand over the pinned revision."
+        f"computed {got}. This is {kind}. The {branch} branch is pinned at "
+        f"StateCivics commit {PINNED_BRANCH_COMMIT[branch]}; semantic digest "
+        f"expected {semantic_want}, computed {semantic_got}. Re-pin deliberately "
+        f"or hand over the pinned revision."
     )
 
 
