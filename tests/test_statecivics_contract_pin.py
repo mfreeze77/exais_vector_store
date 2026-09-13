@@ -484,6 +484,45 @@ def _scope_nodes(statement: ast.AST):
         yield from _scope_nodes(child)
 
 
+def _nested_scope_nodes(body: list[ast.stmt]):
+    """Every node inside a scope NESTED within ``body``.
+
+    Exactly what ``_scope_nodes`` refuses to enter. Ordinary bindings must stay
+    out -- that refusal is Python's scoping and the whole reason a nested
+    function's locals cannot resolve a name at an outer call site. Two forms
+    are not ordinary: ``global`` and ``nonlocal`` reach back OUT of the scope
+    they are written in and rebind a name in an enclosing one. They are the
+    only declarations that do, so they are the only thing read from here.
+    """
+    for statement in body:
+        for node in _scope_nodes(statement):
+            if isinstance(node, _SCOPE_BOUNDARIES):
+                for descendant in ast.walk(node):
+                    if descendant is not node:
+                        yield descendant
+
+
+def _add_reaching_declarations(env, body, declaration, label) -> None:
+    """Count every ``global``/``nonlocal`` NAME declared in a NESTED scope as a
+    binding of NAME in THIS scope.
+
+    R-P26, found in-round by the binding-form battery. ``_scope_env`` recorded
+    a ``global`` only in the function that wrote it, so a module-level name
+    assigned once at module scope and REWRITTEN by ``global`` inside any
+    function looked bound exactly once, and form 2 resolved it CONFIDENTLY AND
+    WRONGLY -- executed, in both directions, including the unsafe one where the
+    call really does reach the fiscal consumer without a pin and the walker
+    reports it as some other module and says nothing.
+
+    A bare ``global x`` binds nothing by itself, so counting it is conservative
+    by construction: it can only add a binding and therefore only ever refuse.
+    """
+    for node in _nested_scope_nodes(body):
+        if isinstance(node, declaration):
+            for name in node.names:
+                env.setdefault(name, []).append(_Binding(node, node.lineno, label))
+
+
 def _definition_time_expressions(node: ast.AST):
     """The sub-expressions of a ``def``/``class`` that run in the ENCLOSING scope.
 
@@ -840,6 +879,9 @@ class _Module:
 
     def module_env(self) -> dict[str, list[_Binding]]:
         env = _scope_env(self.tree.body)
+        _add_reaching_declarations(
+            env, self.tree.body, ast.Global,
+            "global rebinding declared in a nested scope")
         if self.namespace_writes:
             env[_OPAQUE] = [
                 _Binding(node, node.lineno, "namespace write")
@@ -974,8 +1016,11 @@ class _Module:
         other functions in the module, so a sibling helper that happens to
         build two specs cannot refuse a caller that never touches it.
         """
-        envs = _push(self._module_scope(),
-                     _scope_env(definition.body, _parameters(definition)), "function")
+        factory_env = _scope_env(definition.body, _parameters(definition))
+        _add_reaching_declarations(
+            factory_env, definition.body, ast.Nonlocal,
+            "nonlocal rebinding declared in a nested scope")
+        envs = _push(self._module_scope(), factory_env, "function")
         targets = set()
         for sub in ast.walk(definition):
             target = _spec_target(sub, envs, self.path)
@@ -1098,13 +1143,17 @@ class _Module:
         ``class`` scope is not part of the chain any nested scope searches.
         """
         if isinstance(node, ast.ClassDef):
-            self._visit_body(
-                node.body, _push(envs, _scope_env(node.body), "class"), found)
+            env = _scope_env(node.body)
+            kind = "class"
         else:
-            self._visit_body(
-                node.body,
-                _push(envs, _scope_env(node.body, _parameters(node)), "function"),
-                found)
+            env = _scope_env(node.body, _parameters(node))
+            kind = "function"
+        # A nested `nonlocal` rebinds a name in THIS scope, the same way a
+        # nested `global` rebinds one at module scope.
+        _add_reaching_declarations(
+            env, node.body, ast.Nonlocal,
+            "nonlocal rebinding declared in a nested scope")
+        self._visit_body(node.body, _push(envs, env, kind), found)
 
     def _visit_body(self, body, envs, found) -> None:
         for statement in body:
@@ -1378,6 +1427,90 @@ def test_the_name_as_a_string_blocks(spelling, tmp_path, monkeypatch) -> None:
     assert seen.outcome == "BLOCKED", f"{spelling!r} was not blocked: {seen.outcome}"
 
 
+_REACHING = {
+    "global-rebind-to-other": (
+        "ingest = _load_fiscal()\n"
+        "\n\n"
+        "def _swap():\n"
+        "    global ingest\n"
+        "    ingest = _load_other()\n"
+        "\n\n"
+        "_swap()\n"
+        'ingest.load_manifest(Path("m"))\n'
+    ),
+    "global-rebind-to-fiscal": (
+        "ingest = _load_other()\n"
+        "\n\n"
+        "def _swap():\n"
+        "    global ingest\n"
+        "    ingest = _load_fiscal()\n"
+        "\n\n"
+        "_swap()\n"
+        'ingest.load_manifest(Path("m"))\n'
+    ),
+    "nonlocal-rebind": (
+        "def outer():\n"
+        "    ingest = _load_other()\n"
+        "\n"
+        "    def _swap():\n"
+        "        nonlocal ingest\n"
+        "        ingest = _load_fiscal()\n"
+        "\n"
+        "    _swap()\n"
+        '    ingest.load_manifest(Path("m"))\n'
+    ),
+}
+
+_REACHING_PREAMBLE = f"""\
+import importlib.util
+from pathlib import Path
+
+
+def _load_fiscal():
+    spec = importlib.util.spec_from_file_location(
+        "ingest", Path(__file__).parent / {_TARGET_CONSUMER!r})
+    return importlib.util.module_from_spec(spec)
+
+
+def _load_other():
+    spec = importlib.util.spec_from_file_location(
+        "other", Path(__file__).parent / "other-consumer.py")
+    return importlib.util.module_from_spec(spec)
+
+
+"""
+
+
+@pytest.mark.parametrize("shape", sorted(_REACHING), ids=sorted(_REACHING))
+def test_a_nested_global_or_nonlocal_rebinding_refuses(shape, tmp_path) -> None:
+    """R-P26. The two binding forms that reach OUT of the scope they are in.
+
+    ``_scope_nodes`` deliberately stops at a scope boundary, because that is
+    Python's own rule and the reason a nested function's locals cannot resolve
+    a name at an outer call site. ``global`` and ``nonlocal`` are the two
+    declarations that break that containment: written inside a function, they
+    rebind a name in an ENCLOSING scope. Counted only where they were written,
+    the enclosing name looked bound exactly once and the choke point resolved
+    it CONFIDENTLY AND WRONGLY -- a program squarely inside accepted form 2.
+
+    Both directions were executed and both are covered here, including the
+    unsafe one -- ``global-rebind-to-fiscal``, where the call really does reach
+    the fiscal consumer with no pin and the walker previously reported some
+    other module and said nothing at all.
+    """
+    (tmp_path / _TARGET_CONSUMER).write_text(
+        "def load_manifest(path, *, contract_schema=None):\n    return path\n"
+    )
+    (tmp_path / "other-consumer.py").write_text(
+        "def load_manifest(path):\n    return path\n"
+    )
+    module_path = tmp_path / f"reaching_{shape.replace('-', '_')}.py"
+    module_path.write_text(_REACHING_PREAMBLE + _REACHING[shape])
+
+    with pytest.raises(Unclassified, match="bound more than once"):
+        _Module(module_path).call_sites()
+
+
 def test_the_consumer_refuses_a_missing_schema_at_runtime() -> None:
     """The residual risk claimed in the docstring below, executed.
 
@@ -1435,7 +1568,8 @@ def test_every_load_manifest_caller_enforces_the_pin() -> None:
 
     THE THREE FORMS. In all three, every name in the chain must be bound
     EXACTLY ONCE by the R-P16 binding visitor -- which counts every form Python
-    binds a name with -- in Python's own scope chain, where a class body is
+    binds a name with, including a ``global``/``nonlocal`` rebinding declared
+    in a NESTED scope -- in Python's own scope chain, where a class body is
     never part of the chain a nested ``def`` searches:
 
       1. ``load_manifest(...)`` written bare, where the name resolves through
