@@ -26,9 +26,14 @@ The claims under test, in order of how expensive they are to get wrong:
    that names that branch -- and the document branch is never relaxed to let an
    entity record through.
 3. An entity record cannot reach the shared statute/document Qdrant collection.
-   That is asserted on the collection name the adapter RETURNS, because
-   ``QdrantAdapter.collection_name`` does not take ``vector_store_id`` and a new
-   vector store therefore separates nothing.
+   The statute collection name is derived from the INSTANCE CONFIG
+   (``instance.yaml`` plus the statute store's ``source.yaml``); the entity
+   collection is what the adapter RETURNS. Neither is written out here to match
+   the other -- round one computed both with the same call and the same
+   arguments, so it asserted ``X == X`` and could not fail.
+   ``QdrantAdapter.collection_name`` does not take ``vector_store_id``, so a new
+   vector store separates nothing and the embedding profile is the only
+   separator.
 """
 
 from __future__ import annotations
@@ -43,6 +48,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+import yaml
 from svs_common.qdrant_adapter import QdrantAdapter
 from svs_common.statecivics_contract_pin import (
     BRANCH_ROOTS,
@@ -50,15 +56,22 @@ from svs_common.statecivics_contract_pin import (
     load_contract,
 )
 from svs_common.statecivics_record_adapter import (
+    APPROXIMATION_TOKENS,
+    EXACT_FORMATS,
+    EXACT_KEYWORDS,
     EXPECTED_DISPATCH_REQUIRED,
     DispatchRule,
+    DocumentCollectionRosterIncomplete,
     EntityCollectionCollision,
+    InstanceCollectionConfigError,
     RecordBranchError,
     UnsupportedContractKeyword,
     adapt_manifest,
     adapt_records,
     classify_record,
     dispatch_rule,
+    entity_collection_name,
+    read_instance_collection_roster,
     validate,
 )
 
@@ -70,11 +83,16 @@ BAD_ENTITY = FIXTURES / "statecivics-invalid-entity-record.jsonl"
 BAD_DOCUMENT = FIXTURES / "statecivics-invalid-document-record.jsonl"
 ADAPTER_SOURCE = ROOT / "packages" / "svs_common" / "svs_common" / "statecivics_record_adapter.py"
 
-#: The instance and profiles from WAVE-134's store-id note. The document/statute
-#: points for this cell live in svs_biz_ks_state_civics_voyage_4_docs_1024.
-INSTANCE = "biz-ks-state-civics"
-DOCUMENT_PROFILE = "voyage-4-docs-1024"
-ENTITY_PROFILE = "voyage-4-entities-1024"
+#: The REAL instance tree. Every document collection name in these tests is
+#: derived from it, never written out by hand to match something.
+REAL_INSTANCE = ROOT / "instances" / "ks-state-civics"
+STATUTE_SOURCE = (
+    REAL_INSTANCE
+    / "vector-stores/kansas-statutes/sources/statecivics-statute-ledger/source.yaml"
+)
+#: The candidate entity profile from WAVE-134's store-id note. Still an owner
+#: decision; nothing here adopts it.
+ENTITY_PROFILE = "voyage_4_entities_1024"
 
 
 @pytest.fixture(scope="module")
@@ -97,14 +115,14 @@ def manifest():
     return adapt_manifest(MIXED, contract_schema=CONTRACT)
 
 
-def _qdrant() -> QdrantAdapter:
+def _qdrant(prefix: str = "ks_civics_") -> QdrantAdapter:
     """A QdrantAdapter with settings only -- no client, no network.
 
     ``__new__`` is how tests/test_index_versioning.py already builds one; the
     constructor would try to reach a Qdrant.
     """
     adapter = QdrantAdapter.__new__(QdrantAdapter)
-    adapter.settings = SimpleNamespace(qdrant_collection_prefix="svs_", svs_index_version="")
+    adapter.settings = SimpleNamespace(qdrant_collection_prefix=prefix, svs_index_version="")
     return adapter
 
 
@@ -307,6 +325,157 @@ def test_an_unimplemented_keyword_is_refused_rather_than_ignored(schema) -> None
         validate(_jsonl(MIXED)[1], extended, "entity_projection_envelope")
 
 
+def test_a_boolean_never_satisfies_a_numeric_const(schema) -> None:
+    """The round-one fail-open, at the gate the contract calls sufficient.
+
+    ``True == 1`` in Python, so ``record_version: true`` satisfied ``const: 1``
+    and was ADMITTED as a valid entity projection. Driven through the real
+    ``adapt_records``, not through ``validate`` alone, because the claim is that
+    the dispatch path admits it -- and that is what QC reproduced.
+    """
+    record = copy.deepcopy(_jsonl(MIXED)[1])
+    record["record_version"] = True
+    with pytest.raises(RecordBranchError, match="expected const 1, got true"):
+        adapt_records([(1, record)], schema)
+
+
+def test_enum_equality_is_typed_like_const() -> None:
+    """``enum`` shares ``const``'s equality, so it shares the same trap.
+
+    Every enum in the pinned contract sits on a ``type``-constrained string, so
+    a boolean is caught by ``type`` before ``enum`` is reached. That makes the
+    real contract safe TODAY and says nothing about the keyword, so the keyword
+    is exercised directly -- which is the distinction round one missed.
+    """
+    schema = {"$defs": {"probe": {"enum": [1, "yes"]}}}
+    assert validate(1, schema, "probe").ok
+    assert validate(1.0, schema, "probe").ok, "1.0 and 1 are the same number"
+    assert not validate(True, schema, "probe").ok, "true is not the number 1"
+    assert not validate(0, schema, "probe").ok
+
+    const = {"$defs": {"probe": {"const": 0}}}
+    assert not validate(False, const, "probe").ok, "false is not the number 0"
+    assert validate(0.0, const, "probe").ok
+
+
+@pytest.mark.parametrize(
+    "bad_date",
+    ["2026-02-31", "2026-13-99", "0000-99-99", "2026-04-31", "20260701", "2026-W27-1"],
+)
+def test_a_calendar_invalid_date_is_refused(schema, bad_date) -> None:
+    """A shape regex accepted every one of these on both branches."""
+    record = copy.deepcopy(_jsonl(MIXED)[1])
+    record["as_of"]["as_of_date"] = bad_date
+    with pytest.raises(RecordBranchError, match="is not a valid date"):
+        adapt_records([(1, record)], schema)
+
+
+@pytest.mark.parametrize(
+    "bad_date_time",
+    [
+        "2026-02-31T00:00:00Z",  # calendar-invalid day
+        "2026-09-04T25:00:00Z",  # impossible hour
+        "2026-09-04T12:00:00",  # no offset: a local time is not an instant
+        "2026-09-04 12:00:00Z",  # no date/time separator
+        "yesterday",
+    ],
+)
+def test_a_calendar_invalid_or_offsetless_date_time_is_refused(schema, bad_date_time) -> None:
+    record = copy.deepcopy(_jsonl(MIXED)[1])
+    record["exporter"]["exported_at"] = bad_date_time
+    with pytest.raises(RecordBranchError, match="is not a valid date-time"):
+        adapt_records([(1, record)], schema)
+
+
+@pytest.mark.parametrize("good_date_time", ["2026-09-04T12:00:00Z", "2026-09-04t12:00:00.5+02:00"])
+def test_a_real_rfc3339_date_time_is_accepted(schema, good_date_time) -> None:
+    """The refusals above must not be a validator that rejects everything."""
+    record = copy.deepcopy(_jsonl(MIXED)[1])
+    record["exporter"]["exported_at"] = good_date_time
+    assert adapt_records([(1, record)], schema).entity_records
+
+
+def test_unique_items_distinguishes_true_from_one_and_conflates_one_with_one_point_zero() -> None:
+    """``uniqueItems`` uses the same typed equality as ``const``."""
+    schema = {
+        "$defs": {"probe": {"type": "object", "properties": {"xs": {"type": "array", "uniqueItems": True}}}}
+    }
+    assert validate({"xs": [True, 1]}, schema, "probe").ok, "true and 1 are different types"
+    assert not validate({"xs": [1, 1.0]}, schema, "probe").ok, "1 and 1.0 are the same number"
+    assert not validate({"xs": [True, True]}, schema, "probe").ok
+
+
+def test_an_integer_valued_float_is_an_integer() -> None:
+    """Draft 2020-12: ``integer`` matches any number with no fractional part."""
+    schema = {"$defs": {"probe": {"type": "integer"}}}
+    assert validate(48211.0, schema, "probe").ok
+    assert not validate(48211.5, schema, "probe").ok
+    assert not validate(True, schema, "probe").ok
+
+
+def test_the_keyword_vocabulary_is_partitioned_and_disjoint() -> None:
+    """No keyword may be claimed exact and approximate at once."""
+    from svs_common.statecivics_record_adapter import (
+        ANNOTATION_KEYWORDS,
+        APPROXIMATED_KEYWORDS,
+        KNOWN_KEYWORDS,
+    )
+
+    assert EXACT_KEYWORDS.isdisjoint(APPROXIMATED_KEYWORDS)
+    assert EXACT_KEYWORDS.isdisjoint(ANNOTATION_KEYWORDS)
+    assert APPROXIMATED_KEYWORDS.isdisjoint(ANNOTATION_KEYWORDS)
+    assert KNOWN_KEYWORDS == EXACT_KEYWORDS | APPROXIMATED_KEYWORDS | ANNOTATION_KEYWORDS
+    # The four keywords round one claimed while approximating are now exact.
+    assert {"const", "enum", "uniqueItems"} <= EXACT_KEYWORDS
+    assert EXACT_FORMATS == {"date", "date-time"}
+    # ...and `format` stays approximate ONLY because of `uri`.
+    assert "format" in APPROXIMATED_KEYWORDS
+
+
+def test_every_keyword_the_contract_uses_is_classified(schema) -> None:
+    """Nothing in the pinned contract falls outside the three lists."""
+    from svs_common.statecivics_record_adapter import KNOWN_KEYWORDS
+
+    seen: set[str] = set()
+
+    def walk(node, in_schema: bool) -> None:
+        if isinstance(node, dict):
+            if in_schema:
+                seen.update(node)
+            for key, value in node.items():
+                if key in {"properties", "$defs"} and isinstance(value, dict):
+                    for sub in value.values():
+                        walk(sub, True)
+                elif key in {"allOf", "anyOf", "oneOf"} and isinstance(value, list):
+                    for sub in value:
+                        walk(sub, True)
+                elif key in {"if", "then", "else", "not", "items", "additionalProperties"}:
+                    walk(value, True)
+                elif key not in {"required", "enum", "type", "const"}:
+                    walk(value, False)
+        elif isinstance(node, list) and in_schema:
+            for value in node:
+                walk(value, in_schema)
+
+    walk(schema, True)
+    assert seen, "the walker found no keywords, so this test proves nothing"
+    assert seen <= KNOWN_KEYWORDS, f"unclassified: {sorted(seen - KNOWN_KEYWORDS)}"
+
+
+def test_approximations_actually_exercised_are_disclosed(manifest) -> None:
+    """The second disclosure channel, pinned to an EXACT set.
+
+    ``pattern`` and ``format: uri`` are both reached by the real fixtures, so
+    both must be named. If an approximation is ever added or removed, this
+    fails rather than the claim quietly widening.
+    """
+    assert manifest.unsupported_keyword_semantics == ("format:uri", "pattern")
+    assert set(manifest.unsupported_keyword_semantics) <= set(APPROXIMATION_TOKENS)
+    # An entity record reaches `pattern` but no `uri`-formatted field.
+    entity_only = adapt_records([(1, _jsonl(MIXED)[1])], load_contract(CONTRACT))
+    assert entity_only.unsupported_keyword_semantics == ("pattern",)
+
+
 def test_unfollowed_remote_refs_are_reported_not_hidden(manifest) -> None:
     """A remote $ref names a separate contract with its own pin.
 
@@ -326,57 +495,165 @@ def test_unfollowed_remote_refs_are_reported_not_hidden(manifest) -> None:
 # --------------------------------------------------------------------------
 
 
-def test_a_new_vector_store_alone_does_not_separate_the_collection() -> None:
-    """The sharpest finding in WAVE-134, asserted on the adapter's own output.
+def test_the_statute_collection_is_read_from_the_instance_config() -> None:
+    """The name under protection comes from `source.yaml`, not from this test.
 
-    ``collection_name`` takes (business_instance_id, embedding_profile_id). Two
-    different vector stores on the same instance and profile resolve to the SAME
-    collection, so the store id cannot be the separator.
+    Round one computed ``statute_collection`` and ``document_collection`` with
+    the same call and the same arguments and then asserted they were equal --
+    ``X == X``, which cannot fail. Both halves are now independent: the business
+    instance id and prefix come from ``instance.yaml``, and the profile from the
+    statute store's own source package.
     """
-    qdrant = _qdrant()
-    assert (
-        qdrant.collection_name(INSTANCE, DOCUMENT_PROFILE)
-        == "svs_biz_ks_state_civics_voyage_4_docs_1024"
+    instance = yaml.safe_load((REAL_INSTANCE / "instance.yaml").read_text(encoding="utf-8"))
+    package = yaml.safe_load(STATUTE_SOURCE.read_text(encoding="utf-8"))
+    business_instance_id = instance["metadata"]["businessInstanceId"]
+    prefix = instance["storage"]["qdrant"]["collectionPrefix"]
+    statute_profile = package["ingestion"]["embeddingProfile"]
+    assert (business_instance_id, prefix, statute_profile) == (
+        "biz_ks_state_civics",
+        "ks_civics_",
+        "voyage_4_docs_1024",
     )
-    with pytest.raises(EntityCollectionCollision) as excinfo:
-        from svs_common.statecivics_record_adapter import entity_collection_name
+    qdrant = _qdrant(prefix)
+    assert (
+        qdrant.collection_name(business_instance_id, statute_profile)
+        == "ks_civics_biz_ks_state_civics_voyage_4_docs_1024"
+    )
 
+
+def test_the_roster_is_read_off_disk_and_names_stores_it_cannot_resolve() -> None:
+    """What the REAL instance tree says today, asserted rather than assumed."""
+    roster = read_instance_collection_roster(REAL_INSTANCE, _qdrant("ks_civics_"))
+    assert roster.business_instance_id == "biz_ks_state_civics"
+    assert roster.collection_prefix == "ks_civics_"
+    assert roster.document_collections == {
+        "kansas-statutes:voyage_4_docs_1024": "ks_civics_biz_ks_state_civics_voyage_4_docs_1024"
+    }
+    # Three stores declare no ingestion.embeddingProfile in any source package.
+    assert roster.undeclared_profile_stores == (
+        "kansas-court-decisions",
+        "kansas-fiscal-documents",
+        "topeka-municipal-code",
+    )
+
+
+def test_the_real_instance_refuses_because_its_roster_is_incomplete() -> None:
+    """Fail toward blocking when the check itself cannot be completed.
+
+    A non-collision guard that cannot enumerate the collections it must avoid
+    has no answer. Reporting "no collision" because a store was invisible is the
+    fail-open shape this module exists to remove.
+    """
+    with pytest.raises(DocumentCollectionRosterIncomplete) as excinfo:
         entity_collection_name(
-            qdrant,
-            business_instance_id=INSTANCE,
-            document_embedding_profile_id=DOCUMENT_PROFILE,
-            entity_embedding_profile_id=DOCUMENT_PROFILE,
+            _qdrant("ks_civics_"),
+            instance_root=REAL_INSTANCE,
+            entity_embedding_profile_id=ENTITY_PROFILE,
         )
-    assert "svs_biz_ks_state_civics_voyage_4_docs_1024" in str(excinfo.value)
-    assert "vector_store_id" in str(excinfo.value)
+    assert "kansas-fiscal-documents" in str(excinfo.value)
+    assert "embeddingProfile" in str(excinfo.value)
 
 
-def test_entity_records_never_reach_the_shared_statute_collection(manifest) -> None:
+def _complete_instance(tmp_path: Path, *, entity_store_profile: str | None = None) -> Path:
+    """A minimal instance tree where every store declares a profile.
+
+    Copied in shape from the real one -- same keys, same nesting -- so the
+    reader under test is exercised on the layout it will actually meet.
+    """
+    root = tmp_path / "ks-state-civics"
+    (root).mkdir()
+    (root / "instance.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "metadata": {"businessInstanceId": "biz_ks_state_civics"},
+                "storage": {"qdrant": {"collectionPrefix": "ks_civics_"}},
+            }
+        ),
+        encoding="utf-8",
+    )
+    stores = {
+        "kansas-statutes": "voyage_4_docs_1024",
+        "kansas-fiscal-documents": "voyage_4_docs_1024",
+    }
+    if entity_store_profile is not None:
+        stores["kansas-fiscal-entities"] = entity_store_profile
+    for slug, profile in stores.items():
+        source = root / "vector-stores" / slug / "sources" / f"{slug}-ledger"
+        source.mkdir(parents=True)
+        (source / "source.yaml").write_text(
+            yaml.safe_dump({"ingestion": {"embeddingProfile": profile}}), encoding="utf-8"
+        )
+    return root
+
+
+def test_the_collision_fires_against_any_configured_document_collection(tmp_path) -> None:
+    """The guard no longer depends on which profile the caller names.
+
+    Quality control's probe: passing a document profile that is not the statute
+    profile used to return the real shared statute collection with no collision
+    raised. There is no document profile argument to pass any more, so the probe
+    is unexpressible; what remains is that the DECLARED collections collide.
+    """
+    root = _complete_instance(tmp_path)
+    qdrant = _qdrant("ks_civics_")
+    # Sanity: this tree resolves, so the refusal below is about collision only.
+    roster = read_instance_collection_roster(root, qdrant)
+    assert roster.undeclared_profile_stores == ()
+    assert set(roster.document_collections.values()) == {
+        "ks_civics_biz_ks_state_civics_voyage_4_docs_1024"
+    }
+
+    with pytest.raises(EntityCollectionCollision) as excinfo:
+        entity_collection_name(
+            qdrant, instance_root=root, entity_embedding_profile_id="voyage_4_docs_1024"
+        )
+    message = str(excinfo.value)
+    assert "ks_civics_biz_ks_state_civics_voyage_4_docs_1024" in message
+    assert "kansas-statutes:voyage_4_docs_1024" in message
+    assert "kansas-fiscal-documents:voyage_4_docs_1024" in message
+    assert "vector_store_id" in message
+
+
+@pytest.mark.parametrize("profile", [None, "", "   ", 0])
+def test_an_empty_entity_profile_is_refused_not_resolved(tmp_path, profile) -> None:
+    """``None`` used to resolve to the degenerate ``ks_civics_biz_..._``."""
+    with pytest.raises(InstanceCollectionConfigError, match="non-empty profile id"):
+        entity_collection_name(
+            _qdrant("ks_civics_"),
+            instance_root=_complete_instance(tmp_path),
+            entity_embedding_profile_id=profile,
+        )
+
+
+def test_a_prefix_disagreement_between_config_and_settings_is_refused(tmp_path) -> None:
+    """Names computed for another cell are not an answer about this one."""
+    with pytest.raises(InstanceCollectionConfigError, match="collectionPrefix"):
+        read_instance_collection_roster(_complete_instance(tmp_path), _qdrant("svs_"))
+
+
+def test_entity_records_never_reach_the_shared_statute_collection(manifest, tmp_path) -> None:
     """Route the adapter's real output and assert on where each group lands.
 
-    The collection names are what the adapter RETURNS, not strings built here.
+    The statute collection is the one the instance config names; the entity
+    collection is what the adapter RETURNS. Neither is a string built here to
+    match the other.
     """
-    from svs_common.statecivics_record_adapter import entity_collection_name
-
-    qdrant = _qdrant()
-    document_collection = qdrant.collection_name(INSTANCE, DOCUMENT_PROFILE)
-    # The Kansas statutes ride the same instance and the same document profile,
-    # which is exactly why they share one collection with the fiscal documents.
-    statute_collection = qdrant.collection_name(INSTANCE, DOCUMENT_PROFILE)
-    assert statute_collection == document_collection
+    root = _complete_instance(tmp_path)
+    qdrant = _qdrant("ks_civics_")
+    roster = read_instance_collection_roster(root, qdrant)
+    statute_collection = roster.document_collections["kansas-statutes:voyage_4_docs_1024"]
+    assert statute_collection == "ks_civics_biz_ks_state_civics_voyage_4_docs_1024"
 
     entity_collection = entity_collection_name(
-        qdrant,
-        business_instance_id=INSTANCE,
-        document_embedding_profile_id=DOCUMENT_PROFILE,
-        entity_embedding_profile_id=ENTITY_PROFILE,
+        qdrant, instance_root=root, entity_embedding_profile_id=ENTITY_PROFILE
     )
 
     routed: dict[str, list[dict]] = {}
-    routed.setdefault(document_collection, []).extend(manifest.document_records)
+    routed.setdefault(statute_collection, []).extend(manifest.document_records)
     routed.setdefault(entity_collection, []).extend(manifest.entity_records)
 
     assert entity_collection != statute_collection
+    assert entity_collection not in set(roster.document_collections.values())
     assert len(routed) == 2
     assert manifest.entity_records  # the assertion below is not vacuous
     for record in routed[statute_collection]:

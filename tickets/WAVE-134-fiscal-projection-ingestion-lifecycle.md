@@ -273,3 +273,97 @@ reproduce `entity_projection.build_entity_record` at that commit.
 key change, no `source.lock.json` for an entity store, and no owner decision on
 the entity embedding profile. The KS-600 `entity` payloads are not validated by
 this adapter by construction. Those remain open under this ticket.
+
+### 2026-09-13 — lane B round two: the validator, the collision guard, the check
+
+Quality control FAILED the lane B increment at `664f62c`. Three fixes, none
+touching `load_manifest` or the document consumer.
+
+**F1 — the validator was fail-open inside classes its own battery "covered".**
+QC reproduced the round-one cross-check independently, extended it to 93 cases
+and found six divergences from `jsonschema`: five fail-open, three reachable on
+the unmodified pinned contract. The two decisive ones: `value != schema["const"]`
+used Python equality, and `True == 1`, so `record_version: true` satisfied
+`const: 1` and was ADMITTED through the kind/version gate the contract calls
+"sufficient on its own to refuse an unknown kind or version"; and `format: date`
+was a shape regex, so `2026-02-31`, `2026-13-99` and `0000-99-99` all passed on
+both branches. Round one's battery covered every keyword by NAME and agreed on
+all of them -- the defects were in their SEMANTICS. That is WAVE-133's defect
+class one layer inside the check built to avoid it.
+
+Fixed semantically, not renamed:
+
+* `const` / `enum` — typed equality (`_json_equal`). A boolean is never equal to
+  a number; an int and a float of equal mathematical value are equal.
+* `format: date` / `date-time` — parsed by `datetime`, offset REQUIRED on
+  date-time. A local time is not an instant.
+* `uniqueItems` — a typed equality key, so `[true, 1]` is unique and `[1, 1.0]`
+  is not.
+* `type: integer` — accepts integer-valued floats, per draft 2020-12. That was
+  QC's fail-CLOSED finding.
+
+The single `SUPPORTED_KEYWORDS` set is replaced by `EXACT_KEYWORDS` /
+`APPROXIMATED_KEYWORDS` / `ANNOTATION_KEYWORDS`, disjoint and asserted disjoint,
+with everything outside all three still raising. What remains approximate is
+DISCLOSED through the `unvalidated_remote_refs` mechanism: a second channel,
+`RecordValidation.unsupported_keyword_semantics`, whose exact value is pinned by
+a test. Today it is `("format:uri", "pattern")` for the mixed manifest and
+`("pattern",)` for an entity record alone.
+
+Cross-check re-run with `jsonschema` 4.26.0 + `rfc3339-validator` in the SCRATCH
+venv only, organised by SEMANTIC boundary rather than by keyword name, at least
+three near-miss cases per boundary: **86 comparable cases, 0 disagreements**
+across bool-vs-number (28), date-calendar (15), datetime-calendar (13),
+int-vs-float (13), whole-record fixtures (10) and uniqueitems-nested (7). The
+`format: uri` divergence is reported separately and is fail-CLOSED: `jsonschema`
+registers no `uri` checker without the optional `rfc3987`, so it accepts what
+this refuses. It is unreachable through this contract, whose only `uri`-formatted
+required field also carries `pattern: ^https?://`.
+
+Honest limit, recorded because the cross-check cannot show it: `pattern` uses
+Python `re` in BOTH implementations, so a cross-check against `jsonschema`
+cannot detect ECMA-262 divergence. Only replacing the evaluator can, which is
+[WAVE-145](WAVE-145-adopt-jsonschema-and-retire-the-hand-written-evaluator.md),
+filed in the same commit.
+
+**F2 — the collision guard asked its caller for the hazard.** It took
+`document_embedding_profile_id` as an argument, so QC's probe -- pass a document
+profile that is not the statute profile -- got the REAL shared statute collection
+back with no collision raised, and `entity_embedding_profile_id=None` returned
+the degenerate `ks_civics_biz_ks_state_civics_`. The document side is now READ
+FROM THE INSTANCE TREE by `read_instance_collection_roster`: `instance.yaml` for
+`businessInstanceId` and `storage.qdrant.collectionPrefix`, each store's own
+source package for `ingestion.embeddingProfile`. `EntityCollectionCollision`
+fires against ANY declared document collection, whatever the caller passes; an
+empty or non-string entity profile is refused rather than resolved.
+
+Two further refusals, both failing toward blocking:
+`DocumentCollectionRosterIncomplete` when a store declares no embedding profile,
+because a non-collision guard that cannot enumerate what it must avoid has no
+answer; and `InstanceCollectionConfigError` when the adapter's settings prefix
+disagrees with `instance.yaml`, because names computed for another cell are not
+an answer about this one.
+
+**Finding, from the real tree.** Only `kansas-statutes` declares an
+`ingestion.embeddingProfile` (`voyage_4_docs_1024`). `kansas-fiscal-documents`,
+`kansas-court-decisions` and `topeka-municipal-code` declare none in any source
+package, so the real instance CANNOT pass this guard today, and a test asserts
+that refusal by name. Declaring those profiles is prerequisite work for entity
+ingestion under this ticket.
+
+**F3 — the separation test asserted `X == X`.** It computed
+`statute_collection` and `document_collection` with the same call and the same
+arguments. Both halves are now independent: the statute collection comes from
+`instance.yaml` + the statute store's `source.yaml` and is asserted equal to
+`ks_civics_biz_ks_state_civics_voyage_4_docs_1024`, the CONFIGURED name. Round
+one asserted `svs_biz_ks_state_civics_voyage_4_docs_1024`, which was taken from
+this ticket's planning note and is not what the config resolves to: the prefix is
+`ks_civics_`, not `svs_`, and the business instance id is `biz_ks_state_civics`,
+not `biz-ks-state-civics`.
+
+**Baseline, R-P9, regime beside every count.** Corpus vars are
+`SVS_STATUTE_EXPORT_ROOT`, `SVS_STATUTE_CORPUS_ROOT`, `SVS_STATUTE_CUSTODY_ROOT`,
+`SVS_STATUTE_ROLLOUT_SEED`. Measured on `main` at `cc01547`: regime UNSET, 10
+failed + 31 errors = 41 ids; regime SET, 7 failed + 31 errors = 38 ids. This
+supersedes the "5 + 31 = 36" figure reported in the round-one log entry above,
+which was measured with `PYTHONPATH` exported and did not state its regime.
