@@ -1,6 +1,6 @@
 # WAVE-145: Adopt jsonschema as a real dependency and retire the hand-written evaluator
 
-Status: filed 2026-09-13, not started. Parent: WAVE-134.
+Status: DONE 2026-09-13, landed_by (this commit). Parent: WAVE-134.
 
 ## Summary
 
@@ -133,3 +133,54 @@ place; nothing else depends on it.
 
 Filed by WAVE-134 lane B round two, in the same commit that names it, alongside
 the round-two evaluator fixes this ticket supersedes.
+
+**2026-09-13 — done, in WAVE-134 lane B round three.** The owner pulled this
+forward: round two's patched evaluator is not patched further, it is deleted.
+
+* `jsonschema==4.25.1` and `rfc3339-validator==0.1.4` pinned in all four
+  `apps/*/requirements.txt`. 4.25.1 matches repo A's `pyproject.toml:56` and
+  `poetry.lock`, so producer and consumer judge the same record by the same
+  implementation — which is what the composition milestone rests on.
+* Every hand-written validation function is gone: `_validate`, `_probe`,
+  `_json_equal`, `_equality_key`, `_valid_date`, `_valid_date_time`,
+  `_type_matches`, `_check_keywords`, `_Disclosures`, and the
+  `EXACT_KEYWORDS` / `APPROXIMATED_KEYWORDS` / `APPROXIMATION_TOKENS` /
+  `EXACT_FORMATS` sets. `validate` now builds a `Draft202012Validator`.
+* `FormatChecker` is passed EXPLICITLY, because draft 2020-12 makes `format` an
+  annotation by default — a validator built without one calls `2026-02-31` a
+  valid `date`. Which formats actually assert is READ from the registry into
+  `ASSERTED_FORMATS`, not assumed.
+* The vocabulary guard SURVIVES, now derived from
+  `Draft202012Validator.VALIDATORS` rather than hand-listed. `jsonschema`
+  ignores an unrecognised keyword, exactly as the specification requires; that
+  is correct of a validator and wrong of a consumer, so a typo
+  (`dependentRequried`) is still refused by name. Conversely `dependentRequired`
+  — which the old evaluator had to refuse — is now simply CHECKED, and a test
+  asserts that.
+* Remote-`$ref` policy unchanged: always-true `referencing` stubs, never
+  resolution, and `unvalidated_remote_refs` reports each one. Same three refs,
+  now correctly split per branch (`source-artifact` on the document branch, the
+  two KS-600 contracts on the entity branch).
+* **The recorded prediction held.** This ticket expected
+  `unsupported_keyword_semantics` to SURVIVE with `pattern` in it, because
+  `jsonschema` also uses Python `re` rather than ECMA-262. It did, and
+  `format:uri` survived too for a different reason than before: `jsonschema`
+  registers no `uri` checker without `rfc3987`, which is GPLv3 and not a
+  dependency this product can take, so a `uri`-formatted field is now DECLARED
+  AND NOT CHECKED rather than checked more strictly. Both entries are now
+  properties of the library. The values are unchanged — `("pattern",)` for the
+  entity branch, `("format:uri", "pattern")` for the document branch — and are
+  now DERIVED from the branch subtree plus the checker registry rather than
+  listed.
+* The round-two cross-check battery is RETAINED IN THE REPOSITORY, as this
+  ticket's acceptance criteria required, as `_SEMANTIC_BOUNDARIES` plus
+  `test_semantic_boundaries` (41 cases over five boundaries). It no longer
+  compares two implementations; its job now is to keep the boundaries covered
+  by something that runs in CI. `test_every_semantic_boundary_carries_near_misses_and_controls`
+  fails if any boundary becomes all-pass or all-refuse, so it cannot decay into
+  a battery that proves nothing.
+
+Not done here, and still open: the image rebuild. Adding a dependency changes
+every app image, and `.env.images` records immutable digests. Building and
+recording those is a release action with its own approval; this commit changes
+the requirements sets only. See the WAVE-134 log for the exact gate.

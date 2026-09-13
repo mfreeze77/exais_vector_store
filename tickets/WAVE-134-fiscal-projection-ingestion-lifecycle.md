@@ -367,3 +367,103 @@ not `biz-ks-state-civics`.
 failed + 31 errors = 41 ids; regime SET, 7 failed + 31 errors = 38 ids. This
 supersedes the "5 + 31 = 36" figure reported in the round-one log entry above,
 which was measured with `PYTHONPATH` exported and did not state its regime.
+
+### 2026-09-13 — lane B round three: deployment-resolved collections, jsonschema adopted
+
+Round two's F1/F2 approach is REPLACED, on the owner's instruction, after the
+owner measured the running deployment rather than the checked-in YAML.
+
+**R1 — collections resolve from the target deployment.** Round two derived
+document collection names from `instance.yaml`'s
+`storage.qdrant.collectionPrefix` (`ks_civics_`). That is faithful to the file
+and wrong about the deployment. Confirmed independently here, from four places:
+`config.py:31` defaults `qdrant_collection_prefix` to `svs_`;
+`generate-cell-env.py` writes `svs_` in both its blocks; `.env.example` and
+`.env.production.example` say `svs_`; and `docker inspect
+exais-vector-store-ks-fiscal-local-api-1` shows `QDRANT_COLLECTION_PREFIX=svs_`
+with no `SVS_INDEX_VERSION`. And `grep -rn collectionPrefix --include=*.py`
+finds NO runtime reader — the YAML key is unread config. The prefix now comes
+from the adapter's own settings, the same object `QdrantAdapter.collection_name`
+reads; `instance.yaml` is consulted only for `businessInstanceId`. The
+disagreement is [WAVE-146](WAVE-146-qdrant-collection-prefix-config-runtime-mismatch.md),
+filed in this commit, because reconciling it either orphans 96,437 indexed
+points or contradicts `.release/cells/ks-state-civics/.env.cell`.
+
+**Both document collections are covered.** The running cell holds two, and only
+one is named by a source package. The other,
+`svs_biz_ks_state_civics_openai_text_embedding_3_small_1536` (12,579 points),
+is declared in `instance.yaml` under `models.preferredEmbeddingProfiles`. The
+roster reads both places, so both are enumerated and guarded; a test asserts the
+resolved set equals exactly the two collections the cell holds. Nothing is
+declared that the runtime does not use.
+
+**R2 — an entity store is not a document store.** `entity_store_slugs` are
+excluded from the document side entirely, so the guard can never fire against
+the entity store itself; a test shows the same tree refusing without the
+classification and resolving with it. Missing profiles are tracked per SOURCE,
+never per store: round two collected profiles across a store's sources and
+treated the store as declared if ANY source named one, which hid the other.
+`topeka-municipal-code` really does carry two source packages, and QC's masking
+reproduction is now a test. A store with no source package at all is reported
+too, rather than silently contributing nothing.
+
+**R3 — `jsonschema` adopted, hand-written evaluator RETIRED.** See
+[WAVE-145](WAVE-145-adopt-jsonschema-and-retire-the-hand-written-evaluator.md),
+now DONE. `jsonschema==4.25.1` (matching repo A's pin, so producer and consumer
+judge the same record identically) and `rfc3339-validator==0.1.4` are pinned in
+all four `apps/*/requirements.txt`. `FormatChecker` is passed explicitly, since
+draft 2020-12 makes `format` an annotation by default. The vocabulary guard
+survives, derived from `Draft202012Validator.VALIDATORS`. The
+`unvalidated_remote_refs` policy is unchanged, and
+`unsupported_keyword_semantics` survives with the same values —
+`("pattern",)` / `("format:uri", "pattern")` — exactly as WAVE-145 predicted,
+verified rather than dropped.
+
+**R4 — nothing re-embeds.** No provider call, no API call, no store write, no
+index touched. The only runtime interaction in this round was
+`docker inspect` on the fiscal cell's api container, reading configuration.
+
+**Release gate, NOT done here.** Adding a dependency changes every app image.
+`.release/cells/*/.env.images` records immutable digests
+(`SVS_IMAGE_API@sha256:867e4c15…` and four more). This commit changes the
+requirements sets only; building the images and recording new digests is a
+release action with its own approval, and I did not perform it. Until it is,
+the running cell's images do not contain `jsonschema`, so this adapter must not
+be invoked inside them.
+
+**R5 — composition milestone: NOT STARTED, and BLOCKED. Two blockers, both
+upstream, both reported rather than accommodated.**
+
+*Blocker 1 — there is no candidate export to receive.* Repo A is on
+`ks-600-a2-1-hb2513-slice` at `eb460ef4`. `git grep -- "--candidates" HEAD`
+returns nothing; the only `candidate` hits in A are an unrelated political
+candidate harvester. `eb460ef4` adds exactly one file,
+`scripts/operator/ks600_a2_1_hb2513_slice.py`, which reads the operator database
+and writes rows — it is not an export.
+
+*Blocker 2 — and this one is structural.* The pinned contract's
+`entity_eligibility.status` enum is `["reviewed", "published"]`. `candidate` is
+NOT a permitted value, and the contract's own description says so in terms: "a
+row that does not already say reviewed or published is not exported at all, so
+only those two values can appear." A record stamped `eligibility.status =
+"candidate"` is therefore **contract-invalid on the pinned entity branch**, and
+B's adapter will refuse it — for the wrong reason. Refusing a candidate record
+because the schema forbids the word is not the same deliverable as accepting it
+into a candidate-only path and refusing it for the live entity store. Either the
+enum must be extended upstream (which moves `ENTITY_BRANCH_SHA256` and requires
+a deliberate re-pin here) or the candidate marker must live somewhere other than
+`eligibility.status`. That is an owner/upstream decision and I have not guessed
+at it.
+
+*On the `source.url` warning.* Not reproducible at `eb460ef4`: the A2-1 slice
+uses `source_url` (lines 411, 462), `sourceRef` in
+`appropriation-action.schema.json` declares `source_url` under
+`additionalProperties: false`, and `git grep '"url"'` over A's `civic_impact`
+services returns nothing. More importantly, **B's adapter could not refuse it
+even if it arrived.** The `entity` payload is validated by a REMOTE `$ref`
+(`appropriation-action.schema.json`), which this module deliberately does not
+resolve — it names a separate contract with its own pin. Such a record would
+pass B's adapter with the ref reported in `unvalidated_remote_refs`. Making that
+refusal real means pinning the two KS-600 payload contracts as fixtures the way
+`retrieval-export-record.schema.json` already is, with their own digests. That
+is new scope and a new pin, so it is reported here rather than improvised.

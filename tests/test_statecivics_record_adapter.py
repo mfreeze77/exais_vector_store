@@ -56,10 +56,11 @@ from svs_common.statecivics_contract_pin import (
     load_contract,
 )
 from svs_common.statecivics_record_adapter import (
-    APPROXIMATION_TOKENS,
-    EXACT_FORMATS,
-    EXACT_KEYWORDS,
+    ANNOTATION_KEYWORDS,
+    ASSERTED_FORMATS,
     EXPECTED_DISPATCH_REQUIRED,
+    FORMAT_CHECKER,
+    KNOWN_KEYWORDS,
     DispatchRule,
     DocumentCollectionRosterIncomplete,
     EntityCollectionCollision,
@@ -68,7 +69,9 @@ from svs_common.statecivics_record_adapter import (
     UnsupportedContractKeyword,
     adapt_manifest,
     adapt_records,
+    branch_subtree,
     classify_record,
+    deployment_index_settings,
     dispatch_rule,
     entity_collection_name,
     read_instance_collection_roster,
@@ -90,6 +93,13 @@ STATUTE_SOURCE = (
     REAL_INSTANCE
     / "vector-stores/kansas-statutes/sources/statecivics-statute-ledger/source.yaml"
 )
+#: The prefix the TARGET DEPLOYMENT uses. Not instance.yaml's collectionPrefix.
+#: ``config.Settings`` defaults to it, ``generate-cell-env.py`` writes it, and
+#: the running fiscal cell's Qdrant collections carry it. See WAVE-146.
+RUNTIME_PREFIX = "svs_"
+#: The two document collections the running fiscal cell actually holds.
+STATUTE_COLLECTION = "svs_biz_ks_state_civics_voyage_4_docs_1024"
+OPENAI_COLLECTION = "svs_biz_ks_state_civics_openai_text_embedding_3_small_1536"
 #: The candidate entity profile from WAVE-134's store-id note. Still an owner
 #: decision; nothing here adopts it.
 ENTITY_PROFILE = "voyage_4_entities_1024"
@@ -115,7 +125,7 @@ def manifest():
     return adapt_manifest(MIXED, contract_schema=CONTRACT)
 
 
-def _qdrant(prefix: str = "ks_civics_") -> QdrantAdapter:
+def _qdrant(prefix: str = RUNTIME_PREFIX) -> QdrantAdapter:
     """A QdrantAdapter with settings only -- no client, no network.
 
     ``__new__`` is how tests/test_index_versioning.py already builds one; the
@@ -251,10 +261,10 @@ def test_an_invalid_entity_record_is_refused_against_the_entity_branch() -> None
     message = str(excinfo.value)
     assert "routed to the entity branch ($defs.entity_projection_envelope)" in message
     assert "by the contract's dispatch on ['record_kind']" in message
-    assert "missing required property 'entity_type'" in message
+    assert "'entity_type' is a required property" in message
     # The fixture carries the DOCUMENT branch's identity field. The entity
     # branch forbids it, and that is reported rather than tolerated.
-    assert "property 'logical_document_id' is not permitted here" in message
+    assert "Additional properties are not allowed ('logical_document_id' was unexpected)" in message
     assert "is not relaxed to admit a record from the other branch" in message
 
 
@@ -264,7 +274,7 @@ def test_an_invalid_document_record_is_refused_against_the_document_branch() -> 
     message = str(excinfo.value)
     assert "routed to the document branch ($defs.legacy_document_record)" in message
     assert "by the contract's dispatch on ['record_kind']" in message
-    assert "missing required property 'logical_document_id'" in message
+    assert "'logical_document_id' is a required property" in message
     assert "is not relaxed to admit a record from the other branch" in message
 
 
@@ -318,11 +328,34 @@ def test_a_half_tagged_record_matches_neither_arm(schema) -> None:
 # --------------------------------------------------------------------------
 
 
-def test_an_unimplemented_keyword_is_refused_rather_than_ignored(schema) -> None:
+def test_a_draft_keyword_is_now_checked_rather_than_refused(schema) -> None:
+    """``dependentRequired`` was refused by the old evaluator. It is now CHECKED.
+
+    That is the migration's point: the library implements the vocabulary, so a
+    keyword the hand-written evaluator had to refuse is simply enforced.
+    """
     extended = copy.deepcopy(schema)
-    extended["$defs"]["as_of_snapshot"]["dependentRequired"] = {"declared": ["snapshot_id"]}
-    with pytest.raises(UnsupportedContractKeyword, match="dependentRequired"):
-        validate(_jsonl(MIXED)[1], extended, "entity_projection_envelope")
+    extended["$defs"]["as_of_snapshot"]["dependentRequired"] = {"declared": ["nonexistent_key"]}
+    result = validate(_jsonl(MIXED)[1], extended, "entity_projection_envelope")
+    assert not result.ok
+    assert any("nonexistent_key" in error for error in result.errors)
+
+
+def test_a_keyword_outside_the_draft_vocabulary_is_refused(schema) -> None:
+    """jsonschema IGNORES an unrecognised keyword. A consumer must not.
+
+    A typo, or a keyword from a later draft, becomes a constraint nobody checks
+    and nobody is told about. The vocabulary is guarded against the library's
+    OWN validator table, not a hand-written list.
+    """
+    typo = copy.deepcopy(schema)
+    typo["$defs"]["as_of_snapshot"]["dependentRequried"] = {"declared": ["snapshot_id"]}
+    with pytest.raises(UnsupportedContractKeyword, match="dependentRequried"):
+        validate(_jsonl(MIXED)[1], typo, "entity_projection_envelope")
+    # ...and the library really would have ignored it, which is why this exists.
+    import jsonschema
+
+    assert "dependentRequried" not in jsonschema.Draft202012Validator.VALIDATORS
 
 
 def test_a_boolean_never_satisfies_a_numeric_const(schema) -> None:
@@ -335,7 +368,7 @@ def test_a_boolean_never_satisfies_a_numeric_const(schema) -> None:
     """
     record = copy.deepcopy(_jsonl(MIXED)[1])
     record["record_version"] = True
-    with pytest.raises(RecordBranchError, match="expected const 1, got true"):
+    with pytest.raises(RecordBranchError, match="record_version: 1 was expected"):
         adapt_records([(1, record)], schema)
 
 
@@ -366,7 +399,7 @@ def test_a_calendar_invalid_date_is_refused(schema, bad_date) -> None:
     """A shape regex accepted every one of these on both branches."""
     record = copy.deepcopy(_jsonl(MIXED)[1])
     record["as_of"]["as_of_date"] = bad_date
-    with pytest.raises(RecordBranchError, match="is not a valid date"):
+    with pytest.raises(RecordBranchError, match="is not a 'date'"):
         adapt_records([(1, record)], schema)
 
 
@@ -383,7 +416,7 @@ def test_a_calendar_invalid_date_is_refused(schema, bad_date) -> None:
 def test_a_calendar_invalid_or_offsetless_date_time_is_refused(schema, bad_date_time) -> None:
     record = copy.deepcopy(_jsonl(MIXED)[1])
     record["exporter"]["exported_at"] = bad_date_time
-    with pytest.raises(RecordBranchError, match="is not a valid date-time"):
+    with pytest.raises(RecordBranchError, match="is not a 'date-time'"):
         adapt_records([(1, record)], schema)
 
 
@@ -413,67 +446,164 @@ def test_an_integer_valued_float_is_an_integer() -> None:
     assert not validate(True, schema, "probe").ok
 
 
-def test_the_keyword_vocabulary_is_partitioned_and_disjoint() -> None:
-    """No keyword may be claimed exact and approximate at once."""
-    from svs_common.statecivics_record_adapter import (
-        ANNOTATION_KEYWORDS,
-        APPROXIMATED_KEYWORDS,
-        KNOWN_KEYWORDS,
-    )
+def test_the_vocabulary_guard_comes_from_the_library_not_a_hand_list() -> None:
+    """Round one and two both hand-maintained this. It is now derived."""
+    import jsonschema
 
-    assert EXACT_KEYWORDS.isdisjoint(APPROXIMATED_KEYWORDS)
-    assert EXACT_KEYWORDS.isdisjoint(ANNOTATION_KEYWORDS)
-    assert APPROXIMATED_KEYWORDS.isdisjoint(ANNOTATION_KEYWORDS)
-    assert KNOWN_KEYWORDS == EXACT_KEYWORDS | APPROXIMATED_KEYWORDS | ANNOTATION_KEYWORDS
-    # The four keywords round one claimed while approximating are now exact.
-    assert {"const", "enum", "uniqueItems"} <= EXACT_KEYWORDS
-    assert EXACT_FORMATS == {"date", "date-time"}
-    # ...and `format` stays approximate ONLY because of `uri`.
-    assert "format" in APPROXIMATED_KEYWORDS
+    asserting = set(jsonschema.Draft202012Validator.VALIDATORS)
+    # Everything the library asserts is known, with no exceptions written here.
+    assert asserting <= KNOWN_KEYWORDS
+    # `if` applies `then`/`else`, so they have no validator entry of their own.
+    assert {"then", "else"} <= KNOWN_KEYWORDS
+    assert {"then", "else"}.isdisjoint(asserting)
+    assert asserting.isdisjoint(ANNOTATION_KEYWORDS)
+    # The keywords round one claimed while approximating are now the library's.
+    assert {"const", "enum", "uniqueItems", "format", "pattern", "type"} <= asserting
 
 
-def test_every_keyword_the_contract_uses_is_classified(schema) -> None:
-    """Nothing in the pinned contract falls outside the three lists."""
-    from svs_common.statecivics_record_adapter import KNOWN_KEYWORDS
+def test_format_actually_asserts_because_a_checker_is_passed() -> None:
+    """Draft 2020-12 makes ``format`` an ANNOTATION unless a checker is given.
 
+    Without ``FormatChecker``, ``2026-02-31`` is a valid ``date``. This asserts
+    the checker is wired AND that the two formats this contract depends on are
+    among the ones it actually asserts -- read from the registry, not assumed.
+    """
+    import jsonschema
+
+    assert isinstance(FORMAT_CHECKER, jsonschema.FormatChecker)
+    assert {"date", "date-time"} <= ASSERTED_FORMATS
+    # rfc3339-validator is what makes date-time assert at all.
+    assert "date-time" in FORMAT_CHECKER.checkers
+    # ...and `uri` is NOT asserted: it needs rfc3987, which is GPLv3.
+    assert "uri" not in ASSERTED_FORMATS
+
+
+def test_every_keyword_the_contract_uses_is_classified(schema, raw_contract) -> None:
+    """Nothing either branch of the pinned contract uses is unclassified.
+
+    The walk is the module's OWN ``branch_subtree``, so this proves the thing
+    the validator actually inspects -- not a second traversal written here that
+    could disagree with it.
+    """
+    rule = dispatch_rule(schema)
     seen: set[str] = set()
-
-    def walk(node, in_schema: bool) -> None:
-        if isinstance(node, dict):
-            if in_schema:
-                seen.update(node)
-            for key, value in node.items():
-                if key in {"properties", "$defs"} and isinstance(value, dict):
-                    for sub in value.values():
-                        walk(sub, True)
-                elif key in {"allOf", "anyOf", "oneOf"} and isinstance(value, list):
-                    for sub in value:
-                        walk(sub, True)
-                elif key in {"if", "then", "else", "not", "items", "additionalProperties"}:
-                    walk(value, True)
-                elif key not in {"required", "enum", "type", "const"}:
-                    walk(value, False)
-        elif isinstance(node, list) and in_schema:
-            for value in node:
-                walk(value, in_schema)
-
-    walk(schema, True)
-    assert seen, "the walker found no keywords, so this test proves nothing"
+    for root in (rule.present_ref, rule.absent_ref):
+        for node in branch_subtree(schema, root):
+            seen.update(node)
+    seen.update(raw_contract)  # the document root itself
+    assert seen, "the walk found no keywords, so this test proves nothing"
     assert seen <= KNOWN_KEYWORDS, f"unclassified: {sorted(seen - KNOWN_KEYWORDS)}"
 
 
-def test_approximations_actually_exercised_are_disclosed(manifest) -> None:
-    """The second disclosure channel, pinned to an EXACT set.
+#: The round-two cross-check battery, RETAINED in the repository rather than
+#: left in a scratch venv. Its job then was to compare two implementations;
+#: its job now is to keep the semantic boundaries covered by something that
+#: runs in CI, so a future change to how records are validated cannot quietly
+#: move one. Organised by BOUNDARY, never by keyword name -- covering a keyword
+#: by name is exactly what let round one ship five fail-open divergences.
+_SEMANTIC_BOUNDARIES = [
+    # (boundary, subschema, value, valid)
+    ("bool-vs-number", {"const": 1}, True, False),
+    ("bool-vs-number", {"const": 1}, 1, True),
+    ("bool-vs-number", {"const": 1}, 1.0, True),
+    ("bool-vs-number", {"const": 0}, False, False),
+    ("bool-vs-number", {"const": True}, 1, False),
+    ("bool-vs-number", {"enum": [1, "yes"]}, True, False),
+    ("bool-vs-number", {"enum": [True]}, 1, False),
+    ("bool-vs-number", {"type": "integer"}, True, False),
+    ("bool-vs-number", {"type": "number"}, True, False),
+    ("bool-vs-number", {"type": "boolean"}, 1, False),
+    ("bool-vs-number", {"type": "array", "uniqueItems": True}, [True, 1], True),
+    ("bool-vs-number", {"type": "array", "uniqueItems": True}, [False, 0], True),
+    ("bool-vs-number", {"type": "array", "uniqueItems": True}, [True, True], False),
+    ("int-vs-float", {"type": "integer"}, 48211.0, True),
+    ("int-vs-float", {"type": "integer"}, 48211.5, False),
+    ("int-vs-float", {"type": "integer"}, 48211, True),
+    ("int-vs-float", {"const": 1.0}, 1, True),
+    ("int-vs-float", {"enum": [1]}, 1.0, True),
+    ("int-vs-float", {"type": "number", "minimum": 1}, 0.5, False),
+    ("int-vs-float", {"type": "array", "uniqueItems": True}, [1, 1.0], False),
+    ("int-vs-float", {"type": "array", "uniqueItems": True}, [[1], [1.0]], False),
+    ("int-vs-float", {"type": "array", "uniqueItems": True}, [{"a": 1}, {"a": True}], True),
+    ("date-calendar", {"type": "string", "format": "date"}, "2026-02-31", False),
+    ("date-calendar", {"type": "string", "format": "date"}, "2026-13-99", False),
+    ("date-calendar", {"type": "string", "format": "date"}, "0000-99-99", False),
+    ("date-calendar", {"type": "string", "format": "date"}, "2026-04-31", False),
+    ("date-calendar", {"type": "string", "format": "date"}, "2025-02-29", False),
+    ("date-calendar", {"type": "string", "format": "date"}, "20260701", False),
+    ("date-calendar", {"type": "string", "format": "date"}, "2024-02-29", True),
+    ("date-calendar", {"type": "string", "format": "date"}, "2026-07-01", True),
+    ("datetime-calendar", {"type": "string", "format": "date-time"}, "2026-02-31T00:00:00Z", False),
+    ("datetime-calendar", {"type": "string", "format": "date-time"}, "2026-09-04T25:00:00Z", False),
+    ("datetime-calendar", {"type": "string", "format": "date-time"}, "2026-09-04T12:00:00", False),
+    ("datetime-calendar", {"type": "string", "format": "date-time"}, "2026-09-04 12:00:00Z", False),
+    ("datetime-calendar", {"type": "string", "format": "date-time"}, "yesterday", False),
+    ("datetime-calendar", {"type": "string", "format": "date-time"}, "2026-09-04T12:00:00Z", True),
+    ("datetime-calendar", {"type": "string", "format": "date-time"}, "2026-09-04T12:00:00-06:00", True),
+    ("uniqueitems-nested", {"type": "array", "uniqueItems": True},
+     [{"a": 1, "b": 2}, {"b": 2, "a": 1}], False),
+    ("uniqueitems-nested", {"type": "array", "uniqueItems": True}, [None, None], False),
+    ("uniqueitems-nested", {"type": "array", "uniqueItems": True}, ["1", 1], True),
+    ("uniqueitems-nested", {"type": "array", "uniqueItems": True}, [[], {}], True),
+]
 
-    ``pattern`` and ``format: uri`` are both reached by the real fixtures, so
-    both must be named. If an approximation is ever added or removed, this
-    fails rather than the claim quietly widening.
+
+@pytest.mark.parametrize(
+    ("boundary", "subschema", "value", "valid"),
+    _SEMANTIC_BOUNDARIES,
+    ids=[f"{b}-{i}" for i, (b, *_rest) in enumerate(_SEMANTIC_BOUNDARIES)],
+)
+def test_semantic_boundaries(boundary, subschema, value, valid) -> None:
+    result = validate(value, {"$defs": {"probe": subschema}}, "probe")
+    assert result.ok is valid, f"[{boundary}] {value!r} against {subschema}: {result.errors}"
+
+
+def test_every_semantic_boundary_carries_near_misses_and_controls() -> None:
+    """A battery of only-refusals proves nothing; so does one of only-passes."""
+    from collections import Counter
+
+    per_boundary = Counter(b for b, *_ in _SEMANTIC_BOUNDARIES)
+    valid = Counter(b for b, _s, _v, ok in _SEMANTIC_BOUNDARIES if ok)
+    for boundary, total in per_boundary.items():
+        assert total >= 3, f"{boundary} has only {total} cases"
+        assert 0 < valid[boundary] < total, f"{boundary} is all-pass or all-refuse"
+
+
+def test_the_gate_boundary_is_reachable_through_the_real_dispatch(schema) -> None:
+    """The bool-vs-number boundary, on the contract, through adapt_records.
+
+    A probe schema proves the keyword. This proves the PATH: the same defect
+    that QC found, driven the way a manifest is actually read.
     """
+    record = copy.deepcopy(_jsonl(MIXED)[1])
+    record["record_version"] = True
+    with pytest.raises(RecordBranchError, match="record_version: 1 was expected"):
+        adapt_records([(1, record)], schema)
+
+
+def test_the_disclosure_channel_survived_the_migration(manifest, schema) -> None:
+    """WAVE-145 predicted this tuple would SURVIVE. Verified, not dropped.
+
+    Both entries are properties of ``jsonschema`` rather than of the evaluator
+    it replaced: ``pattern`` is Python ``re`` and not ECMA-262 in both, and
+    ``format: uri`` needs the GPLv3 ``rfc3987`` package to assert at all, so a
+    uri-formatted field is DECLARED AND NOT CHECKED.
+    """
+    rule = dispatch_rule(schema)
+    document, provision = _jsonl(MIXED)[0], _jsonl(MIXED)[1]
+    # The entity branch declares no uri-formatted field; the document one does.
+    assert validate(provision, schema, rule.present_ref).unsupported_keyword_semantics == (
+        "pattern",
+    )
+    assert validate(document, schema, rule.absent_ref).unsupported_keyword_semantics == (
+        "format:uri",
+        "pattern",
+    )
     assert manifest.unsupported_keyword_semantics == ("format:uri", "pattern")
-    assert set(manifest.unsupported_keyword_semantics) <= set(APPROXIMATION_TOKENS)
-    # An entity record reaches `pattern` but no `uri`-formatted field.
-    entity_only = adapt_records([(1, _jsonl(MIXED)[1])], load_contract(CONTRACT))
-    assert entity_only.unsupported_keyword_semantics == ("pattern",)
+    # Derived, not listed: every disclosed format is one the checker lacks.
+    for token in manifest.unsupported_keyword_semantics:
+        if token.startswith("format:"):
+            assert token.removeprefix("format:") not in ASSERTED_FORMATS
 
 
 def test_unfollowed_remote_refs_are_reported_not_hidden(manifest) -> None:
@@ -495,41 +625,64 @@ def test_unfollowed_remote_refs_are_reported_not_hidden(manifest) -> None:
 # --------------------------------------------------------------------------
 
 
-def test_the_statute_collection_is_read_from_the_instance_config() -> None:
-    """The name under protection comes from `source.yaml`, not from this test.
+def test_the_statute_collection_is_resolved_for_the_target_deployment() -> None:
+    """The name under protection is the one the RUNNING cell uses.
 
-    Round one computed ``statute_collection`` and ``document_collection`` with
-    the same call and the same arguments and then asserted they were equal --
-    ``X == X``, which cannot fail. Both halves are now independent: the business
-    instance id and prefix come from ``instance.yaml``, and the profile from the
-    statute store's own source package.
+    Round two derived it from ``instance.yaml``'s ``collectionPrefix``
+    (``ks_civics_``) and produced ``ks_civics_biz_ks_state_civics_...``, which
+    the deployment does not have. Nothing in this repository reads that YAML
+    key; the prefix a cell uses is ``QDRANT_COLLECTION_PREFIX``, defaulted to
+    ``svs_`` by ``config.Settings`` and by ``generate-cell-env.py``, and the
+    running fiscal cell's Qdrant holds ``svs_``-prefixed collections. WAVE-146
+    owns the disagreement.
     """
     instance = yaml.safe_load((REAL_INSTANCE / "instance.yaml").read_text(encoding="utf-8"))
     package = yaml.safe_load(STATUTE_SOURCE.read_text(encoding="utf-8"))
-    business_instance_id = instance["metadata"]["businessInstanceId"]
-    prefix = instance["storage"]["qdrant"]["collectionPrefix"]
-    statute_profile = package["ingestion"]["embeddingProfile"]
-    assert (business_instance_id, prefix, statute_profile) == (
-        "biz_ks_state_civics",
-        "ks_civics_",
-        "voyage_4_docs_1024",
-    )
-    qdrant = _qdrant(prefix)
+    assert instance["metadata"]["businessInstanceId"] == "biz_ks_state_civics"
+    assert package["ingestion"]["embeddingProfile"] == "voyage_4_docs_1024"
+    # The YAML's prefix is NOT what the deployment uses, and is not consulted.
+    assert instance["storage"]["qdrant"]["collectionPrefix"] == "ks_civics_"
+
+    settings = deployment_index_settings(REAL_INSTANCE, _qdrant(RUNTIME_PREFIX))
+    assert settings.collection_prefix == RUNTIME_PREFIX == "svs_"
+    assert settings.business_instance_id == "biz_ks_state_civics"
+    qdrant = _qdrant(RUNTIME_PREFIX)
     assert (
-        qdrant.collection_name(business_instance_id, statute_profile)
-        == "ks_civics_biz_ks_state_civics_voyage_4_docs_1024"
+        qdrant.collection_name(settings.business_instance_id, "voyage_4_docs_1024")
+        == STATUTE_COLLECTION
     )
 
 
-def test_the_roster_is_read_off_disk_and_names_stores_it_cannot_resolve() -> None:
-    """What the REAL instance tree says today, asserted rather than assumed."""
-    roster = read_instance_collection_roster(REAL_INSTANCE, _qdrant("ks_civics_"))
-    assert roster.business_instance_id == "biz_ks_state_civics"
-    assert roster.collection_prefix == "ks_civics_"
-    assert roster.document_collections == {
-        "kansas-statutes:voyage_4_docs_1024": "ks_civics_biz_ks_state_civics_voyage_4_docs_1024"
+def test_the_settings_default_prefix_is_the_runtime_prefix() -> None:
+    """Corroboration from a second, independent place in the tree."""
+    from svs_common.config import Settings
+
+    assert Settings.model_fields["qdrant_collection_prefix"].default == RUNTIME_PREFIX
+
+
+def test_the_roster_covers_both_document_collections_the_cell_holds() -> None:
+    """A source-package-only roster finds ONE of the two runtime collections.
+
+    The running fiscal cell's Qdrant holds two document collections. Only the
+    Voyage one is named by a source package; the OpenAI one is declared in
+    ``instance.yaml`` under ``models.preferredEmbeddingProfiles``. A roster that
+    reads only source packages would never enumerate it, let alone guard against
+    it, so both places are read.
+    """
+    roster = read_instance_collection_roster(REAL_INSTANCE, _qdrant(RUNTIME_PREFIX))
+    assert roster.preferred_profiles == ("openai_text_embedding_3_small_1536",)
+    assert set(roster.document_collections.values()) == {
+        STATUTE_COLLECTION,
+        OPENAI_COLLECTION,
     }
-    # Three stores declare no ingestion.embeddingProfile in any source package.
+    assert roster.document_collections["kansas-statutes:voyage_4_docs_1024"] == STATUTE_COLLECTION
+    # Per SOURCE, never per store: four source packages declare no profile.
+    assert roster.undeclared_profile_sources == (
+        "kansas-court-decisions/kscourts-decisions",
+        "kansas-fiscal-documents/statecivics-fiscal-ledger",
+        "topeka-municipal-code/topeka-codified-code",
+        "topeka-municipal-code/topeka-ordinances",
+    )
     assert roster.undeclared_profile_stores == (
         "kansas-court-decisions",
         "kansas-fiscal-documents",
@@ -537,115 +690,225 @@ def test_the_roster_is_read_off_disk_and_names_stores_it_cannot_resolve() -> Non
     )
 
 
-def test_the_real_instance_refuses_because_its_roster_is_incomplete() -> None:
-    """Fail toward blocking when the check itself cannot be completed.
+def _instance_tree(
+    tmp_path: Path,
+    *,
+    stores: dict[str, dict[str, str | None]],
+    preferred: dict[str, str] | None = None,
+) -> Path:
+    """Build an instance tree. ``stores`` maps slug -> {source slug: profile|None}.
 
-    A non-collision guard that cannot enumerate the collections it must avoid
-    has no answer. Reporting "no collision" because a store was invisible is the
-    fail-open shape this module exists to remove.
-    """
-    with pytest.raises(DocumentCollectionRosterIncomplete) as excinfo:
-        entity_collection_name(
-            _qdrant("ks_civics_"),
-            instance_root=REAL_INSTANCE,
-            entity_embedding_profile_id=ENTITY_PROFILE,
-        )
-    assert "kansas-fiscal-documents" in str(excinfo.value)
-    assert "embeddingProfile" in str(excinfo.value)
-
-
-def _complete_instance(tmp_path: Path, *, entity_store_profile: str | None = None) -> Path:
-    """A minimal instance tree where every store declares a profile.
-
-    Copied in shape from the real one -- same keys, same nesting -- so the
-    reader under test is exercised on the layout it will actually meet.
+    Same keys and nesting as the real one, so the reader under test meets the
+    layout it will actually meet.
     """
     root = tmp_path / "ks-state-civics"
-    (root).mkdir()
-    (root / "instance.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "metadata": {"businessInstanceId": "biz_ks_state_civics"},
-                "storage": {"qdrant": {"collectionPrefix": "ks_civics_"}},
-            }
-        ),
-        encoding="utf-8",
-    )
-    stores = {
-        "kansas-statutes": "voyage_4_docs_1024",
-        "kansas-fiscal-documents": "voyage_4_docs_1024",
+    root.mkdir()
+    instance: dict = {
+        "metadata": {"businessInstanceId": "biz_ks_state_civics"},
+        "storage": {"qdrant": {"collectionPrefix": "ks_civics_"}},  # deliberately stale
     }
-    if entity_store_profile is not None:
-        stores["kansas-fiscal-entities"] = entity_store_profile
-    for slug, profile in stores.items():
-        source = root / "vector-stores" / slug / "sources" / f"{slug}-ledger"
-        source.mkdir(parents=True)
-        (source / "source.yaml").write_text(
-            yaml.safe_dump({"ingestion": {"embeddingProfile": profile}}), encoding="utf-8"
-        )
+    if preferred:
+        instance["models"] = {"preferredEmbeddingProfiles": preferred}
+    (root / "instance.yaml").write_text(yaml.safe_dump(instance), encoding="utf-8")
+    for slug, sources in stores.items():
+        for source_slug, profile in sources.items():
+            source = root / "vector-stores" / slug / "sources" / source_slug
+            source.mkdir(parents=True)
+            body: dict = {} if profile is None else {"ingestion": {"embeddingProfile": profile}}
+            (source / "source.yaml").write_text(yaml.safe_dump(body), encoding="utf-8")
     return root
 
 
-def test_the_collision_fires_against_any_configured_document_collection(tmp_path) -> None:
+def _complete_instance(tmp_path: Path) -> Path:
+    return _instance_tree(
+        tmp_path,
+        stores={
+            "kansas-statutes": {"statute-ledger": "voyage_4_docs_1024"},
+            "kansas-fiscal-documents": {"fiscal-ledger": "voyage_4_docs_1024"},
+        },
+    )
+
+
+def test_an_undeclared_source_is_not_masked_by_a_declaring_sibling(tmp_path) -> None:
+    """Missing-source detection is per SOURCE, never per store.
+
+    Round two collected profiles across a store's sources and treated the store
+    as declared if ANY source named one, so a second source with no profile
+    vanished. ``topeka-municipal-code`` really does carry two source packages,
+    which is the arrangement that makes this reachable.
+    """
+    root = _instance_tree(
+        tmp_path,
+        stores={
+            "kansas-statutes": {"statute-ledger": "voyage_4_docs_1024"},
+            "topeka-municipal-code": {
+                "topeka-codified-code": "voyage_4_docs_1024",
+                "topeka-ordinances": None,
+            },
+        },
+    )
+    roster = read_instance_collection_roster(root, _qdrant())
+    assert roster.undeclared_profile_sources == ("topeka-municipal-code/topeka-ordinances",)
+    with pytest.raises(DocumentCollectionRosterIncomplete, match="topeka-ordinances"):
+        entity_collection_name(
+            _qdrant(), instance_root=root, entity_embedding_profile_id=ENTITY_PROFILE
+        )
+
+
+def test_a_store_with_no_source_package_at_all_is_reported(tmp_path) -> None:
+    root = _instance_tree(
+        tmp_path,
+        stores={"kansas-statutes": {"statute-ledger": "voyage_4_docs_1024"}},
+    )
+    (root / "vector-stores" / "mystery-store").mkdir(parents=True)
+    roster = read_instance_collection_roster(root, _qdrant())
+    assert roster.undeclared_profile_sources == ("mystery-store/<no source package>",)
+
+
+def test_an_entity_store_is_not_a_document_store(tmp_path) -> None:
+    """The guard must never fire against the entity store itself.
+
+    An entity store declared in the tree with its own profile is excluded from
+    the document side entirely -- neither a collection to avoid, nor an
+    undeclared document source when it declares nothing.
+    """
+    root = _instance_tree(
+        tmp_path,
+        stores={
+            "kansas-statutes": {"statute-ledger": "voyage_4_docs_1024"},
+            "kansas-fiscal-documents": {"fiscal-ledger": "voyage_4_docs_1024"},
+            "kansas-fiscal-entities": {"entity-ledger": ENTITY_PROFILE},
+        },
+    )
+    qdrant = _qdrant()
+    # Without the classification, the entity store is a document store and the
+    # guard refuses the ONLY arrangement that is actually correct.
+    with pytest.raises(EntityCollectionCollision, match="kansas-fiscal-entities"):
+        entity_collection_name(
+            qdrant, instance_root=root, entity_embedding_profile_id=ENTITY_PROFILE
+        )
+    # With it, the entity store is excluded and the collection resolves.
+    roster = read_instance_collection_roster(
+        root, qdrant, entity_store_slugs=("kansas-fiscal-entities",)
+    )
+    assert roster.entity_store_slugs == ("kansas-fiscal-entities",)
+    assert not any("kansas-fiscal-entities" in key for key in roster.document_collections)
+    assert roster.undeclared_profile_sources == ()
+    resolved = entity_collection_name(
+        qdrant,
+        instance_root=root,
+        entity_embedding_profile_id=ENTITY_PROFILE,
+        entity_store_slugs=("kansas-fiscal-entities",),
+    )
+    assert resolved == f"{RUNTIME_PREFIX}biz_ks_state_civics_voyage_4_entities_1024"
+    assert resolved not in set(roster.document_collections.values())
+
+
+def test_an_undeclared_entity_store_is_not_counted_as_a_document_gap(tmp_path) -> None:
+    """Classification excludes the store from BOTH sides, not just one."""
+    root = _instance_tree(
+        tmp_path,
+        stores={
+            "kansas-statutes": {"statute-ledger": "voyage_4_docs_1024"},
+            "kansas-fiscal-entities": {"entity-ledger": None},
+        },
+    )
+    roster = read_instance_collection_roster(
+        root, _qdrant(), entity_store_slugs=("kansas-fiscal-entities",)
+    )
+    assert roster.undeclared_profile_sources == ()
+
+
+def test_the_collision_fires_against_any_resolved_document_collection(tmp_path) -> None:
     """The guard no longer depends on which profile the caller names.
 
-    Quality control's probe: passing a document profile that is not the statute
-    profile used to return the real shared statute collection with no collision
-    raised. There is no document profile argument to pass any more, so the probe
-    is unexpressible; what remains is that the DECLARED collections collide.
+    Quality control's round-two probe: passing a document profile that is not
+    the statute profile returned the real shared statute collection with no
+    collision raised. There is no document profile argument to pass any more,
+    so the probe is unexpressible; what remains is that the RESOLVED collections
+    collide.
     """
     root = _complete_instance(tmp_path)
-    qdrant = _qdrant("ks_civics_")
-    # Sanity: this tree resolves, so the refusal below is about collision only.
+    qdrant = _qdrant()
     roster = read_instance_collection_roster(root, qdrant)
-    assert roster.undeclared_profile_stores == ()
-    assert set(roster.document_collections.values()) == {
-        "ks_civics_biz_ks_state_civics_voyage_4_docs_1024"
-    }
+    assert roster.undeclared_profile_sources == ()
+    assert set(roster.document_collections.values()) == {STATUTE_COLLECTION}
 
     with pytest.raises(EntityCollectionCollision) as excinfo:
         entity_collection_name(
             qdrant, instance_root=root, entity_embedding_profile_id="voyage_4_docs_1024"
         )
     message = str(excinfo.value)
-    assert "ks_civics_biz_ks_state_civics_voyage_4_docs_1024" in message
+    assert STATUTE_COLLECTION in message
     assert "kansas-statutes:voyage_4_docs_1024" in message
     assert "kansas-fiscal-documents:voyage_4_docs_1024" in message
     assert "vector_store_id" in message
 
 
+def test_the_collision_fires_against_the_preferred_profile_collection(tmp_path) -> None:
+    """The second runtime collection is guarded too, not just the Voyage one."""
+    root = _instance_tree(
+        tmp_path,
+        stores={"kansas-statutes": {"statute-ledger": "voyage_4_docs_1024"}},
+        preferred={"pdf_markdown_external_v1": "openai_text_embedding_3_small_1536"},
+    )
+    with pytest.raises(EntityCollectionCollision) as excinfo:
+        entity_collection_name(
+            _qdrant(),
+            instance_root=root,
+            entity_embedding_profile_id="openai_text_embedding_3_small_1536",
+        )
+    assert OPENAI_COLLECTION in str(excinfo.value)
+    assert "models.preferredEmbeddingProfiles" in str(excinfo.value)
+
+
 @pytest.mark.parametrize("profile", [None, "", "   ", 0])
 def test_an_empty_entity_profile_is_refused_not_resolved(tmp_path, profile) -> None:
-    """``None`` used to resolve to the degenerate ``ks_civics_biz_..._``."""
+    """``None`` used to resolve to the degenerate ``svs_biz_ks_state_civics_``."""
     with pytest.raises(InstanceCollectionConfigError, match="non-empty profile id"):
         entity_collection_name(
-            _qdrant("ks_civics_"),
+            _qdrant(),
             instance_root=_complete_instance(tmp_path),
             entity_embedding_profile_id=profile,
         )
 
 
-def test_a_prefix_disagreement_between_config_and_settings_is_refused(tmp_path) -> None:
-    """Names computed for another cell are not an answer about this one."""
-    with pytest.raises(InstanceCollectionConfigError, match="collectionPrefix"):
-        read_instance_collection_roster(_complete_instance(tmp_path), _qdrant("svs_"))
+def test_a_deployment_with_no_prefix_setting_is_refused(tmp_path) -> None:
+    """Fail toward blocking when the deployment cannot be named at all."""
+    adapter = QdrantAdapter.__new__(QdrantAdapter)
+    adapter.settings = SimpleNamespace(qdrant_collection_prefix="", svs_index_version="")
+    with pytest.raises(InstanceCollectionConfigError, match="qdrant_collection_prefix"):
+        deployment_index_settings(_complete_instance(tmp_path), adapter)
 
 
 def test_entity_records_never_reach_the_shared_statute_collection(manifest, tmp_path) -> None:
     """Route the adapter's real output and assert on where each group lands.
 
-    The statute collection is the one the instance config names; the entity
-    collection is what the adapter RETURNS. Neither is a string built here to
-    match the other.
+    The document collections are the ones the TARGET DEPLOYMENT resolves; the
+    entity collection is what the adapter RETURNS. Neither is a string built
+    here to match the other.
     """
-    root = _complete_instance(tmp_path)
-    qdrant = _qdrant("ks_civics_")
-    roster = read_instance_collection_roster(root, qdrant)
+    root = _instance_tree(
+        tmp_path,
+        stores={
+            "kansas-statutes": {"statute-ledger": "voyage_4_docs_1024"},
+            "kansas-fiscal-documents": {"fiscal-ledger": "voyage_4_docs_1024"},
+            "kansas-fiscal-entities": {"entity-ledger": ENTITY_PROFILE},
+        },
+        preferred={"pdf_markdown_external_v1": "openai_text_embedding_3_small_1536"},
+    )
+    qdrant = _qdrant()
+    entity_stores = ("kansas-fiscal-entities",)
+    roster = read_instance_collection_roster(root, qdrant, entity_store_slugs=entity_stores)
     statute_collection = roster.document_collections["kansas-statutes:voyage_4_docs_1024"]
-    assert statute_collection == "ks_civics_biz_ks_state_civics_voyage_4_docs_1024"
+    assert statute_collection == STATUTE_COLLECTION
+    assert OPENAI_COLLECTION in set(roster.document_collections.values())
 
     entity_collection = entity_collection_name(
-        qdrant, instance_root=root, entity_embedding_profile_id=ENTITY_PROFILE
+        qdrant,
+        instance_root=root,
+        entity_embedding_profile_id=ENTITY_PROFILE,
+        entity_store_slugs=entity_stores,
     )
 
     routed: dict[str, list[dict]] = {}

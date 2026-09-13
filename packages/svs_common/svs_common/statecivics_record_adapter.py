@@ -45,74 +45,71 @@ collection the document points land in. ``QdrantAdapter.collection_name`` takes
 ``business_instance_id`` and ``embedding_profile_id`` and NOT ``vector_store_id``,
 so a new vector store on the same instance and profile resolves to the same
 Qdrant collection. A distinct embedding profile is the only thing that separates
-them. The document side of that comparison is READ FROM THE INSTANCE TREE --
-``instance.yaml`` for the business instance id and prefix, each store's own
-source package for its ``ingestion.embeddingProfile`` -- so the collision fires
-against any collection the instance declares, whatever the caller believes.
-Round one took the document profile as an argument, which let a caller passing
-some other profile receive the real shared statute collection with no collision
-raised: a guard that asks the caller to supply the hazard it guards against.
-Choosing the ENTITY profile remains an owner decision and stays an argument,
-but an empty one is refused rather than resolved to a degenerate name.
+them. The document side of that comparison is RESOLVED FOR THE TARGET
+DEPLOYMENT: the collection prefix from the adapter's own settings -- the same
+object ``QdrantAdapter.collection_name`` reads, ``svs_`` in the running fiscal
+cell -- and the profiles from BOTH places the instance declares them, each
+source package's ``ingestion.embeddingProfile`` and
+``models.preferredEmbeddingProfiles``. Both are needed: the running cell holds
+two document collections, and a roster built from source packages alone finds
+only one of them. ``instance.yaml``'s ``storage.qdrant.collectionPrefix`` is
+NOT consulted -- nothing in this repository reads it, it says ``ks_civics_``
+where the deployment says ``svs_``, and deriving names from it produced
+collection names that do not exist. That mismatch is WAVE-146.
+
+An entity store is not a document store: ``entity_store_slugs`` are excluded
+from the document side, so the guard can never fire against the entity store
+itself. Missing profiles are tracked per SOURCE, never per store, so a sibling
+source that declares one cannot mask one that does not. Choosing the ENTITY
+profile remains an owner decision and stays an argument, but an empty one is
+refused rather than resolved to a degenerate name.
 
 Validation scope
 ----------------
-There is no ``jsonschema`` in this repository -- not installed, not in any
-``requirements.txt`` -- so :func:`validate` is a bounded evaluator for the
-keyword vocabulary the pinned contract uses. WAVE-145 retires it in favour of
-the real library; this is the bridge, and the bridge has to be honest about its
-own edges, because round one was not.
+Validation is ``jsonschema`` 4.25.1 with ``FormatChecker`` passed EXPLICITLY and
+``rfc3339-validator`` installed, pinned in every ``apps/*/requirements.txt`` that
+ships this package. The version matches repo A's ``pyproject.toml`` pin, so the
+producer and this consumer judge the same record by the same implementation --
+which is the whole point of the composition milestone.
 
-Round one's failure is the reason this section is now three lists rather than
-one. A single ``SUPPORTED_KEYWORDS`` set claimed ``const``, ``enum``, ``format``
-and ``uniqueItems`` as supported while approximating all four, and a mutation
-battery that covered each keyword BY NAME agreed with ``jsonschema`` on all of
-them -- because naming a keyword and exercising its semantics are different
-things. Quality control found six divergences inside those nominally-covered
-classes, five of them fail-open and three reachable on the unmodified pinned
-contract. The two decisive ones:
+There WAS a hand-written evaluator here. It is gone, and WAVE-145 records why in
+full: it shipped fail-open in four keywords it claimed to support, a 44-case
+mutation battery organised by keyword NAME agreed with ``jsonschema`` on every
+one of them, and quality control found six divergences inside those same
+classes -- ``True == 1`` in Python, so ``record_version: true`` satisfied
+``const: 1`` and passed the contract's own kind/version gate; ``format: date``
+was a shape regex, so ``2026-02-31`` passed on both branches. A round-two patch
+fixed those four semantically and was itself replaced by this migration, because
+a validator maintained by hand is a standing invitation to that defect class and
+the next divergence would also have sat inside something a battery "covered".
 
-* ``if value != schema["const"]`` used Python equality, and ``True == 1``. So
-  ``record_version: true`` satisfied ``const: 1`` and was admitted as a valid
-  entity projection -- through the kind/version gate the contract itself calls
-  "sufficient on its own to refuse an unknown kind or version".
-* ``format: date`` was a shape regex, so ``2026-02-31``, ``2026-13-99`` and
-  ``0000-99-99`` all passed, on both branches, through the real dispatch.
+``format`` is passed a checker EXPLICITLY because draft 2020-12 treats it as an
+annotation by default: a validator built without one reports ``2026-02-31`` as a
+valid ``date``. Which formats actually assert is READ from the checker registry
+(:data:`ASSERTED_FORMATS`), not assumed.
 
-So the vocabulary is now split three ways and the split is load-bearing:
-
-:data:`EXACT_KEYWORDS`
-    Evaluated to the draft 2020-12 semantics. Equality is TYPED
-    (:func:`_json_equal`): a boolean is never equal to a number, while an int
-    and a float of the same mathematical value are equal. Dates are parsed by
-    :mod:`datetime`, not shape-matched.
-:data:`APPROXIMATED_KEYWORDS`
-    Evaluated, but not to the letter of the specification. Every approximation
-    actually exercised on a record is reported in
-    :attr:`RecordValidation.unsupported_keyword_semantics` -- the same
-    disclosure mechanism as ``unvalidated_remote_refs``, for the same reason.
-:data:`ANNOTATION_KEYWORDS`
-    Carry no assertion. Listed so they are *known* to be ignored.
-
-Anything outside all three raises :class:`UnsupportedContractKeyword`. A
-validator that skips what it does not understand reports "valid" for
-constraints it never checked, which is worse than no validator at all -- and a
-validator that *approximates* what it claims to support is that same defect one
-layer down, which is what round one shipped.
-
-What the two approximations are, precisely:
+Two things are still not checked to the letter, and both are DISCLOSED in
+:attr:`RecordValidation.unsupported_keyword_semantics` rather than claimed:
 
 ``pattern``
-    JSON Schema specifies ECMA-262 regular expressions; this uses Python
-    :mod:`re`, as ``jsonschema`` itself does. The dialects differ -- ``\\d`` is
-    Unicode-wide in Python and ASCII-only in ECMA-262, and Python's ``$``
-    matches before a trailing newline where ECMA-262's does not. Because
-    ``jsonschema`` shares the behaviour, a cross-check against it CANNOT detect
-    these divergences; only replacing the evaluator can.
+    JSON Schema specifies ECMA-262 regular expressions; ``jsonschema`` uses
+    Python :mod:`re`. ``backslash-d`` is Unicode-wide in Python and ASCII-only in
+    ECMA-262, and Python's ``$`` matches before a trailing newline where
+    ECMA-262's does not. WAVE-145 predicted this entry would SURVIVE the
+    migration for exactly this reason, and it did.
 ``format: uri``
-    A scheme-shape check, not RFC 3986. Stricter than ``jsonschema`` without the
-    optional ``rfc3987`` package, which registers no ``uri`` checker at all, so
-    this fails closed rather than open.
+    ``jsonschema`` registers no ``uri`` checker without the optional ``rfc3987``
+    package, which is GPLv3 and therefore not a dependency this product can
+    take. So a ``uri``-formatted field is DECLARED and NOT CHECKED. On this
+    contract the exposure is nil -- ``citation_url`` also carries
+    ``pattern: ^https?://`` -- but that is a fact about this contract, not about
+    the keyword, so it is reported every time the branch declares it.
+
+The vocabulary itself is still guarded, now against the library's OWN validator
+table rather than a hand-written list. ``jsonschema`` IGNORES an unrecognised
+keyword, exactly as the specification requires; that is correct of a validator
+and wrong of a consumer, because a typo or a later-draft keyword becomes a
+constraint nobody checks and nobody is told about.
 
 Remote ``$ref`` is NOT followed, exactly as
 ``statecivics_contract_pin.branch_closure`` does not follow it: a remote ref
@@ -127,11 +124,14 @@ someone has to notice.
 from __future__ import annotations
 
 import json
-import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+from jsonschema import Draft202012Validator, FormatChecker
+from referencing import Registry, Resource
+from referencing.jsonschema import DRAFT202012
 
 from .statecivics_contract_pin import (
     BRANCH_ROOTS,
@@ -143,12 +143,13 @@ from .statecivics_contract_pin import (
 )
 
 __all__ = [
-    "APPROXIMATED_KEYWORDS",
-    "APPROXIMATION_TOKENS",
-    "EXACT_FORMATS",
-    "EXACT_KEYWORDS",
+    "ANNOTATION_KEYWORDS",
+    "ASSERTED_FORMATS",
     "EXPECTED_DISPATCH_REQUIRED",
+    "FORMAT_CHECKER",
+    "KNOWN_KEYWORDS",
     "AdaptedManifest",
+    "DeploymentIndexSettings",
     "DispatchRule",
     "DocumentCollectionRosterIncomplete",
     "EntityCollectionCollision",
@@ -159,7 +160,9 @@ __all__ = [
     "UnsupportedContractKeyword",
     "adapt_manifest",
     "adapt_records",
+    "branch_subtree",
     "classify_record",
+    "deployment_index_settings",
     "dispatch_rule",
     "entity_collection_name",
     "read_instance_collection_roster",
@@ -171,85 +174,6 @@ __all__ = [
 #: then asserts it equals this, so a contract that dispatches on some other key
 #: is refused by name instead of quietly routing every record one way.
 EXPECTED_DISPATCH_REQUIRED: tuple[str, ...] = ("record_kind",)
-
-#: Keywords evaluated to the draft 2020-12 semantics. Nothing is listed here
-#: that the evaluator only approximates -- that claim is what round one got
-#: wrong, and it is the reason ``const``/``enum``/``format``/``uniqueItems``
-#: needed real implementations rather than a rename.
-EXACT_KEYWORDS: frozenset[str] = frozenset(
-    {
-        "$ref",
-        "additionalProperties",
-        "allOf",
-        "anyOf",
-        "const",
-        "else",
-        "enum",
-        "if",
-        "items",
-        "maxItems",
-        "maxLength",
-        "minItems",
-        "minLength",
-        "minimum",
-        "not",
-        "oneOf",
-        "properties",
-        "required",
-        "then",
-        "type",
-        "uniqueItems",
-    }
-)
-
-#: Evaluated, but NOT to the letter of the specification. Every one of these
-#: actually exercised on a record is reported in
-#: :attr:`RecordValidation.unsupported_keyword_semantics`. ``format`` is listed
-#: per-format, because ``date`` and ``date-time`` are now exact and ``uri`` is
-#: not; claiming the whole keyword either way would be false.
-APPROXIMATED_KEYWORDS: frozenset[str] = frozenset({"pattern", "format"})
-
-#: The exact tokens :attr:`RecordValidation.unsupported_keyword_semantics` can
-#: contain. ``format`` disaggregates: only ``uri`` is approximate.
-APPROXIMATION_TOKENS: tuple[str, ...] = ("format:uri", "pattern")
-
-#: Formats evaluated exactly, by parsing rather than by shape.
-EXACT_FORMATS: frozenset[str] = frozenset({"date", "date-time"})
-
-#: Keywords that carry no assertion. Listed so they are *known* to be ignored
-#: rather than falling through the unknown-keyword refusal.
-ANNOTATION_KEYWORDS: frozenset[str] = frozenset(
-    {"$comment", "$defs", "$id", "$schema", "default", "description", "examples", "title"}
-)
-
-#: Backwards-compatible alias for the union this module will accept at all.
-KNOWN_KEYWORDS: frozenset[str] = EXACT_KEYWORDS | APPROXIMATED_KEYWORDS | ANNOTATION_KEYWORDS
-
-_LOCAL_REF = "#/$defs/"
-
-#: RFC 3339 full-date. The regex fixes the SHAPE only; the calendar is then
-#: checked by ``datetime.date.fromisoformat``, which is what refuses 2026-02-31.
-#: The shape check is still needed because Python 3.11+ ``fromisoformat`` also
-#: accepts forms RFC 3339 does not, such as ``20260701`` and ``2026-W27-1``.
-_DATE_SHAPE = re.compile(r"\A\d{4}-\d{2}-\d{2}\Z")
-
-#: RFC 3339 date-time. The offset is REQUIRED -- a local time with no offset is
-#: not an instant, and accepting one silently invents a timezone.
-_DATE_TIME_SHAPE = re.compile(
-    r"\A(?P<date>\d{4}-\d{2}-\d{2})[Tt](?P<time>\d{2}:\d{2}:\d{2}(?:\.\d+)?)"
-    r"(?P<offset>[Zz]|[+-]\d{2}:\d{2})\Z"
-)
-
-#: Scheme shape only. Disclosed as an approximation; see the module docstring.
-_URI_SHAPE = re.compile(r"\A[A-Za-z][A-Za-z0-9+.-]*:")
-
-
-class UnsupportedContractKeyword(ContractPinError):
-    """The contract uses a keyword this evaluator does not implement.
-
-    Raised rather than ignored. An ignored keyword is an unchecked constraint
-    reported as a pass.
-    """
 
 
 class RecordBranchError(ValueError):
@@ -402,20 +326,84 @@ def classify_record(record: Mapping, rule: DispatchRule) -> str:
     )
 
 
+
 # --------------------------------------------------------------------------
-# Bounded JSON Schema evaluation
+# Validation, by jsonschema
 # --------------------------------------------------------------------------
+
+#: Keywords the draft's own vocabulary asserts, taken FROM the library rather
+#: than listed here. A hand-written list is what round one shipped.
+_ASSERTING_KEYWORDS: frozenset[str] = frozenset(Draft202012Validator.VALIDATORS)
+
+#: Keywords that carry no assertion in draft 2020-12. Listed so they are
+#: *known* to be inert rather than falling through the vocabulary refusal.
+ANNOTATION_KEYWORDS: frozenset[str] = frozenset(
+    {
+        "$anchor",
+        "$comment",
+        "$defs",
+        "$dynamicAnchor",
+        "$id",
+        "$schema",
+        "$vocabulary",
+        "default",
+        "deprecated",
+        "description",
+        "examples",
+        "readOnly",
+        "title",
+        "writeOnly",
+    }
+)
+
+#: Keywords with no validator entry of their own because a SIBLING keyword
+#: applies them: ``if`` evaluates ``then`` and ``else``. They assert, so they
+#: are known; they are listed separately so it is clear why the library's table
+#: does not name them.
+_SIBLING_APPLIED_KEYWORDS: frozenset[str] = frozenset({"then", "else"})
+
+#: Everything this module will accept in a contract at all.
+KNOWN_KEYWORDS: frozenset[str] = (
+    _ASSERTING_KEYWORDS | _SIBLING_APPLIED_KEYWORDS | ANNOTATION_KEYWORDS
+)
+
+#: The one format checker registry, built once. ``FormatChecker`` is passed
+#: EXPLICITLY: draft 2020-12 treats ``format`` as an annotation by default, so a
+#: validator constructed without this reports a malformed date as valid. With
+#: ``rfc3339-validator`` installed, ``date`` and ``date-time`` assert; which
+#: formats actually assert is READ from this object rather than assumed.
+FORMAT_CHECKER = FormatChecker()
+
+#: Formats the installed checker registry actually asserts.
+ASSERTED_FORMATS: frozenset[str] = frozenset(FORMAT_CHECKER.checkers)
+
+_LOCAL_REF = "#/$defs/"
+
+
+class UnsupportedContractKeyword(ContractPinError):
+    """The contract uses a keyword outside the draft 2020-12 vocabulary.
+
+    ``jsonschema`` IGNORES an unrecognised keyword, exactly as the
+    specification says it must. That is correct of a validator and wrong of a
+    consumer: a typo, or a keyword from a later draft, becomes a constraint
+    nobody checks and nobody is told about. So the vocabulary is checked here,
+    against the library's OWN validator table rather than a hand-written list.
+    """
 
 
 @dataclass(frozen=True, slots=True)
 class RecordValidation:
-    """What :func:`validate` concluded, including what it declined to check.
+    """What :func:`validate` concluded, including what it did not check.
 
-    ``unsupported_keyword_semantics`` is the second disclosure channel, built on
-    the same principle as ``unvalidated_remote_refs``: every constraint this
-    evaluator only approximated, on the record actually validated, is a value
-    the caller can read and a test can pin. Round one had no such channel and
-    called four approximations "supported".
+    Two disclosure channels, both reported rather than swallowed:
+
+    ``unvalidated_remote_refs``
+        Remote ``$ref``s, deliberately not resolved.
+    ``unsupported_keyword_semantics``
+        Constraints the branch declares that this validator does not check
+        exactly. This survived the migration to ``jsonschema``, as WAVE-145
+        predicted it would, because two of its entries are properties of the
+        library and not of the evaluator it replaced.
     """
 
     errors: tuple[str, ...]
@@ -427,284 +415,127 @@ class RecordValidation:
         return not self.errors
 
 
-def _is_number(value: Any) -> bool:
-    """A JSON number. ``bool`` is a Python ``int`` and is NOT a JSON number."""
-    return isinstance(value, (int, float)) and not isinstance(value, bool)
+def _walk_schema(node: Any):
+    """Every subschema object reachable inside one schema, including itself."""
+    if isinstance(node, dict):
+        yield node
+        for key, value in node.items():
+            if key in {"properties", "$defs", "patternProperties", "dependentSchemas"}:
+                if isinstance(value, dict):
+                    for sub in value.values():
+                        yield from _walk_schema(sub)
+            elif key in {"allOf", "anyOf", "oneOf", "prefixItems"}:
+                if isinstance(value, list):
+                    for sub in value:
+                        yield from _walk_schema(sub)
+            elif key in {
+                "if",
+                "then",
+                "else",
+                "not",
+                "items",
+                "contains",
+                "additionalProperties",
+                "propertyNames",
+                "unevaluatedItems",
+                "unevaluatedProperties",
+            }:
+                yield from _walk_schema(value)
 
 
-def _type_matches(value: Any, name: str) -> bool:
-    if name == "integer":
-        # Draft 2020-12: "integer" matches any number with a zero fractional
-        # part, so 48211.0 IS an integer. Rejecting it was a fail-CLOSED
-        # divergence found by quality control.
-        if isinstance(value, bool):
-            return False
-        if isinstance(value, int):
-            return True
-        return isinstance(value, float) and value.is_integer()
-    if name == "number":
-        return _is_number(value)
-    if name == "string":
-        return isinstance(value, str)
-    if name == "boolean":
-        return isinstance(value, bool)
-    if name == "object":
-        return isinstance(value, dict)
-    if name == "array":
-        return isinstance(value, list)
-    if name == "null":
-        return value is None
-    raise UnsupportedContractKeyword(f"unsupported JSON Schema type {name!r}")
+def branch_subtree(schema: dict[str, Any], branch_root: str) -> list[dict[str, Any]]:
+    """Every subschema object a branch reaches, following LOCAL refs only.
 
-
-def _json_equal(left: Any, right: Any) -> bool:
-    """Draft 2020-12 equality, which is TYPED.
-
-    Two instances are equal when they are of the same JSON type and equal
-    within it -- with the single numeric exception that an integer and a float
-    of the same mathematical value ARE equal. Booleans are their own type, so
-    ``True`` never equals ``1``.
-
-    Python's ``==`` gets this wrong in exactly the way that matters here:
-    ``True == 1`` is True, so ``record_version: true`` satisfied ``const: 1``
-    and passed the contract's kind/version gate.
+    Local-only, for the same reason ``statecivics_contract_pin.branch_closure``
+    is local-only: a remote ref names a separate contract with its own pin.
     """
-    if isinstance(left, bool) or isinstance(right, bool):
-        return isinstance(left, bool) and isinstance(right, bool) and left is right
-    if left is None or right is None:
-        return left is None and right is None
-    if _is_number(left) and _is_number(right):
-        return left == right
-    if isinstance(left, str) and isinstance(right, str):
-        return left == right
-    if isinstance(left, list) and isinstance(right, list):
-        return len(left) == len(right) and all(
-            _json_equal(a, b) for a, b in zip(left, right, strict=True)
-        )
-    if isinstance(left, dict) and isinstance(right, dict):
-        return set(left) == set(right) and all(_json_equal(left[k], right[k]) for k in left)
-    return False
+    defs = schema.get("$defs")
+    if not isinstance(defs, dict) or branch_root not in defs:
+        raise ContractPinError(f"contract is missing $defs.{branch_root}")
+    pending = [branch_root]
+    seen_defs: set[str] = set()
+    objects: list[dict[str, Any]] = []
+    while pending:
+        name = pending.pop()
+        if name in seen_defs:
+            continue
+        if name not in defs:
+            raise ContractPinError(f"contract is missing $defs.{name}")
+        seen_defs.add(name)
+        for node in _walk_schema(defs[name]):
+            objects.append(node)
+            ref = node.get("$ref")
+            if isinstance(ref, str) and ref.startswith(_LOCAL_REF):
+                pending.append(ref[len(_LOCAL_REF) :])
+    return objects
 
 
-def _equality_key(value: Any) -> Any:
-    """A hashable key under :func:`_json_equal`'s equality.
-
-    Booleans get their own tag so ``true`` and ``1`` do not collide; numbers are
-    keyed by mathematical value so ``1`` and ``1.0`` DO collide, which is what
-    draft 2020-12 requires of ``uniqueItems``.
-    """
-    if isinstance(value, bool):
-        return ("bool", value)
-    if value is None:
-        return ("null",)
-    if _is_number(value):
-        return ("number", float(value))
-    if isinstance(value, str):
-        return ("string", value)
-    if isinstance(value, list):
-        return ("array", tuple(_equality_key(item) for item in value))
-    if isinstance(value, dict):
-        return ("object", tuple(sorted((k, _equality_key(v)) for k, v in value.items())))
-    raise UnsupportedContractKeyword(f"cannot compare a {type(value).__name__} as JSON")
-
-
-def _canonical(value: Any) -> str:
-    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-
-
-def _valid_date(value: str) -> bool:
-    """RFC 3339 full-date, calendar included.
-
-    The shape regex alone accepted 2026-02-31, 2026-13-99 and 0000-99-99.
-    """
-    from datetime import date
-
-    if _DATE_SHAPE.match(value) is None:
-        return False
-    try:
-        date.fromisoformat(value)
-    except ValueError:
-        return False
-    return True
-
-
-def _valid_date_time(value: str) -> bool:
-    """RFC 3339 date-time: real calendar date, real clock time, real offset."""
-    from datetime import datetime
-
-    match = _DATE_TIME_SHAPE.match(value)
-    if match is None:
-        return False
-    offset = match.group("offset")
-    normalised = f"{match.group('date')}T{match.group('time')}" + (
-        "+00:00" if offset in {"Z", "z"} else offset
-    )
-    try:
-        parsed = datetime.fromisoformat(normalised)
-    except ValueError:
-        return False
-    # Belt and braces: the shape requires an offset, so a naive result would
-    # mean the parser disagreed with the regex about what it just read.
-    return parsed.utcoffset() is not None
-
-
-def _check_keywords(schema: dict[str, Any]) -> None:
-    unknown = sorted(set(schema) - KNOWN_KEYWORDS)
+def _check_vocabulary(objects: list[dict[str, Any]]) -> None:
+    unknown = sorted({key for node in objects for key in node} - KNOWN_KEYWORDS)
     if unknown:
         raise UnsupportedContractKeyword(
-            f"contract uses JSON Schema keyword(s) {unknown} that this evaluator does not "
-            "implement. Refusing rather than ignoring them: an ignored keyword is an "
-            "unchecked constraint reported as a pass."
+            f"contract uses JSON Schema keyword(s) {unknown} that are outside the draft "
+            "2020-12 vocabulary. jsonschema would ignore them silently, which turns a "
+            "constraint into one nobody checks and nobody is told about."
         )
 
 
-class _Disclosures:
-    """What the evaluator did not check exactly, accumulated as it goes.
+def _remote_refs(objects: list[dict[str, Any]]) -> set[str]:
+    return {
+        node["$ref"]
+        for node in objects
+        if isinstance(node.get("$ref"), str) and not node["$ref"].startswith(_LOCAL_REF)
+    }
 
-    Two channels, both reported rather than swallowed: remote ``$ref``s it did
-    not follow, and approximated keyword semantics it actually exercised.
+
+def _declared_approximations(objects: list[dict[str, Any]]) -> set[str]:
+    """What this branch declares that is NOT checked to the letter.
+
+    Derived from the schema and from the installed checker registry, so it stays
+    true as either changes -- it is not a list someone has to remember to edit.
     """
-
-    __slots__ = ("approximations", "remote")
-
-    def __init__(self) -> None:
-        self.remote: set[str] = set()
-        self.approximations: set[str] = set()
-
-
-def _validate(
-    value: Any,
-    schema: Any,
-    root: dict[str, Any],
-    path: str,
-    errors: list[str],
-    seen: _Disclosures,
-) -> None:
-    if schema is True:
-        return
-    if schema is False:
-        errors.append(f"{path or '<record>'}: schema forbids any value here")
-        return
-    if not isinstance(schema, dict):
-        raise UnsupportedContractKeyword(f"schema at {path!r} is neither an object nor a boolean")
-    _check_keywords(schema)
-
-    ref = schema.get("$ref")
-    if isinstance(ref, str):
-        if ref.startswith(_LOCAL_REF):
-            name = ref[len(_LOCAL_REF) :]
-            target = root.get("$defs", {}).get(name)
-            if target is None:
-                raise ContractPinError(f"contract is missing $defs.{name}")
-            _validate(value, target, root, path, errors, seen)
-        else:
-            # Deliberately not followed. See the module docstring.
-            seen.remote.add(ref)
-
-    if "type" in schema:
-        names = schema["type"]
-        names = [names] if isinstance(names, str) else list(names)
-        if not any(_type_matches(value, name) for name in names):
-            errors.append(f"{path or '<record>'}: expected type {names}, got {type(value).__name__}")
-            return
-
-    # TYPED equality. `True == 1` in Python, so `value != schema["const"]`
-    # admitted `record_version: true` against `const: 1`.
-    if "const" in schema and not _json_equal(value, schema["const"]):
-        errors.append(
-            f"{path or '<record>'}: expected const {_canonical(schema['const'])}, "
-            f"got {_canonical(value)}"
-        )
-    if "enum" in schema and not any(_json_equal(value, option) for option in schema["enum"]):
-        errors.append(f"{path or '<record>'}: {_canonical(value)} is not one of {_canonical(schema['enum'])}")
-
-    if isinstance(value, str):
-        pattern = schema.get("pattern")
-        if isinstance(pattern, str):
-            # Python `re`, exactly as jsonschema does it, and exactly as
-            # ECMA-262 does NOT. Disclosed, not silently claimed.
-            seen.approximations.add("pattern")
-            if re.search(pattern, value) is None:
-                errors.append(f"{path or '<record>'}: {value!r} does not match {pattern!r}")
-        if "minLength" in schema and len(value) < schema["minLength"]:
-            errors.append(f"{path or '<record>'}: shorter than minLength {schema['minLength']}")
-        if "maxLength" in schema and len(value) > schema["maxLength"]:
-            errors.append(f"{path or '<record>'}: longer than maxLength {schema['maxLength']}")
-        fmt = schema.get("format")
-        if isinstance(fmt, str):
-            if fmt == "date":
-                valid = _valid_date(value)
-            elif fmt == "date-time":
-                valid = _valid_date_time(value)
-            elif fmt == "uri":
-                seen.approximations.add("format:uri")
-                valid = _URI_SHAPE.match(value) is not None
-            else:
-                raise UnsupportedContractKeyword(f"contract uses unimplemented format {fmt!r}")
-            if not valid:
-                errors.append(f"{path or '<record>'}: {value!r} is not a valid {fmt}")
-
-    # `bool` is a Python int but is not a JSON number, so it must not be
-    # compared against a numeric bound.
-    if _is_number(value) and "minimum" in schema and value < schema["minimum"]:
-        errors.append(f"{path or '<record>'}: below minimum {schema['minimum']}")
-
-    if isinstance(value, dict):
-        for name in schema.get("required", []):
-            if name not in value:
-                errors.append(f"{path or '<record>'}: missing required property {name!r}")
-        properties = schema.get("properties", {})
-        for name, subschema in properties.items():
-            if name in value:
-                _validate(value[name], subschema, root, f"{path}.{name}" if path else name, errors, seen)
-        if "additionalProperties" in schema:
-            extra = sorted(set(value) - set(properties))
-            allowed = schema["additionalProperties"]
-            if allowed is False:
-                for name in extra:
-                    errors.append(f"{path or '<record>'}: property {name!r} is not permitted here")
-            else:
-                for name in extra:
-                    _validate(value[name], allowed, root, f"{path}.{name}" if path else name, errors, seen)
-
-    if isinstance(value, list):
-        if "items" in schema:
-            for index, item in enumerate(value):
-                _validate(item, schema["items"], root, f"{path}[{index}]", errors, seen)
-        # Typed equality again: [true, 1] IS unique, [1, 1.0] is NOT.
-        if schema.get("uniqueItems") and len({_equality_key(item) for item in value}) != len(value):
-            errors.append(f"{path or '<record>'}: items are not unique")
-        if "minItems" in schema and len(value) < schema["minItems"]:
-            errors.append(f"{path or '<record>'}: fewer than minItems {schema['minItems']}")
-        if "maxItems" in schema and len(value) > schema["maxItems"]:
-            errors.append(f"{path or '<record>'}: more than maxItems {schema['maxItems']}")
-
-    for subschema in schema.get("allOf", []):
-        _validate(value, subschema, root, path, errors, seen)
-
-    if "anyOf" in schema:
-        branches = [_probe(value, sub, root, path, seen) for sub in schema["anyOf"]]
-        if not any(not found for found in branches):
-            errors.append(f"{path or '<record>'}: matched none of the anyOf branches")
-    if "oneOf" in schema:
-        matched = [sub for sub in schema["oneOf"] if not _probe(value, sub, root, path, seen)]
-        if len(matched) != 1:
-            errors.append(f"{path or '<record>'}: matched {len(matched)} oneOf branches, expected exactly 1")
-    if "not" in schema and not _probe(value, schema["not"], root, path, seen):
-        errors.append(f"{path or '<record>'}: matched a schema it must not match")
-
-    if "if" in schema:
-        if not _probe(value, schema["if"], root, path, seen):
-            if "then" in schema:
-                _validate(value, schema["then"], root, path, errors, seen)
-        elif "else" in schema:
-            _validate(value, schema["else"], root, path, errors, seen)
-
-
-def _probe(value: Any, schema: Any, root: dict[str, Any], path: str, seen: _Disclosures) -> list[str]:
-    found: list[str] = []
-    _validate(value, schema, root, path, found, seen)
+    found: set[str] = set()
+    for node in objects:
+        if isinstance(node.get("pattern"), str):
+            # ECMA-262 by specification, Python `re` in this library. See the
+            # module docstring; a cross-check against jsonschema cannot see it.
+            found.add("pattern")
+        fmt = node.get("format")
+        if isinstance(fmt, str) and fmt not in ASSERTED_FORMATS:
+            found.add(f"format:{fmt}")
     return found
+
+
+def _registry(remote: set[str]) -> Any:
+    """Always-true stubs for every remote ref, keyed by base URI.
+
+    NOT a resolution of those contracts. Each names a separate contract with its
+    own pin, and resolving one here would silently widen what this module claims
+    to have checked while leaving the pin unchanged. The refs are reported
+    instead, in :attr:`RecordValidation.unvalidated_remote_refs`.
+    """
+    registry = Registry()
+    merged: dict[str, dict[str, Any]] = {}
+    for ref in remote:
+        base, _, pointer = ref.partition("#")
+        stub = merged.setdefault(base, {})
+        node = stub
+        for segment in [s for s in pointer.split("/") if s]:
+            node = node.setdefault(segment, {})
+    for base, contents in merged.items():
+        registry = registry.with_resource(
+            base, Resource(contents=contents, specification=DRAFT202012)
+        )
+    return registry
+
+
+def _branch_validator(schema: dict[str, Any], branch_root: str, remote: set[str]) -> Any:
+    document = {key: value for key, value in schema.items() if key not in DISPATCH_KEYS}
+    document["$ref"] = f"{_LOCAL_REF}{branch_root}"
+    Draft202012Validator.check_schema(document)
+    return Draft202012Validator(
+        document, registry=_registry(remote), format_checker=FORMAT_CHECKER
+    )
 
 
 def validate(record: Any, schema: dict[str, Any], branch_root: str) -> RecordValidation:
@@ -713,17 +544,25 @@ def validate(record: Any, schema: dict[str, Any], branch_root: str) -> RecordVal
     ``branch_root`` is a ``$defs`` key -- the value the contract's own dispatch
     arm points at, resolved by :func:`dispatch_rule`. Nothing here re-decides
     which branch applies.
+
+    The top-level ``if``/``then``/``else`` is removed from the document handed
+    to the validator, and replaced by a ``$ref`` to the named branch. The
+    dispatch has already run, in :func:`classify_record`, which reads the tag
+    keys and nothing else; leaving the routing in place would let a declarative
+    validator re-decide it with no notion of "first".
     """
-    defs = schema.get("$defs")
-    if not isinstance(defs, dict) or branch_root not in defs:
-        raise ContractPinError(f"contract is missing $defs.{branch_root}")
-    errors: list[str] = []
-    seen = _Disclosures()
-    _validate(record, defs[branch_root], schema, "", errors, seen)
+    objects = branch_subtree(schema, branch_root)
+    _check_vocabulary(objects)
+    remote = _remote_refs(objects)
+    validator = _branch_validator(schema, branch_root, remote)
+    errors = tuple(
+        f"{'.'.join(str(part) for part in error.absolute_path) or '<record>'}: {error.message}"
+        for error in validator.iter_errors(record)
+    )
     return RecordValidation(
-        errors=tuple(errors),
-        unvalidated_remote_refs=tuple(sorted(seen.remote)),
-        unsupported_keyword_semantics=tuple(sorted(seen.approximations)),
+        errors=errors,
+        unvalidated_remote_refs=tuple(sorted(remote)),
+        unsupported_keyword_semantics=tuple(sorted(_declared_approximations(objects))),
     )
 
 
@@ -837,49 +676,82 @@ def adapt_manifest(path: Path, *, contract_schema: Path) -> AdaptedManifest:
 
 
 @dataclass(frozen=True, slots=True)
-class InstanceCollectionRoster:
-    """Every document collection an instance's own config says it writes to.
+class DeploymentIndexSettings:
+    """The collection-naming inputs OF THE TARGET DEPLOYMENT.
 
-    Built by reading the instance tree, never by taking a caller's word for it.
-    Round one took the document profile as an ARGUMENT, so a caller who passed
-    any profile other than the statute one got the real shared statute
-    collection back with no collision raised -- a guard that asked the caller to
-    supply the thing it was meant to protect against.
+    Not of the checked-in instance YAML. ``instance.yaml`` declares
+    ``storage.qdrant.collectionPrefix``, and NOTHING in this repository reads
+    it: the prefix a running cell uses is ``QDRANT_COLLECTION_PREFIX`` from its
+    environment, defaulted to ``svs_`` by ``config.Settings`` and by
+    ``scripts/release/generate-cell-env.py``. The two disagree today for
+    ``ks-state-civics`` (``ks_civics_`` in YAML, ``svs_`` in the running fiscal
+    cell), which is WAVE-146; deriving names from the YAML produced collection
+    names the deployment does not have, which is how a guard came to report
+    safety about a cell that does not exist.
+
+    So the prefix is taken from the adapter's OWN settings -- the same object
+    ``QdrantAdapter.collection_name`` reads -- and the YAML's value is never
+    consulted for it.
     """
 
     business_instance_id: str
     collection_prefix: str
-    #: vector store slug -> collection name, for stores that declare a profile.
+
+
+@dataclass(frozen=True, slots=True)
+class InstanceCollectionRoster:
+    """Every DOCUMENT collection the target deployment resolves for an instance.
+
+    Built by reading the instance tree for profiles and the deployment settings
+    for the prefix, never by taking a caller's word for either. Round two took
+    the document profile as an ARGUMENT, so a caller who passed any profile
+    other than the statute one got the real shared collection back with no
+    collision raised -- a guard that asked the caller to supply the thing it was
+    meant to protect against.
+
+    ``entity_store_slugs`` are EXCLUDED from ``document_collections`` rather
+    than absent from the tree: an entity store is not a document store, and a
+    guard that compared an entity collection against itself would refuse the
+    only arrangement that is actually correct.
+    """
+
+    settings: DeploymentIndexSettings
+    #: "<store slug>:<profile>" -> collection name, document stores only.
     document_collections: dict[str, str]
-    #: Stores whose source package declares no ``ingestion.embeddingProfile``.
-    #: The roster cannot be proved complete while this is non-empty.
-    undeclared_profile_stores: tuple[str, ...]
+    #: Sources that declare no embedding profile, as "<store>/<source>" pairs.
+    #: Tracked per SOURCE, never per store: a store with two source packages,
+    #: one declaring a profile and one not, would otherwise report as fully
+    #: declared and hide the second. The roster cannot be proved complete while
+    #: this is non-empty.
+    undeclared_profile_sources: tuple[str, ...]
+    #: Stores classified as entity stores and therefore not document stores.
+    entity_store_slugs: tuple[str, ...]
+    #: Profiles contributed by ``models.preferredEmbeddingProfiles``, which is
+    #: where the instance declares a profile no source package names.
+    preferred_profiles: tuple[str, ...]
+
+    @property
+    def undeclared_profile_stores(self) -> tuple[str, ...]:
+        """The distinct stores owning at least one undeclared source."""
+        return tuple(sorted({pair.split("/", 1)[0] for pair in self.undeclared_profile_sources}))
 
 
 class InstanceCollectionConfigError(ValueError):
-    """The instance tree cannot be read, or disagrees with the live settings."""
+    """The instance tree or the deployment settings cannot be read."""
 
 
 class DocumentCollectionRosterIncomplete(ValueError):
-    """A document store declares no embedding profile, so it cannot be avoided.
+    """A document source declares no embedding profile, so it cannot be avoided.
 
     Refusing here is the point. A non-collision guard that cannot enumerate what
     it must not collide with does not have an answer, and reporting "no
-    collision" because a store was invisible is exactly the fail-open shape this
-    module keeps being asked to remove.
+    collision" because a source was invisible is exactly the fail-open shape
+    this module keeps being asked to remove.
     """
 
 
-def read_instance_collection_roster(instance_root: Path, adapter: Any) -> InstanceCollectionRoster:
-    """Read one instance's declared document collections off disk.
-
-    ``instance_root`` is an ``instances/<slug>/`` directory. The business
-    instance id and the Qdrant collection prefix come from ``instance.yaml``;
-    each store's embedding profile comes from its own source package's
-    ``ingestion.embeddingProfile``. The names are then computed by the SAME
-    ``adapter.collection_name`` a real ingestion would call, so this roster is
-    what that deployment actually resolves to, not a reconstruction of it.
-    """
+def deployment_index_settings(instance_root: Path, adapter: Any) -> DeploymentIndexSettings:
+    """The business instance id from the tree, the prefix from the deployment."""
     import yaml
 
     root = Path(instance_root)
@@ -890,42 +762,89 @@ def read_instance_collection_roster(instance_root: Path, adapter: Any) -> Instan
     business_instance_id = (instance.get("metadata") or {}).get("businessInstanceId")
     if not business_instance_id:
         raise InstanceCollectionConfigError(f"{instance_file}: metadata.businessInstanceId is missing")
-    declared_prefix = ((instance.get("storage") or {}).get("qdrant") or {}).get("collectionPrefix")
-    if not declared_prefix:
-        raise InstanceCollectionConfigError(f"{instance_file}: storage.qdrant.collectionPrefix is missing")
-    live_prefix = getattr(adapter.settings, "qdrant_collection_prefix", None)
-    if live_prefix != declared_prefix:
+    prefix = getattr(adapter.settings, "qdrant_collection_prefix", None)
+    if not isinstance(prefix, str) or not prefix:
         raise InstanceCollectionConfigError(
-            f"{instance_file} declares collectionPrefix {declared_prefix!r} but the adapter's "
-            f"settings use {live_prefix!r}. The names this roster would compute would not be "
-            "the ones that deployment writes to, so the collision check would be answering "
-            "about a different cell."
+            "the adapter's settings declare no qdrant_collection_prefix, so the collections "
+            "this deployment resolves cannot be named"
+        )
+    return DeploymentIndexSettings(
+        business_instance_id=str(business_instance_id), collection_prefix=prefix
+    )
+
+
+def read_instance_collection_roster(
+    instance_root: Path,
+    adapter: Any,
+    *,
+    entity_store_slugs: tuple[str, ...] = (),
+) -> InstanceCollectionRoster:
+    """Resolve one instance's document collections for the target deployment.
+
+    Profiles come from two declared places, because the runtime uses both:
+
+    * each source package's ``ingestion.embeddingProfile``; and
+    * ``models.preferredEmbeddingProfiles`` in ``instance.yaml``, which is where
+      ``openai_text_embedding_3_small_1536`` is declared -- the profile behind
+      the SECOND document collection in the running fiscal cell. A roster built
+      from source packages alone finds only the Voyage one and would never
+      enumerate, let alone guard against, the other.
+
+    Names are computed by the SAME ``adapter.collection_name`` a real ingestion
+    calls, so this roster is what that deployment resolves to rather than a
+    reconstruction of it.
+    """
+    import yaml
+
+    root = Path(instance_root)
+    settings = deployment_index_settings(root, adapter)
+    instance = yaml.safe_load((root / "instance.yaml").read_text(encoding="utf-8")) or {}
+
+    entity_slugs = tuple(sorted(set(entity_store_slugs)))
+    collections: dict[str, str] = {}
+
+    preferred = (instance.get("models") or {}).get("preferredEmbeddingProfiles") or {}
+    if not isinstance(preferred, dict):
+        raise InstanceCollectionConfigError(
+            f"{root / 'instance.yaml'}: models.preferredEmbeddingProfiles must be a mapping"
+        )
+    preferred_profiles = tuple(sorted({str(v) for v in preferred.values() if v}))
+    for profile in preferred_profiles:
+        collections[f"models.preferredEmbeddingProfiles:{profile}"] = adapter.collection_name(
+            settings.business_instance_id, profile
         )
 
-    collections: dict[str, str] = {}
     undeclared: list[str] = []
     stores_dir = root / "vector-stores"
     if not stores_dir.is_dir():
         raise InstanceCollectionConfigError(f"no vector-stores directory under {root}")
     for store_dir in sorted(p for p in stores_dir.iterdir() if p.is_dir()):
-        profiles: set[str] = set()
-        for source_file in sorted(store_dir.glob("sources/*/source.yaml")):
+        if store_dir.name in entity_slugs:
+            # An entity store is not a document store. It is skipped entirely --
+            # neither enumerated as a collection to avoid, nor counted as an
+            # undeclared document source.
+            continue
+        sources = sorted(store_dir.glob("sources/*/source.yaml"))
+        if not sources:
+            undeclared.append(f"{store_dir.name}/<no source package>")
+            continue
+        for source_file in sources:
             package = yaml.safe_load(source_file.read_text(encoding="utf-8")) or {}
             profile = (package.get("ingestion") or {}).get("embeddingProfile")
-            if profile:
-                profiles.add(str(profile))
-        if not profiles:
-            undeclared.append(store_dir.name)
-            continue
-        for profile in sorted(profiles):
+            if not profile:
+                # Per SOURCE. A sibling that declares one must not mask this.
+                undeclared.append(f"{store_dir.name}/{source_file.parent.name}")
+                continue
             collections[f"{store_dir.name}:{profile}"] = adapter.collection_name(
-                business_instance_id, profile
+                settings.business_instance_id, str(profile)
             )
+
     return InstanceCollectionRoster(
-        business_instance_id=business_instance_id,
-        collection_prefix=declared_prefix,
+        settings=settings,
         document_collections=collections,
-        undeclared_profile_stores=tuple(undeclared),
+        undeclared_profile_sources=tuple(undeclared),
+        entity_store_slugs=entity_slugs,
+        preferred_profiles=preferred_profiles,
     )
 
 
@@ -934,6 +853,7 @@ def entity_collection_name(
     *,
     instance_root: Path,
     entity_embedding_profile_id: str,
+    entity_store_slugs: tuple[str, ...] = (),
 ) -> str:
     """Name the collection entity descriptor points may use, or refuse.
 
@@ -945,12 +865,15 @@ def entity_collection_name(
     invariant -- entity projections never enter the shared statute collection --
     would be violated by a change that looks like it separated them.
 
-    The document side is read from the instance's own config, never passed in:
-    the collision fires against ANY collection the instance declares, whatever
-    the caller believes. The entity profile stays a caller argument because
-    choosing it is an owner decision (it is a new profile, not a rename), but an
-    empty or missing one is refused rather than resolved to the degenerate
-    ``<prefix><instance>_`` name.
+    The document side is resolved for the TARGET DEPLOYMENT and never passed
+    in: the collision fires against any document collection that deployment
+    resolves, whatever the caller believes. ``entity_store_slugs`` names the
+    stores that are entity stores; they are excluded from the document side, so
+    the guard can never fire against the entity store itself.
+
+    Choosing the entity profile remains an owner decision and stays an
+    argument, but an empty or non-string one is refused rather than resolved to
+    the degenerate ``<prefix><instance>_`` name.
     """
     if not isinstance(entity_embedding_profile_id, str) or not entity_embedding_profile_id.strip():
         raise InstanceCollectionConfigError(
@@ -958,24 +881,30 @@ def entity_collection_name(
             f"{entity_embedding_profile_id!r}. An empty profile resolves to a degenerate "
             "collection name shared by every store with an empty profile."
         )
-    roster = read_instance_collection_roster(instance_root, adapter)
-    if roster.undeclared_profile_stores:
+    roster = read_instance_collection_roster(
+        instance_root, adapter, entity_store_slugs=entity_store_slugs
+    )
+    if roster.undeclared_profile_sources:
         raise DocumentCollectionRosterIncomplete(
-            f"{list(roster.undeclared_profile_stores)} declare no ingestion.embeddingProfile in "
-            f"any source package under {Path(instance_root)}, so the document collections for "
-            "this instance cannot be enumerated and a non-collision cannot be proved. Declare "
-            "the profile, or this check is reporting safety it did not establish."
+            f"{list(roster.undeclared_profile_sources)} declare no ingestion.embeddingProfile "
+            f"under {Path(instance_root)}, so the document collections this deployment resolves "
+            "cannot be enumerated and a non-collision cannot be proved. Declare the profile "
+            "each one actually uses -- do not declare one the runtime does not use -- or this "
+            "check is reporting safety it did not establish."
         )
-    entity = adapter.collection_name(roster.business_instance_id, entity_embedding_profile_id)
+    entity = adapter.collection_name(
+        roster.settings.business_instance_id, entity_embedding_profile_id
+    )
     collided = sorted(key for key, name in roster.document_collections.items() if name == entity)
     if collided:
         raise EntityCollectionCollision(
-            f"entity projections would land in {entity!r}, which is already the document "
-            f"collection for {collided} on instance {roster.business_instance_id!r}. "
-            "QdrantAdapter.collection_name takes (business_instance_id, embedding_profile_id) "
-            "and not vector_store_id, so a new vector store does not separate them: the entity "
-            f"profile {entity_embedding_profile_id!r} must differ from every declared document "
-            "profile."
+            f"entity projections would land in {entity!r}, which this deployment already "
+            f"resolves as the document collection for {collided} on business instance "
+            f"{roster.settings.business_instance_id!r}. QdrantAdapter.collection_name takes "
+            "(business_instance_id, embedding_profile_id) and not vector_store_id, so a new "
+            f"vector store does not separate them: the entity profile "
+            f"{entity_embedding_profile_id!r} must differ from every document profile this "
+            "deployment resolves."
         )
     return entity
 
