@@ -215,3 +215,61 @@ were exercised. Separate disposable PostgreSQL checks verified profile migration
 evidence-context changes, dedupe, retries and source/tenant scope. Full migrated
 API/backend integration, live replay and the canonical projection acceptance
 criteria above remain incomplete; this ticket stays in progress.
+
+### 2026-09-13 — lane B increment: the entity/document record adapter
+
+Filed under this ticket rather than a new WAVE id. The Scope bullet already
+says "Entity branch uses WAVE-133 adapter"; the 2026-09-12 P5-PLAN note above
+specifies exactly this dispatch, the store-id/profile finding and the branch
+separation. A new ticket would split one deliverable across two ids.
+
+**What landed.** `packages/svs_common/svs_common/statecivics_record_adapter.py`
+reads a mixed JSONL manifest and returns branch-separated, branch-validated
+records. It is a reader: no embedding, no API call, no upload, no store write.
+
+* The routing comes from the contract, not from this repository. It reuses
+  `statecivics_contract_pin.dispatch_subtree`, so the object it reads is
+  byte-for-byte the one `DISPATCH_SHA256` pins, takes the tag key from the root
+  `if.required` and each arm's `$defs` target from `then`/`else`, and maps each
+  target back to a pin name through `BRANCH_ROOTS`. `EXPECTED_DISPATCH_REQUIRED`
+  is a cross-check asserted against the contract, never the source, so a
+  re-rooted dispatch fails by name rather than only as a digest mismatch.
+* A record is validated against the branch the dispatch chose and refused there
+  by name. The document branch is NOT relaxed to admit entity records; a test
+  asserts both entity fixtures fail `legacy_document_record` while passing
+  `entity_projection_envelope`.
+* `entity_collection_name` refuses when the entity collection would equal the
+  document one. `QdrantAdapter.collection_name` takes
+  `(business_instance_id, embedding_profile_id)` and NOT `vector_store_id`, so a
+  new vector store separates nothing; the embedding profile is the only
+  separator and choosing one stays an owner decision, so both profile ids are
+  arguments.
+
+**`load_manifest` is untouched** — signature, body and contract-pin enforcement.
+The adapter reads the manifest itself and verifies only the pins for branches it
+actually saw, matching `ENFORCED_PINS`. It therefore adds no `load_manifest`
+call site, so the discovered/declared `contractPin.enforcedAt` sets stay equal
+and `test_every_load_manifest_caller_enforces_the_pin` is unaffected. Asserted
+structurally by `test_the_adapter_adds_no_load_manifest_call_site`.
+
+**Validation scope, stated rather than implied.** There is no `jsonschema` in
+this repository, so the evaluator is bounded to the pinned contract's keyword
+vocabulary, and `SUPPORTED_KEYWORDS` is closed: an unimplemented keyword raises
+instead of being ignored. Remote `$ref` is not followed — the same policy
+`branch_closure` already applies — and every unfollowed ref is reported in
+`unvalidated_remote_refs`, so the two KS-600 payload contracts and the
+source-artifact vocabulary are named as unchecked rather than silently skipped.
+Offline corroboration: the evaluator's verdicts were compared against
+`jsonschema` 4.26.0 + `rfc3339-validator` (installed in a scratch venv only,
+never a repo dependency) over the fixtures and a 34-case mutation battery
+covering every keyword class the contract uses — 44 cases, 0 disagreements.
+
+**Fixtures** (`tests/fixtures/statecivics-*.jsonl`, 7.7 KB total). The legacy
+document record and both entity payloads are StateCivics' OWN committed fixtures
+at 314beafe, fetched with `git show`, never invented; the entity envelopes
+reproduce `entity_projection.build_entity_record` at that commit.
+
+**Not verified here.** No live ingestion, no descriptor indexing, no idempotency
+key change, no `source.lock.json` for an entity store, and no owner decision on
+the entity embedding profile. The KS-600 `entity` payloads are not validated by
+this adapter by construction. Those remain open under this ticket.
