@@ -430,6 +430,38 @@ def _scope_nodes(statement: ast.AST):
         yield from _scope_nodes(child)
 
 
+def _definition_time_expressions(node: ast.AST):
+    """The sub-expressions of a ``def``/``class`` that run in the ENCLOSING scope.
+
+    Python evaluates decorators, parameter defaults, annotations and base
+    classes when the ``def``/``class`` statement itself executes, in the scope
+    that contains it -- not inside the scope the statement opens. A positional
+    default is a genuine executing call.
+
+    They are therefore yielded so the caller can visit them with the ENCLOSING
+    ``envs``. Resolving a default's names against the function's own scope would
+    invent bindings that are not visible where the expression actually runs, so
+    ``_scope_nodes``'s refusal to enter a scope boundary is preserved: only
+    ``node.body`` is walked under the new scope.
+    """
+    yield from node.decorator_list
+    if isinstance(node, ast.ClassDef):
+        yield from node.bases
+        for keyword in node.keywords:
+            yield keyword.value
+        return
+    arguments = node.args
+    for default in (*arguments.defaults, *arguments.kw_defaults):
+        if default is not None:
+            yield default
+    for argument in (*arguments.posonlyargs, *arguments.args,
+                     *arguments.kwonlyargs, arguments.vararg, arguments.kwarg):
+        if argument is not None and argument.annotation is not None:
+            yield argument.annotation
+    if node.returns is not None:
+        yield node.returns
+
+
 def _scope_env(body: list[ast.stmt]) -> dict[str, ast.AST]:
     env: dict[str, ast.AST] = {}
     for statement in body:
@@ -528,6 +560,10 @@ class _Module:
             and node.name == CONSUMER_FUNCTION
             for node in self.tree.body
         )
+        # R-P10. The ONE record of what the classifier actually looked at.
+        # `_block_on_unresolved_references` complements against this and
+        # nothing else, so there is no second predicate to keep in step.
+        self.classified_call_funcs: set[int] = set()
         self.factories = self._module_factories()
 
     def _module_factories(self) -> dict[str, Path]:
@@ -590,44 +626,45 @@ class _Module:
     def call_sites(self) -> list[dict]:
         """Every call to a function named ``load_manifest``, each carrying the
         resolved file of the module it actually reaches."""
-        self._block_on_unresolved_references()
         found: list[dict] = []
+        self.classified_call_funcs = set()
+        # Order is load-bearing: the classifier runs first so that the set it
+        # fills in IS the exemption set the blocker then complements. If
+        # `_walk` raises part way, the record is partial and MORE references
+        # block -- the check fails toward blocking either way.
         self._walk(self.tree.body, (), found)
+        self._block_on_unresolved_references()
         return found
 
     def _block_on_unresolved_references(self) -> None:
-        """Block on every reference to the consumer function that is not the
-        callee of a call this walker can resolve.
+        """Block on every reference to the consumer function that the CLASSIFIER
+        did not see.
 
-        This is the COMPLEMENT of what ``_classify`` handles, computed rather
-        than listed. ``_classify`` can follow exactly two syntactic shapes --
-        ``load_manifest(...)`` and ``alias.load_manifest(...)`` -- so every
-        other way the function object can travel to a call site is, by
-        construction, a shape the walker does not resolve, and is therefore
-        ``Unclassified``. The rule is "any reference, minus resolved call
-        position": it names no spelling, exempts no file, and has no branch for
-        ``functools.partial`` or any other particular idiom, so a rebinding
-        nobody has thought of yet blocks the first time it is written.
+        R-P10. The exemption set is not computed here. It IS
+        ``self.classified_call_funcs``, which ``_classify`` writes at the one
+        point it commits to a call. There is exactly one traversal, ``_visit``,
+        and exactly one line that decides what "the walker resolved this"
+        means; this rule is its complement, so whatever the classifier did not
+        resolve blocks.
 
-        The complement is taken over the WHOLE module tree, not the statements
-        ``_walk`` descends into, because a reference needs no scope resolution
-        to be dangerous: a decorator, a default argument, a lambda body and a
-        comprehension can all carry the function object out of sight.
+        Round four computed the exemption set here instead, from a SECOND
+        ``ast.walk`` over the whole module tree, while classification entered
+        through ``_walk``/``_scope_nodes``, which yields a ``def``/``class`` and
+        then returns without visiting its ``decorator_list``, ``args.defaults``,
+        ``args.kw_defaults``, annotations or ``ClassDef.bases``. Those positions
+        were exempted by one traversal and never reached by the other, so the
+        identical expression ``ingest.load_manifest(Path("m"))`` failed in
+        statement position and passed SILENTLY in five of them. Two predicates
+        maintained separately diverge. There is now only one.
         """
-        resolved_call_position = {
-            id(node.func)
-            for node in ast.walk(self.tree)
-            if isinstance(node, ast.Call)
-            and _callee_name(node.func) == CONSUMER_FUNCTION
-        }
         for node in ast.walk(self.tree):
-            if id(node) in resolved_call_position:
+            if id(node) in self.classified_call_funcs:
                 continue
             if isinstance(node, ast.Attribute) and node.attr == CONSUMER_FUNCTION:
-                shape = "an attribute reference outside call position"
+                shape = "an attribute reference the classifier never resolved"
             elif (isinstance(node, ast.Name) and node.id == CONSUMER_FUNCTION
                     and isinstance(node.ctx, ast.Load)):
-                shape = "a bare name load outside call position"
+                shape = "a bare name load the classifier never resolved"
             elif (isinstance(node, ast.Subscript)
                     and isinstance(node.slice, ast.Constant)
                     and node.slice.value == CONSUMER_FUNCTION):
@@ -642,27 +679,65 @@ class _Module:
             )
 
     def _walk(self, body, envs, found) -> None:
+        """Walk a scope's ``body``. ``envs`` is the ENCLOSING scope chain."""
         envs = envs + (_scope_env(body),)
         for statement in body:
-            for node in _scope_nodes(statement):
-                if isinstance(node, _SCOPE_BOUNDARIES):
-                    self._walk(node.body, envs, found)
-                elif isinstance(node, ast.Call):
-                    site = self._classify(node, envs)
-                    if site is not None:
-                        found.append(site)
+            self._visit(statement, envs, found)
+
+    def _visit(self, node_or_expression, envs, found) -> None:
+        """Classify every call under ``node_or_expression`` that runs in ``envs``.
+
+        This is the walker's only traversal. Every ``Call`` it reaches is
+        handed to ``_classify``, which records the ones it commits to; the
+        blocker's exemption set is that record and nothing else.
+        """
+        for node in _scope_nodes(node_or_expression):
+            if isinstance(node, _SCOPE_BOUNDARIES):
+                # R-P11. A decorator, a parameter default, an annotation and a
+                # class base all execute where the `def`/`class` is WRITTEN, at
+                # definition time, so they are visited with the enclosing
+                # `envs` -- never with the new scope's env, which `_walk`
+                # builds only for `node.body` on the next line. Resolving a
+                # default's names against the inner scope would produce wrong
+                # resolutions; `_scope_nodes` still refuses to enter the
+                # boundary, so inner bindings do not leak outward.
+                for outer in _definition_time_expressions(node):
+                    self._visit(outer, envs, found)
+                self._walk(node.body, envs, found)
+            elif isinstance(node, ast.Call):
+                site = self._classify(node, envs)
+                if site is not None:
+                    found.append(site)
 
     def _classify(self, node: ast.Call, envs) -> dict | None:
         func = node.func
-        if (_callee_name(func) == "getattr" and len(node.args) >= 2
-                and isinstance(node.args[1], ast.Constant)
-                and node.args[1].value == CONSUMER_FUNCTION):
-            raise Unclassified(
-                f"{self.path}:{node.lineno}: load_manifest is reached through "
-                "getattr; the callee cannot be resolved statically"
-            )
+        # R-P12. The consumer's name written as a string INSIDE this call's
+        # arguments means the callee is selected at runtime by that string.
+        # Exact equality, no substring. This is one rule where there were
+        # three names: it covers `getattr(mod, "load_manifest")`,
+        # `operator.attrgetter("load_manifest")` and a dispatch table built in
+        # place, and covers the fourth such builtin nobody has written yet.
+        for argument in (*node.args, *(kw.value for kw in node.keywords)):
+            for inner in ast.walk(argument):
+                if (isinstance(inner, ast.Constant)
+                        and isinstance(inner.value, str)
+                        and inner.value == CONSUMER_FUNCTION):
+                    raise Unclassified(
+                        f"{self.path}:{node.lineno}: the string "
+                        f"{CONSUMER_FUNCTION!r} is passed as an argument, so the "
+                        "callee it names is chosen at runtime and whether that "
+                        "call passes contract_schema cannot be decided statically"
+                    )
         if _callee_name(func) != CONSUMER_FUNCTION:
             return None
+        # R-P10. THE exemption set, recorded at the one point the classifier
+        # commits to a call: past this line the call is either resolved to a
+        # module file or explicitly refused below. Recording in `_walk`
+        # instead -- i.e. for every call merely walked past -- would exempt
+        # `TABLE["load_manifest"](...)`, whose `func` the classifier is handed
+        # but cannot name; that shape was blocked in round four and must stay
+        # blocked. Executed: see test_the_name_as_a_string_blocks[dict-dispatch].
+        self.classified_call_funcs.add(id(func))
         if isinstance(func, ast.Attribute):
             if not isinstance(func.value, ast.Name):
                 raise Unclassified(
@@ -706,6 +781,172 @@ def discover_load_manifest_call_sites() -> list[dict]:
     return sites
 
 
+# --- R-P10/R-P11: the coupling is CHECKED, not reviewed ------------------------
+#
+# Round four's exemption set was computed by its own `ast.walk` of the whole
+# module while classification entered through `_walk`/`_scope_nodes`, which
+# yields a def/class and returns without visiting its decorators, defaults,
+# annotations or bases. The identical expression failed in statement position
+# and passed SILENTLY in five others. The tests below make that class of
+# divergence a red suite instead of a review finding.
+
+_TARGET_CONSUMER = "target-consumer.py"
+
+_FIXTURE_PREAMBLE = f"""\
+import importlib.util
+from pathlib import Path
+
+
+def _load_ingest():
+    spec = importlib.util.spec_from_file_location(
+        "ingest", Path(__file__).parent / {_TARGET_CONSUMER!r})
+    return importlib.util.module_from_spec(spec)
+
+
+ingest = _load_ingest()
+"""
+
+# ONE expression. The positions are the only thing that varies.
+_THE_CALL = 'ingest.load_manifest(Path("m"))'
+
+SEVEN_POSITIONS = {
+    "1-statement": f"{_THE_CALL}\n",
+    "2-decorator": f"@{_THE_CALL}\ndef decorated():\n    pass\n",
+    "3-positional-default": f"def positional(manifest={_THE_CALL}):\n    pass\n",
+    "4-keyword-only-default": f"def keyword_only(*, manifest={_THE_CALL}):\n    pass\n",
+    "5-annotation": f"def annotated(manifest: {_THE_CALL}) -> None:\n    pass\n",
+    "6-class-base": f"class Derived({_THE_CALL}):\n    pass\n",
+    "7-lambda-body": f"loader = lambda: {_THE_CALL}\n",
+}
+
+
+def _fixture_module(tmp_path: Path, name: str, source: str) -> tuple[Path, Path]:
+    target = tmp_path / _TARGET_CONSUMER
+    target.write_text(
+        "def load_manifest(path, *, contract_schema=None):\n    return path\n"
+    )
+    module_path = tmp_path / f"{name}.py"
+    module_path.write_text(_FIXTURE_PREAMBLE + source)
+    return module_path, target.resolve()
+
+
+def _outcome(module_path: Path, target: Path, monkeypatch) -> tuple[str, set[int], set[int]]:
+    """Run the walker over one fixture and report what it did.
+
+    Returns the outcome and the two sets that R-P10 requires to be the same
+    one: what ``_classify`` was actually handed, and the exemption set the
+    blocker complements against.
+    """
+    handed_to_classify: list[int] = []
+    original = _Module._classify
+
+    def spy(self, node, envs):
+        handed_to_classify.append(id(node.func))
+        return original(self, node, envs)
+
+
+    monkeypatch.setattr(_Module, "_classify", spy)
+
+    module = _Module(module_path)
+    outcome = "SILENT"
+    try:
+        sites = module.call_sites()
+    except Unclassified:
+        outcome = "BLOCKED"
+    else:
+        if any(site["resolved_callee"] == target for site in sites):
+            outcome = "CLASSIFIED"
+    return outcome, set(handed_to_classify), module.classified_call_funcs
+
+
+@pytest.mark.parametrize("position", sorted(SEVEN_POSITIONS), ids=sorted(SEVEN_POSITIONS))
+def test_no_position_of_the_same_call_passes_silently(position, tmp_path, monkeypatch) -> None:
+    """R-P11. The same expression, seven places Python will execute it.
+
+    A positional default is a real executing call: Python evaluates defaults at
+    definition time, in the enclosing scope. So are a decorator, a keyword-only
+    default, an annotation without ``from __future__ import annotations``, a
+    class base and a lambda body.
+    """
+    module_path, target = _fixture_module(
+        tmp_path, position.replace("-", "_"), SEVEN_POSITIONS[position]
+    )
+    outcome, handed, exempted = _outcome(module_path, target, monkeypatch)
+
+    # (a) R-P10. Nothing is exempt that the classifier was not handed. This is
+    # exactly what round four violated: its exemption set was computed by a
+    # second `ast.walk` and covered these six positions, which `_walk` never
+    # visited, so the set contained ids the classifier had never seen.
+    assert exempted <= handed, (
+        f"{position}: {len(exempted - handed)} call(s) are exempt from blocking "
+        "that the classifier was never handed; a separately computed exemption "
+        "set has come back"
+    )
+    # And here the exemption is precisely the one `ingest.load_manifest` callee
+    # in the fixture -- the preamble's other calls resolve to nothing and are
+    # exempt from nothing.
+    assert len(exempted) == 1, f"{position}: exempted {len(exempted)} callees, expected 1"
+    # (b) The invariant that holds whether or not `_walk` descends into
+    # definition-time expressions: unseen means blocked, never silent.
+    assert outcome != "SILENT", (
+        f"{position}: {_THE_CALL} was neither classified nor blocked. It is the "
+        "identical expression that fails in statement position."
+    )
+    # And, since `_walk` now visits those positions, the stronger result: the
+    # call is resolved to its module, not merely refused.
+    assert outcome == "CLASSIFIED", f"{position}: expected CLASSIFIED, got {outcome}"
+
+
+@pytest.mark.parametrize(
+    "spelling",
+    [
+        'getattr(ingest, "load_manifest")(Path("m"))',
+        'import operator\noperator.attrgetter("load_manifest")(ingest)(Path("m"))',
+        'TABLE = {"load_manifest": print}\nTABLE["load_manifest"](Path("m"))',
+    ],
+    ids=["getattr", "operator.attrgetter", "dict-dispatch"],
+)
+def test_the_name_as_a_string_blocks(spelling, tmp_path, monkeypatch) -> None:
+    """R-P12. One rule, not a list of the builtins that do this.
+
+    Any ``ast.Constant`` equal to the consumer's name EXACTLY, anywhere inside a
+    call's arguments, means the callee is chosen at runtime by that string.
+    Round four named ``getattr`` and caught it while its twin
+    ``operator.attrgetter("load_manifest")`` passed silently.
+    """
+    module_path, target = _fixture_module(tmp_path, "by_string", spelling + "\n")
+    outcome, handed, exempted = _outcome(module_path, target, monkeypatch)
+    assert exempted <= handed
+    assert not exempted, f"{spelling!r} exempted a callee it could not resolve"
+    assert outcome == "BLOCKED", f"{spelling!r} was not blocked: {outcome}"
+
+
+def test_the_consumer_refuses_a_missing_schema_at_runtime() -> None:
+    """The residual risk claimed in the docstring below, executed.
+
+    A caller this walker misses cannot ingest unverified; it dies on the
+    operator's first invocation. That is the bound on what the static check
+    leaves uncovered, and it is checked here rather than asserted in prose.
+    """
+    import importlib.util
+    import sys
+
+    for extra in (FISCAL_CONSUMER.parent, REPO / "packages" / "svs_common"):
+        if str(extra) not in sys.path:
+            sys.path.insert(0, str(extra))
+    spec = importlib.util.spec_from_file_location("_fiscal_consumer", FISCAL_CONSUMER)
+    consumer = importlib.util.module_from_spec(spec)
+    # dataclasses resolves annotations through sys.modules at class-creation
+    # time, so the module must be registered before its body runs.
+    sys.modules[spec.name] = consumer
+    try:
+        spec.loader.exec_module(consumer)
+    finally:
+        sys.modules.pop(spec.name, None)
+    with pytest.raises(consumer.FiscalIngestError, match="--contract-schema is required"):
+        consumer.load_manifest(REPO / "does-not-exist.jsonl")
+
+
 def _declared_enforced_at() -> dict[str, list[str]]:
     """Every contractPin.enforcedAt in every source package, found structurally."""
     def walk(node, path, out):
@@ -744,42 +985,65 @@ def test_every_load_manifest_caller_enforces_the_pin() -> None:
        fails this with no human updating a list; so does a stale entry.
     3. Anything the walker cannot classify raises ``Unclassified`` and fails
        the test, so breaking the checker blocks rather than quietly passing.
-       Concretely, and no more broadly than this:
 
-       DETECTED, because each one mentions ``load_manifest`` literally in the
-       source and is therefore visible to a syntactic rule --
+       There is exactly ONE traversal, ``_visit``. ``_classify`` records
+       ``id(func)`` for each call it commits to, and
+       ``_block_on_unresolved_references`` blocks on every reference to the
+       name that is not in THAT record. The blocker is the classifier's
+       complement, not a second opinion about the same question, because two
+       predicates maintained separately diverge -- which is precisely how round
+       four exempted decorators and defaults that its classifier never visited.
 
+       DETECTED. Each item below was executed against a fixture module, not
+       reasoned about --
+
+       * every call in the seven positions Python actually evaluates the
+         expression in -- statement, decorator, positional default,
+         keyword-only default, annotation, class base, lambda body -- all
+         resolved to their module file, none silent
+         (``test_no_position_of_the_same_call_passes_silently``);
        * a call the walker cannot resolve to a module file (the alias is an
          imported module, the callee is a non-name expression, the factory
          loads more than one module);
-       * ``getattr(mod, "load_manifest")``;
        * a call whose ``contract_schema`` might be hidden in a ``**kwargs``
          splat;
-       * ANY reference to the name outside resolved call position -- an
-         attribute, a bare name load, or a subscript by the string literal.
-         That is the complement of the two shapes ``_classify`` follows, so
-         alias assignment, ``functools.partial``, a dispatch table and
+       * the name written as a string literal inside any call's arguments, by
+         exact equality -- which is one rule where there were three names, and
+         blocks ``getattr(mod, "load_manifest")``,
+         ``operator.attrgetter("load_manifest")`` and an inline dispatch table
+         alike (``test_the_name_as_a_string_blocks``);
+       * ANY reference to the name outside a call the classifier resolved --
+         an attribute, a bare name load, or a subscript by the string literal.
+         That is the complement of the classifier's own record, so alias
+         assignment, ``functools.partial``, ``TABLE["load_manifest"]()`` and
          ``runpy.run_path(...)["load_manifest"]`` all land here without being
-         named anywhere in this file.
+         named anywhere in this file. All four were executed as mutations.
 
-       NOT DETECTED, and deliberately not claimed --
+       NOT DETECTED. Claimed no more broadly than this, because each was
+       executed and observed to pass silently --
 
-       * a callee reached through a name that is never written literally
-         (``getattr(mod, "load_" + "manifest")``, ``table[key]()`` for a
-         computed ``key``, ``exec`` of generated source): there is nothing in
-         the AST to match;
-       * anything outside the scope of `_tracked_python_files` -- this repo's
-         own top-level ``tests/``, git-ignored trees, non-Python runners, and
-         any caller living in another repository;
+       * a callee named by a string this walker never sees as a literal in
+         call-argument position: ``getattr(mod, "load_" + "manifest")``, a
+         computed dispatch key, ``exec`` of generated source, and -- the case
+         the string rule does NOT reach -- a literal bound to a variable first,
+         ``NAME = "load_manifest"`` then ``getattr(mod, NAME)``;
+       * anything outside the scope of ``_tracked_python_files``: this repo's
+         own top-level ``tests/`` (excluded by ``parts[0] == "tests"``, because
+         it deliberately calls the consumer both ways), git-ignored trees,
+         non-Python runners, and any caller living in another repository;
        * whether the value passed as ``contract_schema`` is the RIGHT schema.
-         This proves an argument is passed, not that it is correct.
+         This proves an argument is PASSED. It does not prove it is correct.
 
-       The residual risk this leaves is bounded, and is the reason the check is
-       worth having rather than a claim that it is sufficient: the consumer
-       hard-refuses a missing schema at RUNTIME, so a caller this walker misses
-       still cannot ingest unverified. What it would do is ship CI-green and
-       die on an operator's first invocation -- round two's failure mode, which
-       is what this check exists to catch before an operator does.
+       Nothing broader is claimed. Three previous versions of this list each
+       asserted something false, so every line above names the test or mutation
+       that produced it.
+
+       The residual is bounded, and the bound is executed rather than asserted:
+       the consumer raises ``FiscalIngestError`` when ``contract_schema`` is
+       ``None`` (``test_the_consumer_refuses_a_missing_schema_at_runtime``), so
+       a caller this walker misses still cannot ingest unverified. It would
+       ship CI-green and die on an operator's first invocation -- round two's
+       failure mode, which is what this check exists to catch first.
     """
     sites = discover_load_manifest_call_sites()
     assert sites, "the walker found no load_manifest calls at all; it is broken"

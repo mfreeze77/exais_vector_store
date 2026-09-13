@@ -194,8 +194,8 @@ the FILE its callee actually lives in — following the importlib
 `spec_from_file_location` target behind each module alias — and requires
 `contractPin.enforcedAt` to equal the discovered set exactly, in both
 directions, in all four declaring files. Name matching would be wrong here:
-`scripts/release/kscourts-ingest.py:73` defines an unrelated function of the
-same name, and `scripts/release/kscourts-decrypted-marker-retry.py:97` calls it.
+`scripts/release/kscourts-ingest.py` defines an unrelated function of the same
+name, and `scripts/release/kscourts-decrypted-marker-retry.py` calls it.
 That call site is excluded because its `ingest` alias resolves to
 `scripts/release/kscourts-ingest.py`, which is not the fiscal consumer — by
 resolution, not by any filename special case. A call site the walker cannot
@@ -208,17 +208,12 @@ it finds. Run that test for the current set; a count written into this ticket
 would be a second, unchecked copy of exactly the list this mechanism exists to
 stop maintaining by hand.
 
-The table below is an ILLUSTRATION of the shape of that output, kept because it
-shows why the `kscourts` sites are excluded by resolution rather than by name.
-Nothing checks its line numbers, and they will drift.
-
-| call site | resolved callee | enforced |
-| --- | --- | --- |
-| `scripts/release/kansas-fiscal-document-ingest.py:991` | itself | yes |
-| `scripts/release/kansas-fiscal-marker-handoff.py:278` | `kansas-fiscal-document-ingest.py` | yes |
-| `scripts/release/kansas-statute-rollout.py:92` | `kansas-fiscal-document-ingest.py` | yes |
-| `scripts/release/kscourts-decrypted-marker-retry.py:97` | `kscourts-ingest.py` | n/a, different module |
-| `scripts/release/kscourts-ingest.py:931` | itself | n/a, different module |
+R-P13. A five-row illustration of that output used to sit here, labelled as an
+unchecked example whose line numbers would drift. A hand list that announces it
+will drift has no value; it was deleted. The deriving test prints the live set
+in its own failure message, and the paragraph above explains why the `kscourts`
+sites are excluded by resolution rather than by name -- which needs no line
+numbers.
 
 **R-P8 — the rollout suite is workstation-bound, and stays that way.** No pin
 and no INDEX hash was loosened. `tests/test_kansas_statute_rollout.py` requires
