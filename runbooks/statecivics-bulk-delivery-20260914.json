@@ -1,0 +1,471 @@
+{
+  "after_backup": {
+    "bytes": 331918132,
+    "path": "/Users/mfrieson/Developer/exais-backups/bulk-candidates-20260914/operator112-after-bulk.dump",
+    "pg_restore_catalog_verified": true,
+    "sha256": "1fe919023765a126e470a7a23d408195b7806049a8c586f73665cfd404894bf7"
+  },
+  "api_image": "sha256:5424d7bed8160eff34b922dd223dd84dfb973501487fc2edf6179f7a0fade7e1",
+  "before_backup": {
+    "bytes": 331244667,
+    "path": "/Users/mfrieson/Developer/exais-backups/bulk-candidates-20260914/operator112-before-bulk.dump",
+    "pg_restore_catalog_verified": true,
+    "sha256": "f870d5cc5a25c4826ef3d7ba89bc999d011dd0123e94fa8990fd2ae9e558a35b"
+  },
+  "bulk_cli_commit": "74ac0e991a40f9869d81e1094e12d313a9f472fd",
+  "candidate_apply": {
+    "collection": "svs_biz_ks_state_civics_statecivics_candidates_openai_small_v1",
+    "embedded": 2588,
+    "mode": "apply",
+    "parts": 26,
+    "records": 2588,
+    "source_manifest_sha256": "5155056a4b2d411896787ff6e681d90a8cd58655cf3ddf6805849ca9dccc791b",
+    "unchanged": 0,
+    "written": 2588
+  },
+  "candidate_cli_repeat": {
+    "applied": true,
+    "batch_count": 26,
+    "collection": "svs_biz_ks_state_civics_statecivics_candidates_openai_small_v1",
+    "completed_batches": 26,
+    "embedded": 0,
+    "entity_path": "candidate",
+    "manifest_sha256": "5155056a4b2d411896787ff6e681d90a8cd58655cf3ddf6805849ca9dccc791b",
+    "record_count": 2588,
+    "unchanged": 2588,
+    "written": 0
+  },
+  "complete_local_evidence_root": "/Users/mfrieson/Developer/exais-backups/bulk-candidates-20260914",
+  "date": "2026-09-14",
+  "interruptions": [
+    {
+      "batch": 19,
+      "candidate_points_after_failure": 1802,
+      "cause": "model-gateway provider request httpcore.ReadTimeout, propagated as HTTP 500 before batch index_write",
+      "completed_batches_before_interruption": 18,
+      "recovery": "resume from existing confirmed batch receipts; same manifest bytes and record digests",
+      "usage_limitation": "completed-batch embedded counts exclude embeddings discarded before the failed batch; not total provider request usage"
+    },
+    {
+      "batch": 21,
+      "candidate_points_after_failure": 2002,
+      "cause": "model-gateway provider request httpcore.ConnectError, propagated as HTTP 500 before index_write",
+      "completed_batches_before_interruption": 20,
+      "recovery": "resume confirmed receipts; same manifest",
+      "usage_limitation": "successful batch embedded total excludes incomplete batch activity"
+    }
+  ],
+  "ledger_apply": {
+    "actions": 2393,
+    "after_sha256": "2bc03c263c883f2120dea8a6434aed7e6b87aa0491a4d8acdc3380c1953df2f2",
+    "applied": true,
+    "before_sha256": "47546cbfcbec17f42fbffc0ad5a2752a8b7280e820de822853f98e8e5b14f065",
+    "code_commit": "04e3fc0a7413147a6a95f8c872ae821f36e20780",
+    "plan_sha256": "19d9f53ee882a5b607a967c3eb7603e6cd4cc65627974b46455b062ae664f6bc",
+    "provisions": 198,
+    "rows_written": 2586,
+    "schema": "112_appropriation_amount_kind",
+    "spans": 2588
+  },
+  "ledger_repeat": {
+    "actions": 2393,
+    "after_sha256": "2bc03c263c883f2120dea8a6434aed7e6b87aa0491a4d8acdc3380c1953df2f2",
+    "applied": true,
+    "before_sha256": "2bc03c263c883f2120dea8a6434aed7e6b87aa0491a4d8acdc3380c1953df2f2",
+    "code_commit": "04e3fc0a7413147a6a95f8c872ae821f36e20780",
+    "plan_sha256": "7994aab9c7e7388c9deeff007e1e9dd5fd7a1567bdf99a52160341e7a9876395",
+    "provisions": 198,
+    "rows_written": 0,
+    "schema": "112_appropriation_amount_kind",
+    "spans": 2588
+  },
+  "producer_artifact_commit": "c49d7105",
+  "qdrant_backup": {
+    "bytes": 41414656,
+    "path": "/Users/mfrieson/Developer/exais-backups/bulk-candidates-20260914/qdrant-candidates-after-bulk.snapshot",
+    "restore_exercised": false,
+    "sha256": "9d781a2381733a576073bfb6f46883d4817db894165c55a88b3df632adaeec3d",
+    "source_snapshot": {
+      "checksum": "9d781a2381733a576073bfb6f46883d4817db894165c55a88b3df632adaeec3d",
+      "creation_time": "2026-09-14T21:03:43",
+      "name": "svs_biz_ks_state_civics_statecivics_candidates_openai_small_v1-2231458465670690-2026-09-14-21-03-43.snapshot",
+      "size": 41414656
+    }
+  },
+  "review_items": {
+    "claimant_or_leading_passages": 8,
+    "other_spending_language_entries": 50,
+    "total": 58
+  },
+  "scope": "local candidate delivery; retained enrolled HB 2513; no review promotion or public UI deployment",
+  "source": {
+    "as_of": "2026-09-14",
+    "code_commit": "04e3fc0a7413147a6a95f8c872ae821f36e20780",
+    "manifest_bytes": 7501775,
+    "manifest_sha256": "5155056a4b2d411896787ff6e681d90a8cd58655cf3ddf6805849ca9dccc791b",
+    "record_counts": {
+      "appropriation_action": 2391,
+      "provision_reference": 197
+    }
+  },
+  "usage_note": "Confirmed-batch embedding counts are not total provider usage. Two failed batches performed uncounted embedding requests before retry, and three retrieval queries embedded their queries.",
+  "verification": {
+    "collections_after": {
+      "svs_biz_ks_state_civics_openai_text_embedding_3_small_1536": 12579,
+      "svs_biz_ks_state_civics_statecivics_candidates_openai_small_v1": 2588,
+      "svs_biz_ks_state_civics_voyage_4_docs_1024": 83858
+    },
+    "collections_before": {
+      "svs_biz_ks_state_civics_openai_text_embedding_3_small_1536": 12579,
+      "svs_biz_ks_state_civics_statecivics_candidates_openai_small_v1": 2,
+      "svs_biz_ks_state_civics_voyage_4_docs_1024": 83858
+    },
+    "live_path_refusal": {
+      "detail": {
+        "error": "CandidateRecordRefused",
+        "message": "refusing entity record 'bb03920cd762c1719c390688ab7934c04ca4356edc8f50302d0f3442f5a3f56f' (appropriation_action 'ks-approp-action:00386a3fa43cd13d5843ce0e476638f6d0148d64486cb2a9613ba4374f1993b1:account-0fb59dccef7633ba:n1' revision 1) for the live entity store: eligibility.status is 'candidate', and the live store admits only ['published', 'reviewed']. Stage it on the 'candidate' path instead. Nothing has been embedded or indexed."
+      }
+    },
+    "queries": [
+      {
+        "query": "PKU treatment appropriation fiscal year 2027",
+        "rank": 1,
+        "record": {
+          "as_of": {
+            "as_of_date": "2026-09-14",
+            "declared": true,
+            "snapshot_id": "hb2513-bulk-durable-20260914"
+          },
+          "derivation": {
+            "derivation_id": null,
+            "hash_adapter": "none_stored_as_is",
+            "input_set_hash_sha256": null,
+            "output_set_hash_sha256": null
+          },
+          "description": {
+            "input_sha256": "eb3daa61218e991f369aa4a2ecde7d388fca9a4b72ac7b8dfcc507a55783f10a",
+            "inputs": [
+              "action_type",
+              "display_label",
+              "period_label"
+            ],
+            "template_id": "ks650.appropriation_action.source_label.v2",
+            "template_sha256": "e4d09d31674f2ade448164f73aff9016a7b065d38077ff4eb545b15a2536112c",
+            "text": "PKU treatment (264-00-1000-1710): appropriate appropriation action for fiscal year ending June 30, 2027"
+          },
+          "eligibility": {
+            "human_reviewed": false,
+            "publication_allowed": null,
+            "review_level": "none",
+            "status": "candidate"
+          },
+          "entity": {
+            "action_type": "appropriate",
+            "amount": {
+              "currency": "USD",
+              "value": "199274.0000"
+            },
+            "amount_kind": "stated",
+            "appropriation_action_id": "ks-approp-action:d445fa9ed2ac96ea3de8b2b7bf04263e1f0354daead2f860b99518a87b87f225:account-e11a2d63284e6c3a:n1",
+            "bill_id": "ocd-bill/kliss-hb2513",
+            "bill_version_id": 4782,
+            "conditions": [
+              "PKU treatment (264-00-1000-1710)    $199,274"
+            ],
+            "period": {
+              "end": "2027-06-30",
+              "kind": "fiscal_year",
+              "label": "fiscal year ending June 30, 2027"
+            },
+            "provision_reference_logical_id": "d445fa9ed2ac96ea3de8b2b7bf04263e1f0354daead2f860b99518a87b87f225",
+            "provision_reference_revision": 1,
+            "review": {
+              "human_reviewed": false,
+              "review_level": "none"
+            },
+            "revision": 1,
+            "source": {
+              "locator": "text_offsets [295563, 295607)",
+              "source_revision_id": "01a09cda-2fa6-7143-9e7c-7b539adb86db",
+              "source_span_id": "01a0a199-5274-7009-9f62-31a4af4ab6e7"
+            },
+            "status": "candidate"
+          },
+          "entity_logical_id": "ks-approp-action:d445fa9ed2ac96ea3de8b2b7bf04263e1f0354daead2f860b99518a87b87f225:account-e11a2d63284e6c3a:n1",
+          "entity_revision": 1,
+          "entity_type": "appropriation_action",
+          "export_record_id": "d0389a81da27c0b587e7c9bd58a8daff42825109700641e7f202abc074b5547e",
+          "exporter": {
+            "code_commit": "04e3fc0a7413147a6a95f8c872ae821f36e20780",
+            "name": "statecivics_retrieval_exporter",
+            "version": "retrieval-export-1"
+          },
+          "ingestion": {
+            "action": "upsert",
+            "mode": "api_only",
+            "recall_evaluation_required": true,
+            "target_instance_slug": "ks-state-civics",
+            "target_vector_store_slug": "kansas-appropriation-candidates"
+          },
+          "jurisdiction": "ocd-jurisdiction/country:us/state:ks/government",
+          "lifecycle": {
+            "reason": null,
+            "removal_required": false,
+            "replaced_by": null,
+            "state": "current"
+          },
+          "record_digest_algorithm": "statecivics-canonical-json-v1",
+          "record_digest_sha256": "383e3a0052945ad61b3191842022754f675b31ba9389c2622bc305ff6a5aec6e",
+          "record_kind": "entity_projection",
+          "record_version": 1,
+          "relationships": [
+            {
+              "basis": "exact_shared_identifier",
+              "relationship_type": "action_relies_on_provision",
+              "target": {
+                "provision_reference_logical_id": "d445fa9ed2ac96ea3de8b2b7bf04263e1f0354daead2f860b99518a87b87f225",
+                "provision_reference_revision": 1
+              }
+            },
+            {
+              "basis": "exact_shared_identifier",
+              "relationship_type": "action_enacted_by_bill_version",
+              "target": {
+                "bill_version_id": 4782
+              }
+            }
+          ]
+        },
+        "score": 0.87615645
+      },
+      {
+        "query": "Sexually violent predator expense fund appropriation fiscal year 2027",
+        "rank": 1,
+        "record": {
+          "as_of": {
+            "as_of_date": "2026-09-14",
+            "declared": true,
+            "snapshot_id": "hb2513-bulk-durable-20260914"
+          },
+          "derivation": {
+            "derivation_id": null,
+            "hash_adapter": "none_stored_as_is",
+            "input_set_hash_sha256": null,
+            "output_set_hash_sha256": null
+          },
+          "description": {
+            "input_sha256": "5193f8276bd99c25c5bd521ba61c6f5bf20fa968bc185952f0c4c8af6fcc8b6d",
+            "inputs": [
+              "action_type",
+              "display_label",
+              "period_label"
+            ],
+            "template_id": "ks650.appropriation_action.source_label.v2",
+            "template_sha256": "e4d09d31674f2ade448164f73aff9016a7b065d38077ff4eb545b15a2536112c",
+            "text": "Sexually violent predator expense fund (082-00-2379-2310): appropriate appropriation action for fiscal year ending June 30, 2027"
+          },
+          "eligibility": {
+            "human_reviewed": false,
+            "publication_allowed": null,
+            "review_level": "none",
+            "status": "candidate"
+          },
+          "entity": {
+            "action_type": "appropriate",
+            "amount_kind": "no_limit",
+            "appropriation_action_id": "ks-approp-action:b2532b6462334f8b4c708b1722f25da9965efaa8763c34c4d1a5cd3f839960c3:account-a03bfc22a46964ec:n1",
+            "bill_id": "ocd-bill/kliss-hb2513",
+            "bill_version_id": 4782,
+            "conditions": [
+              "Sexually violent predator\nexpense fund (082-00-2379-2310)    No limit"
+            ],
+            "period": {
+              "end": "2027-06-30",
+              "kind": "fiscal_year",
+              "label": "fiscal year ending June 30, 2027"
+            },
+            "provision_reference_logical_id": "b2532b6462334f8b4c708b1722f25da9965efaa8763c34c4d1a5cd3f839960c3",
+            "provision_reference_revision": 1,
+            "review": {
+              "human_reviewed": false,
+              "review_level": "none"
+            },
+            "revision": 1,
+            "source": {
+              "locator": "text_offsets [47091, 47160)",
+              "source_revision_id": "01a09cda-2fa6-7143-9e7c-7b539adb86db",
+              "source_span_id": "01a0a199-4b49-7406-aaf5-7f77d5a053be"
+            },
+            "status": "candidate"
+          },
+          "entity_logical_id": "ks-approp-action:b2532b6462334f8b4c708b1722f25da9965efaa8763c34c4d1a5cd3f839960c3:account-a03bfc22a46964ec:n1",
+          "entity_revision": 1,
+          "entity_type": "appropriation_action",
+          "export_record_id": "96318a0e40d7cf84f3c57f0532a57ad2c39e03fc42f94363e04945a8d0c942a1",
+          "exporter": {
+            "code_commit": "04e3fc0a7413147a6a95f8c872ae821f36e20780",
+            "name": "statecivics_retrieval_exporter",
+            "version": "retrieval-export-1"
+          },
+          "ingestion": {
+            "action": "upsert",
+            "mode": "api_only",
+            "recall_evaluation_required": true,
+            "target_instance_slug": "ks-state-civics",
+            "target_vector_store_slug": "kansas-appropriation-candidates"
+          },
+          "jurisdiction": "ocd-jurisdiction/country:us/state:ks/government",
+          "lifecycle": {
+            "reason": null,
+            "removal_required": false,
+            "replaced_by": null,
+            "state": "current"
+          },
+          "record_digest_algorithm": "statecivics-canonical-json-v1",
+          "record_digest_sha256": "c764cd9694f9407c35814f11f54c61163448688c94794d6fc06e8f817ffe9474",
+          "record_kind": "entity_projection",
+          "record_version": 1,
+          "relationships": [
+            {
+              "basis": "exact_shared_identifier",
+              "relationship_type": "action_relies_on_provision",
+              "target": {
+                "provision_reference_logical_id": "b2532b6462334f8b4c708b1722f25da9965efaa8763c34c4d1a5cd3f839960c3",
+                "provision_reference_revision": 1
+              }
+            },
+            {
+              "basis": "exact_shared_identifier",
+              "relationship_type": "action_enacted_by_bill_version",
+              "target": {
+                "bill_version_id": 4782
+              }
+            }
+          ]
+        },
+        "score": 0.8949615
+      },
+      {
+        "query": "Nurse fair treatment and recovery fund appropriation fiscal year 2027",
+        "rank": 1,
+        "record": {
+          "as_of": {
+            "as_of_date": "2026-09-14",
+            "declared": true,
+            "snapshot_id": "hb2513-bulk-durable-20260914"
+          },
+          "derivation": {
+            "derivation_id": null,
+            "hash_adapter": "none_stored_as_is",
+            "input_set_hash_sha256": null,
+            "output_set_hash_sha256": null
+          },
+          "description": {
+            "input_sha256": "e93399055eb2a5c486035c072661dc85d75979be1e11ee16a53704851b39f852",
+            "inputs": [
+              "action_type",
+              "display_label",
+              "period_label"
+            ],
+            "template_id": "ks650.appropriation_action.source_label.v2",
+            "template_sha256": "e4d09d31674f2ade448164f73aff9016a7b065d38077ff4eb545b15a2536112c",
+            "text": "Nurse fair treatment and recovery fund: appropriate appropriation action for fiscal year ending June 30, 2027"
+          },
+          "eligibility": {
+            "human_reviewed": false,
+            "publication_allowed": null,
+            "review_level": "none",
+            "status": "candidate"
+          },
+          "entity": {
+            "action_type": "appropriate",
+            "amount_kind": "no_limit",
+            "appropriation_action_id": "ks-approp-action:ks-2025-2026-hb2513:v7:enrolled:section-15:subsection-b:appropriate",
+            "bill_id": "ocd-bill/kliss-hb2513",
+            "bill_version_id": 4782,
+            "conditions": [
+              "Nurse fair treatment and recovery fund    No limit"
+            ],
+            "period": {
+              "end": "2027-06-30",
+              "kind": "fiscal_year",
+              "label": "fiscal year ending June 30, 2027"
+            },
+            "provision_reference_logical_id": "f4cf16d51a9339c186343ece353dbd07fe2feef9e319770359fb9378ceb18998",
+            "provision_reference_revision": 2,
+            "review": {
+              "human_reviewed": false,
+              "review_level": "none"
+            },
+            "revision": 3,
+            "source": {
+              "locator": "text_offsets [7763, 7813)",
+              "source_revision_id": "01a09cda-2fa6-7143-9e7c-7b539adb86db",
+              "source_span_id": "01a0a168-d786-767d-a484-c31e6839ff2e"
+            },
+            "status": "candidate",
+            "supersedes_action_id": "ks-approp-action:ks-2025-2026-hb2513:v7:enrolled:section-15:subsection-b:appropriate",
+            "supersedes_action_revision": 2
+          },
+          "entity_logical_id": "ks-approp-action:ks-2025-2026-hb2513:v7:enrolled:section-15:subsection-b:appropriate",
+          "entity_revision": 3,
+          "entity_type": "appropriation_action",
+          "export_record_id": "bc0bec5a6041cb78a700798ac8fbcda5d37501418a1155ca907ef092ff6397fb",
+          "exporter": {
+            "code_commit": "04e3fc0a7413147a6a95f8c872ae821f36e20780",
+            "name": "statecivics_retrieval_exporter",
+            "version": "retrieval-export-1"
+          },
+          "ingestion": {
+            "action": "upsert",
+            "mode": "api_only",
+            "recall_evaluation_required": true,
+            "target_instance_slug": "ks-state-civics",
+            "target_vector_store_slug": "kansas-appropriation-candidates"
+          },
+          "jurisdiction": "ocd-jurisdiction/country:us/state:ks/government",
+          "lifecycle": {
+            "reason": null,
+            "removal_required": false,
+            "replaced_by": null,
+            "state": "current"
+          },
+          "record_digest_algorithm": "statecivics-canonical-json-v1",
+          "record_digest_sha256": "813c2ba65bf2f54472cb42423451c24ee0548e8f4622260da98125a67e4cb85d",
+          "record_kind": "entity_projection",
+          "record_version": 1,
+          "relationships": [
+            {
+              "basis": "exact_shared_identifier",
+              "relationship_type": "action_relies_on_provision",
+              "target": {
+                "provision_reference_logical_id": "f4cf16d51a9339c186343ece353dbd07fe2feef9e319770359fb9378ceb18998",
+                "provision_reference_revision": 2
+              }
+            },
+            {
+              "basis": "exact_shared_identifier",
+              "relationship_type": "action_enacted_by_bill_version",
+              "target": {
+                "bill_version_id": 4782
+              }
+            },
+            {
+              "basis": "exact_shared_identifier",
+              "relationship_type": "action_supersedes_action",
+              "target": {
+                "appropriation_action_id": "ks-approp-action:ks-2025-2026-hb2513:v7:enrolled:section-15:subsection-b:appropriate",
+                "appropriation_action_revision": 2
+              }
+            }
+          ]
+        },
+        "score": 0.9181936
+      }
+    ],
+    "records_read_back_exactly": 2588,
+    "sample_vector_dimensions": 1536,
+    "source_manifest_sha256": "5155056a4b2d411896787ff6e681d90a8cd58655cf3ddf6805849ca9dccc791b"
+  },
+  "verification_command_commit": "4adb5febe0af91eee30992f469ac030c8effc981"
+}

@@ -1294,3 +1294,36 @@ request. The first run of the new test file used pytest's reserved `setup` name;
 it was renamed and all new tests then executed. The container used
 `ks-test-runner:formatnongpl`, both plain operator clones, network disabled, and
 `SVS_STATECIVICS_REPO=/upstream`. The original application image remains active.
+
+
+### Bulk delivery verified — 2026-09-14
+
+All 2,588 records were persisted through the running candidate API: 2,391 actions
+and 197 provisions. Complete Qdrant readback equals the producer artifact,
+record-for-record. Three fund queries returned the expected action at rank 1:
+PKU treatment ($199,274), sexually violent predator expense fund (No limit), and
+nurse fair treatment and recovery fund (No limit), each for FY ending 2027-06-30.
+The returned payloads carry durable source spans and match A's manifest exactly.
+
+The committed full-manifest CLI then completed all 26 batches with embedded=0,
+written=0, unchanged=2,588. Live-path ingestion independently refused candidates
+with HTTP 422. Document collections stayed at 83,858 and 12,579 points. The
+candidate API image and all other application containers were unchanged.
+
+Two provider failures interrupted the initial run: a read timeout at batch 19
+and a connection error at batch 21. Both occurred before that batch's index
+write. Resuming confirmed batch receipts completed the run. The 2,588 embedding
+count describes successful batches, not total provider usage; failed attempts
+and three search-query embeddings are additional activity.
+
+The repeatable verification command is committed in B at `4adb5fe` and was run
+from its plain operator clone in Docker. The entire corpus readback, three query
+responses, operator ledger fingerprints, pre/post backups and interrupted-run
+receipts are preserved in the delivery JSON. A Qdrant snapshot was downloaded
+outside Dropbox and its SHA-256 matched the server checksum. Its restore was not
+exercised. Fifty other-spending entries and eight claimant/leading passages stay
+cited review items; candidates were not promoted and the VPS UI was not deployed.
+
+Receipt: `runbooks/statecivics-bulk-delivery-20260914.json`. Commands:
+`runbooks/statecivics-candidate-bulk.md`. The historical pilot runbook now points
+to the full manifest and no longer suggests replaying superseded export metadata.
