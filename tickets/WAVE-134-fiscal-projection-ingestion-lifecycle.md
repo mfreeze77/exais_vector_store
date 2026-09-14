@@ -786,3 +786,93 @@ a single assertion would have hidden the distinction rather than checked it.
 
 **Item 7 is complete. Item 8 remains PREPARED AND NOT EXECUTED** — no image
 built, no digest recorded, no `.env.images` written, no container touched.
+
+### 2026-09-13 — round five: two real gaps closed, and the release proposal corrected
+
+**Both gaps reproduced here before anything was changed.** The second was worse
+than reported.
+
+**Gap 1 — envelope and payload were never related.** Changing only the
+ENVELOPE's `eligibility.status` to `published` leaves the PAYLOAD saying
+`candidate`. Executed on both real records: schema-valid `True`,
+`adapt_records` accepts, the live gate admits, **and the embed and index
+callbacks are reached**. The revision twin (envelope 2, payload 1) was
+schema-valid too. JSON Schema cannot express this — the two halves are
+validated against different contracts and nothing relates them.
+
+This was reported to me as a strength: "the same record with only `status`
+changed passes the live path" was my own single-reason discrimination in item 7,
+and it was proving the opposite of what it claimed. The test helper that built
+those twins rewrote one half of the record, so every use of it was testing a
+record that could not be true.
+
+`assert_envelope_payload_agreement` compares `entity_logical_id`,
+`entity_revision` and `eligibility.status` against the payload's identity,
+revision and status, and refuses on any mismatch with the field and BOTH values
+named. It runs in `adapt_records` after schema validation, and again in
+`admit_entity_records`, because records can reach the gate without coming from
+a manifest and every path to embedding runs through it. Removal records carry no
+payload by construction and are skipped rather than failed. **No schema change:
+the three digests recompute unmoved, asserted by test.**
+
+**Gap 2 — the guards were not wired to the function that embeds.** This is the
+sharper finding, and it is worse than "accepts a caller-supplied collection":
+driving `stage_entity_descriptors` with
+`svs_biz_ks_state_civics_voyage_4_docs_1024` embedded and indexed **into the
+shared statute and document collection**. The collision guard, the roster, the
+entity-store classification — all built, all passing their own tests, none of
+them called by the function that writes points. A guard nothing calls does not
+hold an invariant; it describes one. My own
+`test_entity_records_never_reach_the_shared_statute_collection` passed
+throughout, because it exercised a routing dict written in the test rather than
+the staging entrypoint.
+
+`stage_entity_descriptors` now resolves its destination through
+`resolve_staging_collection`, which calls `entity_collection_name` /
+`candidate_collection_name`. `collection=` became an ASSERTION: refused unless
+it equals what the guards resolve, so it can no longer select anything. Every
+guard is inherited through that seam — `DocumentCollectionRosterIncomplete` and
+`EntityCollectionCollision` both now refuse from inside staging, before any
+callback.
+
+**Ordering proved by inversion, three times, each reverted by `git checkout --`
+of the committed file with `git status --porcelain` empty after:**
+
+| experiment | result |
+|---|---|
+| remove the cross-field rule from the gate | 3 tests fail, incl. the pre-embed ordering one |
+| resolve the collection AFTER embedding | 4 tests fail; `AssertionError: embed was called before the eligibility gate refused a candidate` |
+| honour the caller's collection again (the original defect) | `test_r5_2_a_caller_supplied_document_collection_is_refused` fails |
+
+**Item 3 — release proposal corrected, and the finding that matters more.**
+
+The proposal in the earlier log entry named the WRONG CELL. The running cell is
+**`ks-fiscal-local`** (`exais-vector-store-ks-fiscal-local-*`), not
+`ks-state-civics`. Two further facts found while correcting it, both verified:
+
+* `.release/cells/ks-fiscal-local/.env.images` **does not exist** anywhere on
+  disk — only `ks-state-civics`, `local`, `restore`, `restore-src`,
+  `rm005-smoke` and `config-proof` are checked in. So the five superseded
+  digests quoted earlier are `ks-state-civics`'s and are NOT the running cell's.
+  The running containers report image ids `sha256:e7271b65…` (api) and
+  `sha256:d66e0316…` (worker), which is what a rollback for THIS cell would have
+  to be pinned against.
+* **There is no application caller of `adapt_manifest` or
+  `stage_entity_descriptors`.** `grep` over `scripts/`, `apps/` and `packages/`
+  outside the adapter itself returns nothing, and this is now asserted by
+  `test_r5_2g_there_is_no_application_caller_of_adapt_manifest`, which walks the
+  tracked source and FAILS when such a caller appears — the moment a rebuild
+  becomes meaningful. So a rebuild today would ship a library nothing invokes.
+
+Wiring `adapt_manifest` into `kansas-fiscal-document-ingest.py`'s dispatch is
+the remaining WAVE-134 scope and is P5-BUILD's first item, on the TEST image.
+**The cell rebuild is authorized only after that caller exists and is tested —
+not before. Item 8 stays PREPARED AND NOT EXECUTED**; the corrected proposal
+must also be re-derived for `ks-fiscal-local` once that cell's env and image
+pins are available, since the ones recorded earlier belong to a different cell.
+
+**Merge order acknowledged.** A merges first and reports its merge sha; I then
+delete the `PROVISIONAL_BRANCH_COMMIT` entry (its tripwire is designed to fail
+at exactly that moment — that failure is the signal), re-derive all three
+digests with my own walker against A's MERGE COMMIT, and report the three
+digests together with the sha they were computed from. Then B merges.
