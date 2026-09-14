@@ -26,8 +26,12 @@ def manifest(records):
     return body, hashlib.sha256(body.encode()).hexdigest()
 
 
-@pytest.fixture
-def records():
+@pytest.fixture(params=['schema_boundary', 'durable_operator'])
+def records(request):
+    if request.param == 'durable_operator':
+        path = ROOT / 'tests/fixtures/statecivics-hb2513-pilot-durable.0d199c6b.jsonl'
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == '0ac68077b9e18eb9b209382852620fb5ed786817bdb353b2e84c9b095029b7ae'
+        return [json.loads(line) for line in path.read_text().splitlines()]
     path = ROOT / 'tests/fixtures/statecivics-ks600-a2-1-entities-candidates.677d126d.jsonl'
     rows = [json.loads(line) for line in path.read_text().splitlines()]
     for row in rows:
