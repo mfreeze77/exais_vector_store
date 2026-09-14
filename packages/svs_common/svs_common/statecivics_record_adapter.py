@@ -143,6 +143,7 @@ from .statecivics_contract_pin import (
 )
 
 __all__ = [
+    "ACTION_LIFECYCLE_STATES",
     "ANNOTATION_KEYWORDS",
     "ASSERTED_FORMATS",
     "CANDIDATE_ELIGIBILITY_STATUS",
@@ -155,6 +156,8 @@ __all__ = [
     "LIVE_ELIGIBILITY_STATUSES",
     "LIVE_PATH",
     "PAYLOAD_AGREEMENT_KEYS",
+    "REMOVE_ACTION",
+    "UPSERT_ACTION",
     "AdaptedManifest",
     "CallerSuppliedCollectionRefused",
     "CandidateRecordRefused",
@@ -167,6 +170,7 @@ __all__ = [
     "InstanceCollectionRoster",
     "RecordBranchError",
     "RecordValidation",
+    "RemovalRecordNotStageable",
     "StagedEntities",
     "UnknownEligibilityStatus",
     "UnsupportedContractKeyword",
@@ -1003,6 +1007,78 @@ def _envelope_value(record: Mapping, field: str) -> Any:
     return record.get(field)
 
 
+#: The ingestion actions an entity record can declare, and what each one means
+#: for the payload. Keyed on ``ingestion.action``, NOT on whether a payload
+#: happens to be present, and NOT on ``record_kind`` -- which says the record is
+#: an entity projection and says nothing about upsert versus removal.
+UPSERT_ACTION = "upsert"
+REMOVE_ACTION = "remove"
+
+#: The lifecycle states each action is consistent with. An ``upsert`` is current
+#: state; a ``remove`` is a retraction and must say which kind. A record whose
+#: action and lifecycle disagree is refused rather than read under either.
+ACTION_LIFECYCLE_STATES: dict[str, frozenset[str]] = {
+    UPSERT_ACTION: frozenset({"current"}),
+    REMOVE_ACTION: frozenset({"superseded", "withdrawn"}),
+}
+ACTION_REMOVAL_REQUIRED: dict[str, bool] = {UPSERT_ACTION: False, REMOVE_ACTION: True}
+
+
+class RemovalRecordNotStageable(ValueError):
+    """A tombstone was handed to descriptor staging.
+
+    A removal record directs a DELETE. It is identity-minimal by construction --
+    no entity, no description, no derivation -- so there is no descriptor text
+    to embed and nothing to index. It is valid to ADAPT one; it is not valid to
+    stage one. Letting it through would either crash on the missing description
+    or, worse, embed something invented in its place.
+    """
+
+
+def _ingestion_action(record: Mapping) -> str:
+    ingestion = record.get("ingestion")
+    if not isinstance(ingestion, dict) or "action" not in ingestion:
+        raise EnvelopePayloadMismatch(
+            f"record {record.get('export_record_id')!r} declares no ingestion.action, so "
+            "whether its payload should be present cannot be decided. Refusing rather than "
+            "guessing from whether one happens to be there."
+        )
+    action = ingestion["action"]
+    if action not in ACTION_LIFECYCLE_STATES:
+        raise EnvelopePayloadMismatch(
+            f"record {record.get('export_record_id')!r} declares ingestion.action {action!r}, "
+            f"which is none of {sorted(ACTION_LIFECYCLE_STATES)}"
+        )
+    return action
+
+
+def _assert_action_lifecycle_agree(record: Mapping, action: str) -> None:
+    """An action and a lifecycle that disagree describe two different records."""
+    lifecycle = record.get("lifecycle")
+    if not isinstance(lifecycle, dict) or "state" not in lifecycle:
+        raise EnvelopePayloadMismatch(
+            f"record {record.get('export_record_id')!r} declares ingestion.action {action!r} "
+            "but carries no lifecycle.state to agree with it"
+        )
+    state = lifecycle["state"]
+    allowed = ACTION_LIFECYCLE_STATES[action]
+    if state not in allowed:
+        raise EnvelopePayloadMismatch(
+            f"refusing entity record {record.get('export_record_id')!r}: "
+            f"ingestion.action={action!r} but lifecycle.state={state!r}, which is none of "
+            f"{sorted(allowed)}. A record cannot be an upsert of current state and a "
+            "retraction at the same time, and reading it as either would be a guess."
+        )
+    required = lifecycle.get("removal_required")
+    expected = ACTION_REMOVAL_REQUIRED[action]
+    if required is not expected:
+        raise EnvelopePayloadMismatch(
+            f"refusing entity record {record.get('export_record_id')!r}: "
+            f"ingestion.action={action!r} implies lifecycle.removal_required={expected!r}, "
+            f"but the record says {required!r}"
+        )
+
+
 def assert_envelope_payload_agreement(record: Mapping) -> None:
     """Refuse a record whose envelope and payload state different facts.
 
@@ -1010,13 +1086,41 @@ def assert_envelope_payload_agreement(record: Mapping) -> None:
     It changes no schema and moves no digest: it relates two documents that each
     contract already accepts.
 
-    A removal record carries no ``entity`` by construction -- a tombstone names
-    what to delete and nothing else -- so there is nothing to agree with, and
-    that case is skipped rather than failed.
+    **The payload requirement is decided by ``ingestion.action``, never by
+    whether a payload is present.** An earlier revision returned silently when
+    ``entity`` was missing, so a record that was NOT a tombstone -- lifecycle
+    ``current``, ``action: upsert``, description intact -- but whose payload had
+    been stripped skipped the check entirely and was embedded and indexed.
+    Absence of the thing being checked was read as permission to skip the check.
+
+    ``record_kind`` cannot be the discriminator either: it says the record is an
+    entity projection and says nothing about upsert versus removal.
+
+    A removal record is identity-minimal by construction, so there is nothing to
+    agree with and it is skipped here -- but only once its action and lifecycle
+    have been shown to agree that it really is one.
     """
+    action = _ingestion_action(record)
+    _assert_action_lifecycle_agree(record, action)
     payload = record.get("entity")
-    if payload is None:
+
+    if action == REMOVE_ACTION:
+        if payload is not None:
+            raise EnvelopePayloadMismatch(
+                f"refusing entity record {record.get('export_record_id')!r}: it declares "
+                "ingestion.action='remove' but carries an entity payload. A tombstone names "
+                "what to delete and nothing else."
+            )
         return
+
+    if payload is None:
+        raise EnvelopePayloadMismatch(
+            f"refusing entity record {record.get('export_record_id')!r}: "
+            f"ingestion.action={action!r} with lifecycle.state="
+            f"{(record.get('lifecycle') or {}).get('state')!r} requires an entity payload, "
+            "and it has none. A missing payload is not a tombstone -- a tombstone says so in "
+            "its action -- and it is not permission to skip the agreement check."
+        )
     if not isinstance(payload, dict):
         raise EnvelopePayloadMismatch(
             f"record {record.get('export_record_id')!r} has a non-object entity payload, so "
@@ -1132,6 +1236,13 @@ def admit_entity_records(
         # adapt_records because records can reach this gate without having been
         # read from a manifest, and every path to embedding runs through it.
         assert_envelope_payload_agreement(record)
+        if (record.get("ingestion") or {}).get("action") == REMOVE_ACTION:
+            raise RemovalRecordNotStageable(
+                f"refusing entity record {record.get('export_record_id')!r} for descriptor "
+                f"staging on the {path!r} path: ingestion.action='remove' directs a DELETE and "
+                "the record carries no description to embed. A tombstone is valid to adapt and "
+                "is not valid to stage."
+            )
         status = eligibility_status(record)
         if path == LIVE_PATH and status == CANDIDATE_ELIGIBILITY_STATUS:
             raise CandidateRecordRefused(

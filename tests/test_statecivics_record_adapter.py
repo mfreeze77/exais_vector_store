@@ -73,6 +73,7 @@ from svs_common.statecivics_record_adapter import (
     EnvelopePayloadMismatch,
     InstanceCollectionConfigError,
     RecordBranchError,
+    RemovalRecordNotStageable,
     UnknownEligibilityStatus,
     UnsupportedContractKeyword,
     adapt_manifest,
@@ -1245,14 +1246,16 @@ def test_the_gate_itself_holds_no_io_seam() -> None:
 )
 def test_an_unrecognised_or_missing_status_is_refused(manifest, eligibility) -> None:
     record = copy.deepcopy(manifest.entity_records[0])
-    # Drop the payload so the CROSS-FIELD rule is inapplicable and this test is
-    # about the status rule alone. With the payload present, a missing envelope
-    # status is caught earlier as a mismatch -- correct, but a different rule.
-    record.pop("entity")
+    # MIRROR the mutation into the payload, so the cross-field rule passes and
+    # this test is about the status rule alone. Dropping the payload instead
+    # would now be refused as a payload-less upsert -- correct, but a different
+    # rule, and a test that cannot say which rule fired proves neither.
     if eligibility is None:
         record.pop("eligibility")
+        record["entity"]["status"] = None
     else:
         record["eligibility"] = eligibility
+        record["entity"]["status"] = eligibility.get("status")
     with pytest.raises(UnknownEligibilityStatus):
         eligibility_status(record)
     with pytest.raises(UnknownEligibilityStatus):
@@ -1687,6 +1690,15 @@ def test_r5_1c_an_identity_mismatch_is_refused(real_records, schema, kind) -> No
         else "provision_reference_logical_id"
     )
     record["entity"][payload_key] = "0" * 64
+    # PRECONDITION, as r5_1 and r5_1b have: both halves are individually
+    # schema-valid, so what follows can only be the cross-field rule. Without
+    # this the test cannot distinguish that rule from a schema incidentally
+    # catching the mutation -- it would pass either way and prove neither.
+    rule = dispatch_rule(schema)
+    assert validate(record, schema, rule.present_ref).ok, (
+        "the mutated record must still satisfy both schemas, or this test is "
+        "measuring schema validation rather than the cross-field rule"
+    )
     with pytest.raises(EnvelopePayloadMismatch, match="entity_logical_id"):
         adapt_records([(1, record)], schema)
 
@@ -1717,12 +1729,167 @@ def test_r5_1e_nothing_is_embedded_when_a_contradictory_record_is_refused(
     assert (embed.calls, index_write.calls) == (0, 0)
 
 
-def test_r5_1f_a_tombstone_has_no_payload_to_agree_with(real_records) -> None:
-    """A removal record is identity-minimal by construction; skipped, not failed."""
-    tombstone = copy.deepcopy(real_records["provision_reference"])
+def _tombstone(record: dict, state: str = "superseded") -> dict:
+    """A REAL removal record, as upstream's ``build_removal_record`` makes one.
+
+    Identity-minimal: no entity, no description, no derivation; action
+    ``remove``; lifecycle stating which kind of retraction and why.
+    """
+    out = copy.deepcopy(record)
     for key in ("entity", "description", "derivation"):
-        tombstone.pop(key, None)
+        out.pop(key, None)
+    out["ingestion"] = dict(out["ingestion"], action="remove", recall_evaluation_required=False)
+    out["relationships"] = []
+    out["lifecycle"] = {
+        "state": state,
+        "reason": "superseded by a reviewed revision",
+        "replaced_by": {"entity_logical_id": out["entity_logical_id"], "entity_revision": 3},
+        "removal_required": True,
+    }
+    out["eligibility"] = {
+        "status": "published",
+        "human_reviewed": True,
+        "review_level": "retracted",
+        "publication_allowed": False,
+    }
+    return out
+
+
+# --- F3: the payload requirement is decided by the ACTION, not by absence -----
+#
+# `assert_envelope_payload_agreement` used to return silently whenever `entity`
+# was missing. So a record that was NOT a tombstone -- lifecycle `current`,
+# action `upsert`, description intact -- but whose payload had been stripped
+# skipped the check entirely and was embedded and indexed. Absence of the thing
+# being checked was read as permission to skip the check.
+
+
+@pytest.mark.parametrize("kind", ["appropriation_action", "provision_reference"])
+@pytest.mark.parametrize("payload", [None, "missing"])
+def test_f3_1_a_current_upsert_without_a_payload_is_refused(
+    real_records, tmp_path, kind, payload
+) -> None:
+    """F3 check 1. Refused, and refused BEFORE any callback."""
+    record = _candidate(real_records[kind], "published")
+    if payload == "missing":
+        record.pop("entity")
+    else:
+        record["entity"] = None
+    assert record["lifecycle"]["state"] == "current"
+    assert record["ingestion"]["action"] == "upsert"
+    assert "description" in record, "not a tombstone by any reading"
+
+    with pytest.raises(EnvelopePayloadMismatch) as excinfo:
+        assert_envelope_payload_agreement(record)
+    message = str(excinfo.value)
+    assert "requires an entity payload" in message
+    assert "A missing payload is not a tombstone" in message
+
+    embed, index_write = _Detonator("embed"), _Detonator("index_write")
+    with pytest.raises(EnvelopePayloadMismatch):
+        stage_entity_descriptors(
+            [record], path=LIVE_PATH, **_staging(tmp_path), embed=embed, index_write=index_write
+        )
+    assert (embed.calls, index_write.calls) == (0, 0)
+
+
+@pytest.mark.parametrize(
+    ("action", "state", "removal_required"),
+    [
+        ("remove", "current", True),      # retraction claiming current state
+        ("remove", "current", False),
+        ("upsert", "superseded", False),  # the inverse
+        ("upsert", "withdrawn", True),
+        ("remove", "superseded", False),  # action and flag disagree
+        ("upsert", "current", True),
+    ],
+)
+def test_f3_2_contradictory_removal_flags_are_refused(
+    real_records, action, state, removal_required
+) -> None:
+    """F3 check 2. An action and a lifecycle that disagree describe two records."""
+    record = _candidate(real_records["provision_reference"], "published")
+    record["ingestion"] = dict(record["ingestion"], action=action)
+    record["lifecycle"] = dict(
+        record["lifecycle"], state=state, removal_required=removal_required
+    )
+    with pytest.raises(EnvelopePayloadMismatch) as excinfo:
+        assert_envelope_payload_agreement(record)
+    assert "ingestion.action" in str(excinfo.value)
+
+
+@pytest.mark.parametrize("state", ["superseded", "withdrawn"])
+@pytest.mark.parametrize("kind", ["appropriation_action", "provision_reference"])
+def test_f3_3_a_legitimate_tombstone_adapts_but_never_embeds(
+    real_records, schema, tmp_path, kind, state
+) -> None:
+    """F3 check 3, BOTH halves.
+
+    A tombstone is valid to ADAPT -- it is a real record the manifest carries --
+    and is not valid to STAGE, because it directs a DELETE and has no
+    description to embed.
+    """
+    tombstone = _tombstone(real_records[kind], state)
+
+    # half one: valid, schema and cross-field alike, and it goes through the reader.
+    rule = dispatch_rule(schema)
+    assert validate(tombstone, schema, rule.present_ref).ok
     assert_envelope_payload_agreement(tombstone)
+    assert len(adapt_records([(1, tombstone)], schema).entity_records) == 1
+
+    # half two: refused at the staging gate, before any callback.
+    with pytest.raises(RemovalRecordNotStageable, match="directs a DELETE"):
+        admit_entity_records([tombstone], path=LIVE_PATH)
+    embed, index_write = _Detonator("embed"), _Detonator("index_write")
+    with pytest.raises(RemovalRecordNotStageable):
+        stage_entity_descriptors(
+            [tombstone], path=LIVE_PATH, **_staging(tmp_path), embed=embed, index_write=index_write
+        )
+    assert (embed.calls, index_write.calls) == (0, 0)
+
+
+def test_f3_3b_a_tombstone_carrying_a_payload_is_refused(real_records) -> None:
+    """A tombstone names what to delete and nothing else."""
+    tombstone = _tombstone(real_records["provision_reference"])
+    tombstone["entity"] = copy.deepcopy(real_records["provision_reference"]["entity"])
+    with pytest.raises(EnvelopePayloadMismatch, match="names what to delete and nothing else"):
+        assert_envelope_payload_agreement(tombstone)
+
+
+@pytest.mark.parametrize("kind", ["appropriation_action", "provision_reference"])
+def test_f3_4_existing_valid_upserts_still_work(real_records, tmp_path, kind) -> None:
+    """F3 check 4. The positive control: the fix is not "refuse everything"."""
+    record = _candidate(real_records[kind], "published")
+    assert_envelope_payload_agreement(record)
+    assert len(admit_entity_records([record], path=LIVE_PATH)) == 1
+    written: list[tuple] = []
+    staged = stage_entity_descriptors(
+        [record],
+        path=LIVE_PATH,
+        **_staging(tmp_path),
+        embed=lambda text: [0.0],
+        index_write=lambda collection, rows: written.append((collection, rows)),
+    )
+    assert staged.embedded == 1
+    assert written[0][0] == LIVE_ENTITY_COLLECTION
+    # ...and the real candidate records still route to the candidate path.
+    assert len(admit_entity_records([real_records[kind]], path=CANDIDATE_PATH)) == 1
+
+
+def test_f3_5_the_discriminator_is_the_action_not_record_kind(real_records) -> None:
+    """`record_kind` says "entity projection" and nothing about upsert vs remove.
+
+    Both records below carry `record_kind: entity_projection`; they differ only
+    in their action, and the payload requirement follows the action.
+    """
+    upsert = _candidate(real_records["provision_reference"], "published")
+    tombstone = _tombstone(real_records["provision_reference"])
+    assert upsert["record_kind"] == tombstone["record_kind"] == "entity_projection"
+    assert_envelope_payload_agreement(tombstone)  # no payload: correct for remove
+    with pytest.raises(EnvelopePayloadMismatch):
+        stripped = copy.deepcopy(upsert)
+        stripped.pop("entity")
+        assert_envelope_payload_agreement(stripped)  # no payload: wrong for upsert
 
 
 def test_r5_1g_the_rule_moves_no_digest(schema) -> None:
