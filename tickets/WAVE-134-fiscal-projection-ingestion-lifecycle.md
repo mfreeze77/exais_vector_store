@@ -1203,3 +1203,29 @@ regime**. Neither is green.
 **Deployment still deferred.** Item 8 remains PREPARED AND NOT EXECUTED and is
 now blocked only on re-deriving the proposal for `ks-fiscal-local`, whose
 `.env.images` is not checked in anywhere.
+
+
+### Candidate storage delivery — 2026-09-14
+
+The owner paused the other workers and transferred execution to Codex. Finish
+one durable HB 2513 pilot through the authenticated API, isolated candidate
+index and candidate search. Ordinary retrieval and existing document collections
+are not destinations. No full-cell rebuild or database migration is required.
+
+The new API uses the pinned envelope and committed, hashed payload schemas from
+A, validates record digests, resolves candidate collection names through the
+adapter, uses a real embedding profile, upserts with wait=True, and compares
+full-record readback. Repeating the same manifest skips embedding and writes.
+Older revisions and conflicting payloads for the same revision refuse.
+
+The runtime document model registry supplies a conservative collection catalog:
+`embedding_profile_config` refuses profiles outside it, including any new
+candidate index profile. This covers dynamic routing/fallbacks without claiming
+that the four undeclared sources each use a guessed profile. Existing source
+declarations are still included and the original strict guard remains the
+default when the runtime catalog is unavailable.
+
+The candidate API is disabled by default. Enable only in ks-fiscal-local after
+focused API/adapter checks and a target-specific API image build. Rollback is
+disabling that API flag and restoring the previous API image; retained candidate
+points remain separate from document and live-entity collections.

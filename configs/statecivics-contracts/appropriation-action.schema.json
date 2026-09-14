@@ -1,0 +1,388 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://statecivics.ai/contracts/civic-impact/appropriation-action.schema.json",
+  "title": "StateCivics Appropriation Action",
+  "description": "One source-bound appropriation action: a single enacted change to spending authority, bound to the exact bill version and provision that authorises it. The action_type vocabulary is frozen; conditions and qualifiers go in `conditions` and never become new enum members. An action is tied to the source revision it was read from and is superseded by a later stage rather than overwritten.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "action_type",
+    "amount_kind",
+    "appropriation_action_id",
+    "bill_version_id",
+    "period",
+    "provision_reference_logical_id",
+    "provision_reference_revision",
+    "revision",
+    "source",
+    "status"
+  ],
+  "properties": {
+    "appropriation_action_id": {
+      "description": "IDENTITY of the action, stable across its revisions: every revision of one action shares this value, and `revision` distinguishes them. DEFINITION: 'ks-approp-action:<provision_reference_logical_id>:account-<digest>:n<k>'. <digest> is the first 16 hex characters of sha256 over the account text after NORMALISATION (typographic punctuation mapped to ASCII) and then CANONICALISATION by the identity charset rules -- the same ASCII-only rules that keep the Python and PL/pgSQL digests byte-identical. <k> is the 1-BASED count of that account within that provision in textual order, ALWAYS PRESENT, including n1 for an account that occurs once. THE INDEX IS NEVER CONDITIONAL, because an identity that changes when a sibling is discovered is not an identity: were it omitted for a single occurrence, that occurrence would acquire one the day a second was recognised, changing the id of a row already written. WHAT THIS DOES NOT BUY: positional identity is not stable under INSERTION, and nothing can make it so. Recognise a new occurrence between the first two and the former n2 mints as n3. Consistency at minting is taken, and continuity is settled in reconciliation, which REFUSES a shifted match rather than recording it: an equal id is not evidence of sameness once the same string can be minted for a different entry, so a match is accepted only when the stored source position is loaded from retained span evidence and still agrees. Missing or unverifiable position evidence is itself a refusal, never an acceptance. The provision REVISION is deliberately not an input: including it would fork the action's identity whenever its provision was revised, turning revisions into new actions. It is carried in `provision_reference_revision` instead. The same separation is why civic_provision_references holds one logical id across both of its revisions. RECONCILIATION ORDER: an exact id match is preferred and preserves the id; only entries still unmatched attempt a (provision, account) fallback, and only where exactly one stored row and one new entry remain for that pair. Anything else is referred to review by name.",
+      "type": "string"
+    },
+    "revision": {
+      "description": "This action row's own correction revision. Not the provision's revision -- that is provision_reference_revision.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "action_type": {
+      "type": "string",
+      "enum": [
+        "appropriate",
+        "increase",
+        "decrease",
+        "lapse",
+        "transfer",
+        "reappropriate",
+        "limit",
+        "veto",
+        "override",
+        "technical_correction"
+      ],
+      "description": "Frozen vocabulary. KS-600's scope line and the 2026-09-03 prior-art audit both quote this list verbatim; conditions and qualifiers go in `conditions`, never into new enum members."
+    },
+    "amount": {
+      "description": "The monetary amount this action moves. Null when the source states an action without a figure -- a limit or a lapse of an unstated balance -- which is not the same as an amount of zero.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/money"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "from_account_id": {
+      "description": "Source account for a transfer. Null for actions that are not directional.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "to_account_id": {
+      "description": "Destination account for a transfer. Null for actions that are not directional.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "budget_account_id": {
+      "description": "The budget account this action applies to, when the source names one.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "period": {
+      "description": "The fiscal period this action applies to.",
+      "$ref": "#/$defs/period"
+    },
+    "bill_id": {
+      "description": "The bill this action belongs to. Evidence context, not identity.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "bill_version_id": {
+      "description": "EVIDENCE COORDINATE, not identity. Integer foreign key to bill_versions(id), matching civic_claims, civic_fiscal_facts, civic_support_document_bindings and watchlist tracking, which all already key on that surrogate. Because the provision identity tuple excludes it, a re-ingest that re-mints this id cannot fork a provision. NOT NULL in the database: an action always names the bill version it was read from.",
+      "type": "integer"
+    },
+    "provision_reference_logical_id": {
+      "description": "The version-specific provision this action is enacted by: provision-reference.schema.json `provision_reference_logical_id`, itself computed by the database from the identity tuple. Required, and backed by a real composite foreign key on (provision_reference_logical_id, provision_reference_revision) into civic_provision_references -- so an action cannot name a provision that does not exist. A source_span_id or a printed section label is not a substitute; neither is an identity input at all.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "amendment_or_action_id": {
+      "description": "The amendment or legislative action the source attributes this to, when it names one.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "conditions": {
+      "description": "Conditions and qualifiers the source attaches to the action, verbatim. These live here precisely so the action_type enum never has to grow a conditional member.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source": {
+      "description": "The exact retained source coordinate this action was read from.",
+      "$ref": "#/$defs/sourceRef"
+    },
+    "derivation_id": {
+      "description": "The derivation run that produced this action, for lineage. Null when not machine-derived.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "supersedes_action_id": {
+      "description": "The logical appropriation_action_id this action supersedes at a later stage -- an enrolled action superseding an introduced one. Distinct from `revision`, which is a correction to THIS action's own row. Null when nothing is superseded. Paired with supersedes_action_revision, and backed by a composite foreign key: an action cannot supersede one that was never written.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "supersedes_action_revision": {
+      "description": "The revision of the action this one supersedes. Paired with supersedes_action_id: both set or both null. It exists because a foreign key needs it -- the logical action id alone is not unique across revisions -- and it makes the action side symmetric with the provision side's supersession pair.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "status": {
+      "description": "Review state of this action. in_review and quarantined are the actionable states a conflicting ledger fails closed into (KS-600 AC 8); neither is an insert-time refusal.",
+      "type": "string",
+      "enum": [
+        "candidate",
+        "validated",
+        "in_review",
+        "published",
+        "superseded",
+        "rejected",
+        "quarantined"
+      ]
+    },
+    "review": {
+      "description": "Human review state for this action.",
+      "$ref": "#/$defs/review"
+    },
+    "provision_reference_revision": {
+      "description": "The exact provision-reference revision this action relied on: provision-reference.schema.json `revision`. Half of the composite foreign key above, and the reason that key can exist -- provision_reference_logical_id alone is not unique because revisions of one provision share it. It also pins KS-600's rule that an action stays tied to the source revision it was read from.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "amount_kind": {
+      "description": "WHICH KIND OF AMOUNT THE SOURCE STATED, so that a null `amount` is readable rather than merely empty. REQUIRED on every exported record: a record without it fails validation and is refused, never emitted and never defaulted. 'stated' means the source gave a figure and `amount` carries it -- including a figure of 0, which is a stated amount of nothing and NOT a missing one. 'no_limit' means the source granted spending authority with no ceiling, a POSITIVE legislative assertion: in HB 2513 enrolled it is the majority of all entries. 'indeterminate' means an amount was present in the source and could not be read, with the verbatim text preserved for review. Collapsing the last two into 'amount is null' would erase the difference between 'the legislature said unlimited' and 'we could not read it'. Rows written before migration 112 hold NULL in the column and are superseded rather than exported; the database refuses a new row without this field, so the contract and the write path enforce it independently.",
+      "type": "string",
+      "enum": [
+        "stated",
+        "no_limit",
+        "indeterminate"
+      ]
+    }
+  },
+  "$defs": {
+    "money": {
+      "description": "A monetary amount with its currency and price basis stated. Null amount and zero amount are different claims and are not interchangeable.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "currency"
+      ],
+      "properties": {
+        "value": {
+          "description": "Decimal string, to avoid binary floating-point drift in monetary values.",
+          "type": "string",
+          "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+        },
+        "currency": {
+          "description": "ISO 4217 three-letter code.",
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "price_basis": {
+          "description": "Whether the figure is nominal, real, or not applicable. 'unknown' is recorded, not guessed.",
+          "type": "string",
+          "enum": [
+            "nominal",
+            "real",
+            "not_applicable",
+            "unknown"
+          ]
+        },
+        "base_year": {
+          "description": "Base year for a real figure. Null when the basis is nominal or unknown.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1900,
+          "maximum": 2200
+        }
+      }
+    },
+    "period": {
+      "description": "A span of time, with its kind stated rather than inferred from the bounds. 'unknown' is a recorded answer and carries no bounds; an absent date is never defaulted to an ingest or enactment date.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "label"
+      ],
+      "properties": {
+        "kind": {
+          "description": "How to read this period. 'unknown' means the source did not state one.",
+          "type": "string",
+          "enum": [
+            "instant",
+            "date",
+            "date_range",
+            "calendar_year",
+            "fiscal_year",
+            "fiscal_year_range",
+            "session",
+            "open_ended",
+            "unknown"
+          ]
+        },
+        "label": {
+          "description": "The period as the source writes it, e.g. 'FY2026'. Presentation.",
+          "type": "string"
+        },
+        "start": {
+          "description": "Inclusive start date, or null when the source does not give one.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "end": {
+          "description": "Inclusive end date, or null when the source does not give one.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "as_of": {
+          "description": "Observation instant for this period, when the source records one.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      }
+    },
+    "sourceRef": {
+      "description": "One exact coordinate into retained source material. Evidence, never identity: re-extraction moves these and must leave the provision identity unchanged.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_revision_id"
+      ],
+      "properties": {
+        "source_revision_id": {
+          "description": "The immutable source revision this was read from. Required: a reference with no revision is not retained evidence.",
+          "type": "string"
+        },
+        "source_span_id": {
+          "description": "The exact span within that revision, when one was located.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "locator": {
+          "description": "Human-readable locator for the span, e.g. 'page 14, lines 22-31'.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_url": {
+          "description": "Canonical URL of the source, when it is publicly addressable.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        }
+      }
+    },
+    "review": {
+      "description": "Human review state, flattened. Kept separate from publication: a record may be reviewed and still not publishable.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "human_reviewed",
+        "review_level"
+      ],
+      "properties": {
+        "human_reviewed": {
+          "description": "Whether a person reviewed this record. False is the default and is not a failure.",
+          "type": "boolean"
+        },
+        "review_level": {
+          "description": "Depth of the review performed, from the methodology vocabulary.",
+          "type": "string"
+        },
+        "reviewer_id": {
+          "description": "Who reviewed it. Null when unreviewed.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reviewed_at": {
+          "description": "When it was reviewed. Null when unreviewed.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "title": "a stated amount carries a figure",
+      "description": "The test is that `amount` is a non-null money OBJECT, never truthiness and never the presence of a column name. An amount whose value is '0' is a STATED amount of nothing, which is a different fact from no amount at all; any emptiness test would collapse the two, and $defs.money already says null and zero are not interchangeable.",
+      "if": {
+        "required": [
+          "amount_kind"
+        ],
+        "properties": {
+          "amount_kind": {
+            "const": "stated"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "amount"
+        ],
+        "properties": {
+          "amount": {
+            "not": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "a no_limit or indeterminate amount carries no figure",
+      "description": "`amount` is null or absent. A figure here would contradict the kind. The kind is what makes the two distinguishable once the figure is gone.",
+      "if": {
+        "required": [
+          "amount_kind"
+        ],
+        "properties": {
+          "amount_kind": {
+            "enum": [
+              "no_limit",
+              "indeterminate"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "amount": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}
