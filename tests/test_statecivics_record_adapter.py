@@ -1036,11 +1036,13 @@ def document_consumer():
 
 
 def test_the_document_consumer_still_refuses_an_entity_manifest(document_consumer, tmp_path) -> None:
-    """The problem this adapter exists for, demonstrated rather than asserted.
+    """The problem this adapter exists for -- now refused for the RIGHT reason.
 
-    ``load_manifest`` routes every line down the document path, so an entity
-    record fails as a MISSING FIELD -- a shape error wearing a data error's
-    clothes. Nothing about ``load_manifest`` is changed by this work.
+    Before the integration, ``load_manifest`` routed every line down the
+    document path and an entity record failed as a missing
+    ``logical_document_id``: a shape error wearing a data error's clothes. It
+    now dispatches on the contract's own routing predicate and says what the
+    record actually is, and where to read it.
     """
     entity_only = tmp_path / "entities.jsonl"
     entity_only.write_text(
@@ -1049,7 +1051,11 @@ def test_the_document_consumer_still_refuses_an_entity_manifest(document_consume
     )
     with pytest.raises(document_consumer.FiscalIngestError) as excinfo:
         document_consumer.load_manifest(entity_only, contract_schema=CONTRACT)
-    assert "logical_document_id" in str(excinfo.value)
+    message = str(excinfo.value)
+    assert "this is an ENTITY record" in message
+    assert "--record-kind entity" in message
+    # The old message named a field the record was never supposed to have.
+    assert "missing logical_document_id" not in message
 
 
 def test_the_adapter_adds_no_load_manifest_call_site() -> None:
@@ -2044,37 +2050,23 @@ def test_r5_2f_the_candidate_path_needs_its_own_profile(real_records, tmp_path) 
         )
 
 
-def test_r5_2g_there_is_no_application_caller_of_adapt_manifest() -> None:
-    """Round five item 3, asserted rather than asserted-about.
+def test_r5_2g_the_adapter_is_now_wired_to_the_real_entrypoint() -> None:
+    """This assertion INVERTED, which is the tripwire doing its job.
 
-    The adapter is not yet wired into any runner, so an image rebuild would
-    connect nothing. Wiring `adapt_manifest` into the fiscal consumer's dispatch
-    is the remaining WAVE-134 scope. This test fails when that wiring lands,
-    which is the moment the rebuild becomes meaningful -- update it then.
+    It used to assert that NO application caller of ``adapt_manifest`` existed,
+    and to fail the moment one appeared -- because until one did, an image
+    rebuild would have shipped a library nothing invokes. One now exists, so the
+    test says the opposite: the adapter is reachable from the command, and names
+    where. Deleting it instead would have thrown away the check that the wiring
+    stays wired.
     """
-    import subprocess
-
-    listing = subprocess.run(
-        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard", "*.py"],
-        cwd=ROOT, capture_output=True, text=True, check=True,
-    ).stdout
-    callers = []
-    for name in listing.split("\0"):
-        if not name or name.startswith("tests/"):
-            continue
-        path = ROOT / name
-        if not path.is_file():
-            continue
-        tree = ast.parse(path.read_text(encoding="utf-8"))
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Call):
-                callee = (
-                    node.func.attr if isinstance(node.func, ast.Attribute)
-                    else getattr(node.func, "id", None)
-                )
-                if callee in {"adapt_manifest", "stage_entity_descriptors"}:
-                    callers.append(f"{name}:{node.lineno}")
-    assert callers == [], (
-        f"an application caller now exists ({callers}); the image rebuild proposal in "
-        "WAVE-134's log becomes meaningful and this test should be updated"
-    )
+    consumer = ROOT / "scripts" / "release" / "kansas-fiscal-document-ingest.py"
+    tree = ast.parse(consumer.read_text(encoding="utf-8"))
+    called = {
+        node.func.attr if isinstance(node.func, ast.Attribute) else getattr(node.func, "id", None)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+    }
+    assert "adapt_manifest" in called, "the entity entrypoint no longer reads through the adapter"
+    assert "admit_entity_records" in called, "the eligibility gate is no longer applied"
+    assert "classify_record" in called, "the document path no longer dispatches on the contract"

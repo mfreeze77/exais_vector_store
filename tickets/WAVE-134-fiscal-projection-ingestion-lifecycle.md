@@ -1020,3 +1020,95 @@ Still open under this ticket, unchanged by the merge:
   `instance.yaml` / runtime collection-prefix disagreement.
 * [WAVE-147](WAVE-147-statecivics-envelope-payload-helper-robustness.md): the
   same cross-field rule's laxer form in repo A's public helper.
+
+### 2026-09-13 — the adapter connected to the real ingestion entrypoint
+
+P5-BUILD item 1. `scripts/release/kansas-fiscal-document-ingest.py` now
+dispatches on the contract's own routing predicate, and the entity branch has an
+entrypoint of its own. Deployment stays deferred; this runs on the TEST image.
+
+**The document path is unchanged, proved DIFFERENTIALLY.** "Still passing" is
+not the claim on a file that was byte-untouched through WAVE-133's seven rounds
+and all of WAVE-134, and through which 28,812 documents were ingested. The
+pre-change consumer is read out of git at the fixed sha `a7b2843`, loaded
+alongside the new one, and both are handed the same manifest:
+
+* `LoadedManifest.sha256`, `byte_count`, `path` and `records` are equal;
+* five malformed-manifest refusals produce IDENTICAL message strings on both;
+* the missing-schema refusal is identical word for word;
+* `inspect.signature(load_manifest)` is equal between the two.
+
+Not a copy kept beside the test, which would drift, and not a description of the
+old behaviour, which would be a second implementation to get wrong.
+
+**What changed in the document path is one guard**, at the top of the per-line
+loop, before `_validate_record`: classify the record by the contract's own
+dispatch and refuse an entity record by name. For an untagged record that is a
+two-key read returning the document branch, and everything after it is what it
+was. The old failure was `manifest line N: missing logical_document_id` — a
+shape error wearing a data error's clothes, which is the defect this ticket
+opened on. It now says what the record is and where to read it.
+
+**The entity entrypoint.** `--record-kind entity` routes to
+`load_entity_manifest`, which verifies the ENTITY and DISPATCH pins (never the
+document pin — a consumer must not verify a branch it does not read), validates
+through `adapt_manifest`, enforces envelope/payload agreement, and only then
+applies the eligibility gate. It returns a `LoadedEntityManifest`, deliberately
+NOT a `LoadedManifest`, so a caller cannot hand entity records to
+`plan_operations`, which speaks in `logical_document_id`. `--entity-path`
+without `--record-kind entity` is refused: a flag that silently does nothing is
+worse than one that refuses.
+
+**Candidate refusal at the COMMAND, proved by inversion.** `main()` is driven
+with real argv, `--apply` deliberately included, and every API seam
+(`ensure_vector_store`, `apply_operations`, `default_headers`,
+`upload_document`) replaced by a callable that raises if reached. Three
+inversions, each reverted by `git checkout --` of the committed file with
+`git status --porcelain` empty after:
+
+| inversion | result |
+|---|---|
+| gate returns the adapted records ungated | `test_the_command_refuses_a_candidate_for_the_live_store` fails |
+| touch `default_headers` before the gate | `AssertionError: default_headers was called before the entity gate refused a candidate` |
+| remove the document-path dispatch guard | 4 tests fail across both suites |
+
+**Both tripwires, reported honestly.**
+
+`test_r5_2g` fired by design — it asserted that no application caller of
+`adapt_manifest` existed and was built to fail the moment one appeared, because
+until then a rebuild would ship a library nothing invokes. That signal has been
+delivered, so the assertion is INVERTED rather than deleted: it now requires
+`adapt_manifest`, `admit_entity_records` and `classify_record` to be reachable
+from the consumer, and fails if the wiring is removed. Deleting it would have
+thrown away the check that the wiring stays wired.
+
+`test_every_load_manifest_caller_enforces_the_pin` **did NOT fire, and I checked
+why rather than assuming.** The walker discovers FILES containing calls to the
+consumer's `load_manifest` and compares that set against `contractPin.enforcedAt`.
+The only such call in this file is `main()`'s, at what is now line 1149, and
+`scripts/release/kansas-fiscal-document-ingest.py --contract-schema` was already
+declared. The new entity entrypoint calls `adapt_manifest`, not `load_manifest`,
+so no file entered or left the discovered set and the declaration is untouched.
+The test passes on its own terms, not because it was quieted.
+
+**Lint parity.** `ruff check` on the consumer reports the same 10 findings
+before and after, diffed line by line — zero introduced. (One new `F401` was
+introduced and removed before commit.)
+
+**Baselines, carried forward, not re-derived loosely.** Same commands, same
+resolving seed located by matching `SEED_SHA256 = b64003f3…`:
+
+| regime | carried-forward baseline | this branch | NEW failures |
+|---|---|---|---|
+| corpus vars UNSET | 10 failed + 31 errors = 41 ids | 10 failed + 31 errors = 41 ids | **none** |
+| corpus vars SET (resolving) | 7 failed + 4 errors = 11 ids | 7 failed + 4 errors = 11 ids | **none** |
+
+Neither is green; the 11 are the pre-existing statute-tranche, WAVE-144
+subprocess-`PYTHONPATH` and `psycopg` failures.
+
+**Deployment still deferred. Item 8 stays PREPARED AND NOT EXECUTED.** An
+application caller now exists, so a rebuild would ship something that is
+invoked — but the proposal must still be re-derived for `ks-fiscal-local`, the
+running cell, whose `.env.images` is not checked in anywhere; the digests
+recorded earlier belong to `ks-state-civics`. Nothing here touched the running
+cell.

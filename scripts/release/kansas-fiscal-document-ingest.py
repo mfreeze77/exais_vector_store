@@ -32,6 +32,10 @@ from svs_common.statecivics_contract_pin import (
     DISPATCH_SHA256, DOCUMENT_BRANCH_SHA256, ENTITY_BRANCH_SHA256,
     ContractPinError, load_contract, verify_branch, verify_contract,
 )
+from svs_common.statecivics_record_adapter import (
+    ENTITY_PATHS, LIVE_PATH,
+    adapt_manifest, admit_entity_records, classify_record, dispatch_rule,
+)
 from topeka_pipeline_common import (
     DEFAULT_CELL,
     DEFAULT_KNOWLEDGE_BASE_ID,
@@ -332,6 +336,9 @@ def load_manifest(
             f"{path} without verifying the StateCivics contract pin"
         )
     verify_contract_pin(contract_schema)
+    # The routing predicate, taken from the contract rather than guessed. The
+    # dispatch pin verified just above is computed over exactly this object.
+    rule = dispatch_rule(load_contract(contract_schema))
     payload = path.read_bytes()
     if payload and not payload.endswith(b"\n"):
         raise FiscalIngestError(f"{path}: JSONL manifest must end with a newline")
@@ -352,6 +359,19 @@ def load_manifest(
             raise FiscalIngestError(f"{path}:{line_number}: invalid JSON") from exc
         if not isinstance(record, dict):
             raise FiscalIngestError(f"{path}:{line_number}: expected an object")
+        if classify_record(record, rule) != rule.absent_pin:
+            # The contract's OWN dispatch, read from the schema this run was
+            # handed. Before this guard an entity record failed here as
+            # "missing logical_document_id" -- a shape error wearing a data
+            # error's clothes, which is the defect WAVE-134 opened on.
+            #
+            # Document behaviour is untouched: for an untagged record this is a
+            # two-key read that returns the document branch and falls through.
+            raise FiscalIngestError(
+                f"{path}:{line_number}: this is an ENTITY record and the document consumer "
+                f"cannot ingest it. Read it with --record-kind entity, which routes through "
+                f"the entity branch of the contract and its own pin."
+            )
         _validate_record(
             record,
             line_number=line_number,
@@ -379,6 +399,84 @@ def load_manifest(
         sha256=hashlib.sha256(payload).hexdigest(),
         byte_count=len(payload),
         records=tuple(records),
+    )
+
+
+#: Entity records are read by their OWN entrypoint, which verifies the ENTITY
+#: and DISPATCH pins -- never the document pin. A consumer must not verify a
+#: branch it does not read, or unrelated upstream work blocks it.
+CONSUMED_ENTITY_CONTRACT_BRANCH = "entity"
+
+
+@dataclass(frozen=True)
+class LoadedEntityManifest:
+    """Entity projections admitted for ONE path, and nothing else.
+
+    Deliberately not a ``LoadedManifest``: a caller holding one of these cannot
+    hand it to ``plan_operations``, which speaks in ``logical_document_id``.
+    The two kinds stay separable in the type system, not by convention.
+    """
+
+    path: Path
+    sha256: str
+    byte_count: int
+    entity_path: str
+    records: tuple[dict[str, Any], ...]
+    verified_pins: tuple[str, ...]
+    unvalidated_remote_refs: tuple[str, ...]
+
+
+def load_entity_manifest(
+    path: Path,
+    *,
+    contract_schema: Path | None = None,
+    entity_path: str = LIVE_PATH,
+    entrypoint: str = "kansas-fiscal-document-ingest.py --record-kind entity",
+) -> LoadedEntityManifest:
+    """Read a manifest of ENTITY projections for one path, or refuse.
+
+    ``contract_schema`` is REQUIRED, for the same reason it is on the document
+    consumer and with the same shape of refusal: an optional pin is not a pin.
+
+    The refusal order is the point of this function, and it is structural.
+    ``adapt_manifest`` verifies the entity and dispatch pins, validates every
+    record against the branch the contract's own dispatch chose, and enforces
+    envelope/payload agreement. Only then does ``admit_entity_records`` apply
+    the eligibility gate, which refuses a ``candidate`` revision for the live
+    store BEFORE this function returns -- so a caller never holds records it
+    could embed. Nothing here calls an API, an embedding provider or an index.
+    """
+    if entity_path not in ENTITY_PATHS:
+        raise FiscalIngestError(
+            f"{entrypoint}: unknown --entity-path {entity_path!r}; expected one of "
+            f"{list(ENTITY_PATHS)}"
+        )
+    if contract_schema is None:
+        raise FiscalIngestError(
+            f"{entrypoint}: --contract-schema is required; refusing to ingest "
+            f"{path} without verifying the StateCivics contract pin"
+        )
+    adapted = adapt_manifest(path, contract_schema=contract_schema)
+    if adapted.document_records:
+        raise FiscalIngestError(
+            f"{path}: contains {len(adapted.document_records)} DOCUMENT record(s); the entity "
+            "entrypoint reads the entity branch only. Split the manifest, or read it without "
+            "--record-kind entity."
+        )
+    if not adapted.entity_records:
+        raise FiscalIngestError(f"{path}: manifest contains no entity records")
+    # THE GATE. Raises CandidateRecordRefused for a candidate on the live path,
+    # and RemovalRecordNotStageable for a tombstone, before anything is returned.
+    admitted = admit_entity_records(adapted.entity_records, path=entity_path)
+    payload = Path(path).read_bytes()
+    return LoadedEntityManifest(
+        path=Path(path),
+        sha256=hashlib.sha256(payload).hexdigest(),
+        byte_count=len(payload),
+        entity_path=entity_path,
+        records=admitted,
+        verified_pins=adapted.verified_pins,
+        unvalidated_remote_refs=adapted.unvalidated_remote_refs,
     )
 
 
@@ -968,10 +1066,53 @@ def parse_args() -> argparse.Namespace:
         default="auto",
         choices=["auto", "host-curl", "api-container", "docker-network"],
     )
+    parser.add_argument(
+        "--record-kind", choices=["document", "entity"], default="document",
+        help="which branch of the StateCivics contract this manifest carries",
+    )
+    parser.add_argument(
+        "--entity-path", choices=list(ENTITY_PATHS), default=LIVE_PATH,
+        help="destination for --record-kind entity; the live store refuses candidates",
+    )
     parser.add_argument("--apply", action="store_true")
     parser.add_argument('--source-page-chunking-profile', choices=[STATECIVICS_PAGE_MARKDOWN_PROFILE],
                         help='opt retained text into exact page coordinates; PDF/Marker requests remain unchanged')
     return parser.parse_args()
+
+
+def _report_entity_manifest(
+    manifest: LoadedEntityManifest, *, proof: Path | None, apply_requested: bool
+) -> int:
+    """Report what the entity branch admitted. No API call, ever, from here."""
+    result: dict[str, Any] = {
+        "applied": False,
+        "record_kind": "entity",
+        "entity_path": manifest.entity_path,
+        "manifest": str(manifest.path),
+        "manifest_sha256": manifest.sha256,
+        "manifest_byte_count": manifest.byte_count,
+        "record_count": len(manifest.records),
+        "verified_pins": list(manifest.verified_pins),
+        "unvalidated_remote_refs": list(manifest.unvalidated_remote_refs),
+        "admitted": [
+            {
+                "entity_type": record["entity_type"],
+                "entity_logical_id": record["entity_logical_id"],
+                "entity_revision": record["entity_revision"],
+                "eligibility_status": record["eligibility"]["status"],
+            }
+            for record in manifest.records
+        ],
+    }
+    if proof:
+        write_json_atomic(proof, result)
+    print(json.dumps(result, indent=2, sort_keys=True))
+    print(
+        "\nentity manifest read and gated; descriptor staging is not implemented in this "
+        "entrypoint, so no API call, embedding or index write was made"
+        + (" (--apply was requested and is not honoured here)" if apply_requested else "")
+    )
+    return 0
 
 
 def main() -> int:
@@ -988,6 +1129,23 @@ def main() -> int:
                                           expected_manifest_sha256=args.harvest_manifest_sha256)
     elif any(getattr(args, k, None) is not None for k in ('harvest_manifest', 'harvest_root', 'harvest_manifest_sha256')):
         raise FiscalIngestError('harvest flags require the explicit statute source family')
+    if getattr(args, "record_kind", "document") == "entity":
+        # The entity branch, read and gated BEFORE any API work. `--apply` has
+        # not been consulted yet and no header, token or store has been touched,
+        # so a candidate offered to the live store is refused having cost
+        # nothing. Staging entity descriptors is not implemented here: this
+        # entrypoint reads, validates and gates, and deployment stays deferred.
+        return _report_entity_manifest(
+            load_entity_manifest(
+                args.manifest,
+                contract_schema=args.contract_schema,
+                entity_path=args.entity_path,
+            ),
+            proof=args.proof,
+            apply_requested=args.apply,
+        )
+    if getattr(args, "entity_path", LIVE_PATH) != LIVE_PATH:
+        raise FiscalIngestError("--entity-path requires --record-kind entity")
     manifest = load_manifest(
         args.manifest,
         instance_slug=args.instance_slug,
