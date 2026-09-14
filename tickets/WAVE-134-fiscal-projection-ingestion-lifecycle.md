@@ -1286,3 +1286,11 @@ The proof records completed batches and remains applied=false on partial failure
 rerunning uses the API's existing digest idempotence. No API or image change.
 Tests exercise real records, CRLF preservation, file changes after admission,
 and a failure after a successful first batch.
+
+Focused validation at `4e8ae97`: **298 passed, none skipped** across bulk command,
+candidate storage, entity-ingest integration, adapter, contract-pin and document
+consumer suites. A later-batch invalid payload is refused before the first
+request. The first run of the new test file used pytest's reserved `setup` name;
+it was renamed and all new tests then executed. The container used
+`ks-test-runner:formatnongpl`, both plain operator clones, network disabled, and
+`SVS_STATECIVICS_REPO=/upstream`. The original application image remains active.
