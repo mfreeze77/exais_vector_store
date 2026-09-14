@@ -1,6 +1,6 @@
 # WAVE-134: Ingest scoped projections with consistent eligibility and lifecycle
 
-Status: in progress — lane B (the entity/document record adapter) LANDED; landed_by: 1565a84 (merge), 830ccb7 (branch tip). Wiring `adapt_manifest` into `kansas-fiscal-document-ingest.py`'s dispatch remains open and is P5-BUILD's first item. Parent: WAVE-132 (reopened). Filed 2026-09-10.
+Status: in progress — lane B LANDED (adapter: 1565a84 / 830ccb7; entrypoint integration: 0b15b6a / 5aef516). Two runtime follow-ups are required before any cell rebuild — see WAVE-148. Parent: WAVE-132 (reopened). Filed 2026-09-10.
 
 ## Summary
 
@@ -1112,3 +1112,31 @@ invoked — but the proposal must still be re-derived for `ks-fiscal-local`, the
 running cell, whose `.env.images` is not checked in anywhere; the digests
 recorded earlier belong to `ks-state-civics`. Nothing here touched the running
 cell.
+
+
+### 2026-09-13 — the entrypoint integration landed
+
+Merged to `main` as `0b15b6a` (`--no-ff`), branch tip `5aef516`.
+`wave-134-entity-ingest-integration` deleted after the merge.
+
+QC PASS. Two things from it worth carrying, because both make this repo's own
+record more accurate rather than less:
+
+* The QC ran **34 manifests** through both consumer versions against my 5. Of
+  the 6 divergences, all are one class — a document record carrying
+  `record_kind` at any value — and none is blocking on three independent
+  grounds: `legacy_document_record` declares `additionalProperties: false`, so
+  such a record was never contract-valid; A's producer cannot emit one; and
+  `grep -c record_kind kansas-statutes.jsonl` is 0.
+* **My sealed-seam evidence was thinner than I stated.** The fixture named four
+  seams including `upload_document`, which does not exist in the module, so its
+  `hasattr` guard silently sealed 3 of 4. The conclusion held — the QC
+  re-confirmed `CandidateRecordRefused` with all 12 real network-capable seams
+  plus `socket.socket` and `urllib.request.urlopen` sealed — but a guard that
+  skips what it cannot find is the same shape as the defects this ticket keeps
+  finding, and it was in a test written to prove the opposite. Fixed under
+  WAVE-148.
+
+Deployment stays deferred. **Item 8 remains PREPARED AND NOT EXECUTED**, and is
+now blocked on WAVE-148 plus re-deriving the proposal for `ks-fiscal-local`,
+whose `.env.images` is not checked in anywhere.
