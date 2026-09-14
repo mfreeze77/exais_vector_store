@@ -23,7 +23,7 @@ def module():
     return result
 
 
-CONTRACT_SCHEMA = Path(__file__).parent / 'fixtures' / 'statecivics-retrieval-export-record.314beafe.json'
+CONTRACT_SCHEMA = Path(__file__).parent / 'fixtures' / 'statecivics-retrieval-export-record.24c9d3de.json'
 
 
 def required(variable):

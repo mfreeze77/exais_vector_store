@@ -968,7 +968,7 @@
       }
     },
     "entity_eligibility": {
-      "description": "The row's OWN review and publication columns, copied. The exporter never sets, defaults or fabricates any of these: a row that does not already say reviewed or published is not exported at all, so only those two values can appear. publication_allowed is null for an appropriation action, which has no such column.",
+      "description": "The row's OWN review and publication columns, copied. The exporter never sets, defaults or fabricates any of these; status is whatever the row already said, and a row whose status is outside the lane being exported is not exported at all. publication_allowed is null for an appropriation action, which has no such column.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -979,8 +979,10 @@
       ],
       "properties": {
         "status": {
+          "description": "The row's own review state, copied. 'candidate' is machine-derived and has been seen by no reviewer; 'reviewed' has been through review; 'published' is a decided publishable state. TWO LANES, AND THEY NEVER MIX IN ONE FILE. The standard export emits only 'reviewed' and 'published'; 'candidate' is emitted ONLY by the exporter's --candidates mode, into its own output path. A candidate record MUST NEVER enter a live entity store: it is not desired state, and a consumer that reads a manifest as desired state would treat unreviewed machine output as authority. Consumers of the live store refuse any manifest containing 'candidate'. 'candidate' exists here so that an unreviewed row can be carried truthfully rather than borrowing a review that never happened -- which is exactly what the previous two-value enum forced, because status is required and no other value was permitted.",
           "type": "string",
           "enum": [
+            "candidate",
             "reviewed",
             "published"
           ]

@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RELEASE = ROOT / "scripts" / "release"
 SCRIPT = RELEASE / "kansas-fiscal-marker-handoff.py"
 CONTRACT_FIXTURE = (
-    Path(__file__).parent / "fixtures" / "statecivics-retrieval-export-record.314beafe.json"
+    Path(__file__).parent / "fixtures" / "statecivics-retrieval-export-record.24c9d3de.json"
 )
 sys.path.insert(0, str(RELEASE))
 

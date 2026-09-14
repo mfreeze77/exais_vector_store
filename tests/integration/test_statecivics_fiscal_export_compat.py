@@ -16,7 +16,7 @@ ADAPTER = ROOT / "scripts" / "release" / "kansas-fiscal-document-ingest.py"
 CONTRACT_FIXTURE = (
     Path(__file__).resolve().parents[1]
     / "fixtures"
-    / "statecivics-retrieval-export-record.314beafe.json"
+    / "statecivics-retrieval-export-record.24c9d3de.json"
 )
 STATECIVICS_REPO = Path(os.getenv("STATECIVICS_REPO", "")).resolve()
 pytestmark = pytest.mark.skipif(

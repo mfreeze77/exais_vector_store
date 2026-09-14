@@ -25,7 +25,7 @@ from svs_common.statecivics_contract_pin import (
     ENFORCED_PINS,
     PINNED_BRANCH_COMMIT,
     PINNED_BRANCH_SHA256,
-    PINNED_CONTRACT_COMMIT,
+    FIXTURE_CONTRACT_COMMIT,
     PIN_NAMES,
     SUPERSEDED_BRANCH_SHA256,
     ContractPinError,
@@ -38,7 +38,7 @@ from svs_common.statecivics_contract_pin import (
     verify_contract,
 )
 
-FIXTURE = Path(__file__).parent / "fixtures" / "statecivics-retrieval-export-record.314beafe.json"
+FIXTURE = Path(__file__).parent / "fixtures" / "statecivics-retrieval-export-record.24c9d3de.json"
 
 
 @pytest.fixture(scope="module")
@@ -236,9 +236,16 @@ def test_declared_pin_matches_the_enforced_constants(package: Path) -> None:
     assert "documentBranchSemanticSha256" not in pin
     assert "entityBranchSemanticSha256" not in pin
 
+    # A LIST now, because the entity branch has been superseded twice. Every
+    # declared entry must be a real superseded pin, and every superseded pin
+    # must be declared -- set equality in both directions, so neither side can
+    # quietly drop one.
     superseded = pin["supersededEntityBranch"]
-    assert (("entity", superseded["commit"], superseded["sha256"])
-            in SUPERSEDED_BRANCH_SHA256)
+    assert isinstance(superseded, list), "one entry cannot record two supersessions"
+    declared = {("entity", entry["commit"], entry["sha256"]) for entry in superseded}
+    assert declared == set(SUPERSEDED_BRANCH_SHA256)
+    for entry in superseded:
+        assert entry["readWith"].startswith(f"git show {entry['commit']}:")
 
     text = (package / "source.yaml").read_text()
     assert "contractSha256:" not in text
@@ -342,7 +349,7 @@ def test_historical_digests_are_reproducible_at_their_recorded_commit() -> None:
 #: computed FROM the fixture, so if the fixture is not the upstream file at the
 #: pinned commit, every number below it is internally consistent and externally
 #: meaningless.
-FIXTURE_SHA256 = "899b541a8ba03431e0a129c09a8a3733b2d43057e4bb260b8bdb010dece2e8a7"
+FIXTURE_SHA256 = "9bd52e297b7df5fd3901c52a203cc06ee5bb39e4187e8da2071def1a7d1f081f"
 UPSTREAM_CONTRACT_PATH = "contracts/civic-impact/retrieval-export-record.schema.json"
 
 
@@ -358,7 +365,10 @@ def test_the_fixture_is_the_upstream_contract_at_the_pinned_commit() -> None:
     import hashlib
 
     upstream = statecivics_repo()
-    commit = PINNED_CONTRACT_COMMIT
+    # The commit the FIXTURE BYTES came from, not any one branch's pin. The
+    # three no longer agree: document and dispatch are still at 314beafe, the
+    # entity branch moved to 24c9d3de, and the fixture is one whole file.
+    commit = FIXTURE_CONTRACT_COMMIT
 
     blob = subprocess.run(
         ["git", "-C", str(upstream), "show", f"{commit}:{UPSTREAM_CONTRACT_PATH}"],
@@ -379,17 +389,38 @@ def test_the_fixture_is_the_upstream_contract_at_the_pinned_commit() -> None:
     )
 
     # A digest proves the bytes; it does not prove the commit is real history.
-    # A commit that is not an ancestor of `main` is a dangling or abandoned
-    # object, and pinning to one is how a pin outlives the work it pinned.
-    ancestry = subprocess.run(
-        ["git", "-C", str(upstream), "merge-base", "--is-ancestor", commit, "main"],
-        capture_output=True,
+    # A commit no branch reaches is a dangling or abandoned object, and pinning
+    # to one is how a pin outlives the work it pinned.
+    #
+    # `main` is the requirement. A pin may instead name an unmerged branch in
+    # PROVISIONAL_BRANCH_COMMIT, and then it must be an ancestor of THAT branch
+    # -- so the check never becomes "any object will do", it becomes "say where
+    # this lives". The debt is that the entry exists at all, and the test below
+    # makes the debt visible rather than letting it rest.
+    from svs_common.statecivics_contract_pin import PROVISIONAL_BRANCH_COMMIT
+
+    provisional = PROVISIONAL_BRANCH_COMMIT.get("entity")
+    targets = ["main"] if provisional is None else ["main", provisional]
+    reached = [
+        target
+        for target in targets
+        if subprocess.run(
+            ["git", "-C", str(upstream), "merge-base", "--is-ancestor", commit, target],
+            capture_output=True,
+        ).returncode
+        == 0
+    ]
+    assert reached, (
+        f"{commit} is an ancestor of none of {targets}; the contract pin does not "
+        f"point at upstream history that any branch reaches"
     )
-    assert ancestry.returncode == 0, (
-        f"{commit} is not an ancestor of StateCivics main; the contract pin "
-        f"does not point at landed upstream history (git said: "
-        f"{ancestry.stderr.decode().strip()!r})"
-    )
+    if provisional is not None and "main" in reached:
+        raise AssertionError(
+            f"{commit} HAS merged to StateCivics main, so the provisional entry "
+            f"PROVISIONAL_BRANCH_COMMIT['entity'] = {provisional!r} is stale. Delete it: a "
+            "pin left provisional after its branch merges is indistinguishable from one "
+            "that was never checked."
+        )
 
 
 def test_every_pinned_digest_travels_with_its_commit(contract) -> None:
@@ -397,7 +428,19 @@ def test_every_pinned_digest_travels_with_its_commit(contract) -> None:
     assert set(PINNED_BRANCH_COMMIT) == {"document", "entity", "dispatch"}
     for branch, commit in PINNED_BRANCH_COMMIT.items():
         assert len(commit) == 40 and int(commit, 16) >= 0
-    assert PINNED_CONTRACT_COMMIT == PINNED_BRANCH_COMMIT["document"]
+    # The pins move separately, and at 24c9d3de they actually did: the entity
+    # branch advanced while document and dispatch stayed where they were. A
+    # constant collapsing them into one contract revision would now be false,
+    # which is why PINNED_CONTRACT_COMMIT is gone rather than stale.
+    import svs_common.statecivics_contract_pin as pin
+
+    assert not hasattr(pin, "PINNED_CONTRACT_COMMIT")
+    assert PINNED_BRANCH_COMMIT["document"] == PINNED_BRANCH_COMMIT["dispatch"]
+    assert PINNED_BRANCH_COMMIT["entity"] != PINNED_BRANCH_COMMIT["document"]
+    assert FIXTURE_CONTRACT_COMMIT == PINNED_BRANCH_COMMIT["entity"], (
+        "the fixture must be the file at the LATEST branch movement, or a branch "
+        "digest recomputed from it would not match its own pin"
+    )
     # The pinned commit must be the one the fixture actually came from.
     assert branch_digests(contract) == {
         "document": DOCUMENT_BRANCH_SHA256,
@@ -406,11 +449,32 @@ def test_every_pinned_digest_travels_with_its_commit(contract) -> None:
     }
 
 
+def test_a_provisional_pin_names_a_branch_and_only_a_pinned_one() -> None:
+    """A provisional entry may exist; it may not be vague or orphaned."""
+    from svs_common.statecivics_contract_pin import PROVISIONAL_BRANCH_COMMIT
+
+    assert set(PROVISIONAL_BRANCH_COMMIT) <= set(PIN_NAMES)
+    for name, branch in PROVISIONAL_BRANCH_COMMIT.items():
+        assert name in PINNED_BRANCH_COMMIT
+        assert isinstance(branch, str) and branch and branch != "main", (
+            "a provisional pin must name the unmerged branch it lives on; naming main "
+            "would make the entry meaningless"
+        )
+    # The document and dispatch pins are landed and must stay that way.
+    assert "document" not in PROVISIONAL_BRANCH_COMMIT
+    assert "dispatch" not in PROVISIONAL_BRANCH_COMMIT
+
+
 def test_superseded_entity_pin_is_kept_as_a_commit_digest_pair() -> None:
+    """Two supersessions now: one prose-only, one a real constraint change."""
     assert SUPERSEDED_BRANCH_SHA256 == (
         ("entity", "e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a",
          "da242fd879b3c124449b6c1ddead558db64d8f0427ade638bf596c8fd1d9f17e"),
+        ("entity", "314beafe4f7905f06a2edb7828b0ea8b2976266c",
+         "d5248a5452389c40a55c844f2e455343b2e24ce3dedff9a9ecac0752eeb28734"),
     )
+    # Only the entity branch has ever moved.
+    assert {branch for branch, _c, _d in SUPERSEDED_BRANCH_SHA256} == {"entity"}
     live = {DOCUMENT_BRANCH_SHA256, ENTITY_BRANCH_SHA256, DISPATCH_SHA256}
     for _branch, _commit, digest in SUPERSEDED_BRANCH_SHA256:
         assert digest not in live, "a superseded digest is still pinned live"

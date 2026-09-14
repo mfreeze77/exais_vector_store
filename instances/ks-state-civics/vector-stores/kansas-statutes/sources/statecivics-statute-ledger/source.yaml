@@ -35,18 +35,25 @@ source:
       # Each digest carries the commit it was computed from; they move separately.
       documentBranchCommit: 314beafe4f7905f06a2edb7828b0ea8b2976266c
       documentBranchSha256: d3a7212a4873a2f375d451e74ab4d5f11a56ff50bbbeb5a162dae1f8640807e2
-      entityBranchCommit: 314beafe4f7905f06a2edb7828b0ea8b2976266c
-      entityBranchSha256: d5248a5452389c40a55c844f2e455343b2e24ce3dedff9a9ecac0752eeb28734
+      entityBranchCommit: 24c9d3ded35405054094a1280c7ea1f074fad5d5
+      entityBranchSha256: 52fd9ee50585c805664a39f5548ba04d00c0ac1a16c4095e2149d06451817058
       # The top-level if/then/else routing predicate. A change to routing alone
       # redirects records between branches while both branch subtrees stay
       # byte-identical, so it is pinned and enforced on its own.
       dispatchCommit: 314beafe4f7905f06a2edb7828b0ea8b2976266c
       dispatchSha256: 03dc178429d04275f7b49a6d4ab9e05ee56bc970a31de78268942eb3de3b7940
+      # The entity branch has moved twice; the document branch has not moved at
+      # all. That asymmetry is the whole reason these are pinned per branch.
       supersededEntityBranch:
         # Prose-only drift: A rewrote two entity-branch descriptions, which moved
         # this digest and left the document branch untouched.
-        commit: e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a
-        sha256: da242fd879b3c124449b6c1ddead558db64d8f0427ade638bf596c8fd1d9f17e
+        - commit: e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a
+          sha256: da242fd879b3c124449b6c1ddead558db64d8f0427ade638bf596c8fd1d9f17e
+        # A real constraint change: KS-650 B1.3 widened
+        # entity_eligibility.status to admit 'candidate'. The whole diff sits
+        # inside $defs.entity_eligibility, so document and dispatch did not move.
+        - commit: 314beafe4f7905f06a2edb7828b0ea8b2976266c
+          sha256: d5248a5452389c40a55c844f2e455343b2e24ce3dedff9a9ecac0752eeb28734
       enforcedBy: packages/svs_common/svs_common/statecivics_contract_pin.py
       # EVERY runner that reads a desired-state manifest through the document
       # consumer enforces. Listing some while another ran unpinned is the defect
