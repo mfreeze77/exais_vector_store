@@ -154,12 +154,15 @@ __all__ = [
     "KNOWN_KEYWORDS",
     "LIVE_ELIGIBILITY_STATUSES",
     "LIVE_PATH",
+    "PAYLOAD_AGREEMENT_KEYS",
     "AdaptedManifest",
+    "CallerSuppliedCollectionRefused",
     "CandidateRecordRefused",
     "DeploymentIndexSettings",
     "DispatchRule",
     "DocumentCollectionRosterIncomplete",
     "EntityCollectionCollision",
+    "EnvelopePayloadMismatch",
     "InstanceCollectionConfigError",
     "InstanceCollectionRoster",
     "RecordBranchError",
@@ -170,6 +173,7 @@ __all__ = [
     "adapt_manifest",
     "adapt_records",
     "admit_entity_records",
+    "assert_envelope_payload_agreement",
     "branch_subtree",
     "candidate_collection_name",
     "classify_record",
@@ -179,6 +183,7 @@ __all__ = [
     "entity_collection_name",
     "entity_path_for",
     "read_instance_collection_roster",
+    "resolve_staging_collection",
     "stage_entity_descriptors",
     "validate",
 ]
@@ -645,6 +650,14 @@ def adapt_records(
                 + "; ".join(result.errors)
                 + f". The {pin} branch is not relaxed to admit a record from the other branch."
             )
+        if pin == rule.present_pin:
+            # Cross-field, after schema validation and before any routing. The
+            # two contracts each accept a self-contradictory record; only a rule
+            # that relates them can refuse it.
+            try:
+                assert_envelope_payload_agreement(record)
+            except EnvelopePayloadMismatch as exc:
+                raise EnvelopePayloadMismatch(f"{source}:{line_number}: {exc}") from None
         buckets[pin].append(record)
 
     return AdaptedManifest(
@@ -948,6 +961,109 @@ KNOWN_ELIGIBILITY_STATUSES: frozenset[str] = LIVE_ELIGIBILITY_STATUSES | {
 }
 
 
+#: Where each entity type's KS-600 payload keeps the three fields the envelope
+#: also carries. Both halves of a record state identity, revision and review
+#: state; a record in which they disagree is not two opinions, it is one record
+#: that is wrong.
+PAYLOAD_AGREEMENT_KEYS: dict[str, dict[str, str]] = {
+    "provision_reference": {
+        "entity_logical_id": "provision_reference_logical_id",
+        "entity_revision": "provision_reference_revision",
+        "eligibility.status": "status",
+    },
+    "appropriation_action": {
+        "entity_logical_id": "appropriation_action_id",
+        "entity_revision": "revision",
+        "eligibility.status": "status",
+    },
+}
+
+
+class EnvelopePayloadMismatch(ValueError):
+    """The envelope and its KS-600 payload disagree about the same fact.
+
+    JSON Schema cannot express this. The envelope is validated against the
+    retrieval-export contract and the payload against its own KS-600 contract,
+    and nothing relates them -- so a record whose envelope says ``published``
+    while its payload says ``candidate`` satisfies BOTH schemas and is still a
+    record that cannot be true. Quality control found exactly that, and found it
+    reaching the embedding and index callbacks.
+
+    The revision form of it is worse, because it is what a half-applied as-of
+    selection leaves behind: a revision-2 envelope wrapping a revision-1
+    payload. A stale fixture upstream produced that shape by accident, which is
+    the evidence that it is reachable rather than theoretical.
+    """
+
+
+def _envelope_value(record: Mapping, field: str) -> Any:
+    if field == "eligibility.status":
+        eligibility = record.get("eligibility")
+        return eligibility.get("status") if isinstance(eligibility, dict) else None
+    return record.get(field)
+
+
+def assert_envelope_payload_agreement(record: Mapping) -> None:
+    """Refuse a record whose envelope and payload state different facts.
+
+    A CROSS-FIELD rule, applied after schema validation and before any routing.
+    It changes no schema and moves no digest: it relates two documents that each
+    contract already accepts.
+
+    A removal record carries no ``entity`` by construction -- a tombstone names
+    what to delete and nothing else -- so there is nothing to agree with, and
+    that case is skipped rather than failed.
+    """
+    payload = record.get("entity")
+    if payload is None:
+        return
+    if not isinstance(payload, dict):
+        raise EnvelopePayloadMismatch(
+            f"record {record.get('export_record_id')!r} has a non-object entity payload, so "
+            "envelope/payload agreement cannot be established"
+        )
+    entity_type = record.get("entity_type")
+    keys = PAYLOAD_AGREEMENT_KEYS.get(entity_type) if isinstance(entity_type, str) else None
+    if keys is None:
+        raise EnvelopePayloadMismatch(
+            f"record {record.get('export_record_id')!r} declares entity_type {entity_type!r}, "
+            f"for which no envelope/payload field mapping is known "
+            f"({sorted(PAYLOAD_AGREEMENT_KEYS)}). Refusing rather than skipping the check: an "
+            "unknown type is not evidence that the two halves agree."
+        )
+    for envelope_field, payload_field in keys.items():
+        envelope_value = _envelope_value(record, envelope_field)
+        if payload_field not in payload:
+            raise EnvelopePayloadMismatch(
+                f"record {record.get('export_record_id')!r} ({entity_type}): the payload has no "
+                f"{payload_field!r} to compare with the envelope's {envelope_field} "
+                f"={envelope_value!r}, so agreement cannot be established"
+            )
+        payload_value = payload[payload_field]
+        if not _json_equal_scalar(envelope_value, payload_value):
+            raise EnvelopePayloadMismatch(
+                f"refusing entity record {record.get('export_record_id')!r} ({entity_type}): "
+                f"envelope {envelope_field}={envelope_value!r} but payload "
+                f"{payload_field}={payload_value!r}. Both schemas accept this record "
+                "separately; nothing relates them, so the disagreement is invisible to "
+                "validation and must be refused here."
+            )
+
+
+def _json_equal_scalar(left: Any, right: Any) -> bool:
+    """Typed equality for the scalars this rule compares.
+
+    A boolean is never a number, for the same reason it is not in JSON Schema.
+    An int and a float of equal mathematical value are equal, so a revision
+    emitted as ``2.0`` still agrees with ``2``.
+    """
+    if isinstance(left, bool) or isinstance(right, bool):
+        return isinstance(left, bool) and isinstance(right, bool) and left is right
+    if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+        return left == right
+    return type(left) is type(right) and left == right
+
+
 class CandidateRecordRefused(ValueError):
     """A candidate revision was offered to the LIVE entity store.
 
@@ -1011,6 +1127,11 @@ def admit_entity_records(
         raise ValueError(f"unknown entity path {path!r}; expected one of {list(ENTITY_PATHS)}")
     admitted: list[dict[str, Any]] = []
     for record in records:
+        # Before the status is even read: a record whose two halves disagree has
+        # no single status to route on. Repeated here and not only in
+        # adapt_records because records can reach this gate without having been
+        # read from a manifest, and every path to embedding runs through it.
+        assert_envelope_payload_agreement(record)
         status = eligibility_status(record)
         if path == LIVE_PATH and status == CANDIDATE_ELIGIBILITY_STATUS:
             raise CandidateRecordRefused(
@@ -1034,6 +1155,18 @@ def admit_entity_records(
     return tuple(admitted)
 
 
+class CallerSuppliedCollectionRefused(ValueError):
+    """A caller named a collection that is not the one the guards resolve.
+
+    The guards were built and then not wired to the function that actually
+    calls embedding and indexing, which is the same as not having them: quality
+    control drove ``stage_entity_descriptors`` with
+    ``svs_biz_ks_state_civics_voyage_4_docs_1024`` -- the shared statute and
+    document collection -- and it embedded and indexed into it. A guard nothing
+    calls does not hold an invariant; it describes one.
+    """
+
+
 @dataclass(frozen=True, slots=True)
 class StagedEntities:
     """What a staging run admitted and where it put it."""
@@ -1044,11 +1177,49 @@ class StagedEntities:
     embedded: int
 
 
+def resolve_staging_collection(
+    adapter: Any,
+    *,
+    path: str,
+    instance_root: Path,
+    entity_embedding_profile_id: str,
+    candidate_embedding_profile_id: str | None = None,
+    entity_store_slugs: tuple[str, ...] = (),
+) -> str:
+    """The collection ``path`` resolves to, through the guards, or refuse."""
+    if path == LIVE_PATH:
+        return entity_collection_name(
+            adapter,
+            instance_root=instance_root,
+            entity_embedding_profile_id=entity_embedding_profile_id,
+            entity_store_slugs=entity_store_slugs,
+        )
+    if path == CANDIDATE_PATH:
+        if candidate_embedding_profile_id is None:
+            raise InstanceCollectionConfigError(
+                "the candidate path needs its own embedding profile: it must share a "
+                "collection with neither the document stores nor the live entity store"
+            )
+        return candidate_collection_name(
+            adapter,
+            instance_root=instance_root,
+            candidate_embedding_profile_id=candidate_embedding_profile_id,
+            entity_embedding_profile_id=entity_embedding_profile_id,
+            entity_store_slugs=entity_store_slugs,
+        )
+    raise ValueError(f"unknown entity path {path!r}; expected one of {list(ENTITY_PATHS)}")
+
+
 def stage_entity_descriptors(
     records: Sequence[Mapping],
     *,
     path: str,
-    collection: str,
+    adapter: Any,
+    instance_root: Path,
+    entity_embedding_profile_id: str,
+    candidate_embedding_profile_id: str | None = None,
+    entity_store_slugs: tuple[str, ...] = (),
+    collection: str | None = None,
     embed: Any,
     index_write: Any,
 ) -> StagedEntities:
@@ -1058,17 +1229,42 @@ def stage_entity_descriptors(
     ``index_write`` are the caller's, are keyword-only and have NO defaults, so
     this function cannot be invoked into doing I/O by accident.
 
-    The ordering is the substance of the guarantee and it is structural, not a
-    convention: :func:`admit_entity_records` is called first, completes over the
-    whole batch, and raises out of this function before the first ``embed``. A
-    test drives it with callables that raise if invoked, so an inversion fails
-    loudly rather than costing a run.
+    TWO refusals run before the first ``embed``, and the ordering is structural
+    rather than a convention:
+
+    1. :func:`admit_entity_records` -- which now also enforces envelope/payload
+       agreement -- over the WHOLE batch, so one bad record refuses the batch
+       instead of embedding the clean ones ahead of it.
+    2. :func:`resolve_staging_collection` -- the destination is RESOLVED HERE,
+       through the collection guards, not accepted from the caller. ``collection``
+       is an optional ASSERTION: if given it must equal what the guards resolve,
+       and otherwise it is refused. It cannot select a destination.
+
+    That second one is the round-five finding. The guards existed and this
+    function did not call them, so a caller naming the shared document
+    collection was embedded and indexed straight into it.
     """
     admitted = admit_entity_records(records, path=path)
+    resolved = resolve_staging_collection(
+        adapter,
+        path=path,
+        instance_root=instance_root,
+        entity_embedding_profile_id=entity_embedding_profile_id,
+        candidate_embedding_profile_id=candidate_embedding_profile_id,
+        entity_store_slugs=entity_store_slugs,
+    )
+    if collection is not None and collection != resolved:
+        raise CallerSuppliedCollectionRefused(
+            f"caller named collection {collection!r} for the {path!r} path, but this "
+            f"deployment resolves {resolved!r}. The destination is not a caller's to "
+            "choose: a caller that could name it could name the shared document "
+            "collection, which is exactly what happened. Nothing has been embedded or "
+            "indexed."
+        )
     vectors = [embed(record["description"]["text"]) for record in admitted]
-    index_write(collection, tuple(zip(admitted, vectors, strict=True)))
+    index_write(resolved, tuple(zip(admitted, vectors, strict=True)))
     return StagedEntities(
-        path=path, collection=collection, records=admitted, embedded=len(vectors)
+        path=path, collection=resolved, records=admitted, embedded=len(vectors)
     )
 
 

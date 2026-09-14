@@ -65,10 +65,12 @@ from svs_common.statecivics_record_adapter import (
     KNOWN_KEYWORDS,
     LIVE_ELIGIBILITY_STATUSES,
     LIVE_PATH,
+    CallerSuppliedCollectionRefused,
     CandidateRecordRefused,
     DispatchRule,
     DocumentCollectionRosterIncomplete,
     EntityCollectionCollision,
+    EnvelopePayloadMismatch,
     InstanceCollectionConfigError,
     RecordBranchError,
     UnknownEligibilityStatus,
@@ -76,6 +78,7 @@ from svs_common.statecivics_record_adapter import (
     adapt_manifest,
     adapt_records,
     admit_entity_records,
+    assert_envelope_payload_agreement,
     branch_subtree,
     candidate_collection_name,
     classify_record,
@@ -85,6 +88,7 @@ from svs_common.statecivics_record_adapter import (
     entity_collection_name,
     entity_path_for,
     read_instance_collection_roster,
+    resolve_staging_collection,
     stage_entity_descriptors,
     validate,
 )
@@ -155,6 +159,43 @@ def _jsonl(path: Path) -> list[dict]:
 @pytest.fixture(scope="module")
 def manifest():
     return adapt_manifest(MIXED, contract_schema=CONTRACT)
+
+
+#: The two collections a correctly-configured cell resolves for entity work.
+LIVE_ENTITY_COLLECTION = "svs_biz_ks_state_civics_voyage_4_entities_1024"
+CANDIDATE_COLLECTION = "svs_biz_ks_state_civics_voyage_4_candidates_1024"
+CANDIDATE_PROFILE = "voyage_4_candidates_1024"
+ENTITY_STORES = ("kansas-fiscal-entities", "kansas-fiscal-entity-candidates")
+
+
+def _staging(tmp_path: Path) -> dict:
+    """Everything `stage_entity_descriptors` needs to RESOLVE its own collection.
+
+    There is no `collection=` here on purpose: the destination is the guards'
+    to decide. Round five found the guards existed and this function did not
+    call them, so a caller naming the shared document collection was embedded
+    and indexed straight into it.
+    """
+    return {
+        "adapter": _qdrant(),
+        "instance_root": _staging_instance(tmp_path),
+        "entity_embedding_profile_id": ENTITY_PROFILE,
+        "candidate_embedding_profile_id": CANDIDATE_PROFILE,
+        "entity_store_slugs": ENTITY_STORES,
+    }
+
+
+def _staging_instance(tmp_path: Path) -> Path:
+    return _instance_tree(
+        tmp_path,
+        stores={
+            "kansas-statutes": {"statute-ledger": "voyage_4_docs_1024"},
+            "kansas-fiscal-documents": {"fiscal-ledger": "voyage_4_docs_1024"},
+            "kansas-fiscal-entities": {"entity-ledger": ENTITY_PROFILE},
+            "kansas-fiscal-entity-candidates": {"candidate-ledger": CANDIDATE_PROFILE},
+        },
+        preferred={"pdf_markdown_external_v1": "openai_text_embedding_3_small_1536"},
+    )
 
 
 def _qdrant(prefix: str = RUNTIME_PREFIX) -> QdrantAdapter:
@@ -1065,6 +1106,10 @@ def _candidate(record: dict, status: str = CANDIDATE_ELIGIBILITY_STATUS) -> dict
     """
     out = copy.deepcopy(record)
     out["eligibility"]["status"] = status
+    # BOTH halves. Rewriting only the envelope produces the self-contradictory
+    # record round five is about, and the cross-field rule now refuses it -- so
+    # a helper that did that would be testing the wrong thing everywhere.
+    out["entity"]["status"] = status
     return out
 
 
@@ -1122,7 +1167,7 @@ def test_the_candidate_path_refuses_a_reviewed_record(manifest) -> None:
         admit_entity_records(manifest.entity_records, path=CANDIDATE_PATH)
 
 
-def test_nothing_is_embedded_or_indexed_before_the_refusal(manifest) -> None:
+def test_nothing_is_embedded_or_indexed_before_the_refusal(manifest, tmp_path) -> None:
     """THE ordering proof. The callables detonate if reached."""
     embed, index_write = _Detonator("embed"), _Detonator("index_write")
     records = [manifest.entity_records[0], _candidate(manifest.entity_records[1])]
@@ -1130,7 +1175,7 @@ def test_nothing_is_embedded_or_indexed_before_the_refusal(manifest) -> None:
         stage_entity_descriptors(
             records,
             path=LIVE_PATH,
-            collection="svs_biz_ks_state_civics_voyage_4_entities_1024",
+            **_staging(tmp_path),
             embed=embed,
             index_write=index_write,
         )
@@ -1138,7 +1183,7 @@ def test_nothing_is_embedded_or_indexed_before_the_refusal(manifest) -> None:
     assert index_write.calls == 0, "an index write was made before the refusal"
 
 
-def test_one_candidate_refuses_the_whole_batch_before_the_first_embed(manifest) -> None:
+def test_one_candidate_refuses_the_whole_batch_before_the_first_embed(manifest, tmp_path) -> None:
     """The clean record ahead of it must not be embedded either.
 
     Per-record refusal would embed the first record, then refuse -- and the
@@ -1148,19 +1193,19 @@ def test_one_candidate_refuses_the_whole_batch_before_the_first_embed(manifest) 
     records = [manifest.entity_records[0]] * 5 + [_candidate(manifest.entity_records[1])]
     with pytest.raises(CandidateRecordRefused):
         stage_entity_descriptors(
-            records, path=LIVE_PATH, collection="c", embed=embed, index_write=index_write
+            records, path=LIVE_PATH, **_staging(tmp_path), embed=embed, index_write=index_write
         )
     assert embed.calls == 0
 
 
-def test_staging_calls_embed_then_index_once_admitted(manifest) -> None:
+def test_staging_calls_embed_then_index_once_admitted(manifest, tmp_path) -> None:
     """The gate is not simply refusing everything."""
     embedded: list[str] = []
     written: list[tuple] = []
     result = stage_entity_descriptors(
         manifest.entity_records,
         path=LIVE_PATH,
-        collection="svs_biz_ks_state_civics_voyage_4_entities_1024",
+        **_staging(tmp_path),
         embed=lambda text: embedded.append(text) or [0.0],
         index_write=lambda collection, rows: written.append((collection, rows)),
     )
@@ -1168,7 +1213,8 @@ def test_staging_calls_embed_then_index_once_admitted(manifest) -> None:
     assert len(embedded) == 2
     assert embedded == [r["description"]["text"] for r in manifest.entity_records]
     assert len(written) == 1
-    assert written[0][0] == "svs_biz_ks_state_civics_voyage_4_entities_1024"
+    # The collection is the one the GUARDS resolved, not one named here.
+    assert written[0][0] == result.collection == LIVE_ENTITY_COLLECTION
 
 
 def test_staging_takes_no_default_io_callables() -> None:
@@ -1179,7 +1225,7 @@ def test_staging_takes_no_default_io_callables() -> None:
     import inspect
 
     sig = inspect.signature(stage_entity_descriptors)
-    for name in ("path", "collection", "embed", "index_write"):
+    for name in ("path", "adapter", "instance_root", "embed", "index_write"):
         parameter = sig.parameters[name]
         assert parameter.kind is inspect.Parameter.KEYWORD_ONLY
         assert parameter.default is inspect.Parameter.empty
@@ -1199,6 +1245,10 @@ def test_the_gate_itself_holds_no_io_seam() -> None:
 )
 def test_an_unrecognised_or_missing_status_is_refused(manifest, eligibility) -> None:
     record = copy.deepcopy(manifest.entity_records[0])
+    # Drop the payload so the CROSS-FIELD rule is inapplicable and this test is
+    # about the status rule alone. With the payload present, a missing envelope
+    # status is caught earlier as a mismatch -- correct, but a different rule.
+    record.pop("entity")
     if eligibility is None:
         record.pop("eligibility")
     else:
@@ -1383,8 +1433,7 @@ def test_7_2b_the_refusal_is_for_candidacy_and_for_nothing_else(
     rule = dispatch_rule(schema)
     assert validate(record, schema, rule.present_ref).ok
     for status in sorted(LIVE_ELIGIBILITY_STATUSES):
-        twin = copy.deepcopy(record)
-        twin["eligibility"]["status"] = status
+        twin = _candidate(record, status)  # BOTH halves; see round five
         assert entity_path_for(twin) == LIVE_PATH
         assert len(admit_entity_records([twin], path=LIVE_PATH)) == 1
         # ...and still valid, so nothing else in the record is marginal.
@@ -1394,21 +1443,21 @@ def test_7_2b_the_refusal_is_for_candidacy_and_for_nothing_else(
     assert "uri" in ASSERTED_FORMATS
 
 
-def test_7_2c_the_whole_manifest_is_refused_with_nothing_spent(real_records) -> None:
+def test_7_2c_the_whole_manifest_is_refused_with_nothing_spent(real_records, tmp_path) -> None:
     """Proof 2, ordered, on the real manifest: two records, zero calls."""
     embed, index_write = _Detonator("embed"), _Detonator("index_write")
     with pytest.raises(CandidateRecordRefused):
         stage_entity_descriptors(
             list(real_records.values()),
             path=LIVE_PATH,
-            collection="svs_biz_ks_state_civics_voyage_4_entities_1024",
+            **_staging(tmp_path),
             embed=embed,
             index_write=index_write,
         )
     assert (embed.calls, index_write.calls) == (0, 0)
 
 
-def test_7_3_the_candidate_path_accepts_both(real_records) -> None:
+def test_7_3_the_candidate_path_accepts_both(real_records, tmp_path) -> None:
     """Proof 3."""
     records = list(real_records.values())
     for record in records:
@@ -1420,13 +1469,13 @@ def test_7_3_the_candidate_path_accepts_both(real_records) -> None:
     staged = stage_entity_descriptors(
         records,
         path=CANDIDATE_PATH,
-        collection="svs_biz_ks_state_civics_voyage_4_candidates_1024",
+        **_staging(tmp_path),
         embed=lambda text: embedded.append(text) or [0.0],
         index_write=lambda collection, rows: written.append((collection, rows)),
     )
     assert staged.embedded == 2
     assert embedded == [r["description"]["text"] for r in records]
-    assert written[0][0] == "svs_biz_ks_state_civics_voyage_4_candidates_1024"
+    assert written[0][0] == staged.collection == CANDIDATE_COLLECTION
 
 
 @pytest.mark.parametrize("kind", ["appropriation_action", "provision_reference"])
@@ -1461,9 +1510,10 @@ def test_7_4b_the_superseded_twin_would_be_admitted_which_is_the_point(
     has to be the assertion on the revision as emitted, and this is the thing
     it guards against.
     """
-    fallback = copy.deepcopy(real_records[kind])
+    fallback = _candidate(real_records[kind], "reviewed")
     fallback["entity_revision"] = 1
-    fallback["eligibility"]["status"] = "reviewed"
+    fallback["entity"]["revision" if kind == "appropriation_action"
+                       else "provision_reference_revision"] = 1
     assert len(admit_entity_records([fallback], path=LIVE_PATH)) == 1
     assert fallback["entity_revision"] != real_records[kind]["entity_revision"]
 
@@ -1568,3 +1618,290 @@ def test_the_real_records_match_the_authoritative_identifiers(real_action, real_
     ]
     assert "url" not in real_action["entity"]["source"]
     assert "url" not in real_provision["entity"]["evidence"][0]
+
+
+# --------------------------------------------------------------------------
+# Round five, item 1: envelope and payload must agree
+# --------------------------------------------------------------------------
+#
+# The gap this closes was reported as a STRENGTH. "The same record with only
+# `status` changed passes the live path" was offered as proof the refusal was
+# single-reason. It is the opposite: changing only the ENVELOPE's status leaves
+# the PAYLOAD saying `candidate`, and that self-contradictory record satisfied
+# both schemas -- and reached the embedding and index callbacks.
+#
+# JSON Schema cannot express this. The envelope is validated against the
+# retrieval-export contract and the payload against its own KS-600 contract,
+# and nothing relates them. So it is a cross-field rule, applied after schema
+# validation, and it moves no digest.
+
+
+@pytest.mark.parametrize("kind", ["appropriation_action", "provision_reference"])
+def test_r5_1_the_contradictory_record_is_now_refused(real_records, schema, kind) -> None:
+    """THE INVERSION. This record passed before round five; it must not now."""
+    record = copy.deepcopy(real_records[kind])
+    record["eligibility"]["status"] = "published"  # envelope only
+    assert record["entity"]["status"] == "candidate"  # payload untouched
+
+    # Both schemas still accept it -- which is the whole problem.
+    rule = dispatch_rule(schema)
+    assert validate(record, schema, rule.present_ref).ok
+
+    with pytest.raises(EnvelopePayloadMismatch) as excinfo:
+        adapt_records([(1, record)], schema)
+    message = str(excinfo.value)
+    assert "eligibility.status='published'" in message
+    assert "status='candidate'" in message
+    assert record["export_record_id"] in message
+    # ...and the gate refuses it too, so no path to embedding is left open.
+    with pytest.raises(EnvelopePayloadMismatch):
+        admit_entity_records([record], path=LIVE_PATH)
+
+
+@pytest.mark.parametrize("kind", ["appropriation_action", "provision_reference"])
+def test_r5_1b_the_revision_mismatch_twin_is_refused(real_records, schema, kind) -> None:
+    """Envelope revision 2, payload revision 1.
+
+    Exactly the shape upstream's stale fixture produced by accident, and exactly
+    what a half-applied as-of selection would leave behind.
+    """
+    record = copy.deepcopy(real_records[kind])
+    payload_key = "revision" if kind == "appropriation_action" else "provision_reference_revision"
+    record["entity"][payload_key] = 1
+    rule = dispatch_rule(schema)
+    assert validate(record, schema, rule.present_ref).ok, "schemas still accept it"
+
+    with pytest.raises(EnvelopePayloadMismatch) as excinfo:
+        adapt_records([(1, record)], schema)
+    message = str(excinfo.value)
+    assert "entity_revision=2" in message
+    assert f"{payload_key}=1" in message
+
+
+@pytest.mark.parametrize("kind", ["appropriation_action", "provision_reference"])
+def test_r5_1c_an_identity_mismatch_is_refused(real_records, schema, kind) -> None:
+    """The third field. A record pointing at somebody else's identity."""
+    record = copy.deepcopy(real_records[kind])
+    payload_key = (
+        "appropriation_action_id" if kind == "appropriation_action"
+        else "provision_reference_logical_id"
+    )
+    record["entity"][payload_key] = "0" * 64
+    with pytest.raises(EnvelopePayloadMismatch, match="entity_logical_id"):
+        adapt_records([(1, record)], schema)
+
+
+@pytest.mark.parametrize("kind", ["appropriation_action", "provision_reference"])
+def test_r5_1d_the_real_records_are_positive_controls(real_records, kind) -> None:
+    """The internally consistent revision-2 records still pass. Not a blanket no."""
+    assert_envelope_payload_agreement(real_records[kind])
+    assert len(admit_entity_records([real_records[kind]], path=CANDIDATE_PATH)) == 1
+
+
+def test_r5_1e_nothing_is_embedded_when_a_contradictory_record_is_refused(
+    real_records, tmp_path
+) -> None:
+    """Same batch-level, pre-embed ordering as the candidate gate, proved the same way."""
+    embed, index_write = _Detonator("embed"), _Detonator("index_write")
+    contradictory = _candidate(real_records["provision_reference"], "published")
+    contradictory["entity"]["status"] = "candidate"  # break the agreement again
+    clean = _candidate(real_records["appropriation_action"], "published")
+    with pytest.raises(EnvelopePayloadMismatch):
+        stage_entity_descriptors(
+            [clean, contradictory],
+            path=LIVE_PATH,
+            **_staging(tmp_path),
+            embed=embed,
+            index_write=index_write,
+        )
+    assert (embed.calls, index_write.calls) == (0, 0)
+
+
+def test_r5_1f_a_tombstone_has_no_payload_to_agree_with(real_records) -> None:
+    """A removal record is identity-minimal by construction; skipped, not failed."""
+    tombstone = copy.deepcopy(real_records["provision_reference"])
+    for key in ("entity", "description", "derivation"):
+        tombstone.pop(key, None)
+    assert_envelope_payload_agreement(tombstone)
+
+
+def test_r5_1g_the_rule_moves_no_digest(schema) -> None:
+    """A cross-field rule relates two documents; it changes neither."""
+    from svs_common.statecivics_contract_pin import (
+        DISPATCH_SHA256,
+        DOCUMENT_BRANCH_SHA256,
+        ENTITY_BRANCH_SHA256,
+        branch_digests,
+    )
+
+    assert branch_digests(schema) == {
+        "document": DOCUMENT_BRANCH_SHA256,
+        "entity": ENTITY_BRANCH_SHA256,
+        "dispatch": DISPATCH_SHA256,
+    }
+
+
+# --------------------------------------------------------------------------
+# Round five, item 2: staging resolves its own collection
+# --------------------------------------------------------------------------
+
+
+def test_r5_2_a_caller_supplied_document_collection_is_refused(real_records, tmp_path) -> None:
+    """THE FINDING. This exact call embedded into the shared statute collection.
+
+    The guards existed and `stage_entity_descriptors` did not call them, so a
+    guard that describes an invariant is not a guard that holds one.
+    """
+    embed, index_write = _Detonator("embed"), _Detonator("index_write")
+    live = [_candidate(r, "published") for r in real_records.values()]
+    with pytest.raises(CallerSuppliedCollectionRefused) as excinfo:
+        stage_entity_descriptors(
+            live,
+            path=LIVE_PATH,
+            **_staging(tmp_path),
+            collection=STATUTE_COLLECTION,
+            embed=embed,
+            index_write=index_write,
+        )
+    message = str(excinfo.value)
+    assert STATUTE_COLLECTION in message
+    assert LIVE_ENTITY_COLLECTION in message
+    assert "Nothing has been embedded or indexed." in message
+    assert (embed.calls, index_write.calls) == (0, 0)
+
+
+def test_r5_2b_the_live_path_resolves_its_own_collection(real_records, tmp_path) -> None:
+    """No `collection=` given at all: the guards decide, and they decide right."""
+    written: list[tuple] = []
+    staged = stage_entity_descriptors(
+        [_candidate(r, "published") for r in real_records.values()],
+        path=LIVE_PATH,
+        **_staging(tmp_path),
+        embed=lambda text: [0.0],
+        index_write=lambda collection, rows: written.append((collection, rows)),
+    )
+    assert staged.collection == LIVE_ENTITY_COLLECTION
+    assert written[0][0] == LIVE_ENTITY_COLLECTION
+    assert staged.collection != STATUTE_COLLECTION
+    assert staged.collection != OPENAI_COLLECTION
+
+
+def test_r5_2c_the_candidate_path_resolves_its_own_collection(real_records, tmp_path) -> None:
+    staged = stage_entity_descriptors(
+        list(real_records.values()),
+        path=CANDIDATE_PATH,
+        **_staging(tmp_path),
+        embed=lambda text: [0.0],
+        index_write=lambda collection, rows: None,
+    )
+    assert staged.collection == CANDIDATE_COLLECTION
+    assert staged.collection not in {STATUTE_COLLECTION, OPENAI_COLLECTION, LIVE_ENTITY_COLLECTION}
+
+
+def test_r5_2d_a_matching_caller_supplied_collection_is_permitted(real_records, tmp_path) -> None:
+    """`collection=` is an ASSERTION, not a selection. Agreeing is allowed."""
+    staged = stage_entity_descriptors(
+        list(real_records.values()),
+        path=CANDIDATE_PATH,
+        **_staging(tmp_path),
+        collection=CANDIDATE_COLLECTION,
+        embed=lambda text: [0.0],
+        index_write=lambda collection, rows: None,
+    )
+    assert staged.collection == CANDIDATE_COLLECTION
+
+
+def test_r5_2e_staging_inherits_every_collection_guard(real_records, tmp_path) -> None:
+    """The guards are reached THROUGH staging, not merely available beside it."""
+    (tmp_path / "incomplete").mkdir()
+    incomplete = _instance_tree(
+        tmp_path / "incomplete",
+        stores={
+            "kansas-statutes": {"statute-ledger": "voyage_4_docs_1024"},
+            "kansas-fiscal-documents": {"fiscal-ledger": None},
+            "kansas-fiscal-entities": {"entity-ledger": ENTITY_PROFILE},
+        },
+    )
+    embed, index_write = _Detonator("embed"), _Detonator("index_write")
+    with pytest.raises(DocumentCollectionRosterIncomplete):
+        stage_entity_descriptors(
+            [_candidate(real_records["provision_reference"], "published")],
+            path=LIVE_PATH,
+            adapter=_qdrant(),
+            instance_root=incomplete,
+            entity_embedding_profile_id=ENTITY_PROFILE,
+            entity_store_slugs=("kansas-fiscal-entities",),
+            embed=embed,
+            index_write=index_write,
+        )
+    assert (embed.calls, index_write.calls) == (0, 0)
+
+    # ...and the collision guard, through the same seam.
+    (tmp_path / "colliding").mkdir()
+    colliding = _instance_tree(
+        tmp_path / "colliding",
+        stores={
+            "kansas-statutes": {"statute-ledger": "voyage_4_docs_1024"},
+            "kansas-fiscal-entities": {"entity-ledger": "voyage_4_docs_1024"},
+        },
+    )
+    with pytest.raises(EntityCollectionCollision):
+        stage_entity_descriptors(
+            [_candidate(real_records["provision_reference"], "published")],
+            path=LIVE_PATH,
+            adapter=_qdrant(),
+            instance_root=colliding,
+            entity_embedding_profile_id="voyage_4_docs_1024",
+            entity_store_slugs=("kansas-fiscal-entities",),
+            embed=embed,
+            index_write=index_write,
+        )
+    assert (embed.calls, index_write.calls) == (0, 0)
+
+
+def test_r5_2f_the_candidate_path_needs_its_own_profile(real_records, tmp_path) -> None:
+    """Falling back to the live profile would serve candidates from the live store."""
+    with pytest.raises(InstanceCollectionConfigError, match="candidate path needs its own"):
+        resolve_staging_collection(
+            _qdrant(),
+            path=CANDIDATE_PATH,
+            instance_root=_staging_instance(tmp_path),
+            entity_embedding_profile_id=ENTITY_PROFILE,
+            entity_store_slugs=ENTITY_STORES,
+        )
+
+
+def test_r5_2g_there_is_no_application_caller_of_adapt_manifest() -> None:
+    """Round five item 3, asserted rather than asserted-about.
+
+    The adapter is not yet wired into any runner, so an image rebuild would
+    connect nothing. Wiring `adapt_manifest` into the fiscal consumer's dispatch
+    is the remaining WAVE-134 scope. This test fails when that wiring lands,
+    which is the moment the rebuild becomes meaningful -- update it then.
+    """
+    import subprocess
+
+    listing = subprocess.run(
+        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard", "*.py"],
+        cwd=ROOT, capture_output=True, text=True, check=True,
+    ).stdout
+    callers = []
+    for name in listing.split("\0"):
+        if not name or name.startswith("tests/"):
+            continue
+        path = ROOT / name
+        if not path.is_file():
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                callee = (
+                    node.func.attr if isinstance(node.func, ast.Attribute)
+                    else getattr(node.func, "id", None)
+                )
+                if callee in {"adapt_manifest", "stage_entity_descriptors"}:
+                    callers.append(f"{name}:{node.lineno}")
+    assert callers == [], (
+        f"an application caller now exists ({callers}); the image rebuild proposal in "
+        "WAVE-134's log becomes meaningful and this test should be updated"
+    )
