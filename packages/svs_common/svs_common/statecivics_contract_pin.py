@@ -58,21 +58,56 @@ PIN_NAMES: tuple[str, ...] = ("document", "entity", "dispatch")
 #: one day.  Every pinned digest below travels with its commit, and the pins
 #: carry their commits separately because they move separately.
 #:
-#: Computed from StateCivics main at 314beafe (KS-650 B1 + B1.1, landed_by
-#: 121083e9).  Recompute with :func:`branch_digests`; never hand-edit.
+#: Each entry is the commit at which THAT BRANCH last changed, which is not the
+#: same thing as the commit the fixture came from.  Recompute with
+#: :func:`branch_digests`; never hand-edit.
+#:
+#: ``document`` and ``dispatch`` are still at 314beafe (KS-650 B1 + B1.1,
+#: landed_by 121083e9) because KS-650 B1.3 touched neither: its whole diff is
+#: inside ``$defs.entity_eligibility``.  ``entity`` moved to 24c9d3de, where the
+#: status enum gained ``candidate``.  This is the arrangement the module was
+#: built for and the first time it has actually occurred, so the three commits
+#: no longer agree -- which is why nothing below collapses them into one.
 PINNED_BRANCH_COMMIT: dict[str, str] = {
     "document": "314beafe4f7905f06a2edb7828b0ea8b2976266c",
-    "entity": "314beafe4f7905f06a2edb7828b0ea8b2976266c",
+    "entity": "24c9d3ded35405054094a1280c7ea1f074fad5d5",
     "dispatch": "314beafe4f7905f06a2edb7828b0ea8b2976266c",
 }
 
-#: All three pins happen to sit at the same commit today.  Prefer
-#: ``PINNED_BRANCH_COMMIT[name]``; this stays only for messages that name one
-#: contract revision, and is valid only while the three agree.
-PINNED_CONTRACT_COMMIT = PINNED_BRANCH_COMMIT["document"]
+#: The commit the COMMITTED FIXTURE's bytes came from.  A separate fact from
+#: any branch pin: the fixture is one whole file, and a file carries every
+#: branch at whatever revision that file has.  It is the commit a byte-identity
+#: check must read, and the only one.
+#:
+#: There was a ``PINNED_CONTRACT_COMMIT`` here, defined as the document branch's
+#: commit and documented as "valid only while the three agree".  They stopped
+#: agreeing at 24c9d3de, so it is GONE rather than left to answer with the
+#: document branch's commit while the fixture is a later file.  A constant whose
+#: stated precondition has failed is precisely the superseded whole-file
+#: ``78a3de13...`` defect, which is what this module exists to not repeat.
+FIXTURE_CONTRACT_COMMIT = "24c9d3ded35405054094a1280c7ea1f074fad5d5"
+
+#: Pins that point at upstream work which has NOT yet merged to ``main``.
+#:
+#: The provenance check requires every pinned commit to be an ancestor of
+#: StateCivics ``main``, because pinning to an object no branch reaches is how a
+#: pin outlives the work it pinned.  ``24c9d3de`` is 13 commits ahead of ``main``
+#: on ``ks-600-a2-1-hb2513-slice`` and is reachable from that branch and no
+#: other.  Recording it here is NOT a waiver of the check: the commit must still
+#: be an ancestor of the branch named beside it, so it still cannot be dangling,
+#: abandoned or invented.  What it is, is a DEBT, stated where the pin is rather
+#: than in a ticket nobody reads at the point of use.
+#:
+#: This entry must be DELETED when KS-650 B1.3 merges, and the check then holds
+#: against ``main`` with nothing special about it.  A pin left provisional after
+#: its branch merges is indistinguishable from one that was never checked, which
+#: is the whole failure mode.  Tracked by WAVE-134.
+PROVISIONAL_BRANCH_COMMIT: dict[str, str] = {
+    "entity": "ks-600-a2-1-hb2513-slice",
+}
 
 DOCUMENT_BRANCH_SHA256 = "d3a7212a4873a2f375d451e74ab4d5f11a56ff50bbbeb5a162dae1f8640807e2"
-ENTITY_BRANCH_SHA256 = "d5248a5452389c40a55c844f2e455343b2e24ce3dedff9a9ecac0752eeb28734"
+ENTITY_BRANCH_SHA256 = "52fd9ee50585c805664a39f5548ba04d00c0ac1a16c4095e2149d06451817058"
 DISPATCH_SHA256 = "03dc178429d04275f7b49a6d4ab9e05ee56bc970a31de78268942eb3de3b7940"
 
 PINNED_BRANCH_SHA256: dict[str, str] = {
@@ -93,14 +128,27 @@ ENFORCED_PINS: dict[str, tuple[str, ...]] = {
 #: rather than quietly ceasing to be.  Each is re-derivable with
 #: ``git show <commit>:<path>``.
 #:
-#: The entity branch moved once, and for prose only: between e94a894e and
-#: 1de6312e StateCivics rewrote two entity-branch descriptions.  The document
-#: branch did not move.  A whole-file hash could not have told those apart, and
-#: that distinction is why this module pins per branch.  The contract file has
-#: been byte-identical from 1de6312e through 314beafe.
+#: The entity branch has now moved twice, and the document branch not at all.
+#:
+#: e94a894e -> 1de6312e was PROSE ONLY: StateCivics rewrote two entity-branch
+#: descriptions.  A whole-file hash could not have told that apart from a
+#: constraint change, and that distinction is why this module pins per branch.
+#: The contract file was byte-identical from 1de6312e through 314beafe.
+#:
+#: 314beafe -> 24c9d3de is a real CONSTRAINT change, and the first one this
+#: mechanism has had to carry: KS-650 B1.3 widened
+#: ``entity_eligibility.properties.status.enum`` from ``[reviewed, published]``
+#: to ``[candidate, reviewed, published]`` and rewrote the two descriptions
+#: around it.  The whole diff is inside ``$defs.entity_eligibility``, so the
+#: document and dispatch digests are byte-for-byte what they were -- which is
+#: the property per-branch pinning was built to deliver, demonstrated rather
+#: than argued.  Re-derived here from ``git show 24c9d3de:<contract>`` with
+#: :func:`branch_digests`, not copied from upstream's published value.
 SUPERSEDED_BRANCH_SHA256: tuple[tuple[str, str, str], ...] = (
     ("entity", "e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a",
      "da242fd879b3c124449b6c1ddead558db64d8f0427ade638bf596c8fd1d9f17e"),
+    ("entity", "314beafe4f7905f06a2edb7828b0ea8b2976266c",
+     "d5248a5452389c40a55c844f2e455343b2e24ce3dedff9a9ecac0752eeb28734"),
 )
 
 _LOCAL_REF = "#/$defs/"

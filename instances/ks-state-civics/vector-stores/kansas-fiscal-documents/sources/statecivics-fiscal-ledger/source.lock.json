@@ -16,18 +16,26 @@
       "algorithm": "sha256-canonical-json-subtree-v1",
       "documentBranchCommit": "314beafe4f7905f06a2edb7828b0ea8b2976266c",
       "documentBranchSha256": "d3a7212a4873a2f375d451e74ab4d5f11a56ff50bbbeb5a162dae1f8640807e2",
-      "entityBranchCommit": "314beafe4f7905f06a2edb7828b0ea8b2976266c",
-      "entityBranchSha256": "d5248a5452389c40a55c844f2e455343b2e24ce3dedff9a9ecac0752eeb28734",
+      "entityBranchCommit": "24c9d3ded35405054094a1280c7ea1f074fad5d5",
+      "entityBranchSha256": "52fd9ee50585c805664a39f5548ba04d00c0ac1a16c4095e2149d06451817058",
       "dispatchCommit": "314beafe4f7905f06a2edb7828b0ea8b2976266c",
       "dispatchSha256": "03dc178429d04275f7b49a6d4ab9e05ee56bc970a31de78268942eb3de3b7940",
       "dispatchCovers": "the top-level if/then/else routing predicate; a routing change alone redirects records between branches while both branch subtrees stay byte-identical",
       "noSemanticDigest": "Deliberate. JSON Schema property names share a namespace with annotation keywords, so an annotation-stripped digest also strips legacy_document_record.properties.title and entity_projection_record.properties.description, reporting a real constraint change on the enforced branch as annotation-only drift.",
-      "supersededEntityBranch": {
-        "commit": "e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a",
-        "sha256": "da242fd879b3c124449b6c1ddead558db64d8f0427ade638bf596c8fd1d9f17e",
-        "reason": "Prose-only drift: two entity-branch descriptions were rewritten, moving this digest while the document branch stayed identical.",
-        "readWith": "git show e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a:contracts/civic-impact/retrieval-export-record.schema.json"
-      },
+      "supersededEntityBranch": [
+        {
+          "commit": "e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a",
+          "sha256": "da242fd879b3c124449b6c1ddead558db64d8f0427ade638bf596c8fd1d9f17e",
+          "reason": "Prose-only drift: two entity-branch descriptions were rewritten, moving this digest while the document branch stayed identical.",
+          "readWith": "git show e94a894e6f66fdd7eb6b798e35b3ebe7a2ae266a:contracts/civic-impact/retrieval-export-record.schema.json"
+        },
+        {
+          "commit": "314beafe4f7905f06a2edb7828b0ea8b2976266c",
+          "sha256": "d5248a5452389c40a55c844f2e455343b2e24ce3dedff9a9ecac0752eeb28734",
+          "reason": "KS-650 B1.3 widened entity_eligibility.status from [reviewed, published] to [candidate, reviewed, published] and rewrote the descriptions around it. A real constraint change, confined to $defs.entity_eligibility, so the document and dispatch digests did not move.",
+          "readWith": "git show 314beafe4f7905f06a2edb7828b0ea8b2976266c:contracts/civic-impact/retrieval-export-record.schema.json"
+        }
+      ],
       "enforcedBy": "packages/svs_common/svs_common/statecivics_contract_pin.py",
       "enforcedAt": [
         "scripts/release/kansas-fiscal-document-ingest.py --contract-schema",

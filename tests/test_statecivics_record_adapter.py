@@ -91,10 +91,16 @@ from svs_common.statecivics_record_adapter import (
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = Path(__file__).parent / "fixtures"
-CONTRACT = FIXTURES / "statecivics-retrieval-export-record.314beafe.json"
+CONTRACT = FIXTURES / "statecivics-retrieval-export-record.24c9d3de.json"
 MIXED = FIXTURES / "statecivics-mixed-manifest.jsonl"
 BAD_ENTITY = FIXTURES / "statecivics-invalid-entity-record.jsonl"
 BAD_DOCUMENT = FIXTURES / "statecivics-invalid-document-record.jsonl"
+#: The REAL HB 2513 Sec. 15(b) candidate provision record, revision 2, lifted
+#: verbatim from repo A's committed `_provision_record()` at
+#: 24c9d3ded35405054094a1280c7ea1f074fad5d5 -- read with `git show` and parsed
+#: with `ast`, so nothing in A's tree was imported or executed, and A's working
+#: tree was never read.
+REAL_CANDIDATE = FIXTURES / "statecivics-hb2513-candidate-provision.24c9d3de.jsonl"
 ADAPTER_SOURCE = ROOT / "packages" / "svs_common" / "svs_common" / "statecivics_record_adapter.py"
 
 #: The REAL instance tree. Every document collection name in these tests is
@@ -1037,12 +1043,10 @@ def test_the_fixtures_cover_every_entity_kind_upstream_emits(manifest) -> None:
 def _candidate(record: dict, status: str = CANDIDATE_ELIGIBILITY_STATUS) -> dict:
     """A copy of an entity record with its own review status rewritten.
 
-    NOTE: at the pinned contract (314beafe) ``entity_eligibility.status`` is
-    ``["reviewed","published"]``, so a record like this is contract-INVALID and
-    ``adapt_records`` refuses it before the eligibility gate is ever reached.
-    The gate is therefore exercised directly here. The end-to-end path opens
-    when the enum is extended upstream and ``ENTITY_BRANCH_SHA256`` is
-    deliberately re-pinned -- WAVE-134 item 5, which waits on repo A.
+    At the pinned contract (24c9d3de) ``entity_eligibility.status`` admits
+    ``candidate``, so such a record is contract-VALID and reaches the gate
+    through ``adapt_records``. Before the re-pin it did not: the enum was
+    ``["reviewed","published"]`` and the record was refused by the schema first.
     """
     out = copy.deepcopy(record)
     out["eligibility"]["status"] = status
@@ -1227,20 +1231,210 @@ def test_the_candidate_collection_is_not_the_live_entity_collection(tmp_path) ->
         )
 
 
-def test_the_pinned_contract_still_forbids_the_candidate_status(schema) -> None:
-    """Item 5 is not done, and this records exactly why the gate is not yet live.
+def test_the_pinned_contract_now_permits_candidate_and_the_gate_still_refuses(schema) -> None:
+    """This test was a TRIPWIRE and it fired. Here is what it caught.
 
-    The gate above is ready. The contract is not: ``candidate`` is not in the
-    enum at 314beafe, so a candidate record cannot reach the gate through
-    ``adapt_records``. When repo A extends the enum, ENTITY_BRANCH_SHA256 moves
-    and must be re-pinned deliberately; this test then flips to asserting the
-    new enum, and the end-to-end path opens.
+    Before KS-650 B1.3 it asserted the enum was ``["reviewed","published"]`` and
+    that a candidate record was refused by ``adapt_records`` -- so the gate could
+    not silently go live against a contract that did not permit the value. The
+    re-pin to 24c9d3de widened the enum, this test failed, and it now asserts the
+    other half of the invariant: the CONTRACT admits ``candidate``, and the LIVE
+    GATE still refuses it. Those are different mechanisms and both must hold --
+    a schema that permits a value is not a store that should receive it, which
+    is what the contract's own new description says in terms.
     """
-    enum = schema["$defs"]["entity_eligibility"]["properties"]["status"]["enum"]
-    assert enum == ["reviewed", "published"], (
-        "the pinned contract's eligibility enum changed; re-pin ENTITY_BRANCH_SHA256 "
-        "deliberately (WAVE-134 item 5) and update this test"
+    status = schema["$defs"]["entity_eligibility"]["properties"]["status"]
+    assert status["enum"] == ["candidate", "reviewed", "published"]
+    # The prose must not be left contradicting the enum it describes.
+    assert "never enter a live entity store" in status["description"].lower()
+    assert (
+        "only those two values can appear"
+        not in schema["$defs"]["entity_eligibility"]["description"]
     )
+
     record = _candidate(_jsonl(MIXED)[1])
-    with pytest.raises(RecordBranchError, match="is not one of"):
-        adapt_records([(1, record)], schema)
+    # The contract now accepts it...
+    adapted = adapt_records([(1, record)], schema)
+    assert len(adapted.entity_records) == 1
+    # ...and the live path still does not.
+    with pytest.raises(CandidateRecordRefused):
+        admit_entity_records(adapted.entity_records, path=LIVE_PATH)
+    assert len(admit_entity_records(adapted.entity_records, path=CANDIDATE_PATH)) == 1
+
+
+# --------------------------------------------------------------------------
+# Item 7: the composition milestone, on the REAL HB 2513 revision-2 record
+# --------------------------------------------------------------------------
+#
+# One real record, not a fixture written here: repo A's committed
+# `_provision_record()` at 24c9d3de, the provision for HB 2513 Sec. 15(b),
+# entity_revision 2, eligibility.status "candidate".
+#
+# What this file does NOT contain, and why, is as much of the result as what it
+# does. See the WAVE-134 log: A's candidate MANIFEST (sha256 8b495ed7...) is not
+# a committed file and is not on disk; the appropriation_action ENVELOPE exists
+# nowhere at the fixed sha (only its KS-600 payload does); and three of the
+# values supplied to me do not match what A committed. None of that was
+# reconstructed, because reconstructing it would be writing the milestone rather
+# than proving it.
+
+
+@pytest.fixture(scope="module")
+def real_candidate() -> dict:
+    return _jsonl(REAL_CANDIDATE)[0]
+
+
+def test_7_1_the_real_record_is_valid_under_the_widened_contract(real_candidate, schema) -> None:
+    """Proof 1. Valid -- which it was NOT before the enum widened."""
+    rule = dispatch_rule(schema)
+    assert classify_record(real_candidate, rule) == rule.present_pin
+    result = validate(real_candidate, schema, rule.present_ref)
+    assert result.ok, result.errors
+    # It is the real record, not a lookalike.
+    assert real_candidate["entity_logical_id"].startswith("f4cf16d51a93")
+    assert real_candidate["entity_type"] == "provision_reference"
+    assert real_candidate["eligibility"]["status"] == "candidate"
+    # ...and it goes through the whole reader, not just the validator.
+    adapted = adapt_records([(1, real_candidate)], schema)
+    assert len(adapted.entity_records) == 1
+    assert adapted.document_records == ()
+
+
+def test_7_1b_the_same_record_was_invalid_under_the_superseded_entity_branch(
+    real_candidate, schema
+) -> None:
+    """The widening is load-bearing, not cosmetic.
+
+    Rebuild the pre-change enum in a copy and show the identical record fails.
+    That is what makes the re-pin a real constraint change rather than prose.
+    """
+    narrowed = copy.deepcopy(schema)
+    status = narrowed["$defs"]["entity_eligibility"]["properties"]["status"]
+    status["enum"] = ["reviewed", "published"]
+    result = validate(real_candidate, narrowed, "entity_projection_envelope")
+    assert not result.ok
+    assert any("candidate" in error for error in result.errors)
+
+
+def test_7_2_the_live_path_refuses_it_with_the_named_refusal(real_candidate) -> None:
+    """Proof 2. THE DELIVERABLE. The first time B says no to A, correctly."""
+    with pytest.raises(CandidateRecordRefused) as excinfo:
+        admit_entity_records([real_candidate], path=LIVE_PATH)
+    message = str(excinfo.value)
+    assert "for the live entity store" in message
+    assert "eligibility.status is 'candidate'" in message
+    assert real_candidate["entity_logical_id"] in message
+    assert "revision 2" in message
+    assert "Nothing has been embedded or indexed." in message
+
+
+def test_7_2b_the_refusal_is_for_candidacy_and_for_nothing_else(
+    real_candidate, schema
+) -> None:
+    """Proof 2, sharpened. A refusal for the WRONG reason is not the milestone.
+
+    The record must be otherwise flawless: valid against the branch, and the
+    same record with only `status` changed must sail through the live path.
+    """
+    rule = dispatch_rule(schema)
+    assert validate(real_candidate, schema, rule.present_ref).ok
+    for status in sorted(LIVE_ELIGIBILITY_STATUSES):
+        twin = copy.deepcopy(real_candidate)
+        twin["eligibility"]["status"] = status
+        assert len(admit_entity_records([twin], path=LIVE_PATH)) == 1
+        assert entity_path_for(twin) == LIVE_PATH
+    # And no URI reason can be hiding in there: `uri` is asserted now, and this
+    # record passes. (A is strict on uri too, so neither side refuses the other
+    # for that.)
+    assert "uri" in ASSERTED_FORMATS
+
+
+def test_7_2c_nothing_is_embedded_or_indexed_when_the_real_record_is_refused(
+    real_candidate,
+) -> None:
+    """Proof 2, ordered. The refusal costs nothing, on the real record."""
+    embed, index_write = _Detonator("embed"), _Detonator("index_write")
+    with pytest.raises(CandidateRecordRefused):
+        stage_entity_descriptors(
+            [real_candidate],
+            path=LIVE_PATH,
+            collection="svs_biz_ks_state_civics_voyage_4_entities_1024",
+            embed=embed,
+            index_write=index_write,
+        )
+    assert (embed.calls, index_write.calls) == (0, 0)
+
+
+def test_7_3_the_candidate_path_accepts_it(real_candidate) -> None:
+    """Proof 3."""
+    assert entity_path_for(real_candidate) == CANDIDATE_PATH
+    admitted = admit_entity_records([real_candidate], path=CANDIDATE_PATH)
+    assert len(admitted) == 1
+    assert admitted[0]["export_record_id"] == real_candidate["export_record_id"]
+
+    embedded: list[str] = []
+    written: list[tuple] = []
+    staged = stage_entity_descriptors(
+        [real_candidate],
+        path=CANDIDATE_PATH,
+        collection="svs_biz_ks_state_civics_voyage_4_candidates_1024",
+        embed=lambda text: embedded.append(text) or [0.0],
+        index_write=lambda collection, rows: written.append((collection, rows)),
+    )
+    assert staged.embedded == 1
+    assert embedded == [real_candidate["description"]["text"]]
+    assert written[0][0] == "svs_biz_ks_state_civics_voyage_4_candidates_1024"
+
+
+def test_7_4_no_fallback_the_emitted_revision_is_two(real_candidate) -> None:
+    """Proof 4. The one that would have failed silently.
+
+    An as-of query that quietly picked revision 1 -- which is `reviewed` -- would
+    make the live path appear to ACCEPT a record it must never see, and it would
+    look like success. B cannot watch A's selection; what B can do is refuse to
+    treat the revision as incidental. The emitted revision is asserted, and the
+    revision-1 twin is shown to be exactly the thing that would have slipped
+    through.
+    """
+    assert real_candidate["entity_revision"] == 2
+
+    fallback = copy.deepcopy(real_candidate)
+    fallback["entity_revision"] = 1
+    fallback["eligibility"]["status"] = "reviewed"
+    # This is what a silent fallback looks like on arrival: indistinguishable
+    # from a legitimate live record. Nothing downstream of the manifest can tell.
+    assert len(admit_entity_records([fallback], path=LIVE_PATH)) == 1
+    # ...so the guard has to be the assertion above, on the record as emitted.
+    assert real_candidate["entity_revision"] != fallback["entity_revision"]
+
+
+def test_the_real_record_matches_what_upstream_committed(real_candidate) -> None:
+    """Provenance: these are A's bytes, and this is which of them I verified.
+
+    The values asserted here are the ones I could corroborate at
+    24c9d3ded35405054094a1280c7ea1f074fad5d5. Values supplied to me that do NOT
+    appear at that sha are recorded in the WAVE-134 log rather than asserted
+    here, because a test that asserts an unverified number manufactures
+    agreement.
+    """
+    assert real_candidate["export_record_id"] == (
+        "f4c674039b228388692962afbbeaf05cc981262d97a733e15828c40165343684"
+    )
+    assert real_candidate["entity_logical_id"] == (
+        "f4cf16d51a9339c186343ece353dbd07fe2feef9e319770359fb9378ceb18998"
+    )
+    assert real_candidate["record_digest_algorithm"] == "statecivics-canonical-json-v1"
+    assert real_candidate["as_of"]["snapshot_id"] == "ks600-a2-1-candidates-2026-09-13"
+    assert real_candidate["as_of"]["declared"] is True
+    assert real_candidate["eligibility"] == {
+        "status": "candidate",
+        "human_reviewed": False,
+        "review_level": "none",
+        "publication_allowed": False,
+    }
+    # The KS-600 payload is NOT validated here -- it is a remote $ref with its
+    # own pin -- so its shape is recorded, not judged. `source_url` is the
+    # declared key and the stray `url` that KS-650 B1.3 fixed is absent.
+    evidence = real_candidate["entity"]["evidence"][0]
+    assert "url" not in evidence
+    assert set(evidence) == {"source_revision_id", "source_span_id", "locator"}

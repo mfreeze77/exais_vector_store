@@ -591,3 +591,120 @@ B's side of it is that `(entity_logical_id, entity_revision)` is the identity
 and revision 1 and 2 are distinct records; proving the as-of query does not
 quietly pick revision 1 requires A's selection, and the test must assert the
 emitted revision is 2 for both records.
+
+### 2026-09-13 — lane B items 5 and 7: the re-pin, and the composition milestone
+
+**Item 5 — re-pinned, all three digests re-derived here, not copied.**
+
+Re-derivation is a two-step check, because a mismatch is only meaningful if the
+two sides agree on the method first. My walker (`branch_digests`) was run on the
+PRE-change contract and reproduced all three current pins exactly
+(`d3a7212a…`, `d5248a54…`, `03dc1784…`), which mirrors A's own corroboration
+method. Only then was it run on `git show 24c9d3de:<contract>`:
+
+| branch | re-derived here | vs A published | moved |
+|---|---|---|---|
+| document | `d3a7212a4873a2f375d451e74ab4d5f11a56ff50bbbeb5a162dae1f8640807e2` | match | no |
+| entity | `52fd9ee50585c805664a39f5548ba04d00c0ac1a16c4095e2149d06451817058` | match | YES |
+| dispatch | `03dc178429d04275f7b49a6d4ab9e05ee56bc970a31de78268942eb3de3b7940` | match | no |
+
+`ENTITY_BRANCH_SHA256` re-pinned, `PINNED_BRANCH_COMMIT["entity"]` → 24c9d3de,
+supersession triple `("entity", "314beafe…", "d5248a54…")` recorded in the
+existing form, and both `source.lock.json` / `source.yaml` pin blocks updated
+(`supersededEntityBranch` becomes a LIST, since there are now two, with set
+equality asserted against the module in both directions). Fixture replaced with
+A's file at 24c9d3de and renamed accordingly; byte-identity re-asserted against
+`git show`, and `git diff` of A's contract 314beafe→24c9d3de confirms the whole
+change sits inside `$defs.entity_eligibility` — which is *why* document and
+dispatch did not move. **This is the first time the per-branch pin has had a
+real constraint change to carry, and it did what it was built for.**
+
+**Two things the re-pin forced that were not in the instruction, both reported
+rather than done quietly.**
+
+1. `PINNED_CONTRACT_COMMIT` is GONE. It was defined as the document branch's
+   commit and documented as "valid only while the three agree". They stopped
+   agreeing at 24c9d3de, and `test_the_fixture_is_the_upstream_contract_at_the_pinned_commit`
+   used it to fetch the blob for the byte-identity check — so leaving it would
+   have compared the new fixture against the file at 314beafe. It is replaced by
+   `FIXTURE_CONTRACT_COMMIT`, the commit the FIXTURE BYTES came from, which is a
+   different fact from any branch pin. A test asserts the old name is absent,
+   that document and dispatch still agree with each other, and that entity does
+   not agree with them.
+2. **`24c9d3de` IS NOT AN ANCESTOR OF A's `main`.** It is 13 commits ahead on
+   `ks-600-a2-1-hb2513-slice` and reachable from that branch and no other. The
+   provenance check required ancestry of `main`, on the stated ground that
+   pinning to an object no branch reaches is how a pin outlives the work it
+   pinned. I did not weaken that check to a pass. `PROVISIONAL_BRANCH_COMMIT`
+   now records `{"entity": "ks-600-a2-1-hb2513-slice"}`; the commit must still
+   be an ancestor of the branch named beside it, so the check is still "say
+   where this lives", not "any object will do". **It carries its own staleness
+   tripwire: the moment 24c9d3de merges to main, the test FAILS and tells you to
+   delete the entry** — a pin left provisional after its branch merges is
+   indistinguishable from one that was never checked. `document` and `dispatch`
+   are asserted never to be provisional.
+
+**Item 7 — the milestone, proved on the record I could verify, and NOT on the
+parts I could not.**
+
+Proved, on repo A's committed `_provision_record()` at 24c9d3de — the real
+HB 2513 Sec. 15(b) provision, `entity_logical_id f4cf16d51a93…`,
+`entity_revision 2`, `eligibility.status "candidate"`. Lifted by `git show` and
+parsed with `ast`, so nothing in A's tree was imported or executed and A's
+working tree was never read.
+
+1. **VALID** under the widened contract, through the full reader, and — the part
+   that makes the re-pin load-bearing — the *identical* record is shown INVALID
+   against a copy with the pre-change enum restored.
+2. **REFUSED by the live path** with the named refusal, naming the logical id
+   and `revision 2`. Sharpened so the refusal cannot be for the wrong reason:
+   the record validates cleanly, and the same record with only `status` changed
+   to `reviewed` or `published` passes the live path. Ordered: the detonating
+   callables show zero embed and zero index calls.
+3. **ACCEPTED by the candidate path**, embedded once, written to the candidate
+   collection.
+4. **NO FALLBACK**: the emitted `entity_revision` is asserted to be 2. The test
+   also builds the revision-1 twin and demonstrates it would be admitted by the
+   live path — i.e. on arrival a silent fallback is indistinguishable from a
+   legitimate live record, which is exactly why the assertion has to be on the
+   revision as emitted. A's compiled-SQL proof is the other half and B cannot
+   see it.
+
+**WHAT I COULD NOT VERIFY — four supplied values do not appear at the fixed sha,
+and nothing was reconstructed to cover the gap.**
+
+* The candidate MANIFEST `sha256 8b495ed7d427c41639fe3d18db91e2255de112f331fdb3728af37539708f1f95`
+  is not a committed file at 24c9d3de and is not on disk anywhere I can read
+  (searched `~/Developer` and both project trees).
+* The **appropriation_action ENVELOPE does not exist** at the fixed sha. A
+  committed its KS-600 *payload* (`VALID_ACTION_PAYLOAD`) and a full envelope
+  for the provision only. Assembling an action envelope would have meant
+  inventing `export_record_id`, `record_digest_sha256`, `as_of`, `exporter` and
+  the three relationships — writing the milestone instead of proving it. So
+  `export_record_id f3f72004…` is unverified and appears nowhere on disk, and
+  the edge set (`action_relies_on_provision`→rev 2,
+  `action_enacted_by_bill_version`→4782, `action_supersedes_action`→rev 1) is
+  **unproved on B's side**.
+* Provision `record_digest_sha256`: supplied as `f504a500b9f0e80b…`; A committed
+  **`0a6fd52238749d4c…`**. The fixture carries A's committed value.
+* `exporter.code_commit`: supplied as the exporter commit `24c9d3de…`; A
+  committed **`cda8d7937abbf3ef2e254aa1a0216415d5d598be`**.
+* Observation for A, not resolved here: the envelope says `entity_revision: 2`
+  while its KS-600 payload carries `provision_reference_revision: 1`, and
+  `VALID_ACTION_PAYLOAD` carries `revision: 1` / `provision_reference_revision: 1`.
+  That may be deliberate (payload fields are the row's own columns) or it may be
+  the fallback this ruling is about. B cannot tell, and B does not validate the
+  payload — it is a remote `$ref` with its own pin.
+* `entity.source` keys: the coordinator's list is for the ACTION payload. The
+  provision's evidence entry carries
+  `{source_revision_id, source_span_id, locator}` and **no stray `url`**, which
+  is asserted.
+
+So: **three of item 7's four proofs are complete on a real record, and the
+fourth is complete for the provision.** The milestone is NOT complete for the
+appropriation_action, and the manifest-level proof is not started, both for want
+of artefacts that do not exist at the sha I was given. Send the manifest file
+(or commit it) and the action envelope, and the remaining half is a short step.
+
+**Item 8 remains PREPARED AND NOT EXECUTED.** No image built, no digest
+recorded, no `.env.images` written, no container touched.
