@@ -1,6 +1,6 @@
 # WAVE-134: Ingest scoped projections with consistent eligibility and lifecycle
 
-Status: in progress — lane B LANDED (adapter: 1565a84 / 830ccb7; entrypoint integration: 0b15b6a / 5aef516). Two runtime follow-ups are required before any cell rebuild — see WAVE-148. Parent: WAVE-132 (reopened). Filed 2026-09-10.
+Status: in progress — lane B LANDED (adapter: 1565a84 / 830ccb7; entrypoint integration: 0b15b6a / 5aef516). The two runtime follow-ups are CLOSED (WAVE-148, merged). Item 8 is blocked only on re-deriving the release proposal for `ks-fiscal-local`. Parent: WAVE-132 (reopened). Filed 2026-09-10.
 
 ## Summary
 
@@ -1134,8 +1134,8 @@ record more accurate rather than less:
   re-confirmed `CandidateRecordRefused` with all 12 real network-capable seams
   plus `socket.socket` and `urllib.request.urlopen` sealed — but a guard that
   skips what it cannot find is the same shape as the defects this ticket keeps
-  finding, and it was in a test written to prove the opposite. Fixed under
-  WAVE-148.
+  finding, and it was in a test written to prove the opposite. Fixed under WAVE-148, merged as the
+  commit below.
 
 Deployment stays deferred. **Item 8 remains PREPARED AND NOT EXECUTED**, and is
 now blocked on WAVE-148 plus re-deriving the proposal for `ks-fiscal-local`,
