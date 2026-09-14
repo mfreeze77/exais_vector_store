@@ -58,23 +58,34 @@ from svs_common.statecivics_contract_pin import (
 from svs_common.statecivics_record_adapter import (
     ANNOTATION_KEYWORDS,
     ASSERTED_FORMATS,
+    CANDIDATE_ELIGIBILITY_STATUS,
+    CANDIDATE_PATH,
     EXPECTED_DISPATCH_REQUIRED,
     FORMAT_CHECKER,
     KNOWN_KEYWORDS,
+    LIVE_ELIGIBILITY_STATUSES,
+    LIVE_PATH,
+    CandidateRecordRefused,
     DispatchRule,
     DocumentCollectionRosterIncomplete,
     EntityCollectionCollision,
     InstanceCollectionConfigError,
     RecordBranchError,
+    UnknownEligibilityStatus,
     UnsupportedContractKeyword,
     adapt_manifest,
     adapt_records,
+    admit_entity_records,
     branch_subtree,
+    candidate_collection_name,
     classify_record,
     deployment_index_settings,
     dispatch_rule,
+    eligibility_status,
     entity_collection_name,
+    entity_path_for,
     read_instance_collection_roster,
+    stage_entity_descriptors,
     validate,
 )
 
@@ -471,11 +482,11 @@ def test_format_actually_asserts_because_a_checker_is_passed() -> None:
     import jsonschema
 
     assert isinstance(FORMAT_CHECKER, jsonschema.FormatChecker)
-    assert {"date", "date-time"} <= ASSERTED_FORMATS
-    # rfc3339-validator is what makes date-time assert at all.
+    assert {"date", "date-time", "uri"} <= ASSERTED_FORMATS
+    # rfc3339-validator makes date-time assert; the format-nongpl extra's
+    # rfc3986-validator/rfc3987-syntax make uri assert. Neither is GPL.
     assert "date-time" in FORMAT_CHECKER.checkers
-    # ...and `uri` is NOT asserted: it needs rfc3987, which is GPLv3.
-    assert "uri" not in ASSERTED_FORMATS
+    assert "uri" in FORMAT_CHECKER.checkers
 
 
 def test_every_keyword_the_contract_uses_is_classified(schema, raw_contract) -> None:
@@ -582,12 +593,18 @@ def test_the_gate_boundary_is_reachable_through_the_real_dispatch(schema) -> Non
 
 
 def test_the_disclosure_channel_survived_the_migration(manifest, schema) -> None:
-    """WAVE-145 predicted this tuple would SURVIVE. Verified, not dropped.
+    """WAVE-145 predicted this tuple would SURVIVE. It did -- but SMALLER.
 
-    Both entries are properties of ``jsonschema`` rather than of the evaluator
-    it replaced: ``pattern`` is Python ``re`` and not ECMA-262 in both, and
-    ``format: uri`` needs the GPLv3 ``rfc3987`` package to assert at all, so a
-    uri-formatted field is DECLARED AND NOT CHECKED.
+    ``pattern`` survives: ``jsonschema`` uses Python ``re``, not ECMA-262, so
+    the divergence is a property of the library and cannot be cross-checked
+    against it.
+
+    ``format:uri`` does NOT survive, and the round-three note claiming it needed
+    the GPLv3 ``rfc3987`` was WRONG. The ``format-nongpl`` extra pulls
+    ``rfc3986-validator`` and ``rfc3987-syntax``, both non-GPL; only the plain
+    ``format`` extra pulls ``rfc3987``. With the extra pinned, ``uri`` asserts
+    and drops out of the disclosure set on its own -- the set is derived from
+    the checker registry, so no code changed, only this expectation.
     """
     rule = dispatch_rule(schema)
     document, provision = _jsonl(MIXED)[0], _jsonl(MIXED)[1]
@@ -596,10 +613,9 @@ def test_the_disclosure_channel_survived_the_migration(manifest, schema) -> None
         "pattern",
     )
     assert validate(document, schema, rule.absent_ref).unsupported_keyword_semantics == (
-        "format:uri",
         "pattern",
     )
-    assert manifest.unsupported_keyword_semantics == ("format:uri", "pattern")
+    assert manifest.unsupported_keyword_semantics == ("pattern",)
     # Derived, not listed: every disclosed format is one the checker lacks.
     for token in manifest.unsupported_keyword_semantics:
         if token.startswith("format:"):
@@ -1011,3 +1027,220 @@ def test_the_fixtures_cover_every_entity_kind_upstream_emits(manifest) -> None:
     )
     assert enumerated == {"provision_reference", "appropriation_action"}
     assert {r["entity_type"] for r in manifest.entity_records} == enumerated
+
+
+# --------------------------------------------------------------------------
+# Item 6: the live path refuses a candidate BEFORE any embed or index call
+# --------------------------------------------------------------------------
+
+
+def _candidate(record: dict, status: str = CANDIDATE_ELIGIBILITY_STATUS) -> dict:
+    """A copy of an entity record with its own review status rewritten.
+
+    NOTE: at the pinned contract (314beafe) ``entity_eligibility.status`` is
+    ``["reviewed","published"]``, so a record like this is contract-INVALID and
+    ``adapt_records`` refuses it before the eligibility gate is ever reached.
+    The gate is therefore exercised directly here. The end-to-end path opens
+    when the enum is extended upstream and ``ENTITY_BRANCH_SHA256`` is
+    deliberately re-pinned -- WAVE-134 item 5, which waits on repo A.
+    """
+    out = copy.deepcopy(record)
+    out["eligibility"]["status"] = status
+    return out
+
+
+class _Detonator:
+    """A callable that fails if it is ever called.
+
+    The ordering claim is that nothing is embedded or written before the
+    eligibility gate decides. Asserting "the spy list is empty afterwards" only
+    proves it for the run that happened; a callable that raises proves it for
+    the call itself, and names which one fired.
+    """
+
+    def __init__(self, what: str) -> None:
+        self.what = what
+        self.calls = 0
+
+    def __call__(self, *args, **kwargs):
+        self.calls += 1
+        raise AssertionError(
+            f"{self.what} was called before the eligibility gate refused a candidate"
+        )
+
+
+def test_a_candidate_is_refused_for_the_live_path_by_name(manifest) -> None:
+    record = _candidate(manifest.entity_records[0])
+    with pytest.raises(CandidateRecordRefused) as excinfo:
+        admit_entity_records([record], path=LIVE_PATH)
+    message = str(excinfo.value)
+    assert "for the live entity store" in message
+    assert "eligibility.status is 'candidate'" in message
+    assert record["entity_logical_id"] in message
+    assert "Nothing has been embedded or indexed." in message
+
+
+def test_the_candidate_path_accepts_it(manifest) -> None:
+    record = _candidate(manifest.entity_records[0])
+    admitted = admit_entity_records([record], path=CANDIDATE_PATH)
+    assert len(admitted) == 1
+    assert admitted[0]["eligibility"]["status"] == CANDIDATE_ELIGIBILITY_STATUS
+    assert entity_path_for(record) == CANDIDATE_PATH
+
+
+def test_the_live_path_accepts_reviewed_and_published(manifest) -> None:
+    for status in sorted(LIVE_ELIGIBILITY_STATUSES):
+        record = _candidate(manifest.entity_records[0], status)
+        assert entity_path_for(record) == LIVE_PATH
+        assert len(admit_entity_records([record], path=LIVE_PATH)) == 1
+    # ...and the real fixtures, unmodified, are live records.
+    assert len(admit_entity_records(manifest.entity_records, path=LIVE_PATH)) == 2
+
+
+def test_the_candidate_path_refuses_a_reviewed_record(manifest) -> None:
+    """Symmetry: a reviewed revision parked on the candidate path is invisible."""
+    with pytest.raises(CandidateRecordRefused, match="belongs on the 'live' path"):
+        admit_entity_records(manifest.entity_records, path=CANDIDATE_PATH)
+
+
+def test_nothing_is_embedded_or_indexed_before_the_refusal(manifest) -> None:
+    """THE ordering proof. The callables detonate if reached."""
+    embed, index_write = _Detonator("embed"), _Detonator("index_write")
+    records = [manifest.entity_records[0], _candidate(manifest.entity_records[1])]
+    with pytest.raises(CandidateRecordRefused):
+        stage_entity_descriptors(
+            records,
+            path=LIVE_PATH,
+            collection="svs_biz_ks_state_civics_voyage_4_entities_1024",
+            embed=embed,
+            index_write=index_write,
+        )
+    assert embed.calls == 0, "an embedding call was made before the refusal"
+    assert index_write.calls == 0, "an index write was made before the refusal"
+
+
+def test_one_candidate_refuses_the_whole_batch_before_the_first_embed(manifest) -> None:
+    """The clean record ahead of it must not be embedded either.
+
+    Per-record refusal would embed the first record, then refuse -- and the
+    money is spent and the point is written whatever the refusal then says.
+    """
+    embed, index_write = _Detonator("embed"), _Detonator("index_write")
+    records = [manifest.entity_records[0]] * 5 + [_candidate(manifest.entity_records[1])]
+    with pytest.raises(CandidateRecordRefused):
+        stage_entity_descriptors(
+            records, path=LIVE_PATH, collection="c", embed=embed, index_write=index_write
+        )
+    assert embed.calls == 0
+
+
+def test_staging_calls_embed_then_index_once_admitted(manifest) -> None:
+    """The gate is not simply refusing everything."""
+    embedded: list[str] = []
+    written: list[tuple] = []
+    result = stage_entity_descriptors(
+        manifest.entity_records,
+        path=LIVE_PATH,
+        collection="svs_biz_ks_state_civics_voyage_4_entities_1024",
+        embed=lambda text: embedded.append(text) or [0.0],
+        index_write=lambda collection, rows: written.append((collection, rows)),
+    )
+    assert result.embedded == 2
+    assert len(embedded) == 2
+    assert embedded == [r["description"]["text"] for r in manifest.entity_records]
+    assert len(written) == 1
+    assert written[0][0] == "svs_biz_ks_state_civics_voyage_4_entities_1024"
+
+
+def test_staging_takes_no_default_io_callables() -> None:
+    """``embed``/``index_write`` are keyword-only with no defaults.
+
+    A default would make it possible to invoke this into doing I/O by accident.
+    """
+    import inspect
+
+    sig = inspect.signature(stage_entity_descriptors)
+    for name in ("path", "collection", "embed", "index_write"):
+        parameter = sig.parameters[name]
+        assert parameter.kind is inspect.Parameter.KEYWORD_ONLY
+        assert parameter.default is inspect.Parameter.empty
+
+
+def test_the_gate_itself_holds_no_io_seam() -> None:
+    """``admit_entity_records`` cannot be arranged into spending anything."""
+    import inspect
+
+    sig = inspect.signature(admit_entity_records)
+    assert set(sig.parameters) == {"records", "path"}
+
+
+@pytest.mark.parametrize(
+    "eligibility",
+    [None, {}, {"status": "draft"}, {"status": None}, {"status": 1}, {"human_reviewed": True}],
+)
+def test_an_unrecognised_or_missing_status_is_refused(manifest, eligibility) -> None:
+    record = copy.deepcopy(manifest.entity_records[0])
+    if eligibility is None:
+        record.pop("eligibility")
+    else:
+        record["eligibility"] = eligibility
+    with pytest.raises(UnknownEligibilityStatus):
+        eligibility_status(record)
+    with pytest.raises(UnknownEligibilityStatus):
+        admit_entity_records([record], path=LIVE_PATH)
+
+
+def test_the_candidate_collection_is_not_the_live_entity_collection(tmp_path) -> None:
+    root = _instance_tree(
+        tmp_path,
+        stores={
+            "kansas-statutes": {"statute-ledger": "voyage_4_docs_1024"},
+            "kansas-fiscal-entities": {"entity-ledger": ENTITY_PROFILE},
+            "kansas-fiscal-entity-candidates": {"candidate-ledger": "voyage_4_candidates_1024"},
+        },
+    )
+    entity_stores = ("kansas-fiscal-entities", "kansas-fiscal-entity-candidates")
+    qdrant = _qdrant()
+    candidate = candidate_collection_name(
+        qdrant,
+        instance_root=root,
+        candidate_embedding_profile_id="voyage_4_candidates_1024",
+        entity_embedding_profile_id=ENTITY_PROFILE,
+        entity_store_slugs=entity_stores,
+    )
+    live = entity_collection_name(
+        qdrant,
+        instance_root=root,
+        entity_embedding_profile_id=ENTITY_PROFILE,
+        entity_store_slugs=entity_stores,
+    )
+    assert candidate == "svs_biz_ks_state_civics_voyage_4_candidates_1024"
+    assert candidate != live
+    assert candidate != STATUTE_COLLECTION
+    with pytest.raises(EntityCollectionCollision, match="LIVE entity collection"):
+        candidate_collection_name(
+            qdrant,
+            instance_root=root,
+            candidate_embedding_profile_id=ENTITY_PROFILE,
+            entity_embedding_profile_id=ENTITY_PROFILE,
+            entity_store_slugs=entity_stores,
+        )
+
+
+def test_the_pinned_contract_still_forbids_the_candidate_status(schema) -> None:
+    """Item 5 is not done, and this records exactly why the gate is not yet live.
+
+    The gate above is ready. The contract is not: ``candidate`` is not in the
+    enum at 314beafe, so a candidate record cannot reach the gate through
+    ``adapt_records``. When repo A extends the enum, ENTITY_BRANCH_SHA256 moves
+    and must be re-pinned deliberately; this test then flips to asserting the
+    new enum, and the end-to-end path opens.
+    """
+    enum = schema["$defs"]["entity_eligibility"]["properties"]["status"]["enum"]
+    assert enum == ["reviewed", "published"], (
+        "the pinned contract's eligibility enum changed; re-pin ENTITY_BRANCH_SHA256 "
+        "deliberately (WAVE-134 item 5) and update this test"
+    )
+    record = _candidate(_jsonl(MIXED)[1])
+    with pytest.raises(RecordBranchError, match="is not one of"):
+        adapt_records([(1, record)], schema)

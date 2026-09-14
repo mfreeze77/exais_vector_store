@@ -124,7 +124,7 @@ someone has to notice.
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -145,10 +145,17 @@ from .statecivics_contract_pin import (
 __all__ = [
     "ANNOTATION_KEYWORDS",
     "ASSERTED_FORMATS",
+    "CANDIDATE_ELIGIBILITY_STATUS",
+    "CANDIDATE_PATH",
+    "ENTITY_PATHS",
     "EXPECTED_DISPATCH_REQUIRED",
     "FORMAT_CHECKER",
+    "KNOWN_ELIGIBILITY_STATUSES",
     "KNOWN_KEYWORDS",
+    "LIVE_ELIGIBILITY_STATUSES",
+    "LIVE_PATH",
     "AdaptedManifest",
+    "CandidateRecordRefused",
     "DeploymentIndexSettings",
     "DispatchRule",
     "DocumentCollectionRosterIncomplete",
@@ -157,15 +164,22 @@ __all__ = [
     "InstanceCollectionRoster",
     "RecordBranchError",
     "RecordValidation",
+    "StagedEntities",
+    "UnknownEligibilityStatus",
     "UnsupportedContractKeyword",
     "adapt_manifest",
     "adapt_records",
+    "admit_entity_records",
     "branch_subtree",
+    "candidate_collection_name",
     "classify_record",
     "deployment_index_settings",
     "dispatch_rule",
+    "eligibility_status",
     "entity_collection_name",
+    "entity_path_for",
     "read_instance_collection_roster",
+    "stage_entity_descriptors",
     "validate",
 ]
 
@@ -907,6 +921,191 @@ def entity_collection_name(
             "deployment resolves."
         )
     return entity
+
+
+
+
+# --------------------------------------------------------------------------
+# Live and candidate entity paths
+# --------------------------------------------------------------------------
+
+#: The two destinations an entity projection can be staged for.
+LIVE_PATH = "live"
+CANDIDATE_PATH = "candidate"
+ENTITY_PATHS: tuple[str, ...] = (LIVE_PATH, CANDIDATE_PATH)
+
+#: ``eligibility.status`` values the LIVE entity store admits. Read from the
+#: record's own copied review columns; this module never sets or defaults them.
+LIVE_ELIGIBILITY_STATUSES: frozenset[str] = frozenset({"reviewed", "published"})
+
+#: The status that routes a record to the candidate-only path.
+CANDIDATE_ELIGIBILITY_STATUS = "candidate"
+
+#: Every status either path recognises. A value outside this is refused rather
+#: than routed: an unrecognised review state is not evidence of a safe one.
+KNOWN_ELIGIBILITY_STATUSES: frozenset[str] = LIVE_ELIGIBILITY_STATUSES | {
+    CANDIDATE_ELIGIBILITY_STATUS
+}
+
+
+class CandidateRecordRefused(ValueError):
+    """A candidate revision was offered to the LIVE entity store.
+
+    This refusal is a deliverable, not an incident. A candidate is material a
+    human has not signed off; the live entity store is what ordinary retrieval
+    reads. The refusal is raised by :func:`admit_entity_records`, which runs to
+    completion over the whole batch BEFORE :func:`stage_entity_descriptors`
+    calls ``embed`` or ``index_write`` even once -- because a refusal that
+    arrives after an embedding call has already spent money and written state,
+    and "we refused it" would then be false about both.
+    """
+
+
+class UnknownEligibilityStatus(ValueError):
+    """A record's ``eligibility.status`` is a value neither path recognises."""
+
+
+def eligibility_status(record: Mapping) -> str:
+    """The record's OWN copied review status, or refuse.
+
+    Never defaulted. A record with no eligibility block is refused rather than
+    treated as unreviewed-and-therefore-candidate or as reviewed-by-omission;
+    both guesses are the exporter's job and it already did it.
+    """
+    eligibility = record.get("eligibility")
+    if not isinstance(eligibility, dict) or "status" not in eligibility:
+        raise UnknownEligibilityStatus(
+            f"record {record.get('export_record_id')!r} carries no eligibility.status, so "
+            "neither path can admit it. The status is copied from the row's own review "
+            "columns upstream and is never defaulted here."
+        )
+    status = eligibility["status"]
+    if not isinstance(status, str) or status not in KNOWN_ELIGIBILITY_STATUSES:
+        raise UnknownEligibilityStatus(
+            f"record {record.get('export_record_id')!r} has eligibility.status {status!r}, "
+            f"which is none of {sorted(KNOWN_ELIGIBILITY_STATUSES)}. An unrecognised review "
+            "state is not evidence of a safe one."
+        )
+    return status
+
+
+def entity_path_for(record: Mapping) -> str:
+    """Which path this record belongs to, by its own status."""
+    return CANDIDATE_PATH if eligibility_status(record) == CANDIDATE_ELIGIBILITY_STATUS else LIVE_PATH
+
+
+def admit_entity_records(
+    records: Sequence[Mapping], *, path: str
+) -> tuple[dict[str, Any], ...]:
+    """Return the records ``path`` admits, or refuse by name.
+
+    THE GATE. Pure: it reads records and raises. It performs no I/O, holds no
+    client and calls nothing injected, so there is no arrangement of it that can
+    spend money or write state before deciding.
+
+    The whole batch is judged before anything is returned, so one candidate
+    anywhere refuses the batch rather than letting the records ahead of it
+    through first.
+    """
+    if path not in ENTITY_PATHS:
+        raise ValueError(f"unknown entity path {path!r}; expected one of {list(ENTITY_PATHS)}")
+    admitted: list[dict[str, Any]] = []
+    for record in records:
+        status = eligibility_status(record)
+        if path == LIVE_PATH and status == CANDIDATE_ELIGIBILITY_STATUS:
+            raise CandidateRecordRefused(
+                f"refusing entity record {record.get('export_record_id')!r} "
+                f"({record.get('entity_type')} {record.get('entity_logical_id')!r} revision "
+                f"{record.get('entity_revision')!r}) for the live entity store: "
+                f"eligibility.status is {CANDIDATE_ELIGIBILITY_STATUS!r}, and the live store "
+                f"admits only {sorted(LIVE_ELIGIBILITY_STATUSES)}. Stage it on the "
+                f"{CANDIDATE_PATH!r} path instead. Nothing has been embedded or indexed."
+            )
+        if path == CANDIDATE_PATH and status != CANDIDATE_ELIGIBILITY_STATUS:
+            # Symmetry matters: the candidate path is not a dumping ground, and
+            # a reviewed revision quietly sitting there would be invisible to
+            # the live store that should have had it.
+            raise CandidateRecordRefused(
+                f"refusing entity record {record.get('export_record_id')!r} for the candidate "
+                f"path: eligibility.status is {status!r}, not "
+                f"{CANDIDATE_ELIGIBILITY_STATUS!r}. It belongs on the {LIVE_PATH!r} path."
+            )
+        admitted.append(dict(record))
+    return tuple(admitted)
+
+
+@dataclass(frozen=True, slots=True)
+class StagedEntities:
+    """What a staging run admitted and where it put it."""
+
+    path: str
+    collection: str
+    records: tuple[dict[str, Any], ...]
+    embedded: int
+
+
+def stage_entity_descriptors(
+    records: Sequence[Mapping],
+    *,
+    path: str,
+    collection: str,
+    embed: Any,
+    index_write: Any,
+) -> StagedEntities:
+    """Stage admitted entity descriptors, refusing BEFORE any call is made.
+
+    This module holds no provider and no index client. ``embed`` and
+    ``index_write`` are the caller's, are keyword-only and have NO defaults, so
+    this function cannot be invoked into doing I/O by accident.
+
+    The ordering is the substance of the guarantee and it is structural, not a
+    convention: :func:`admit_entity_records` is called first, completes over the
+    whole batch, and raises out of this function before the first ``embed``. A
+    test drives it with callables that raise if invoked, so an inversion fails
+    loudly rather than costing a run.
+    """
+    admitted = admit_entity_records(records, path=path)
+    vectors = [embed(record["description"]["text"]) for record in admitted]
+    index_write(collection, tuple(zip(admitted, vectors, strict=True)))
+    return StagedEntities(
+        path=path, collection=collection, records=admitted, embedded=len(vectors)
+    )
+
+
+def candidate_collection_name(
+    adapter: Any,
+    *,
+    instance_root: Path,
+    candidate_embedding_profile_id: str,
+    entity_embedding_profile_id: str,
+    entity_store_slugs: tuple[str, ...] = (),
+) -> str:
+    """Name the candidate-only collection, or refuse.
+
+    A candidate point must share a collection with neither the document stores
+    nor the LIVE entity store. The first is the standing invariant; the second
+    is this ruling's: ordinary retrieval reads the live entity collection, so a
+    candidate landing there is served whatever the eligibility gate decided
+    earlier.
+    """
+    candidate = entity_collection_name(
+        adapter,
+        instance_root=instance_root,
+        entity_embedding_profile_id=candidate_embedding_profile_id,
+        entity_store_slugs=entity_store_slugs,
+    )
+    live = adapter.collection_name(
+        deployment_index_settings(instance_root, adapter).business_instance_id,
+        entity_embedding_profile_id,
+    )
+    if candidate == live:
+        raise EntityCollectionCollision(
+            f"candidate projections would land in {candidate!r}, the LIVE entity collection. "
+            f"Ordinary retrieval reads that collection, so a candidate there is served "
+            f"regardless of the eligibility gate: profiles "
+            f"{candidate_embedding_profile_id!r} and {entity_embedding_profile_id!r} must differ."
+        )
+    return candidate
 
 
 assert set(DISPATCH_KEYS) == {"if", "then", "else"}, (

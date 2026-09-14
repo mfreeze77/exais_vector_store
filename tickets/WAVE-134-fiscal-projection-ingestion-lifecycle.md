@@ -467,3 +467,127 @@ pass B's adapter with the ref reported in `unvalidated_remote_refs`. Making that
 refusal real means pinning the two KS-600 payload contracts as fixtures the way
 `retrieval-export-record.schema.json` already is, with their own digests. That
 is new scope and a new pin, so it is reported here rather than improvised.
+
+### 2026-09-13 — lane B items 6 and 8 (items 5 and 7 blocked on repo A)
+
+**Item 6 — the live path refuses a candidate before anything is spent.**
+
+`admit_entity_records(records, *, path)` is the gate. It is PURE: two
+parameters, no client, no injected callable, no I/O seam, so there is no
+arrangement of it that can spend money or write state before it decides. A test
+asserts its signature is exactly `{records, path}` so that stays true.
+
+`stage_entity_descriptors(records, *, path, collection, embed, index_write)`
+calls the gate first, over the WHOLE batch, and raises out before the first
+`embed`. Per-record refusal would have embedded the clean records ahead of the
+candidate — the money is spent and the point is written whatever the refusal
+then says — so a single candidate anywhere refuses the batch. `embed` and
+`index_write` are keyword-only with NO defaults, asserted by test, so this
+cannot be invoked into doing I/O by accident; this module holds no provider and
+no index client.
+
+The ordering proof does not assert "the spy list is empty afterwards", which
+only holds for the run that happened. The callables DETONATE — they raise
+`AssertionError("embed was called before the eligibility gate refused a
+candidate")` — so an inversion fails loudly and names which call fired.
+
+The named refusal reads:
+
+> refusing entity record '…' (appropriation_action 'ks:2026:…' revision 1) for
+> the live entity store: eligibility.status is 'candidate', and the live store
+> admits only ['published', 'reviewed']. Stage it on the 'candidate' path
+> instead. Nothing has been embedded or indexed.
+
+Symmetry is enforced too: the candidate path REFUSES a reviewed record. A
+reviewed revision parked among candidates is invisible to the live store that
+should have had it. A missing or unrecognised `eligibility.status` raises
+`UnknownEligibilityStatus` rather than being defaulted in either direction.
+
+`candidate_collection_name` refuses when the candidate collection would equal
+the LIVE entity collection, on top of the existing document-collection guard:
+ordinary retrieval reads the live entity collection, so a candidate landing
+there is served whatever the gate decided earlier.
+
+**`format-nongpl` — the owner's correction was right and my round-three note was
+wrong.** Verified from the installed 4.25.1 metadata rather than assumed:
+`Provides-Extra: format, format-nongpl`; `format` pulls GPL `rfc3987`, while
+`format-nongpl` pulls `rfc3986-validator>0.1.0` and `rfc3987-syntax>=1.1.0`,
+neither GPL. All four requirements sets now pin
+`jsonschema[format-nongpl]==4.25.1`. With it installed, `uri` asserts
+(`'not a uri'` and `'/relative/path'` refused, `urn:isbn:…` accepted), so
+`format:uri` drops out of `unsupported_keyword_semantics` **on its own** — the
+set is derived from the checker registry, so no code changed, only the
+expectation. The disclosure tuple is now `("pattern",)` on BOTH branches.
+WAVE-145's prediction therefore held for `pattern` and did NOT hold for
+`format:uri`; both are recorded rather than quietly adjusted.
+
+**Divergence this creates, which must reach A.** Repo A pins
+`jsonschema = "4.25.1"` with NO extra: `grep -c` over A's `poetry.lock` finds
+`rfc3339-validator` (1) but `rfc3986-validator` (0), `rfc3987-syntax` (0) and
+`rfc3987` (0). So A asserts `date`/`date-time` and does NOT assert `uri`. After
+this change B is STRICTER than A on `uri`, which is the opposite of "both repos
+validate identically". The direction is fail-closed for B, and the exposure on
+this contract is exactly one field: `retrieval_url` on the document branch,
+which is the only `uri`-formatted field with no `pattern` beside it
+(`citation_url` carries `pattern: ^https?://`; the entity branch has no
+`uri` field). **A should add the same extra.** Until it does, a record A accepts
+could be refused by B for a `retrieval_url` reason — which for item 7 would be
+the WRONG refusal.
+
+**Item 8 — PROPOSED RELEASE ACTION. NOT EXECUTED.**
+
+Nothing below was run. No image was built, no digest recorded, no `.env.images`
+written, no container touched.
+
+Scope: four of the five app images change. `apps/{api,worker,model_gateway,
+instance_agent}/Dockerfile` each `COPY <app>/requirements.txt` then
+`pip install`, and each also `COPY packages/`, so both the new dependency and
+the adapter source land in them. `apps/admin_ui/Dockerfile` contains no
+`requirements.txt` reference and copies only `apps/admin_ui`, so admin-ui is
+unchanged by this branch — its `.env.images` line is rewritten by the publish
+step but its content does not change.
+
+```sh
+# 1. Build. Version comes from VERSION (0.9.8-production-candidate).
+python scripts/release/build-images.py \
+  --service api --service worker --service model-gateway --service instance-agent \
+  --manifest-output .release/image-build-manifest.json
+
+# 2. Publish and record the pinned digests for the target cell.
+python scripts/release/publish-images.py --cell ks-state-civics
+
+# 3. The five SVS_IMAGE_* lines in .release/cells/ks-state-civics/.env.images
+#    are rewritten by step 2. Superseded values, for rollback:
+#      SVS_IMAGE_API            @sha256:867e4c1540927c1bc1a5d77741ff1fbe5dc2111eb9129c094caf4c673b56fcce
+#      SVS_IMAGE_WORKER         @sha256:60577793484ed5947c4c119ab1c5664325450bdc97d0f37ea78cd6079debe2a1
+#      SVS_IMAGE_MODEL_GATEWAY  @sha256:60f2dd5137a54b6e3acda4167594f4e81882fe82a156686e3b269d4b1c3cadbd
+#      SVS_IMAGE_ADMIN_UI       @sha256:aebffd553eaf86ee87752c9f696e816cc0a8d63e4fd27f006fa2e84bdc90941e
+#      SVS_IMAGE_INSTANCE_AGENT @sha256:55868ba8ed9e274c067f6c2653934fa9de6ea78a9931b35679f3dba26040ecce
+```
+
+Gate: item 7's proof runs in the TEST image, never inside the running cell
+(`exais-vector-store-ks-fiscal-local-*`). Until the rebuild is executed, that
+cell's images do not contain `jsonschema`, so this adapter must not be invoked
+inside them. `rpds-py` (via `jsonschema` → `referencing`) is a compiled wheel;
+the platform matrix should be confirmed during the build, not after.
+
+**Item 5 — BLOCKED on A.** Waiting on A's published three digests from A's new
+main. When they arrive I re-derive all three MYSELF with `branch_digests` over
+`git show <A sha>:contracts/civic-impact/retrieval-export-record.schema.json`
+rather than copying A's values, re-pin `ENTITY_BRANCH_SHA256` only, add the
+`("entity", <old commit>, <old digest>)` supersession triple in the existing
+`SUPERSEDED_BRANCH_SHA256` form, and assert `DOCUMENT_BRANCH_SHA256` and
+`DISPATCH_SHA256` unchanged.
+
+**Item 7 — BLOCKED on A.** Needs the two real HB 2513 revision-2 records. Held
+in place meanwhile:
+`test_the_pinned_contract_still_forbids_the_candidate_status` asserts the enum
+is still `["reviewed","published"]` at 314beafe and that a candidate record is
+refused by `adapt_records` today — so the day item 5 lands, that test fails and
+says exactly what to update. The no-fallback-to-revision-1 requirement is the
+one that would fail silently, and it is not testable here: B receives whatever
+records A's as-of selection emits and cannot see the rows it did not choose.
+B's side of it is that `(entity_logical_id, entity_revision)` is the identity
+and revision 1 and 2 are distinct records; proving the as-of query does not
+quietly pick revision 1 requires A's selection, and the test must assert the
+emitted revision is 2 for both records.
