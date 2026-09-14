@@ -1,0 +1,426 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://statecivics.ai/contracts/civic-impact/provision-reference.schema.json",
+  "title": "StateCivics Version-Specific Provision Reference",
+  "description": "The identity of one legal provision inside one version of one legal instrument. KS-600 owns this definition; it is the Gap named in the KS-600 prior-art audit. THE IDENTITY TUPLE IS SETTLED AND CLOSED: (instrument_id, version_ordinal, stage, provision_path). Nothing else is identity. Four things are kept deliberately apart and must never be collapsed into one another: (1) IDENTITY -- the tuple above, and only it; (2) DISPLAY -- version_label and display_label, the stage and section numbering a reader sees, presentation and never identity; (3) EVIDENCE -- SourceSpan coordinates and version_id, which move whenever the text is re-extracted or re-ingested without creating a new legal provision; (4) TIME -- observation and effective time, properties of an assertion about the provision, not of the provision. A source-span id alone, or a section label alone, is NOT a provision reference. provision_reference_logical_id is COMPUTED from the identity tuple by a database trigger and is never taken on trust from a writer. The row's surrogate UUID is internal only (provision_reference_row_id) and is deliberately absent from this contract: a consumer references a provision by (provision_reference_logical_id, revision) and by nothing else. The row surrogate and the row-level supersession link are internal only (provision_reference_row_id, supersedes_provision_reference_row_id) and are absent from this contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "provision_reference_logical_id",
+    "provision_reference_revision",
+    "instrument",
+    "provision_path",
+    "evidence",
+    "status"
+  ],
+  "properties": {
+    "provision_reference_logical_id": {
+      "description": "IDENTITY, and the wire key. sha256 over the canonical serialization of the identity tuple (instrument_id, version_ordinal, stage, provision_path). COMPUTED BY THE DATABASE: migration 111 installs a BEFORE INSERT OR UPDATE trigger that recomputes this from the identity columns and rejects any row whose supplied value disagrees. A writer cannot assert an identity it did not earn. Display, evidence and time are not inputs, so re-extraction cannot move it, a relabelled section cannot fork it, and a re-ingested version_id cannot fork it. Together with `revision` this is the ONLY pair a consumer needs to reference a provision: appropriation-action.schema.json carries exactly these two names.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "provision_reference_revision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "IDENTITY's companion on the wire. Together with provision_reference_logical_id this is the ONLY pair a consumer needs to reference a provision, and appropriation-action.schema.json carries the same two names. The storage column is `revision`; the contract name is what a foreign consumer sees, and one concept gets one name across the two records it reads side by side."
+    },
+    "supersedes_provision_reference_logical_id": {
+      "description": "The provision reference this row supersedes, by logical id. Null on the first revision. Mirrors the action side's supersedes pair. A correction is a new revision superseding the prior row; nothing is ever mutated in place.",
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "supersedes_provision_reference_revision": {
+      "description": "The revision of the provision reference this row supersedes. Null on the first revision. Paired with supersedes_provision_reference_logical_id: both are set or both are null.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "instrument": {
+      "description": "The legal instrument and the specific version of it. Three of its members are identity; the rest describe.",
+      "$ref": "#/$defs/instrument"
+    },
+    "provision_path": {
+      "description": "The structured address of the provision within its instrument version, ordered root to leaf. IDENTITY. Not the displayed numbering.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/provisionPathSegment"
+      }
+    },
+    "display_label": {
+      "description": "The section numbering as printed, e.g. 'Sec. 7.(b)(2)'. Presentation only. Two references that differ only here are the same provision; two references in different instrument versions that agree here are NOT the same provision and are NOT continuous without evidence.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "heading_text": {
+      "description": "The provision's heading as printed. Presentation, like display_label; never identity.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence": {
+      "description": "Exact retained source coordinates for this reference. Required -- a provision reference must be bound to retained evidence -- but never sufficient: evidence identifies where the provision was READ, not which provision it IS. Re-extraction replaces these entries and must leave provision_reference_logical_id unchanged. Every entry must be a real source reference; an element that is not an object with a non-empty source_revision_id string is rejected.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/sourceRef"
+      }
+    },
+    "effective_period": {
+      "description": "When the provision has legal effect. Nullable in whole, and its kind may be 'unknown' with null bounds. An unknown effective date is recorded as unknown and is never defaulted to an enactment date, a session date, or the current date.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/period"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "observed_at": {
+      "description": "When this reference was observed in the source. Null means not known, not 'now'.",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "continuity": {
+      "description": "An assertion that this provision continues a provision in an earlier instrument version. Optional and independently evidenced. Absence of continuity is not a claim of discontinuity.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/continuity"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "status": {
+      "description": "Review state of this provision reference. Separate from publication_allowed: a reference may be reviewed and still not publishable.",
+      "type": "string",
+      "enum": [
+        "candidate",
+        "in_review",
+        "reviewed",
+        "published",
+        "rejected",
+        "superseded",
+        "unresolved"
+      ]
+    },
+    "publication_allowed": {
+      "description": "Whether this reference may be published. Separate from status, and one-directionally coupled: publishing requires a reviewed, decided status.",
+      "type": "boolean"
+    },
+    "review": {
+      "description": "Human review state for this provision reference.",
+      "$ref": "#/$defs/review"
+    },
+    "derivation_id": {
+      "description": "The derivation run that produced this reference, for lineage. Null when the reference was not machine-derived.",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "$defs": {
+    "instrument": {
+      "description": "The legal instrument AND the specific version of it. Exactly three properties are identity: instrument_id, version_ordinal and stage. version_label, instrument_type, jurisdiction and version_id are NOT, and each says why below.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instrument_id",
+        "version_ordinal",
+        "stage"
+      ],
+      "properties": {
+        "instrument_id": {
+          "description": "IDENTITY. The namespaced instrument key, e.g. 'ks-2025-sb125'. Lowercase ASCII: the identity digest is computed in both Python and PostgreSQL, and restricting the charset is what makes those two computations byte-identical instead of locale-dependent.",
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._:-]*$"
+        },
+        "version_ordinal": {
+          "description": "IDENTITY, and REQUIRED. The position of this version in the instrument's own ordered version sequence. Two different ordinals with the same stage are two different provisions -- a bill amended twice in one chamber has two 'amendment' versions and they are not interchangeable. That is why the ordinal cannot be omitted, defaulted or refused.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "stage": {
+          "description": "IDENTITY. A controlled vocabulary, not free text. Taken from this repository's existing bill-version classification (etl/bill_versions/version_discovery.py _classify_from_label) and extended with the post-passage stages KS-600's scope line names. There is deliberately no 'unknown' member: a version_label that does not map to one of these is REJECTED at contract validation rather than pooled into an 'unknown' bucket where two unrelated provisions at the same ordinal would collide.",
+          "type": "string",
+          "enum": [
+            "introduced",
+            "amendment",
+            "committee_substitute",
+            "engrossed",
+            "conference_committee",
+            "enrolled",
+            "governor_action",
+            "session_law"
+          ]
+        },
+        "version_label": {
+          "description": "DISPLAY ONLY. The stage as printed, e.g. 'As Amended by House Committee'. Excluded from identity: it is presentation, its wording varies between sources for one legal version, and the stage enum above carries the meaning.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "instrument_type": {
+          "description": "NOT IDENTITY. Descriptive classification of the instrument.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "bill",
+            "resolution",
+            "concurrent_resolution",
+            "session_law",
+            "statute",
+            "appropriation_act",
+            "executive_order",
+            "veto_message",
+            "unknown",
+            null
+          ]
+        },
+        "jurisdiction": {
+          "description": "NOT IDENTITY. instrument_id is already namespaced ('ks-2025-sb125'), so the jurisdiction is carried inside it; this is the readable form.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "version_id": {
+          "description": "NOT IDENTITY, and an evidence coordinate. The retained bill_versions row id, an autoincrement integer a re-ingest can re-mint. Because it sits outside the identity tuple, re-minting it cannot fork a provision.",
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      }
+    },
+    "provisionPathSegment": {
+      "description": "One level of the structured provision address, e.g. section 7. Ordered root to leaf, and part of identity.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "value"
+      ],
+      "properties": {
+        "level": {
+          "description": "Which structural level this segment names. Part of identity, and not folded away by lowercasing -- paragraph (a) and subparagraph (A) differ here, not in the value.",
+          "type": "string",
+          "enum": [
+            "article",
+            "chapter",
+            "part",
+            "division",
+            "section",
+            "subsection",
+            "paragraph",
+            "subparagraph",
+            "clause",
+            "item",
+            "line_item",
+            "schedule",
+            "appendix",
+            "unknown"
+          ]
+        },
+        "value": {
+          "description": "Lowercased and whitespace-collapsed before storage. Non-ASCII is ALLOWED -- legal numbering carries section marks, accents and dashes -- because the identity digest never calls lower() on either side: Python normalises, and the database hashes the stored bytes verbatim as UTF-8. What is forbidden is a control character (the identity separators are 0x1d/0x1e/0x1f, so admitting one would let a value forge a different tuple) and an uppercase ASCII letter (which would mean the value reached storage un-normalised).",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^\\u0000-\\u001f\\u007fA-Z]+$"
+        }
+      }
+    },
+    "continuity": {
+      "description": "A claim that this provision continues one in an earlier instrument version. Separately evidenced, and never inferred from an equal section label.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "predecessor_provision_reference_logical_id",
+        "basis",
+        "evidence"
+      ],
+      "properties": {
+        "predecessor_provision_reference_logical_id": {
+          "description": "The provision this one is claimed to continue, by logical id.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "basis": {
+          "description": "Drawn from kansas-source-registry.yaml crosswalk_policy.evidence_order. An equal section label is not a basis.",
+          "type": "string",
+          "enum": [
+            "exact_shared_identifier",
+            "official_crosswalk",
+            "statutory_formula",
+            "reviewed_composite_key",
+            "reviewed_name_and_context",
+            "unresolved"
+          ]
+        },
+        "evidence": {
+          "description": "Source coordinates supporting the continuity claim, separate from the reference's own evidence. May be empty -- an unevidenced continuity claim is representable as a candidate -- but a continuity claim with no evidence, or resting solely on a prohibited method, may never be published.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourceRef"
+          }
+        },
+        "methods": {
+          "description": "Every method that produced the claim. crosswalk_policy.prohibited_as_sole_public_join names the four that may never be the only entry for a published claim.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "note": {
+          "description": "Free-text reviewer note about the continuity claim.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "period": {
+      "description": "A span of time, with its kind stated rather than inferred from the bounds. 'unknown' is a recorded answer and carries no bounds; an absent date is never defaulted to an ingest or enactment date.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "label"
+      ],
+      "properties": {
+        "kind": {
+          "description": "How to read this period. 'unknown' means the source did not state one.",
+          "type": "string",
+          "enum": [
+            "instant",
+            "date",
+            "date_range",
+            "calendar_year",
+            "fiscal_year",
+            "fiscal_year_range",
+            "session",
+            "open_ended",
+            "unknown"
+          ]
+        },
+        "label": {
+          "description": "The period as the source writes it, e.g. 'FY2026'. Presentation.",
+          "type": "string"
+        },
+        "start": {
+          "description": "Inclusive start date, or null when the source does not give one.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "end": {
+          "description": "Inclusive end date, or null when the source does not give one.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "as_of": {
+          "description": "Observation instant for this period, when the source records one.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      }
+    },
+    "sourceRef": {
+      "description": "One exact coordinate into retained source material. Evidence, never identity: re-extraction moves these and must leave the provision identity unchanged.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_revision_id"
+      ],
+      "properties": {
+        "source_revision_id": {
+          "description": "The immutable source revision this was read from. Required: a reference with no revision is not retained evidence.",
+          "type": "string",
+          "minLength": 1
+        },
+        "source_span_id": {
+          "description": "The exact span within that revision, when one was located.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "locator": {
+          "description": "Human-readable locator for the span, e.g. 'page 14, lines 22-31'.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_url": {
+          "description": "Canonical URL of the source, when it is publicly addressable.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        }
+      }
+    },
+    "review": {
+      "description": "Human review state, flattened. Kept separate from publication: a record may be reviewed and still not publishable.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "human_reviewed",
+        "review_level"
+      ],
+      "properties": {
+        "human_reviewed": {
+          "description": "Whether a person reviewed this record. False is the default and is not a failure.",
+          "type": "boolean"
+        },
+        "review_level": {
+          "description": "Depth of the review performed, from the methodology vocabulary.",
+          "type": "string"
+        },
+        "reviewer_id": {
+          "description": "Who reviewed it. Null when unreviewed.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reviewed_at": {
+          "description": "When it was reviewed. Null when unreviewed.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

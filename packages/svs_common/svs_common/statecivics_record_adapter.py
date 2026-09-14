@@ -885,6 +885,7 @@ def entity_collection_name(
     instance_root: Path,
     entity_embedding_profile_id: str,
     entity_store_slugs: tuple[str, ...] = (),
+    document_profile_catalog: tuple[str, ...] = (),
 ) -> str:
     """Name the collection entity descriptor points may use, or refuse.
 
@@ -902,8 +903,13 @@ def entity_collection_name(
     stores that are entity stores; they are excluded from the document side, so
     the guard can never fire against the entity store itself.
 
-    Choosing the entity profile remains an owner decision and stays an
-    argument, but an empty or non-string one is refused rather than resolved to
+    The optional document_profile_catalog is the server's complete model
+    registry: document ingestion refuses a profile absent from that registry.
+    It bounds dynamic routing and fallbacks even when a source package has not
+    declared its profile. Source declarations still contribute their names.
+    Without that runtime catalog, every source must still declare a profile.
+
+    An empty or non-string entity profile is refused rather than resolved to
     the degenerate ``<prefix><instance>_`` name.
     """
     if not isinstance(entity_embedding_profile_id, str) or not entity_embedding_profile_id.strip():
@@ -915,7 +921,7 @@ def entity_collection_name(
     roster = read_instance_collection_roster(
         instance_root, adapter, entity_store_slugs=entity_store_slugs
     )
-    if roster.undeclared_profile_sources:
+    if roster.undeclared_profile_sources and not document_profile_catalog:
         raise DocumentCollectionRosterIncomplete(
             f"{list(roster.undeclared_profile_sources)} declare no ingestion.embeddingProfile "
             f"under {Path(instance_root)}, so the document collections this deployment resolves "
@@ -926,7 +932,14 @@ def entity_collection_name(
     entity = adapter.collection_name(
         roster.settings.business_instance_id, entity_embedding_profile_id
     )
-    collided = sorted(key for key, name in roster.document_collections.items() if name == entity)
+    documents = dict(roster.document_collections)
+    for profile in document_profile_catalog:
+        if not isinstance(profile, str) or not profile.strip():
+            raise InstanceCollectionConfigError("document profile catalog contains an empty profile")
+        documents[f"registry:{profile}"] = adapter.collection_name(
+            roster.settings.business_instance_id, profile
+        )
+    collided = sorted(key for key, name in documents.items() if name == entity)
     if collided:
         raise EntityCollectionCollision(
             f"entity projections would land in {entity!r}, which this deployment already "
@@ -1296,6 +1309,7 @@ def resolve_staging_collection(
     entity_embedding_profile_id: str,
     candidate_embedding_profile_id: str | None = None,
     entity_store_slugs: tuple[str, ...] = (),
+    document_profile_catalog: tuple[str, ...] = (),
 ) -> str:
     """The collection ``path`` resolves to, through the guards, or refuse."""
     if path == LIVE_PATH:
@@ -1304,6 +1318,7 @@ def resolve_staging_collection(
             instance_root=instance_root,
             entity_embedding_profile_id=entity_embedding_profile_id,
             entity_store_slugs=entity_store_slugs,
+            document_profile_catalog=document_profile_catalog,
         )
     if path == CANDIDATE_PATH:
         if candidate_embedding_profile_id is None:
@@ -1317,6 +1332,7 @@ def resolve_staging_collection(
             candidate_embedding_profile_id=candidate_embedding_profile_id,
             entity_embedding_profile_id=entity_embedding_profile_id,
             entity_store_slugs=entity_store_slugs,
+            document_profile_catalog=document_profile_catalog,
         )
     raise ValueError(f"unknown entity path {path!r}; expected one of {list(ENTITY_PATHS)}")
 
@@ -1330,6 +1346,7 @@ def stage_entity_descriptors(
     entity_embedding_profile_id: str,
     candidate_embedding_profile_id: str | None = None,
     entity_store_slugs: tuple[str, ...] = (),
+    document_profile_catalog: tuple[str, ...] = (),
     collection: str | None = None,
     embed: Any,
     index_write: Any,
@@ -1363,6 +1380,7 @@ def stage_entity_descriptors(
         entity_embedding_profile_id=entity_embedding_profile_id,
         candidate_embedding_profile_id=candidate_embedding_profile_id,
         entity_store_slugs=entity_store_slugs,
+        document_profile_catalog=document_profile_catalog,
     )
     if collection is not None and collection != resolved:
         raise CallerSuppliedCollectionRefused(
@@ -1386,6 +1404,7 @@ def candidate_collection_name(
     candidate_embedding_profile_id: str,
     entity_embedding_profile_id: str,
     entity_store_slugs: tuple[str, ...] = (),
+    document_profile_catalog: tuple[str, ...] = (),
 ) -> str:
     """Name the candidate-only collection, or refuse.
 
@@ -1400,6 +1419,7 @@ def candidate_collection_name(
         instance_root=instance_root,
         entity_embedding_profile_id=candidate_embedding_profile_id,
         entity_store_slugs=entity_store_slugs,
+        document_profile_catalog=document_profile_catalog,
     )
     live = adapter.collection_name(
         deployment_index_settings(instance_root, adapter).business_instance_id,

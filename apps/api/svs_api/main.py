@@ -212,6 +212,9 @@ logging.basicConfig(level=os.getenv('SVS_LOG_LEVEL', 'INFO').upper())
 
 app = FastAPI(title='exai_vector_store API', version=settings.svs_product_version)
 
+from .statecivics_candidates import candidate_router
+app.include_router(candidate_router(get_request_principal, db_for_principal))
+
 
 def _openai_response_stream_event_schema_ref() -> dict[str, Any]:
     return {'schema': {'$ref': '#/components/schemas/OpenAIResponseStreamEvent'}}

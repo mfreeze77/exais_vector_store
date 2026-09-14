@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     qdrant_url: str = 'http://localhost:6333'
     qdrant_api_key: str | None = None
     qdrant_collection_prefix: str = 'svs_'
+    # Operator candidate API; disabled until its source contracts and target
+    # instance have been reviewed. Ordinary document retrieval never reads it.
+    svs_entity_candidate_enabled: bool = False
     opensearch_url: str = 'http://localhost:9200'
     opensearch_user: str = 'admin'
     opensearch_password: str = 'admin'

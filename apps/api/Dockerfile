@@ -7,6 +7,7 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 COPY packages /app/packages
 COPY apps /app/apps
 COPY configs /app/configs
+COPY instances /app/instances
 COPY tests /app/tests
 COPY scripts /app/scripts
 COPY evals /app/evals

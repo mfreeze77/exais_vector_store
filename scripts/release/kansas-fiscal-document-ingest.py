@@ -1171,9 +1171,8 @@ def _report_entity_manifest(
         write_json_atomic(proof, result)
     print(json.dumps(result, indent=2, sort_keys=True))
     print(
-        "\nentity manifest read and gated; descriptor staging is not implemented in this "
-        "entrypoint, so no API call, embedding or index write was made"
-        + (" (--apply was requested and is not honoured here)" if apply_requested else "")
+        "\nentity manifest read and gated; plan only, so no API call, embedding or index write was made. "
+        "Use --apply to submit to the candidate storage API."
     )
     return 0
 
@@ -1195,15 +1194,26 @@ def main() -> int:
     if getattr(args, "record_kind", "document") == "entity":
         # The entity branch, read and gated BEFORE any API work. `--apply` has
         # not been consulted yet and no header, token or store has been touched,
-        # so a candidate offered to the live store is refused having cost
-        # nothing. Staging entity descriptors is not implemented here: this
-        # entrypoint reads, validates and gates, and deployment stays deferred.
+        # so a candidate offered to the live store is refused before the API.
+        # The API independently validates the complete payload before storage.
+        manifest = load_entity_manifest(
+            args.manifest, contract_schema=args.contract_schema, entity_path=args.entity_path,
+        )
+        if args.apply:
+            result = api_json(
+                "POST", args.api or default_api_base(args.cell),
+                "/api/v1/statecivics/entities/ingest",
+                {"manifest": args.manifest.read_text(encoding="utf-8"),
+                 "manifest_sha256": manifest.sha256, "path": args.entity_path, "apply": True},
+                headers=default_headers(cell=args.cell, auth_token_file=args.auth_token_file),
+                timeout=args.api_timeout_seconds, cell=args.cell, transport=args.api_transport,
+            )
+            if args.proof:
+                write_json_atomic(args.proof, result)
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0
         return _report_entity_manifest(
-            load_entity_manifest(
-                args.manifest,
-                contract_schema=args.contract_schema,
-                entity_path=args.entity_path,
-            ),
+            manifest,
             proof=args.proof,
             apply_requested=args.apply,
         )
