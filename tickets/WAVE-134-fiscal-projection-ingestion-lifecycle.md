@@ -1273,3 +1273,16 @@ Runnable handoff: `runbooks/statecivics-candidate-pilot.md`. The adjacent JSON
 receipt records actual index and retrieval results. The source `80092998` bulk
 parser branch remains unmerged; full-bill import and public-UI deployment remain
 outstanding.
+
+### Bulk candidate command — 2026-09-14
+
+A exported 2,588 durable records (2,391 actions, 197 provisions), with full
+manifest SHA-256 5155056a4b2d411896787ff6e681d90a8cd58655cf3ddf6805849ca9dccc791b.
+The exact compressed artifact is committed in A at c49d7105 and copied here.
+The existing API accepts at most two million manifest characters per request,
+so the operator command now validates the entire artifact before sending bounded
+batches of at most 100 records / 1.5 MB. Bytes and record digests are preserved.
+The proof records completed batches and remains applied=false on partial failure;
+rerunning uses the API's existing digest idempotence. No API or image change.
+Tests exercise real records, CRLF preservation, file changes after admission,
+and a failure after a successful first batch.
