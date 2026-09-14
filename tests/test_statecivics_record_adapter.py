@@ -103,7 +103,7 @@ BAD_DOCUMENT = FIXTURES / "statecivics-invalid-document-record.jsonl"
 #: The REAL candidate manifest the exporter wrote for HB 2513 Sec. 15(b), both
 #: records, byte-identical to repo A's committed
 #: `tests/fixtures/civic_impact/ks600-a2-1-entities-candidates.jsonl` at
-#: 5e9b88cc -- read with `git show`, never from A's working tree.
+#: 677d126d (A's origin/main) -- read with `git show`, never from A's working tree.
 #:
 #: This REPLACES a copy earlier lifted out of A's unit-test source with `ast`.
 #: That copy carried `record_digest_sha256 0a6fd522...` and
@@ -113,8 +113,8 @@ BAD_DOCUMENT = FIXTURES / "statecivics-invalid-document-record.jsonl"
 #: every fixture from this manifest so there is nothing left to keep in sync.
 #: An artifact beats a reconstruction, which is the whole reason B refused to
 #: assemble the missing record itself.
-REAL_MANIFEST = FIXTURES / "statecivics-ks600-a2-1-entities-candidates.5e9b88cc.jsonl"
-REAL_MANIFEST_SHA256 = "8b495ed7d427c41639fe3d18db91e2255de112f331fdb3728af37539708f1f95"
+REAL_MANIFEST = FIXTURES / "statecivics-ks600-a2-1-entities-candidates.677d126d.jsonl"
+REAL_MANIFEST_SHA256 = "dd795e63359238697d57eca693307a04cebc0ec1888bae91113496d1878b61a8"
 #: The two logical identities in that manifest, so edge targets can be crossed
 #: against them by name rather than by repeating a hex string in each assertion.
 PROVISION_LOGICAL_ID = "f4cf16d51a9339c186343ece353dbd07fe2feef9e319770359fb9378ceb18998"
@@ -1582,22 +1582,28 @@ def test_the_real_records_match_the_authoritative_identifiers(real_action, real_
     The values previously carried here -- `0a6fd522...` and `cda8d793...` --
     came from a hand-written fixture that had gone stale. They are gone from
     upstream's tree and gone from here.
+
+    Refreshed to A's `origin/main` at 677d126d. The two manifests differ in
+    EXACTLY two fields -- `exporter.code_commit` and `record_digest_sha256` --
+    which was verified here by diffing them rather than taken on report. Every
+    substantive field is identical, so item 7's semantic conclusions carry over
+    and only these digest assertions needed re-running.
     """
     assert real_action["export_record_id"] == (
         "f3f720043071536735e626895a345c510ae9be097b8414c98b0b57399f742941"
     )
     assert real_action["record_digest_sha256"] == (
-        "09164d898dc27ba7f165b7732d256f4b4880c6e0048829bb94a74870dbb14313"
+        "3479ae3bbc5b7df554230c8434510e2b6803ea281e9f38261791d1a2b68d9334"
     )
     assert real_provision["export_record_id"] == (
         "f4c674039b228388692962afbbeaf05cc981262d97a733e15828c40165343684"
     )
     assert real_provision["record_digest_sha256"] == (
-        "f504a500b9f0e80bddf9a1de51e81d8a65d2edad4c26420446816ce8368efc80"
+        "14c01e5a8f9a6bf11902f741a52bd76dc3c5c86725525c6a30256e67eb2322b0"
     )
     for record in (real_action, real_provision):
         assert record["exporter"]["code_commit"] == (
-            "24c9d3ded35405054094a1280c7ea1f074fad5d5"
+            "d3000e989afb85a7a9efd24d529672b50359ffcd"
         )
         assert record["record_digest_algorithm"] == "statecivics-canonical-json-v1"
         assert record["as_of"]["declared"] is True

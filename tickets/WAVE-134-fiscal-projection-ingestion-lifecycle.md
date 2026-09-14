@@ -876,3 +876,119 @@ delete the `PROVISIONAL_BRANCH_COMMIT` entry (its tripwire is designed to fail
 at exactly that moment — that failure is the signal), re-derive all three
 digests with my own walker against A's MERGE COMMIT, and report the three
 digests together with the sha they were computed from. Then B merges.
+
+### 2026-09-13 — F3, F4, the pin retirement, and a BASELINE RETRACTION
+
+**F3 — a real staging bypass, reproduced before it was fixed.**
+
+`assert_envelope_payload_agreement` returned silently whenever `entity` was
+missing. Executed here: a record with `lifecycle.state: current`,
+`ingestion.action: upsert` and its `description` intact — a tombstone by no
+reading — but with its payload stripped was staged, embedded and indexed into
+`svs_biz_ks_state_civics_voyage_4_entities_1024`. Absence of the thing being
+checked was read as permission to skip the check.
+
+The payload requirement is now decided by `ingestion.action`, with the lifecycle
+asserted to agree with it. `record_kind` is NOT the discriminator: it says the
+record is an entity projection and says nothing about upsert versus removal.
+
+| action | lifecycle.state | removal_required | payload |
+|---|---|---|---|
+| `upsert` | `current` | `false` | REQUIRED |
+| `remove` | `superseded` / `withdrawn` | `true` | FORBIDDEN |
+
+A tombstone is valid to ADAPT and is refused for descriptor STAGING by
+`RemovalRecordNotStageable`: it directs a DELETE and carries no description to
+embed, so letting it through would either crash on the missing description or
+embed something invented in its place.
+
+Four checks, each by execution: a payload-less current upsert refused before any
+callback (`entity` missing and `entity: null`, both entity types); six
+contradictory action/lifecycle combinations refused; legitimate tombstones
+adapt AND never embed, both halves, both states; existing valid upserts still
+stage, as the positive control so the fix cannot be satisfied by refusing
+everything. A fifth test pins the discriminator itself: two records with the
+same `record_kind` and different actions get different payload requirements.
+
+**F4** — `test_r5_1c` gains the "both halves are individually schema-valid"
+precondition, so it cannot pass by a schema incidentally catching the mutation.
+A related repair: the status-rule test now MIRRORS its mutation into the payload
+instead of dropping it, so it isolates the status rule rather than tripping the
+new payload rule.
+
+**Pin retirement.** The provisional entry's tripwire fired, unprompted, on the
+first run after A merged:
+
+> `AssertionError: 24c9d3ded3... HAS merged to StateCivics main, so the
+> provisional entry PROVISIONAL_BRANCH_COMMIT['entity'] = 'ks-600-a2-1-hb2513-slice'
+> is stale. Delete it: a pin left provisional after its branch merges is
+> indistinguishable from one that was never checked.`
+
+`PROVISIONAL_BRANCH_COMMIT` is now `{}`, and the docstring says to keep it that
+way.
+
+**One deviation from the instruction, and the reason for it.** I was asked to
+re-pin `ENTITY_BRANCH_SHA256` from `677d126d` and record a supersession triple.
+Re-derived with my own walker at `677d126d`:
+
+| branch | digest @677d126d | moved since 24c9d3de |
+|---|---|---|
+| document | `d3a7212a4873a2f375d451e74ab4d5f11a56ff50bbbeb5a162dae1f8640807e2` | no |
+| entity | `52fd9ee50585c805664a39f5548ba04d00c0ac1a16c4095e2149d06451817058` | **no** |
+| dispatch | `03dc178429d04275f7b49a6d4ab9e05ee56bc970a31de78268942eb3de3b7940` | no |
+
+**The entity digest did not move**, so there was nothing to re-pin and no
+supersession to record. `ENTITY_BRANCH_SHA256` is already that value.
+`PINNED_BRANCH_COMMIT["entity"]` stays at `24c9d3de`, which is the commit at
+which the branch actually last changed — the documented meaning of that field —
+and is now an ancestor of A's `main`, so the provenance check passes against
+`main` with nothing special about it. Writing `677d126d` there, or adding a
+supersession triple for a digest that is unchanged, would have recorded
+something false.
+
+**Fixture manifest refreshed** to `677d126d`, sha256
+`dd795e63359238697d57eca693307a04cebc0ec1888bae91113496d1878b61a8` recomputed
+here and byte-identical to `git show`. The QC's nuance was verified rather than
+taken on report — I diffed the two manifests field by field, and they differ in
+EXACTLY two: `exporter.code_commit` (now `d3000e98...`, not `24c9d3de...`) and
+`record_digest_sha256`. Every substantive field is identical, so item 7's
+semantic conclusions carry over unchanged and only the digest assertions were
+re-run. New digests asserted: action
+`3479ae3bbc5b7df554230c8434510e2b6803ea281e9f38261791d1a2b68d9334`, provision
+`14c01e5a8f9a6bf11902f741a52bd76dc3c5c86725525c6a30256e67eb2322b0`.
+
+## BASELINE RETRACTION (R-P9)
+
+**Every "regime SET" figure in the log entries above is WITHDRAWN. It was never
+the SET regime.**
+
+`SVS_STATUTE_ROLLOUT_SEED` pointed at
+`~/Developer/statecivics-statute-ingestion/wave-139/seed-state.json`. That file
+EXISTS, so the suite's `required()` helper — which checks `path.exists()` —
+passed it. But its sha256 is `bfb88ed4...` and the rollout module demands
+`SEED_SHA256 = b64003f370c161c45c6dc5384951ea787242cba56be6446b12327099755d5c2d`,
+so every module-scoped fixture raised "unapproved seed hash" and the 31 setup
+errors never cleared. I read those 31 errors as an environmental constant across
+both regimes and reported the counts beside a label that was wrong. **Resolving
+is not the same as correct, and a path check that only asks whether a file
+exists cannot tell the difference.** This is R-P9's own failure mode occurring
+inside the rule meant to prevent it.
+
+The seed was located by matching that hash, not by guessing:
+`~/Developer/statecivics-statute-ingestion/ks-fiscal-local-kansas-statutes.json`.
+
+The regimes, re-measured with the same command on both sides:
+
+| regime | main @`cc01547` | branch | set difference |
+|---|---|---|---|
+| corpus vars UNSET | 10 failed + 31 errors = **41 ids** | 10 failed + 31 errors = **41 ids** | empty both directions |
+| corpus vars SET **(resolving)** | 7 failed + 4 errors = **11 ids** | 7 failed + 4 errors = **11 ids** | empty both directions |
+
+**Neither number is a green baseline, and neither should be quoted as one.**
+The 11 that survive the resolving regime are 4 `test_kansas_statute_tranches`
+setup errors, 4 `test_fiscal_document_evidence` + 1 `test_statecivics_statutes`
+subprocess-`PYTHONPATH` failures (WAVE-144), and 2 `test_kscourts_graphrag_load`
+failures (missing `psycopg`). All pre-existing, none touched by this branch.
+
+**F5 filed as [WAVE-147](WAVE-147-statecivics-envelope-payload-helper-robustness.md)**
+against repo A, in the same commit that names it.

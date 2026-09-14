@@ -89,22 +89,16 @@ FIXTURE_CONTRACT_COMMIT = "24c9d3ded35405054094a1280c7ea1f074fad5d5"
 
 #: Pins that point at upstream work which has NOT yet merged to ``main``.
 #:
-#: The provenance check requires every pinned commit to be an ancestor of
-#: StateCivics ``main``, because pinning to an object no branch reaches is how a
-#: pin outlives the work it pinned.  ``24c9d3de`` is 13 commits ahead of ``main``
-#: on ``ks-600-a2-1-hb2513-slice`` and is reachable from that branch and no
-#: other.  Recording it here is NOT a waiver of the check: the commit must still
-#: be an ancestor of the branch named beside it, so it still cannot be dangling,
-#: abandoned or invented.  What it is, is a DEBT, stated where the pin is rather
-#: than in a ticket nobody reads at the point of use.
+#: EMPTY, and that is the outcome the mechanism was built for. ``24c9d3de`` was
+#: recorded here while it lived only on ``ks-600-a2-1-hb2513-slice``; the
+#: provenance check still required it to be an ancestor of THAT branch, so it
+#: could never have been a dangling object, and a test failed the moment the
+#: branch merged. It did fail, with "HAS merged to StateCivics main, so the
+#: provisional entry ... is stale. Delete it", and this is that deletion.
 #:
-#: This entry must be DELETED when KS-650 B1.3 merges, and the check then holds
-#: against ``main`` with nothing special about it.  A pin left provisional after
-#: its branch merges is indistinguishable from one that was never checked, which
-#: is the whole failure mode.  Tracked by WAVE-134.
-PROVISIONAL_BRANCH_COMMIT: dict[str, str] = {
-    "entity": "ks-600-a2-1-hb2513-slice",
-}
+#: Keep it empty. An entry that outlives its branch is indistinguishable from a
+#: pin that was never checked.
+PROVISIONAL_BRANCH_COMMIT: dict[str, str] = {}
 
 DOCUMENT_BRANCH_SHA256 = "d3a7212a4873a2f375d451e74ab4d5f11a56ff50bbbeb5a162dae1f8640807e2"
 ENTITY_BRANCH_SHA256 = "52fd9ee50585c805664a39f5548ba04d00c0ac1a16c4095e2149d06451817058"
