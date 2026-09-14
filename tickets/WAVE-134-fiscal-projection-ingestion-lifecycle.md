@@ -708,3 +708,81 @@ of artefacts that do not exist at the sha I was given. Send the manifest file
 
 **Item 8 remains PREPARED AND NOT EXECUTED.** No image built, no digest
 recorded, no `.env.images` written, no container touched.
+
+### 2026-09-13 — item 7 COMPLETE: both HB 2513 revision-2 records
+
+The artifacts landed at A `5e9b88cc`. Verified before use, not after:
+`tests/fixtures/civic_impact/ks600-a2-1-entities-candidates.jsonl` read with
+`git show`, sha256 `8b495ed7d427c41639fe3d18db91e2255de112f331fdb3728af37539708f1f95`
+recomputed here and matching, two records, byte-identical to the copy committed
+as `tests/fixtures/statecivics-ks600-a2-1-entities-candidates.5e9b88cc.jsonl`.
+
+**The pin did not move, and that was checked rather than accepted.** The
+contract at `5e9b88cc` is byte-identical to the committed fixture
+(`9bd52e29…`), and all three digests recompute unchanged
+(`d3a7212a…`/`52fd9ee5…`/`03dc1784…`). `PROVISIONAL_BRANCH_COMMIT` stays as-is,
+with its merge tripwire armed.
+
+**All four proofs, now for BOTH records** (parametrised over
+`appropriation_action` and `provision_reference`):
+
+1. **VALID** under the widened contract, individually and as a manifest through
+   `adapt_manifest` — 2 entity records, 0 document records, pins
+   `('dispatch', 'entity')`. And the identical records are shown INVALID against
+   a copy with the pre-change enum restored, so the widening is load-bearing.
+2. **REFUSED by the live path** with the named refusal, naming the logical id,
+   the export record id and `revision 2`. Sharpened the same way as the
+   provision: each record validates cleanly, and the same record with ONLY
+   `status` changed to `reviewed` or `published` passes the live path AND stays
+   valid — so the refusal is candidacy and nothing else. Ordered: the whole
+   manifest on the live path produces **0 embed calls and 0 index calls**.
+3. **ACCEPTED by the candidate path**, both records, embedded twice, written to
+   the candidate collection.
+4. **NO FALLBACK**: `entity_revision == 2` **and** payload revision `== 2`, for
+   both records — A's fallback signature, asserted directly. The revision-1-twin
+   test is kept and is what makes assertion 4 load-bearing: it shows the
+   superseded twin WOULD be admitted by the live path, because revision 1 is
+   `reviewed` and on arrival a silent fallback is indistinguishable from a
+   legitimate live record.
+
+**Edges, proved from the artifact** (all `basis: exact_shared_identifier`). The
+four split three-and-one, which is what the contract requires — an action
+carries the three its own columns support, a provision carries only its
+supersession, because the action side owns that FK:
+
+* action: `action_relies_on_provision` → provision `f4cf16d5…18998` revision
+  **2**; `action_enacted_by_bill_version` → `4782`; `action_supersedes_action` →
+  itself revision 1.
+* provision: `provision_supersedes_provision` → itself revision 1.
+
+Crossed against each other rather than against constants: the action's
+`relies_on` target equals the provision record's own `entity_logical_id` and
+`entity_revision`, and its `supersedes` target equals its own id at
+`entity_revision - 1`. An edge pointing at revision 1 would be the fallback
+wearing a different hat, so this is asserted explicitly.
+
+**The revision discrepancy is closed, and the resolution went the other way from
+what a guess would have produced.** The exporter was always correct; a
+hand-written fixture at `fa74ca7a` had gone stale and was reused inside a
+revision-2 envelope at `e84a4642`. Refusing to reconstruct the missing record
+surfaced that. The values this repo carried from that fixture —
+`record_digest_sha256 0a6fd522…` and `exporter.code_commit cda8d793…` — are gone
+from both trees; the authoritative values are asserted from the committed
+artifact:
+
+| | export_record_id | record_digest_sha256 |
+|---|---|---|
+| action | `f3f72004…f742941` | `09164d89…bb14313` |
+| provision | `f4c67403…5343684` | `f504a500…68efc80` |
+
+both with `exporter.code_commit = 24c9d3de…`.
+
+**One detail found while asserting, worth recording.** `eligibility.publication_allowed`
+is `null` on the action and `false` on the provision. That is correct and the
+contract says why — `civic_appropriation_actions` has no such column, so null
+says "no column" rather than inventing a permissive default. My first assertion
+used one value for both and failed; it is now asserted per entity type, because
+a single assertion would have hidden the distinction rather than checked it.
+
+**Item 7 is complete. Item 8 remains PREPARED AND NOT EXECUTED** — no image
+built, no digest recorded, no `.env.images` written, no container touched.

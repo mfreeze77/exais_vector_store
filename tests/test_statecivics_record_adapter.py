@@ -95,12 +95,27 @@ CONTRACT = FIXTURES / "statecivics-retrieval-export-record.24c9d3de.json"
 MIXED = FIXTURES / "statecivics-mixed-manifest.jsonl"
 BAD_ENTITY = FIXTURES / "statecivics-invalid-entity-record.jsonl"
 BAD_DOCUMENT = FIXTURES / "statecivics-invalid-document-record.jsonl"
-#: The REAL HB 2513 Sec. 15(b) candidate provision record, revision 2, lifted
-#: verbatim from repo A's committed `_provision_record()` at
-#: 24c9d3ded35405054094a1280c7ea1f074fad5d5 -- read with `git show` and parsed
-#: with `ast`, so nothing in A's tree was imported or executed, and A's working
-#: tree was never read.
-REAL_CANDIDATE = FIXTURES / "statecivics-hb2513-candidate-provision.24c9d3de.jsonl"
+#: The REAL candidate manifest the exporter wrote for HB 2513 Sec. 15(b), both
+#: records, byte-identical to repo A's committed
+#: `tests/fixtures/civic_impact/ks600-a2-1-entities-candidates.jsonl` at
+#: 5e9b88cc -- read with `git show`, never from A's working tree.
+#:
+#: This REPLACES a copy earlier lifted out of A's unit-test source with `ast`.
+#: That copy carried `record_digest_sha256 0a6fd522...` and
+#: `exporter.code_commit cda8d793...`, which disagreed with the values the
+#: exporter actually emits. Both are gone from A's tree: the hand-written
+#: fixture was stale, the exporter was always right, and A has since derived
+#: every fixture from this manifest so there is nothing left to keep in sync.
+#: An artifact beats a reconstruction, which is the whole reason B refused to
+#: assemble the missing record itself.
+REAL_MANIFEST = FIXTURES / "statecivics-ks600-a2-1-entities-candidates.5e9b88cc.jsonl"
+REAL_MANIFEST_SHA256 = "8b495ed7d427c41639fe3d18db91e2255de112f331fdb3728af37539708f1f95"
+#: The two logical identities in that manifest, so edge targets can be crossed
+#: against them by name rather than by repeating a hex string in each assertion.
+PROVISION_LOGICAL_ID = "f4cf16d51a9339c186343ece353dbd07fe2feef9e319770359fb9378ceb18998"
+ACTION_LOGICAL_ID = (
+    "ks-approp-action:ks-2025-2026-hb2513:v7:enrolled:section-15:subsection-b:appropriate"
+)
 ADAPTER_SOURCE = ROOT / "packages" / "svs_common" / "svs_common" / "statecivics_record_adapter.py"
 
 #: The REAL instance tree. Every document collection name in these tests is
@@ -1263,100 +1278,128 @@ def test_the_pinned_contract_now_permits_candidate_and_the_gate_still_refuses(sc
 
 
 # --------------------------------------------------------------------------
-# Item 7: the composition milestone, on the REAL HB 2513 revision-2 record
+# Item 7: the composition milestone, on BOTH real HB 2513 revision-2 records
 # --------------------------------------------------------------------------
 #
-# One real record, not a fixture written here: repo A's committed
-# `_provision_record()` at 24c9d3de, the provision for HB 2513 Sec. 15(b),
-# entity_revision 2, eligibility.status "candidate".
-#
-# What this file does NOT contain, and why, is as much of the result as what it
-# does. See the WAVE-134 log: A's candidate MANIFEST (sha256 8b495ed7...) is not
-# a committed file and is not on disk; the appropriation_action ENVELOPE exists
-# nowhere at the fixed sha (only its KS-600 payload does); and three of the
-# values supplied to me do not match what A committed. None of that was
-# reconstructed, because reconstructing it would be writing the milestone rather
-# than proving it.
+# Not a fixture written here: the manifest repo A's exporter actually wrote for
+# HB 2513 Sec. 15(b), committed at 5e9b88cc and byte-identical to it. Two
+# records, both revision 2, both `candidate`: the provision_reference and the
+# appropriation_action with its three stored edges.
 
 
 @pytest.fixture(scope="module")
-def real_candidate() -> dict:
-    return _jsonl(REAL_CANDIDATE)[0]
+def real_records() -> dict[str, dict]:
+    records = _jsonl(REAL_MANIFEST)
+    assert len(records) == 2
+    return {record["entity_type"]: record for record in records}
 
 
-def test_7_1_the_real_record_is_valid_under_the_widened_contract(real_candidate, schema) -> None:
-    """Proof 1. Valid -- which it was NOT before the enum widened."""
-    rule = dispatch_rule(schema)
-    assert classify_record(real_candidate, rule) == rule.present_pin
-    result = validate(real_candidate, schema, rule.present_ref)
-    assert result.ok, result.errors
-    # It is the real record, not a lookalike.
-    assert real_candidate["entity_logical_id"].startswith("f4cf16d51a93")
-    assert real_candidate["entity_type"] == "provision_reference"
-    assert real_candidate["eligibility"]["status"] == "candidate"
-    # ...and it goes through the whole reader, not just the validator.
-    adapted = adapt_records([(1, real_candidate)], schema)
-    assert len(adapted.entity_records) == 1
-    assert adapted.document_records == ()
+@pytest.fixture(scope="module")
+def real_action(real_records) -> dict:
+    return real_records["appropriation_action"]
 
 
-def test_7_1b_the_same_record_was_invalid_under_the_superseded_entity_branch(
-    real_candidate, schema
+@pytest.fixture(scope="module")
+def real_provision(real_records) -> dict:
+    return real_records["provision_reference"]
+
+
+def _payload_revision(record: dict) -> int:
+    """The revision the KS-600 payload itself carries, by entity type."""
+    entity = record["entity"]
+    return entity["revision" if record["entity_type"] == "appropriation_action" else
+                  "provision_reference_revision"]
+
+
+def test_the_manifest_is_the_artifact_upstream_committed() -> None:
+    """Provenance before proof. These are the exporter's bytes, unaltered."""
+    import hashlib
+
+    assert hashlib.sha256(REAL_MANIFEST.read_bytes()).hexdigest() == REAL_MANIFEST_SHA256
+
+
+@pytest.mark.parametrize("kind", ["appropriation_action", "provision_reference"])
+def test_7_1_the_real_record_is_valid_under_the_widened_contract(
+    real_records, schema, kind
 ) -> None:
-    """The widening is load-bearing, not cosmetic.
+    """Proof 1. Valid -- which neither record was before the enum widened."""
+    record = real_records[kind]
+    rule = dispatch_rule(schema)
+    assert classify_record(record, rule) == rule.present_pin
+    result = validate(record, schema, rule.present_ref)
+    assert result.ok, result.errors
+    assert record["eligibility"]["status"] == "candidate"
 
-    Rebuild the pre-change enum in a copy and show the identical record fails.
-    That is what makes the re-pin a real constraint change rather than prose.
-    """
+
+def test_7_1b_the_whole_manifest_goes_through_the_reader(real_records, schema) -> None:
+    """Both records at once, through adapt_records, as a manifest is read."""
+    adapted = adapt_manifest(REAL_MANIFEST, contract_schema=CONTRACT)
+    assert len(adapted.entity_records) == 2
+    assert adapted.document_records == ()
+    assert {r["entity_type"] for r in adapted.entity_records} == set(real_records)
+    assert set(adapted.verified_pins) == {"dispatch", "entity"}
+
+
+@pytest.mark.parametrize("kind", ["appropriation_action", "provision_reference"])
+def test_7_1c_the_same_record_was_invalid_under_the_superseded_entity_branch(
+    real_records, schema, kind
+) -> None:
+    """The widening is load-bearing, not cosmetic."""
     narrowed = copy.deepcopy(schema)
-    status = narrowed["$defs"]["entity_eligibility"]["properties"]["status"]
-    status["enum"] = ["reviewed", "published"]
-    result = validate(real_candidate, narrowed, "entity_projection_envelope")
+    narrowed["$defs"]["entity_eligibility"]["properties"]["status"]["enum"] = [
+        "reviewed",
+        "published",
+    ]
+    result = validate(real_records[kind], narrowed, "entity_projection_envelope")
     assert not result.ok
     assert any("candidate" in error for error in result.errors)
 
 
-def test_7_2_the_live_path_refuses_it_with_the_named_refusal(real_candidate) -> None:
-    """Proof 2. THE DELIVERABLE. The first time B says no to A, correctly."""
+@pytest.mark.parametrize("kind", ["appropriation_action", "provision_reference"])
+def test_7_2_the_live_path_refuses_it_with_the_named_refusal(real_records, kind) -> None:
+    """Proof 2. THE DELIVERABLE, now for both records."""
+    record = real_records[kind]
     with pytest.raises(CandidateRecordRefused) as excinfo:
-        admit_entity_records([real_candidate], path=LIVE_PATH)
+        admit_entity_records([record], path=LIVE_PATH)
     message = str(excinfo.value)
     assert "for the live entity store" in message
     assert "eligibility.status is 'candidate'" in message
-    assert real_candidate["entity_logical_id"] in message
+    assert record["entity_logical_id"] in message
+    assert record["export_record_id"] in message
     assert "revision 2" in message
     assert "Nothing has been embedded or indexed." in message
 
 
+@pytest.mark.parametrize("kind", ["appropriation_action", "provision_reference"])
 def test_7_2b_the_refusal_is_for_candidacy_and_for_nothing_else(
-    real_candidate, schema
+    real_records, schema, kind
 ) -> None:
     """Proof 2, sharpened. A refusal for the WRONG reason is not the milestone.
 
     The record must be otherwise flawless: valid against the branch, and the
-    same record with only `status` changed must sail through the live path.
+    same record with ONLY `status` changed must sail through the live path.
     """
+    record = real_records[kind]
     rule = dispatch_rule(schema)
-    assert validate(real_candidate, schema, rule.present_ref).ok
+    assert validate(record, schema, rule.present_ref).ok
     for status in sorted(LIVE_ELIGIBILITY_STATUSES):
-        twin = copy.deepcopy(real_candidate)
+        twin = copy.deepcopy(record)
         twin["eligibility"]["status"] = status
-        assert len(admit_entity_records([twin], path=LIVE_PATH)) == 1
         assert entity_path_for(twin) == LIVE_PATH
-    # And no URI reason can be hiding in there: `uri` is asserted now, and this
-    # record passes. (A is strict on uri too, so neither side refuses the other
-    # for that.)
+        assert len(admit_entity_records([twin], path=LIVE_PATH)) == 1
+        # ...and still valid, so nothing else in the record is marginal.
+        assert validate(twin, schema, rule.present_ref).ok
+    # No URI reason can be hiding either: `uri` asserts here, and A is strict on
+    # it too, so neither side can refuse the other for that.
     assert "uri" in ASSERTED_FORMATS
 
 
-def test_7_2c_nothing_is_embedded_or_indexed_when_the_real_record_is_refused(
-    real_candidate,
-) -> None:
-    """Proof 2, ordered. The refusal costs nothing, on the real record."""
+def test_7_2c_the_whole_manifest_is_refused_with_nothing_spent(real_records) -> None:
+    """Proof 2, ordered, on the real manifest: two records, zero calls."""
     embed, index_write = _Detonator("embed"), _Detonator("index_write")
     with pytest.raises(CandidateRecordRefused):
         stage_entity_descriptors(
-            [real_candidate],
+            list(real_records.values()),
             path=LIVE_PATH,
             collection="svs_biz_ks_state_civics_voyage_4_entities_1024",
             embed=embed,
@@ -1365,76 +1408,163 @@ def test_7_2c_nothing_is_embedded_or_indexed_when_the_real_record_is_refused(
     assert (embed.calls, index_write.calls) == (0, 0)
 
 
-def test_7_3_the_candidate_path_accepts_it(real_candidate) -> None:
+def test_7_3_the_candidate_path_accepts_both(real_records) -> None:
     """Proof 3."""
-    assert entity_path_for(real_candidate) == CANDIDATE_PATH
-    admitted = admit_entity_records([real_candidate], path=CANDIDATE_PATH)
-    assert len(admitted) == 1
-    assert admitted[0]["export_record_id"] == real_candidate["export_record_id"]
+    records = list(real_records.values())
+    for record in records:
+        assert entity_path_for(record) == CANDIDATE_PATH
+    assert len(admit_entity_records(records, path=CANDIDATE_PATH)) == 2
 
     embedded: list[str] = []
     written: list[tuple] = []
     staged = stage_entity_descriptors(
-        [real_candidate],
+        records,
         path=CANDIDATE_PATH,
         collection="svs_biz_ks_state_civics_voyage_4_candidates_1024",
         embed=lambda text: embedded.append(text) or [0.0],
         index_write=lambda collection, rows: written.append((collection, rows)),
     )
-    assert staged.embedded == 1
-    assert embedded == [real_candidate["description"]["text"]]
+    assert staged.embedded == 2
+    assert embedded == [r["description"]["text"] for r in records]
     assert written[0][0] == "svs_biz_ks_state_civics_voyage_4_candidates_1024"
 
 
-def test_7_4_no_fallback_the_emitted_revision_is_two(real_candidate) -> None:
+@pytest.mark.parametrize("kind", ["appropriation_action", "provision_reference"])
+def test_7_4_no_fallback_envelope_and_payload_both_say_revision_two(
+    real_records, kind
+) -> None:
     """Proof 4. The one that would have failed silently.
 
-    An as-of query that quietly picked revision 1 -- which is `reviewed` -- would
-    make the live path appear to ACCEPT a record it must never see, and it would
-    look like success. B cannot watch A's selection; what B can do is refuse to
-    treat the revision as incidental. The emitted revision is asserted, and the
-    revision-1 twin is shown to be exactly the thing that would have slipped
-    through.
-    """
-    assert real_candidate["entity_revision"] == 2
+    An as-of query that quietly picked revision 1 -- which is the superseded,
+    non-candidate row -- would make the live path appear to ACCEPT a record it
+    must never see, and it would look like success.
 
-    fallback = copy.deepcopy(real_candidate)
+    Two assertions, because A made envelope/payload agreement the fallback
+    signature: a revision-2 envelope wrapping a revision-1 payload is exactly
+    what a half-applied selection leaves behind. (That mismatch was real, in a
+    stale hand-written fixture, and is what refusing to reconstruct surfaced.)
+    """
+    record = real_records[kind]
+    assert record["entity_revision"] == 2
+    assert _payload_revision(record) == 2
+
+
+@pytest.mark.parametrize("kind", ["appropriation_action", "provision_reference"])
+def test_7_4b_the_superseded_twin_would_be_admitted_which_is_the_point(
+    real_records, kind
+) -> None:
+    """What makes assertion 4 load-bearing rather than decorative.
+
+    On arrival a silent fallback is INDISTINGUISHABLE from a legitimate live
+    record: revision 1 is `reviewed`, so the gate admits it and everything
+    downstream looks like success. B cannot watch A's selection. So the guard
+    has to be the assertion on the revision as emitted, and this is the thing
+    it guards against.
+    """
+    fallback = copy.deepcopy(real_records[kind])
     fallback["entity_revision"] = 1
     fallback["eligibility"]["status"] = "reviewed"
-    # This is what a silent fallback looks like on arrival: indistinguishable
-    # from a legitimate live record. Nothing downstream of the manifest can tell.
     assert len(admit_entity_records([fallback], path=LIVE_PATH)) == 1
-    # ...so the guard has to be the assertion above, on the record as emitted.
-    assert real_candidate["entity_revision"] != fallback["entity_revision"]
+    assert fallback["entity_revision"] != real_records[kind]["entity_revision"]
 
 
-def test_the_real_record_matches_what_upstream_committed(real_candidate) -> None:
-    """Provenance: these are A's bytes, and this is which of them I verified.
+def test_7_5_the_action_carries_its_three_stored_edges(real_action) -> None:
+    """Every v1 edge an appropriation action's own columns support.
 
-    The values asserted here are the ones I could corroborate at
-    24c9d3ded35405054094a1280c7ea1f074fad5d5. Values supplied to me that do NOT
-    appear at that sha are recorded in the WAVE-134 log rather than asserted
-    here, because a test that asserts an unverified number manufactures
-    agreement.
+    The `action_relies_on_provision` target is revision **2** -- the candidate
+    provision in this same manifest, not the superseded one. An edge pointing at
+    revision 1 would be the fallback wearing a different hat.
     """
-    assert real_candidate["export_record_id"] == (
+    edges = {e["relationship_type"]: e for e in real_action["relationships"]}
+    assert set(edges) == {
+        "action_relies_on_provision",
+        "action_enacted_by_bill_version",
+        "action_supersedes_action",
+    }
+    assert all(e["basis"] == "exact_shared_identifier" for e in edges.values())
+
+    relies = edges["action_relies_on_provision"]["target"]
+    assert relies["provision_reference_logical_id"] == PROVISION_LOGICAL_ID
+    assert relies["provision_reference_revision"] == 2, (
+        "the action must rely on the revision-2 provision in this manifest, not the "
+        "superseded revision 1"
+    )
+    assert edges["action_enacted_by_bill_version"]["target"] == {"bill_version_id": 4782}
+    assert edges["action_supersedes_action"]["target"] == {
+        "appropriation_action_id": ACTION_LOGICAL_ID,
+        "appropriation_action_revision": 1,
+    }
+
+
+def test_7_5b_the_provision_carries_only_its_own_supersession_edge(real_provision) -> None:
+    """A provision has exactly one kind of edge; the action side owns the FK."""
+    edges = real_provision["relationships"]
+    assert [e["relationship_type"] for e in edges] == ["provision_supersedes_provision"]
+    assert edges[0]["basis"] == "exact_shared_identifier"
+    assert edges[0]["target"] == {
+        "provision_reference_logical_id": PROVISION_LOGICAL_ID,
+        "provision_reference_revision": 1,
+    }
+
+
+def test_7_5c_the_edge_targets_are_consistent_with_the_manifest(real_action, real_provision) -> None:
+    """Cross the two records against each other, not against constants here."""
+    relies = next(
+        e for e in real_action["relationships"]
+        if e["relationship_type"] == "action_relies_on_provision"
+    )["target"]
+    assert relies["provision_reference_logical_id"] == real_provision["entity_logical_id"]
+    assert relies["provision_reference_revision"] == real_provision["entity_revision"]
+    supersedes = next(
+        e for e in real_action["relationships"]
+        if e["relationship_type"] == "action_supersedes_action"
+    )["target"]
+    assert supersedes["appropriation_action_id"] == real_action["entity_logical_id"]
+    assert supersedes["appropriation_action_revision"] == real_action["entity_revision"] - 1
+
+
+def test_the_real_records_match_the_authoritative_identifiers(real_action, real_provision) -> None:
+    """The identifiers, now read from a committed artifact rather than relayed.
+
+    The values previously carried here -- `0a6fd522...` and `cda8d793...` --
+    came from a hand-written fixture that had gone stale. They are gone from
+    upstream's tree and gone from here.
+    """
+    assert real_action["export_record_id"] == (
+        "f3f720043071536735e626895a345c510ae9be097b8414c98b0b57399f742941"
+    )
+    assert real_action["record_digest_sha256"] == (
+        "09164d898dc27ba7f165b7732d256f4b4880c6e0048829bb94a74870dbb14313"
+    )
+    assert real_provision["export_record_id"] == (
         "f4c674039b228388692962afbbeaf05cc981262d97a733e15828c40165343684"
     )
-    assert real_candidate["entity_logical_id"] == (
-        "f4cf16d51a9339c186343ece353dbd07fe2feef9e319770359fb9378ceb18998"
+    assert real_provision["record_digest_sha256"] == (
+        "f504a500b9f0e80bddf9a1de51e81d8a65d2edad4c26420446816ce8368efc80"
     )
-    assert real_candidate["record_digest_algorithm"] == "statecivics-canonical-json-v1"
-    assert real_candidate["as_of"]["snapshot_id"] == "ks600-a2-1-candidates-2026-09-13"
-    assert real_candidate["as_of"]["declared"] is True
-    assert real_candidate["eligibility"] == {
-        "status": "candidate",
-        "human_reviewed": False,
-        "review_level": "none",
-        "publication_allowed": False,
-    }
-    # The KS-600 payload is NOT validated here -- it is a remote $ref with its
-    # own pin -- so its shape is recorded, not judged. `source_url` is the
-    # declared key and the stray `url` that KS-650 B1.3 fixed is absent.
-    evidence = real_candidate["entity"]["evidence"][0]
-    assert "url" not in evidence
-    assert set(evidence) == {"source_revision_id", "source_span_id", "locator"}
+    for record in (real_action, real_provision):
+        assert record["exporter"]["code_commit"] == (
+            "24c9d3ded35405054094a1280c7ea1f074fad5d5"
+        )
+        assert record["record_digest_algorithm"] == "statecivics-canonical-json-v1"
+        assert record["as_of"]["declared"] is True
+        assert record["eligibility"]["status"] == "candidate"
+        assert record["eligibility"]["human_reviewed"] is False
+        assert record["eligibility"]["review_level"] == "none"
+    # `publication_allowed` differs BY ENTITY TYPE, and the contract says why:
+    # civic_appropriation_actions has no such column, so null says "no column"
+    # rather than inventing a permissive default. Asserted per type, because
+    # asserting one value for both would have hidden that distinction.
+    assert real_action["eligibility"]["publication_allowed"] is None
+    assert real_provision["eligibility"]["publication_allowed"] is False
+    # The KS-600 payloads are NOT validated here -- they are remote $refs with
+    # their own pins -- so their shape is recorded, not judged. `source_url` is
+    # the declared key and the stray `url` that KS-650 B1.3 fixed is absent.
+    assert sorted(real_action["entity"]["source"]) == [
+        "locator",
+        "source_revision_id",
+        "source_span_id",
+        "source_url",
+    ]
+    assert "url" not in real_action["entity"]["source"]
+    assert "url" not in real_provision["entity"]["evidence"][0]
