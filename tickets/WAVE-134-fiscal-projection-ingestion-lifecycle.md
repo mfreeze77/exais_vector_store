@@ -1229,3 +1229,20 @@ The candidate API is disabled by default. Enable only in ks-fiscal-local after
 focused API/adapter checks and a target-specific API image build. Rollback is
 disabling that API flag and restoring the previous API image; retained candidate
 points remain separate from document and live-entity collections.
+
+
+Validation at `5e24383`: 281 focused tests passed with no skips across candidate
+storage, entity CLI, adapter, contract pins and document CLI. The first harness
+run omitted `SVS_STATECIVICS_REPO`; after mounting A, its operator clone's `main`
+ref was stale. Fetching canonical A main resolved the provenance failure. No test
+or pin exception was added. The final image built from `apps/api/Dockerfile`
+passed all 11 candidate-storage tests under its own Python 3.12 dependencies,
+and importing the full API registered both routes.
+
+Local activation uses a candidate API service alongside the existing API on the
+ks-fiscal-local network, with its own loopback port and DNS alias. The existing
+API, worker and model gateway remain running. This is an operator candidate
+endpoint, not a public-UI release or a five-image cell release. Its image ID,
+source commit, route checks and durable-record receipts are recorded with the
+pilot handoff. The existing cell currently uses local header principals; this
+exercise does not claim bearer-token authentication in that local deployment.
