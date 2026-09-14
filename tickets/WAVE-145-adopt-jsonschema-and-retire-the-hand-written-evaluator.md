@@ -1,6 +1,6 @@
 # WAVE-145: Adopt jsonschema as a real dependency and retire the hand-written evaluator
 
-Status: DONE 2026-09-13, landed_by (this commit). Parent: WAVE-134.
+Status: DONE 2026-09-13. landed_by: 1565a84 (merge), 830ccb7 (branch tip). Parent: WAVE-134.
 
 ## Summary
 

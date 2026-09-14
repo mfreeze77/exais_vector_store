@@ -1,6 +1,6 @@
 # WAVE-134: Ingest scoped projections with consistent eligibility and lifecycle
 
-Status: in progress — bounded document coordinates; canonical projection integration pending. Parent: WAVE-132 (reopened). Filed 2026-09-10.
+Status: in progress — lane B (the entity/document record adapter) LANDED; landed_by: 1565a84 (merge), 830ccb7 (branch tip). Wiring `adapt_manifest` into `kansas-fiscal-document-ingest.py`'s dispatch remains open and is P5-BUILD's first item. Parent: WAVE-132 (reopened). Filed 2026-09-10.
 
 ## Summary
 
@@ -992,3 +992,31 @@ failures (missing `psycopg`). All pre-existing, none touched by this branch.
 
 **F5 filed as [WAVE-147](WAVE-147-statecivics-envelope-payload-helper-robustness.md)**
 against repo A, in the same commit that names it.
+
+
+### 2026-09-13 — lane B landed
+
+Merged to `main` as `1565a84` (`--no-ff`), branch tip `830ccb7`, ten commits.
+`wave-134-entity-record-adapter` deleted after the merge.
+
+Post-merge verification on `main`, same commands as the branch: corpus vars
+UNSET 10 failed + 31 errors = 41 ids; corpus vars SET (resolving) 7 failed + 4
+errors = 11 ids. Identical to the pre-merge measurements on both sides. Neither
+is a green baseline — see the retraction above for what the 11 are.
+
+Still open under this ticket, unchanged by the merge:
+
+* **No application caller exists.** `adapt_manifest` and
+  `stage_entity_descriptors` are invoked by nothing outside their own module,
+  asserted by `test_r5_2g_there_is_no_application_caller_of_adapt_manifest`,
+  which fails when one appears. Wiring the dispatch into
+  `kansas-fiscal-document-ingest.py` is P5-BUILD's first item, on the TEST image.
+* **Item 8 remains PREPARED AND NOT EXECUTED.** No image built, no digest
+  recorded, no `.env.images` written, no container touched. The proposal must
+  still be re-derived for `ks-fiscal-local` — the running cell — whose
+  `.env.images` is not checked in anywhere; the digests recorded earlier belong
+  to `ks-state-civics`.
+* [WAVE-146](WAVE-146-qdrant-collection-prefix-config-runtime-mismatch.md): the
+  `instance.yaml` / runtime collection-prefix disagreement.
+* [WAVE-147](WAVE-147-statecivics-envelope-payload-helper-robustness.md): the
+  same cross-field rule's laxer form in repo A's public helper.
