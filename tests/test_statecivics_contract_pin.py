@@ -324,6 +324,28 @@ def test_audit_records_its_digests_as_commit_digest_pairs() -> None:
     assert "WORKTREE-PATH-PROVENANCE" in text
 
 
+def test_candidate_payload_contracts_and_durable_manifest_are_exact_upstream_artifacts():
+    import hashlib
+    import subprocess
+    upstream = statecivics_repo()
+    root = Path(__file__).resolve().parents[1]
+    directory = root / 'configs/statecivics-contracts'
+    provenance = json.loads((directory / 'provenance.json').read_text())
+    for name, digest in provenance['files'].items():
+        actual = (directory / name).read_bytes()
+        expected = subprocess.check_output([
+            'git', '-C', str(upstream), 'show',
+            f"{provenance['producer_commit']}:contracts/civic-impact/{name}",
+        ])
+        assert actual == expected
+        assert hashlib.sha256(actual).hexdigest() == digest
+    expected = subprocess.check_output([
+        'git', '-C', str(upstream), 'show',
+        '0d199c6b:tests/fixtures/civic_impact/hb2513-pilot-durable-20260914.jsonl',
+    ])
+    assert (root / 'tests/fixtures/statecivics-hb2513-pilot-durable.0d199c6b.jsonl').read_bytes() == expected
+
+
 def test_historical_digests_are_reproducible_at_their_recorded_commit() -> None:
     """Re-derive the audit's numbers from git, not from a mutable worktree."""
     import hashlib
