@@ -209,15 +209,55 @@ class _Detonator:
         raise AssertionError(f"{self.what} was called before the entity gate refused a candidate")
 
 
+#: Every network-capable attribute of the consumer module. Enumerated, and then
+#: CHECKED to exist -- see `sealed`.
+NETWORK_SEAMS = (
+    "api_json",
+    "api_json_via_api_container",
+    "api_json_via_cell_network",
+    "api_json_via_direct_http",
+    "api_json_via_host_curl",
+    "api_multipart",
+    "apply_operations",
+    "default_api_base",
+    "default_headers",
+    "ensure_vector_store",
+    "submit_upsert",
+)
+
+
 @pytest.fixture
 def sealed(ingest, monkeypatch):
-    """Every API seam in the consumer replaced by something that detonates."""
+    """Every network-capable seam replaced by something that detonates.
+
+    An earlier version of this fixture listed four names guarded by `hasattr`,
+    one of which -- `upload_document` -- does not exist in the module. So it
+    silently sealed three of four and reported a proof stronger than the one it
+    had run. A guard that skips what it cannot find is the same shape as the
+    defects this ticket keeps turning up, and it was inside a test written to
+    prove the opposite.
+
+    So: every name is asserted to EXIST before it is sealed. A seam that is
+    renamed away fails here loudly instead of quietly reducing the proof. The
+    two bottom layers are sealed too, so a seam nobody enumerated still cannot
+    reach the network.
+    """
+    import socket
+    import urllib.request
+
+    missing = [name for name in NETWORK_SEAMS if not hasattr(ingest, name)]
+    assert not missing, (
+        f"{missing} are named as network seams but do not exist in the module; "
+        "a seal list that silently skips what it cannot find proves less than it claims"
+    )
     seams = {}
-    for name in ("ensure_vector_store", "apply_operations", "default_headers", "upload_document"):
-        if hasattr(ingest, name):
-            seams[name] = _Detonator(name)
-            monkeypatch.setattr(ingest, name, seams[name])
-    assert "ensure_vector_store" in seams and "apply_operations" in seams
+    for name in NETWORK_SEAMS:
+        seams[name] = _Detonator(name)
+        monkeypatch.setattr(ingest, name, seams[name])
+    for module, name in ((socket, "socket"), (urllib.request, "urlopen")):
+        seams[f"{module.__name__}.{name}"] = _Detonator(f"{module.__name__}.{name}")
+        monkeypatch.setattr(module, name, seams[f"{module.__name__}.{name}"])
+    assert len(seams) == len(NETWORK_SEAMS) + 2
     return seams
 
 
@@ -345,3 +385,120 @@ def test_the_default_record_kind_is_document(ingest):
 
     source = inspect.getsource(ingest.parse_args)
     assert '"--record-kind", choices=["document", "entity"], default="document"' in source
+
+
+# --------------------------------------------------------------------------
+# WAVE-148: the runtime refusals the docstrings already claimed
+# --------------------------------------------------------------------------
+
+
+def test_plan_operations_refuses_entity_records_by_name(ingest):
+    """A forged `LoadedManifest` of entity records. Named refusal, not KeyError.
+
+    `LoadedEntityManifest` is a distinct type, so the two cannot be confused
+    STATICALLY -- but `plan_operations` is duck-typed, and constructing the
+    wrong object by hand used to produce `KeyError: 'logical_document_id'`. A
+    claim that holds only until somebody builds the object by hand is a claim
+    about type checking, not about the program.
+    """
+    records = tuple(_jsonl(REAL_MANIFEST))
+    forged = ingest.LoadedManifest(
+        path=Path("forged.jsonl"), sha256="0" * 64, byte_count=1, records=records
+    )
+    # `state={}` is deliberate: the guard must raise before anything reads it,
+    # and a real state dict would hide that ordering.
+    with pytest.raises(ingest.FiscalIngestError) as excinfo:
+        ingest.plan_operations(forged, custody_root=Path("/nonexistent"), state={})
+    message = str(excinfo.value)
+    assert "'record_kind'" in message
+    assert "ENTITY projection" in message
+    assert "logical_document_id" in message
+    assert "--record-kind entity" in message
+
+
+def test_plan_operations_refuses_a_record_with_no_document_identity(ingest):
+    """The other half: untagged, but still not a document record."""
+    forged = ingest.LoadedManifest(
+        path=Path("forged.jsonl"), sha256="0" * 64, byte_count=1,
+        records=({"export_record_id": "a" * 64},),
+    )
+    with pytest.raises(ingest.FiscalIngestError, match="no logical_document_id"):
+        ingest.plan_operations(forged, custody_root=Path("/nonexistent"), state={})
+
+
+def test_plan_operations_still_plans_real_document_records(ingest, tmp_path):
+    """The positive control: the guard is not "refuse everything"."""
+    manifest = ingest.load_manifest(
+        _document_manifest(ingest, tmp_path), contract_schema=CONTRACT
+    )
+    custody = tmp_path / "custody" / "kanview"
+    record = manifest.records[0]
+    digest = record["content_hash_sha256"]
+    (custody / digest[:2]).mkdir(parents=True)
+    (custody / digest[:2] / digest).write_bytes(b"%PDF-1.7\nkansas fiscal integration fixture\n")
+    operations = ingest.plan_operations(
+        manifest,
+        custody_root=tmp_path / "custody",
+        state=ingest.load_state(tmp_path / "state.json", vector_store_id="vs_test"),
+    )
+    assert operations and operations[0].logical_document_id == record["logical_document_id"]
+
+
+@pytest.mark.parametrize("declared", ["nonsense", "", "fiscal_graph_publisher", 1, None])
+def test_an_unknown_record_kind_gets_its_own_message(ingest, tmp_path, declared):
+    """Routing is by PRESENCE, so an unknown kind lands in the same guard.
+
+    Advising "use --record-kind entity" would send that operator to a path that
+    refuses the record too, at the kind/version gate. The two cases now get
+    different advice.
+    """
+    path = tmp_path / f"unknown-{abs(hash(str(declared)))}.jsonl"
+    path.write_text(
+        json.dumps({"record_kind": declared, "export_record_id": "a" * 64}) + "\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ingest.FiscalIngestError) as excinfo:
+        ingest.load_manifest(path, contract_schema=CONTRACT)
+    message = str(excinfo.value)
+    assert "is not a record kind this contract knows" in message
+    assert "would refuse it too, at the kind/version gate" in message
+    assert "Read it with --record-kind entity, which routes" not in message
+
+
+def test_a_real_entity_record_keeps_the_entity_advice(ingest):
+    """...and the record that IS an entity projection still gets sent there."""
+    with pytest.raises(ingest.FiscalIngestError) as excinfo:
+        ingest.load_manifest(REAL_MANIFEST, contract_schema=CONTRACT)
+    message = str(excinfo.value)
+    assert "this is an ENTITY record" in message
+    assert "Read it with --record-kind entity" in message
+    assert "is not a record kind this contract knows" not in message
+
+
+def test_the_known_kind_is_read_from_the_contract_not_written_here(ingest):
+    """The message's notion of "known" must move with the contract."""
+    import json as _json
+
+    schema = _json.loads(CONTRACT.read_text(encoding="utf-8"))
+    assert ingest._known_entity_record_kind(schema) == (
+        schema["$defs"]["entity_kind_version_gate"]["properties"]["record_kind"]["const"]
+    )
+    # A contract whose gate is gone must not silently make every kind "known".
+    stripped = _json.loads(CONTRACT.read_text(encoding="utf-8"))
+    del stripped["$defs"]["entity_kind_version_gate"]
+    assert ingest._known_entity_record_kind(stripped) is None
+
+
+def test_the_seal_list_fails_loudly_when_a_seam_disappears(ingest, monkeypatch):
+    """The fixture's own guard, tested.
+
+    The previous fixture used `hasattr` and silently sealed 3 of 4 named seams.
+    This asserts the replacement refuses instead of shrinking.
+    """
+    missing = [name for name in NETWORK_SEAMS if not hasattr(ingest, name)]
+    assert not missing
+    assert "upload_document" not in NETWORK_SEAMS, (
+        "upload_document does not exist in the module; naming it is what made the "
+        "earlier seal list report a proof it had not run"
+    )
+    assert len(NETWORK_SEAMS) == 11

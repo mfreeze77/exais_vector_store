@@ -33,7 +33,7 @@ from svs_common.statecivics_contract_pin import (
     ContractPinError, load_contract, verify_branch, verify_contract,
 )
 from svs_common.statecivics_record_adapter import (
-    ENTITY_PATHS, LIVE_PATH,
+    ENTITY_PATHS, EXPECTED_DISPATCH_REQUIRED, LIVE_PATH,
     adapt_manifest, admit_entity_records, classify_record, dispatch_rule,
 )
 from topeka_pipeline_common import (
@@ -305,6 +305,36 @@ def verify_contract_pin(contract_path: Path, *, consumer: str = CONSUMED_CONTRAC
     return verify_contract(load_contract(contract_path), consumer)
 
 
+def _known_entity_record_kind(schema: dict[str, Any]) -> Any:
+    """The one ``record_kind`` value the contract's gate accepts.
+
+    Read out of ``$defs.entity_kind_version_gate`` rather than written here, so
+    a contract that renames its kind changes this message with it.
+    """
+    gate = (schema.get("$defs") or {}).get("entity_kind_version_gate") or {}
+    return ((gate.get("properties") or {}).get("record_kind") or {}).get("const")
+
+
+def _foreign_record_refusal(path: Path, line_number: int, record: dict[str, Any],
+                            rule: Any, schema: dict[str, Any]) -> str:
+    """Say which of the two things went wrong, not merely that one did."""
+    tag = rule.tag_keys[0] if rule.tag_keys else EXPECTED_DISPATCH_REQUIRED[0]
+    declared = record.get(tag)
+    known = _known_entity_record_kind(schema)
+    if known is not None and declared != known:
+        return (
+            f"{path}:{line_number}: {tag}={declared!r} is not a record kind this contract "
+            f"knows. The contract routes on the PRESENCE of {tag}, so this record is not a "
+            f"document record either; its only tagged branch accepts {tag}={known!r}. "
+            f"--record-kind entity would refuse it too, at the kind/version gate."
+        )
+    return (
+        f"{path}:{line_number}: this is an ENTITY record and the document consumer cannot "
+        f"ingest it. Read it with --record-kind entity, which routes through the entity "
+        f"branch of the contract and its own pin."
+    )
+
+
 def load_manifest(
     path: Path,
     *,
@@ -338,7 +368,8 @@ def load_manifest(
     verify_contract_pin(contract_schema)
     # The routing predicate, taken from the contract rather than guessed. The
     # dispatch pin verified just above is computed over exactly this object.
-    rule = dispatch_rule(load_contract(contract_schema))
+    schema = load_contract(contract_schema)
+    rule = dispatch_rule(schema)
     payload = path.read_bytes()
     if payload and not payload.endswith(b"\n"):
         raise FiscalIngestError(f"{path}: JSONL manifest must end with a newline")
@@ -367,11 +398,12 @@ def load_manifest(
             #
             # Document behaviour is untouched: for an untagged record this is a
             # two-key read that returns the document branch and falls through.
-            raise FiscalIngestError(
-                f"{path}:{line_number}: this is an ENTITY record and the document consumer "
-                f"cannot ingest it. Read it with --record-kind entity, which routes through "
-                f"the entity branch of the contract and its own pin."
-            )
+            #
+            # Routing is by PRESENCE of the tag, which is what the contract's
+            # `if.required` says -- so an UNKNOWN kind also lands here, and
+            # telling its operator to "use --record-kind entity" would send them
+            # to a path that refuses it too. The two cases get different advice.
+            raise FiscalIngestError(_foreign_record_refusal(path, line_number, record, rule, schema))
         _validate_record(
             record,
             line_number=line_number,
@@ -558,6 +590,36 @@ def write_json_atomic(path: Path, value: dict[str, Any]) -> None:
         raise
 
 
+def _assert_document_records(manifest: Any) -> None:
+    """Refuse a manifest of entity records by NAME, at runtime.
+
+    ``LoadedEntityManifest`` is a distinct type, so the two cannot be confused
+    statically -- but ``plan_operations`` is duck-typed, and handed a forged
+    ``LoadedManifest`` of entity records it used to fail with
+    ``KeyError: 'logical_document_id'``. A claim that holds only until somebody
+    constructs the object by hand is a claim about type checking, not about the
+    program, and the docstring said otherwise.
+    """
+    tag = EXPECTED_DISPATCH_REQUIRED[0]
+    for index, record in enumerate(getattr(manifest, "records", ()) or (), start=1):
+        if not isinstance(record, dict):
+            raise FiscalIngestError(
+                f"{getattr(manifest, 'path', '<manifest>')}: record {index} is not an object"
+            )
+        if tag in record:
+            raise FiscalIngestError(
+                f"{getattr(manifest, 'path', '<manifest>')}: record {index} carries {tag!r}, "
+                "so it is an ENTITY projection and this planner cannot plan it. Document "
+                "operations are keyed on logical_document_id, which an entity record "
+                "deliberately does not have. Read it with --record-kind entity."
+            )
+        if "logical_document_id" not in record:
+            raise FiscalIngestError(
+                f"{getattr(manifest, 'path', '<manifest>')}: record {index} has no "
+                "logical_document_id, so no document operation can be keyed on it"
+            )
+
+
 def plan_operations(
     manifest: LoadedManifest,
     *,
@@ -567,6 +629,7 @@ def plan_operations(
     source_family: str = "kansas-fiscal-documents",
     statute_harvest: StatuteHarvest | None = None,
 ) -> list[PlannedOperation]:
+    _assert_document_records(manifest)
     _validate_source_family(source_family)
     if source_family == "kansas-statutes" and (statute_harvest is None or source_page_chunking_profile is not None):
         raise FiscalIngestError("statutes require reviewed harvest and reject the fiscal page profile")
