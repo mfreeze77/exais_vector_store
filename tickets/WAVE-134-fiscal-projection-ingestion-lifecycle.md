@@ -1140,3 +1140,66 @@ record more accurate rather than less:
 Deployment stays deferred. **Item 8 remains PREPARED AND NOT EXECUTED**, and is
 now blocked on WAVE-148 plus re-deriving the proposal for `ks-fiscal-local`,
 whose `.env.images` is not checked in anywhere.
+
+### 2026-09-13 — WAVE-148: the runtime refusals the docstrings already claimed
+
+Three fixes, all reproduced before being fixed, all proved by inversion. Folded
+into a branch rather than filed as a ticket, because each is small and leaving
+them open would have left the docstrings saying more than the program does.
+
+**1. `plan_operations` refused with `KeyError`, not by name.**
+`LoadedEntityManifest` is a distinct type, so the two cannot be confused
+STATICALLY — but `plan_operations` is duck-typed, and handed a forged
+`LoadedManifest` of entity records it produced `KeyError: 'logical_document_id'`.
+The docstring's "cannot hand it to `plan_operations` … in the type system, not
+by convention" was true of type checking and not of the program. **A claim that
+holds only until somebody constructs the object by hand is a claim about the
+type checker.** `_assert_document_records` now refuses by name, and separately
+refuses an untagged record with no `logical_document_id`. The forged-manifest
+tests pass `state={}` deliberately: the guard must raise before anything reads
+the state, and a real state dict would hide that ordering.
+
+**2. The `record_kind` message advised a path that would also refuse.**
+For `record_kind: "nonsense"` the refusal said "Read it with `--record-kind
+entity`" — which routes to the entity branch, where the kind/version gate
+refuses it too. Routing is by PRESENCE, per the contract's own `if.required`,
+so an unknown kind lands in the same guard as a real entity record. The two now
+get different advice, and "known" is READ from
+`$defs.entity_kind_version_gate.properties.record_kind.const` rather than
+written here, so a contract that renames its kind changes the message with it.
+A test asserts a contract with the gate removed yields `None` rather than
+silently making every kind known.
+
+**3. My own sealed-seam evidence was thinner than I stated.** The fixture named
+four seams behind a `hasattr` guard, and one — `upload_document` — does not
+exist in the module, so it sealed three of four while the report said four. The
+conclusion held, and QC re-confirmed it with every seam sealed, but **a guard
+that skips what it cannot find is the same shape as the defects this ticket
+keeps turning up, and this one was inside a test written to prove the
+opposite.** The fixture now enumerates all 11 network-capable module attributes,
+ASSERTS each exists before sealing it, and seals `socket.socket` and
+`urllib.request.urlopen` underneath so an unenumerated seam still cannot reach
+the network. A test asserts `upload_document` is not in the list and says why.
+
+| inversion | result |
+|---|---|
+| remove the `plan_operations` guard | 2 tests fail |
+| restore the one-size-fits-all message | 5 tests fail |
+| put `upload_document` back in the seal list | `['upload_document'] are named as network seams but do not exist in the module` |
+
+Each reverted by `git checkout --` of the committed file; `git status
+--porcelain` empty after.
+
+**Lint parity**: `ruff check` on the consumer gives the same 10 findings on
+`main` and on this branch, diffed line by line — 0 new. (My first parity check
+was itself wrong: `git stash` on a clean tree stashed nothing, so it diffed the
+changed file against itself and reported a trivially identical result. Redone
+against `git show main:`.)
+
+**Baselines**, same commands, resolving seed: corpus vars UNSET 41 ids both
+sides; SET (resolving) 11 ids both sides; **zero new failures in either
+regime**. Neither is green.
+
+**Deployment still deferred.** Item 8 remains PREPARED AND NOT EXECUTED and is
+now blocked only on re-deriving the proposal for `ks-fiscal-local`, whose
+`.env.images` is not checked in anywhere.
