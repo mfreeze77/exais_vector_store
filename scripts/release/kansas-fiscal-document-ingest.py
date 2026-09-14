@@ -17,6 +17,7 @@ import hashlib
 import json
 import os
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -1177,6 +1178,72 @@ def _report_entity_manifest(
     return 0
 
 
+def apply_entity_manifest(manifest: LoadedEntityManifest, args) -> dict:
+    """Submit bounded batches after validating the complete original artifact.
+
+    A retry replays the same bytes; the API skips already stored record digests.
+    Successful earlier batches remain stored if a later request fails. The proof
+    records that partial state, and applied becomes true only after all batches.
+    """
+    from svs_common.statecivics_entity_store import validate_candidate_manifest
+
+    raw = manifest.path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != manifest.sha256:
+        raise FiscalIngestError("entity manifest changed after admission")
+    body = raw.decode("utf-8")
+    # Includes payload schemas and record digests, before the first API request.
+    validate_candidate_manifest(body, manifest.sha256, path=manifest.entity_path)
+    batches, pending, size, pending_records = [], [], 0, 0
+    for line in raw.splitlines(keepends=True):
+        if len(line) > 1_500_000:
+            raise FiscalIngestError("an entity record exceeds the candidate API batch limit")
+        if pending_records and (pending_records >= 100 or size + len(line) > 1_500_000):
+            batches.append(b"".join(pending))
+            pending, size, pending_records = [], 0, 0
+        pending.append(line)
+        size += len(line)
+        pending_records += bool(line.strip())
+    if pending:
+        if pending_records:
+            batches.append(b"".join(pending))
+        else:
+            batches[-1] += b"".join(pending)
+    headers = default_headers(cell=args.cell, auth_token_file=args.auth_token_file)
+    result = {"applied": False, "entity_path": manifest.entity_path,
+              "manifest_sha256": manifest.sha256, "record_count": len(manifest.records),
+              "batch_count": len(batches), "completed_batches": 0,
+              "embedded": 0, "written": 0, "unchanged": 0, "point_ids": [], "batches": []}
+    if args.proof:
+        write_json_atomic(args.proof, result)
+    for index, batch in enumerate(batches):
+        batch_sha = hashlib.sha256(batch).hexdigest()
+        response = api_json(
+            "POST", args.api or default_api_base(args.cell),
+            "/api/v1/statecivics/entities/ingest",
+            {"manifest": batch.decode("utf-8"), "manifest_sha256": batch_sha,
+             "path": manifest.entity_path, "apply": True},
+            headers=headers, timeout=args.api_timeout_seconds,
+            cell=args.cell, transport=args.api_transport,
+        )
+        if not response.get("applied") or response.get("manifest_sha256") != batch_sha:
+            raise FiscalIngestError("candidate API did not confirm the submitted batch")
+        if response.get("record_count") != sum(bool(line.strip()) for line in batch.splitlines()):
+            raise FiscalIngestError("candidate API returned the wrong batch record count")
+        if index and response.get("collection") != result["collection"]:
+            raise FiscalIngestError("candidate API collection changed between batches")
+        result["collection"] = response["collection"]
+        for key in ("embedded", "written", "unchanged"):
+            result[key] += response[key]
+        result["point_ids"].extend(response["point_ids"])
+        result["batches"].append({"manifest_sha256": batch_sha, "record_count": response["record_count"]})
+        result["completed_batches"] += 1
+        result["applied"] = result["completed_batches"] == result["batch_count"]
+        if args.proof:
+            write_json_atomic(args.proof, result)
+        print(f"candidate batch {index + 1}/{len(batches)} confirmed", file=sys.stderr)
+    return result
+
+
 def main() -> int:
     args = parse_args()
     source_family = getattr(args, 'source_family', 'kansas-fiscal-documents')
@@ -1200,14 +1267,7 @@ def main() -> int:
             args.manifest, contract_schema=args.contract_schema, entity_path=args.entity_path,
         )
         if args.apply:
-            result = api_json(
-                "POST", args.api or default_api_base(args.cell),
-                "/api/v1/statecivics/entities/ingest",
-                {"manifest": args.manifest.read_text(encoding="utf-8"),
-                 "manifest_sha256": manifest.sha256, "path": args.entity_path, "apply": True},
-                headers=default_headers(cell=args.cell, auth_token_file=args.auth_token_file),
-                timeout=args.api_timeout_seconds, cell=args.cell, transport=args.api_transport,
-            )
+            result = apply_entity_manifest(manifest, args)
             if args.proof:
                 write_json_atomic(args.proof, result)
             print(json.dumps(result, indent=2, sort_keys=True))
