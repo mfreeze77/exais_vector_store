@@ -24,7 +24,7 @@ def command(monkeypatch):
     return module
 
 
-def setup(command,tmp_path,ending='\n'):
+def make_case(command,tmp_path,ending='\n'):
     original=gzip.decompress((ROOT/'tests/fixtures/statecivics-hb2513-bulk-durable.c49d7105.jsonl.gz').read_bytes())
     assert hashlib.sha256(original).hexdigest()=='5155056a4b2d411896787ff6e681d90a8cd58655cf3ddf6805849ca9dccc791b'
     # Real distinct records exercise payload validation and global duplicate checks.
@@ -43,7 +43,7 @@ def answer(payload):
 
 @pytest.mark.parametrize('ending',['\n','\r\n'])
 def test_batches_preserve_exact_bytes_and_aggregate_all_confirmed_records(command,tmp_path,monkeypatch,ending):
-    raw,loaded,args=setup(command,tmp_path,ending)
+    raw,loaded,args=make_case(command,tmp_path,ending)
     calls=[]
     def api(method,base,path,payload,**kw):
         calls.append(payload['manifest'].encode())
@@ -60,7 +60,7 @@ def test_batches_preserve_exact_bytes_and_aggregate_all_confirmed_records(comman
 
 
 def test_later_failure_leaves_an_explicit_partial_receipt(command,tmp_path,monkeypatch):
-    _,loaded,args=setup(command,tmp_path)
+    _,loaded,args=make_case(command,tmp_path)
     calls=[]
     def api(method,base,path,payload,**kw):
         calls.append(payload)
@@ -74,7 +74,7 @@ def test_later_failure_leaves_an_explicit_partial_receipt(command,tmp_path,monke
 
 
 def test_changed_file_refuses_before_any_request(command,tmp_path,monkeypatch):
-    _,loaded,args=setup(command,tmp_path)
+    _,loaded,args=make_case(command,tmp_path)
     loaded.path.write_bytes(b'changed')
     def forbidden(*a,**kw):raise AssertionError('API called before change refusal')
     monkeypatch.setattr(command,'api_json',forbidden)
