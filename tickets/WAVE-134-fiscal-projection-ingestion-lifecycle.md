@@ -1246,3 +1246,30 @@ endpoint, not a public-UI release or a five-image cell release. Its image ID,
 source commit, route checks and durable-record receipts are recorded with the
 pilot handoff. The existing cell currently uses local header principals; this
 exercise does not claim bearer-token authentication in that local deployment.
+
+
+### Pilot delivered — 2026-09-14
+
+The durable manifest `0ac68077…`, exported by A at `8a618c3f` and committed
+in A at `0d199c6b`, passed the real operator CLI into the local candidate API.
+Two real descriptors were embedded with OpenAI text-embedding-3-small and two
+full records were written and read back exactly. The nursing-fund query returned
+action revision 3 first, with `amount_kind=no_limit`, period end 2027-06-30, and
+committed source span `01a0a168-d786-767d-a484-c31e6839ff2e` at [7763,7813).
+A database join separately confirmed both the quote and source revision hash.
+
+A repeated import reported embedded=0, written=0, unchanged=2. The live CLI
+refused before contacting the API; the live API independently returned 422
+CandidateRecordRefused. Existing document point counts stayed 83,858 and
+12,579. The original API image is unchanged.
+
+Final focused B validation at `ba359c3`: **293 passed, none skipped**, including
+the complete candidate test matrix against the committed durable manifest and
+byte equality of the vendored payload schemas/manifest with A's fixed commits.
+`SVS_STATECIVICS_REPO=/upstream` mounted the refreshed plain operator clone.
+No claim is made that the unrelated full baseline is green.
+
+Runnable handoff: `runbooks/statecivics-candidate-pilot.md`. The adjacent JSON
+receipt records actual index and retrieval results. The source `80092998` bulk
+parser branch remains unmerged; full-bill import and public-UI deployment remain
+outstanding.
