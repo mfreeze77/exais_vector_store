@@ -79,3 +79,16 @@ def test_changed_file_refuses_before_any_request(command,tmp_path,monkeypatch):
     def forbidden(*a,**kw):raise AssertionError('API called before change refusal')
     monkeypatch.setattr(command,'api_json',forbidden)
     with pytest.raises(command.FiscalIngestError,match='changed after admission'):command.apply_entity_manifest(loaded,args)
+
+
+def test_invalid_payload_in_later_batch_refuses_before_first_request(command,tmp_path,monkeypatch):
+    from svs_common.statecivics_entity_store import digest_record
+    _,loaded,args=make_case(command,tmp_path)
+    records=[json.loads(line) for line in loaded.path.read_text().splitlines()]
+    records[-1]['entity'].pop('amount_kind')
+    records[-1]['record_digest_sha256']=digest_record(records[-1])
+    loaded.path.write_text(''.join(json.dumps(r,separators=(',',':'))+'\n' for r in records))
+    loaded=command.load_entity_manifest(loaded.path,contract_schema=ROOT/'configs/statecivics-contracts/retrieval-export-record.schema.json',entity_path='candidate')
+    def forbidden(*a,**kw):raise AssertionError('a batch was sent before whole-payload validation')
+    monkeypatch.setattr(command,'api_json',forbidden)
+    with pytest.raises(ValueError,match='amount_kind'):command.apply_entity_manifest(loaded,args)
