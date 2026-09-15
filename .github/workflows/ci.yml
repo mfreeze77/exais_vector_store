@@ -3,14 +3,50 @@ on: [push, pull_request]
 jobs:
   python:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: vector-store
+    env:
+      SVS_STATECIVICS_REPO: ${{ github.workspace }}/statecivics
+      PYTHONPATH: ${{ github.workspace }}/vector-store/packages/svs_common:${{ github.workspace }}/vector-store/apps/api:${{ github.workspace }}/vector-store/apps/worker:${{ github.workspace }}/vector-store/apps/model_gateway:${{ github.workspace }}/vector-store/apps/instance_agent
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          path: vector-store
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
+      - name: Derive the declared upstream pin
+        id: upstream-pin
+        run: echo "commit=$(python scripts/ci/upstream_proof.py --pin)" >> "$GITHUB_OUTPUT"
+      - name: Require scoped upstream read access
+        env:
+          UPSTREAM_READ_TOKEN: ${{ secrets.STATECIVICS_READ_TOKEN }}
+        run: |
+          if [ -z "$UPSTREAM_READ_TOKEN" ]; then
+            echo '::error::STATECIVICS_READ_TOKEN is required: read-only Contents access to mfreeze77/state-civics-ai. Do not substitute a broad personal token.'
+            exit 1
+          fi
+      - name: Check out the private upstream at its declared pin
+        uses: actions/checkout@v4
+        with:
+          repository: mfreeze77/state-civics-ai
+          ref: ${{ steps.upstream-pin.outputs.commit }}
+          fetch-depth: 0
+          path: statecivics
+          token: ${{ secrets.STATECIVICS_READ_TOKEN }}
+          persist-credentials: false
+      - name: Preserve the fetched upstream main ancestry
+        run: |
+          git -C "$SVS_STATECIVICS_REPO" branch --no-track main refs/remotes/origin/main
+          test "$(git -C "$SVS_STATECIVICS_REPO" rev-parse HEAD)" = '${{ steps.upstream-pin.outputs.commit }}'
       - run: python -m pip install --upgrade pip
       - run: pip install -r apps/api/requirements.txt pytest
+      - name: Prove history and upstream SET/UNSET behavior
+        run: python scripts/ci/upstream_proof.py
       - run: PYTHONPATH=packages/svs_common:apps/api:apps/worker:apps/model_gateway:apps/instance_agent python -m compileall -f packages apps tests
       - run: PYTHONPATH=packages/svs_common:apps/api:apps/worker:apps/model_gateway:apps/instance_agent pytest -q
 
