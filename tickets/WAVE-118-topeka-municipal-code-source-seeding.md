@@ -15,6 +15,11 @@ not prove the new collection split, additional sources or jurisdiction UI
 handoff. This direction concerns Topeka source/document publication; the
 paused Kansas fiscal/appropriations work is not resumed by it.
 
+Execution brief: [ExAIS-only manager/worker handoff](../runbooks/topeka-source-pipeline-manager-handoff.md).
+It assigns no StateCivics repository or deployment work. Deliver the validated
+schema and starter artifact release first so the StateCivics developer can
+implement that consumer independently.
+
 The product acceptance ticket is
 [StateCivics KS-539](https://github.com/mfreeze77/state-civics-ai/blob/main/tickets/KS-539-publish-complete-topeka-meeting-corpus.md).
 WAVE-117 and the [jurisdiction playbook](../docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md)

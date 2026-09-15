@@ -127,7 +127,7 @@ Use `WAVE-*` tickets for release or production-hardening waves. Use
 - [WAVE-115 Kansas Civics GraphRAG Search Expansion](./WAVE-115-kansas-civics-graphrag-search-expansion.md)
 - [WAVE-116 Instance-Scoped Caller Vector Store Lifecycle](./WAVE-116-instance-scoped-caller-vector-store-lifecycle.md)
 - [WAVE-117 Instance Vector-Store Source Package Contract](./WAVE-117-instance-vector-store-source-package-contract.md)
-- [WAVE-118 Topeka Municipal Code Source Seeding](./WAVE-118-topeka-municipal-code-source-seeding.md) — includes the 2026-09-15 master-collection store split and KS-539 clean-artifact/UI handoff; extension specified, not activated.
+- [WAVE-118 Topeka Municipal Code Source Seeding](./WAVE-118-topeka-municipal-code-source-seeding.md) — includes the 2026-09-15 master-collection store split and KS-539 clean-artifact/UI handoff; extension specified, not activated. [ExAIS-only implementation manager brief](../runbooks/topeka-source-pipeline-manager-handoff.md).
 - [WAVE-119 Topeka Workbench Canonical Projection](./WAVE-119-topeka-workbench-canonical-projection.md)
 - [WAVE-120 GraphRAG Search Lenses](./WAVE-120-graphrag-search-lenses.md)
 - [WAVE-121 KS Civics VPS Go-Live Handoff](./WAVE-121-KS-civics-vps-go-live-handoff.md)
