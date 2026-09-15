@@ -11,9 +11,18 @@ a variant of the schema.
 - Validator: [`scripts/release/jurisdiction-release-validate.py`](../scripts/release/jurisdiction-release-validate.py)
 - Retained-input audit: [`scripts/release/topeka-retained-input-audit.py`](../scripts/release/topeka-retained-input-audit.py)
 
-All four scripts are stdlib-only and run offline. They do not embed, do not call
-an ExAIS API, and do not touch a StateCivics database. A consumer can validate a
-delivered bundle with no credentials and no ExAIS deployment.
+All of these run offline. They do not embed, do not call an ExAIS API, and do
+not touch a StateCivics database, so a consumer can validate a delivered bundle
+with no credentials and no ExAIS deployment.
+
+Their only third-party dependency is `jsonschema`, already declared in every
+`apps/*/requirements.txt`. Schema validation is **not** hand-rolled: an earlier
+revision of this contract shipped its own draft 2020-12 evaluator, and it
+accepted `true` against `const: 1` and `enum: [1]` (Python makes `True == 1`),
+ignored `multipleOf` entirely, and treated `[1, 1.0]` as unique. Its
+keyword-coverage guard had itself listed `multipleOf` as supported while never
+implementing it — the exact failure a guard like that cannot catch. Run these
+through the repository's Docker path (`infra/test-runner.Dockerfile`).
 
 ## Presence semantics
 
@@ -139,6 +148,10 @@ python scripts/release/topeka-source-release-export.py \
 
 # validate a delivered bundle, from anywhere
 python scripts/release/jurisdiction-release-validate.py --bundle <bundle> --output <report.json>
+
+# the whole refresh loop, wired: discover -> acquire -> destinations -> export -> validate
+python scripts/release/topeka-collection-refresh.py --dry-run
+python scripts/release/topeka-collection-refresh.py --execute --offline   # skips publisher stages
 ```
 
 `--bundle-kind fixture` labels a demonstration bundle; `--expect-kind production`

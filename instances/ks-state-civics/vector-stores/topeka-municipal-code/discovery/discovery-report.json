@@ -1,6 +1,6 @@
 {
   "artifact": "topeka_collection_discovery",
-  "discovered_at": "2026-09-15T22:57:28Z",
+  "discovered_at": "2026-09-15T23:25:16Z",
   "findings": [
     {
       "code": "CATEGORY_SUBTOTAL_GAP",
@@ -25,6 +25,18 @@
       "severity": "warning"
     },
     {
+      "code": "LABEL_HREF_IDENTITY_CONFLICT",
+      "detail": "2 document(s) have a listing label naming one number and a linked filename naming another ([('20520', '20521'), ('20610', '20609')]); identity is ambiguous and no correction is proposed",
+      "group": "ordinances",
+      "severity": "warning"
+    },
+    {
+      "code": "CONVENTION_CANDIDATE_AVAILABLE",
+      "detail": "1 document(s) depart from their group's filename convention; a candidate derived from the publisher's own pattern is recorded for acquisition to try only if the listed URL fails",
+      "group": "ordinances",
+      "severity": "warning"
+    },
+    {
       "code": "EXTRACTION_UNSUPPORTED_MEDIA",
       "detail": "14 listed document(s) are not PDFs ({'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 14}); they are inventoried and acquirable, but the configured extraction path is PDF-only",
       "group": "ordinances",
@@ -41,6 +53,12 @@
     {
       "code": "MEMBERSHIP_REVIEW_NEEDED",
       "detail": "1 document(s) are linked from the page but not from the document centre (['2026-internet-twtw-program-overview']); membership is not established by a page link alone and needs review before release",
+      "group": "resolutions",
+      "severity": "warning"
+    },
+    {
+      "code": "CONVENTION_CANDIDATE_AVAILABLE",
+      "detail": "4 document(s) depart from their group's filename convention; a candidate derived from the publisher's own pattern is recorded for acquisition to try only if the listed URL fails",
       "group": "resolutions",
       "severity": "warning"
     },

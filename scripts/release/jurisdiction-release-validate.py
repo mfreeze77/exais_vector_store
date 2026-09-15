@@ -3,8 +3,9 @@
 
 Independently callable: it takes a bundle directory, not an exporter run, and
 re-derives everything from the delivered bytes. It never imports the exporter,
-so an exporter bug cannot validate itself away. Stdlib only; no embeddings, no
-ExAIS API, no StateCivics database.
+so an exporter bug cannot validate itself away. Schema validation is delegated to
+``jsonschema`` (a declared dependency of every app here), never hand-rolled. No
+embeddings, no ExAIS API, no StateCivics database.
 
     python scripts/release/jurisdiction-release-validate.py --bundle <dir>
 

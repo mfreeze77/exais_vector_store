@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Shared contract code for jurisdiction document releases.
 
-Stdlib only. Nothing here imports an embedding provider, a vector store client,
-a database driver or a consumer application, so the exporter and the validator
-both run on a bare checkout.
+Nothing here imports an embedding provider, a vector store client, a database
+driver or a consumer application, so the exporter and the validator both run on
+a bare checkout. The only third-party import is ``jsonschema``, already a
+declared dependency of every app in this repository.
 
 Three things live here:
 
-* a small draft 2020-12 evaluator, so the published JSON Schemas are executable
-  rather than decorative (the repository does not vendor ``jsonschema``);
+* schema validation, delegated to ``jsonschema`` rather than hand-rolled;
 * the registered master-collection registry and the routing function derived
   from it, so no caller hand-lists which URLs belong to which store;
 * the identity, hashing and canonical-JSON helpers the exporter and validator
@@ -20,6 +20,8 @@ import hashlib
 import json
 import re
 import uuid
+
+import jsonschema
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
@@ -357,7 +359,7 @@ def component_id(source_component_key: str) -> str:
 
 
 # --------------------------------------------------------------------------
-# minimal draft 2020-12 evaluator
+# schema validation
 # --------------------------------------------------------------------------
 
 @dataclass
@@ -370,190 +372,43 @@ class SchemaError:
         return f"{self.path or '<root>'}: {self.message} [{self.keyword}]"
 
 
-_TYPES: dict[str, type | tuple[type, ...]] = {
-    "object": dict,
-    "array": list,
-    "string": str,
-    "boolean": bool,
-    "number": (int, float),
-    "integer": int,
-    "null": type(None),
-}
-
-
-def _is_type(value: Any, name: str) -> bool:
-    expected = _TYPES.get(name)
-    if expected is None:
-        return True
-    if name in {"integer", "number"} and isinstance(value, bool):
-        return False
-    if name == "integer" and isinstance(value, float):
-        return value.is_integer()
-    return isinstance(value, expected)
+def _pointer(error: "jsonschema.ValidationError") -> str:
+    """Render a jsonschema error path the way the rest of this module reports paths."""
+    parts: list[str] = []
+    for token in error.absolute_path:
+        if isinstance(token, int):
+            parts.append(f"[{token}]")
+        else:
+            parts.append(f".{token}" if parts else str(token))
+    return "".join(parts)
 
 
 class SchemaValidator:
-    """Evaluates the subset of draft 2020-12 used by the contract schemas.
+    """Draft 2020-12 validation, delegated to the ``jsonschema`` library.
 
-    Supported: ``type``, ``const``, ``enum``, ``required``, ``properties``,
-    ``additionalProperties``, ``items``, ``minItems``, ``maxItems``,
-    ``uniqueItems``, ``minLength``, ``maxLength``, ``minimum``, ``maximum``,
-    ``pattern``, ``anyOf``, ``allOf``, ``oneOf``, ``not`` and local ``$ref``.
-    Unsupported keywords raise at construction time rather than passing silently,
-    so a schema can never claim a constraint the validator does not enforce.
+    This deliberately does NOT hand-roll an evaluator. An earlier version did,
+    and it silently accepted `true` against `const: 1` and `enum: [1]` (Python
+    makes `True == 1`), ignored `multipleOf` entirely, and treated `[1, 1.0]` as
+    unique. The keyword-coverage guard that was supposed to make hand-rolling
+    safe had itself listed `multipleOf` as supported while never implementing
+    it -- which is exactly the failure mode a guard like that cannot catch.
+
+    ``jsonschema`` is already a declared dependency of every app in this repo
+    (``apps/*/requirements.txt``), so using it costs nothing new.
     """
-
-    KNOWN = {
-        "$schema", "$id", "$defs", "$ref", "title", "description", "examples", "default",
-        "type", "const", "enum", "required", "properties", "additionalProperties",
-        "items", "prefixItems", "minItems", "maxItems", "uniqueItems",
-        "minLength", "maxLength", "pattern", "format",
-        "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "multipleOf",
-        "anyOf", "allOf", "oneOf", "not",
-    }
 
     def __init__(self, schema: Mapping[str, Any]) -> None:
         self.schema = schema
-        self._assert_supported(schema, "#")
-
-    def _assert_supported(self, node: Mapping[str, Any], path: str) -> None:
-        """Fail loudly on a keyword this evaluator would otherwise ignore.
-
-        A schema that silently drops an unenforced constraint is worse than no
-        schema, so an unknown keyword is a construction-time error.
-        """
-        unknown = sorted(set(node) - self.KNOWN)
-        if unknown:
-            raise ValueError(f"unsupported schema keyword(s) {unknown} at {path}")
-        for key in ("properties", "$defs"):
-            for name, sub in (node.get(key) or {}).items():
-                self._assert_supported(sub, f"{path}/{key}/{name}")
-        for key in ("items", "not", "additionalProperties"):
-            sub = node.get(key)
-            if isinstance(sub, dict):
-                self._assert_supported(sub, f"{path}/{key}")
-        for key in ("anyOf", "allOf", "oneOf", "prefixItems"):
-            for index, sub in enumerate(node.get(key) or []):
-                self._assert_supported(sub, f"{path}/{key}/{index}")
+        # Reject a malformed schema at construction, rather than silently
+        # under-constraining every document validated against it.
+        jsonschema.Draft202012Validator.check_schema(schema)
+        self._validator = jsonschema.Draft202012Validator(schema)
 
     def validate(self, instance: Any) -> list[SchemaError]:
-        errors: list[SchemaError] = []
-        self._validate(instance, self.schema, "", errors)
-        return errors
-
-    def _resolve(self, ref: str) -> Mapping[str, Any]:
-        if not ref.startswith("#/"):
-            raise ValueError(f"only local $ref is supported, got {ref!r}")
-        node: Any = self.schema
-        for part in ref[2:].split("/"):
-            part = part.replace("~1", "/").replace("~0", "~")
-            node = node[part]
-        return node
-
-    def _validate(self, instance: Any, schema: Mapping[str, Any], path: str, errors: list[SchemaError]) -> None:
-        if "$ref" in schema:
-            self._validate(instance, self._resolve(schema["$ref"]), path, errors)
-            # siblings of $ref are still applied (2020-12 behaviour)
-            schema = {k: v for k, v in schema.items() if k != "$ref"}
-            if not schema:
-                return
-
-        if "const" in schema and instance != schema["const"]:
-            errors.append(SchemaError(path, "const", f"expected {schema['const']!r}, got {instance!r}"))
-
-        if "enum" in schema and instance not in schema["enum"]:
-            errors.append(SchemaError(path, "enum", f"{instance!r} is not one of {schema['enum']!r}"))
-
-        if "type" in schema:
-            names = schema["type"]
-            names = [names] if isinstance(names, str) else list(names)
-            if not any(_is_type(instance, name) for name in names):
-                errors.append(
-                    SchemaError(path, "type", f"expected type {'|'.join(names)}, got {type(instance).__name__}")
-                )
-                return
-
-        for keyword in ("allOf",):
-            for index, sub in enumerate(schema.get(keyword, [])):
-                self._validate(instance, sub, path, errors)
-
-        if "anyOf" in schema:
-            if not any(not self._collect(instance, sub, path) for sub in schema["anyOf"]):
-                errors.append(SchemaError(path, "anyOf", "value matches none of the allowed shapes"))
-
-        if "oneOf" in schema:
-            matched = sum(1 for sub in schema["oneOf"] if not self._collect(instance, sub, path))
-            if matched != 1:
-                errors.append(SchemaError(path, "oneOf", f"expected exactly one match, got {matched}"))
-
-        if "not" in schema and not self._collect(instance, schema["not"], path):
-            errors.append(SchemaError(path, "not", "value matches a forbidden shape"))
-
-        if isinstance(instance, str):
-            self._validate_string(instance, schema, path, errors)
-        elif isinstance(instance, (int, float)) and not isinstance(instance, bool):
-            self._validate_number(instance, schema, path, errors)
-        elif isinstance(instance, list):
-            self._validate_array(instance, schema, path, errors)
-        elif isinstance(instance, dict):
-            self._validate_object(instance, schema, path, errors)
-
-    def _collect(self, instance: Any, schema: Mapping[str, Any], path: str) -> list[SchemaError]:
-        errors: list[SchemaError] = []
-        self._validate(instance, schema, path, errors)
-        return errors
-
-    def _validate_string(self, instance: str, schema: Mapping[str, Any], path: str, errors: list[SchemaError]) -> None:
-        if "minLength" in schema and len(instance) < schema["minLength"]:
-            errors.append(SchemaError(path, "minLength", f"shorter than {schema['minLength']}"))
-        if "maxLength" in schema and len(instance) > schema["maxLength"]:
-            errors.append(SchemaError(path, "maxLength", f"longer than {schema['maxLength']}"))
-        if "pattern" in schema and not re.search(schema["pattern"], instance):
-            errors.append(SchemaError(path, "pattern", f"{instance!r} does not match {schema['pattern']!r}"))
-
-    def _validate_number(self, instance: Any, schema: Mapping[str, Any], path: str, errors: list[SchemaError]) -> None:
-        if "minimum" in schema and instance < schema["minimum"]:
-            errors.append(SchemaError(path, "minimum", f"{instance} < {schema['minimum']}"))
-        if "maximum" in schema and instance > schema["maximum"]:
-            errors.append(SchemaError(path, "maximum", f"{instance} > {schema['maximum']}"))
-        if "exclusiveMinimum" in schema and instance <= schema["exclusiveMinimum"]:
-            errors.append(SchemaError(path, "exclusiveMinimum", f"{instance} <= {schema['exclusiveMinimum']}"))
-        if "exclusiveMaximum" in schema and instance >= schema["exclusiveMaximum"]:
-            errors.append(SchemaError(path, "exclusiveMaximum", f"{instance} >= {schema['exclusiveMaximum']}"))
-
-    def _validate_array(self, instance: list, schema: Mapping[str, Any], path: str, errors: list[SchemaError]) -> None:
-        if "minItems" in schema and len(instance) < schema["minItems"]:
-            errors.append(SchemaError(path, "minItems", f"{len(instance)} items, minimum {schema['minItems']}"))
-        if "maxItems" in schema and len(instance) > schema["maxItems"]:
-            errors.append(SchemaError(path, "maxItems", f"{len(instance)} items, maximum {schema['maxItems']}"))
-        if schema.get("uniqueItems"):
-            seen = [canonical_json_bytes(item) for item in instance]
-            if len(set(seen)) != len(seen):
-                errors.append(SchemaError(path, "uniqueItems", "array contains duplicates"))
-        prefix = schema.get("prefixItems") or []
-        for index, sub in enumerate(prefix):
-            if index < len(instance):
-                self._validate(instance[index], sub, f"{path}[{index}]", errors)
-        item_schema = schema.get("items")
-        if isinstance(item_schema, dict):
-            for index in range(len(prefix), len(instance)):
-                self._validate(instance[index], item_schema, f"{path}[{index}]", errors)
-
-    def _validate_object(self, instance: dict, schema: Mapping[str, Any], path: str, errors: list[SchemaError]) -> None:
-        for name in schema.get("required", []):
-            if name not in instance:
-                errors.append(SchemaError(path, "required", f"missing required property {name!r}"))
-        properties = schema.get("properties") or {}
-        for name, value in instance.items():
-            child = f"{path}.{name}" if path else name
-            if name in properties:
-                self._validate(value, properties[name], child, errors)
-                continue
-            extra = schema.get("additionalProperties", True)
-            if extra is False:
-                errors.append(SchemaError(child, "additionalProperties", f"property {name!r} is not allowed"))
-            elif isinstance(extra, dict):
-                self._validate(value, extra, child, errors)
+        return [
+            SchemaError(_pointer(error), error.validator or "schema", error.message)
+            for error in sorted(self._validator.iter_errors(instance), key=lambda e: list(e.absolute_path))
+        ]
 
 
 @dataclass

@@ -1,0 +1,31 @@
+{
+  "artifact": "jurisdiction_document_release_validation",
+  "bundle": "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/topeka-source-2026-09-15-offline",
+  "checks": {
+    "bundle_kind": "starter",
+    "collections": [
+      "ks:city:topeka:charter-ordinances",
+      "ks:city:topeka:municipal-code",
+      "ks:city:topeka:ordinances"
+    ],
+    "document_count": 3,
+    "evidence_references_resolved": 39,
+    "evidence_references_unavailable": 3,
+    "file_count_recomputed": 15,
+    "inventory_sha256_recomputed": "99de2e5f0fd302c2237a8a61365a75e9ccfcd5e6183d1c7698c33352263ab7b5",
+    "manifest_sha256": "eb0269fc66b15d1ff3516fba7121714627d340be23cff6a8b6f7555c46e8806c",
+    "present_byte_count_recomputed": 437393,
+    "release_id": "topeka-source-2026-09-15-offline"
+  },
+  "error_count": 0,
+  "issues": [
+    {
+      "code": "DIRTY_PRODUCER",
+      "location": "release.producer",
+      "message": "produced from a dirty worktree; release.producer.commit does not reproduce this bundle",
+      "severity": "warning"
+    }
+  ],
+  "passed": true,
+  "warning_count": 1
+}

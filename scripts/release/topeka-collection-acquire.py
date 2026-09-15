@@ -60,6 +60,7 @@ OUTCOMES = (
     "unchanged_remote",     # already acquired here and the publisher still serves the same bytes
     "failed",               # retryable error (timeout, 5xx, write failure); the item stays pending
     "unavailable_at_source",  # the publisher's own link 404s; a terminal, reportable outcome
+    "downloaded_corrected_url",  # listed link 404s; an evidenced correction on the official host resolved
     "skipped_unlisted",     # retained but absent from the current listing; nothing to fetch
 )
 
@@ -126,6 +127,38 @@ def fetch(url: str, *, timeout: int) -> tuple[bytes, str]:
     raise last if last else RuntimeError(f"no attempt made for {url}")
 
 
+class ObservationLog:
+    """Append-only record of every observation, never rewritten.
+
+    The checkpoint holds the latest state per document so a resume is cheap.
+    That file is rewritten in full on every flush, so it cannot also serve as
+    history. This log is the history: one line per observation, appended and
+    never edited, so "what did the publisher serve, and when" stays answerable
+    after a document changes.
+    """
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+
+    def append(self, row: dict[str, Any]) -> None:
+        with self.path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(row, sort_keys=True) + "\n")
+            handle.flush()
+
+    def observations_for(self, source_document_id: str) -> list[dict[str, Any]]:
+        if not self.path.exists():
+            return []
+        rows = []
+        with self.path.open("r", encoding="utf-8") as handle:
+            for line in handle:
+                if line.strip():
+                    row = json.loads(line)
+                    if row.get("source_document_id") == source_document_id:
+                        rows.append(row)
+        return rows
+
+
 @dataclass
 class Checkpoint:
     """Per-document acquisition state, rewritten after every item."""
@@ -161,12 +194,91 @@ class Checkpoint:
         tmp.replace(self.path)
 
 
-def target_path(output_dir: Path, row: dict[str, Any]) -> Path:
+def document_dir(output_dir: Path, row: dict[str, Any]) -> Path:
     spec = COLLECTIONS_BY_ID.get(row["collection_id"])
     slug = spec.slug if spec else "unregistered"
-    suffix = Path(urlsplit(row["official_url"]).path).suffix.lower() or ".bin"
     stem = row["source_document_id"].rsplit(":", 1)[-1]
-    return output_dir / slug / "raw" / f"{safe_name(stem)}{suffix}"
+    return output_dir / slug / "raw" / safe_name(stem)
+
+
+def version_path(output_dir: Path, row: dict[str, Any], content_sha256: str) -> Path:
+    """Immutable, content-addressed location for one observed version.
+
+    Storage is keyed by the hash of the bytes, so a changed document lands
+    beside its predecessor instead of on top of it. Nothing here is ever
+    overwritten, which is what keeps an earlier acquisition receipt's hash
+    resolvable after the publisher revises a document.
+    """
+    suffix = Path(urlsplit(row["official_url"]).path).suffix.lower() or ".bin"
+    return document_dir(output_dir, row) / f"{content_sha256[:16]}{suffix}"
+
+
+def held_versions(output_dir: Path, row: dict[str, Any]) -> list[str]:
+    """Content hashes already stored for this document, oldest-agnostic."""
+    folder = document_dir(output_dir, row)
+    if not folder.is_dir():
+        return []
+    return sorted(sha256_file(path) for path in folder.iterdir() if path.is_file())
+
+
+def _evidenced_correction(
+    row: dict[str, Any],
+    *,
+    timeout: int,
+    downloader: Callable[..., tuple[bytes, str]],
+) -> tuple[bytes, str, str, dict[str, Any]] | None:
+    """Try the candidate derived from the publisher's own naming convention.
+
+    Retrieving a corrected URL from the official publisher can preserve
+    provenance, but a 200 alone cannot: it only shows that *something* is there.
+    A correction is accepted only when all of these hold, and every one of them
+    is recorded alongside the bytes:
+
+      * the candidate was constructed from the dominant filename pattern of the
+        publisher's own other members of the same listing group, not invented;
+      * it is on the same official host and directory as the broken link;
+      * the listing label for this document appears in the candidate filename;
+      * the fetch returns 200.
+
+    The broken listing URL is retained either way, and the result is marked for
+    review rather than treated as settled.
+    """
+    candidate = row.get("convention_candidate_url")
+    if not candidate:
+        return None
+
+    listed = urlsplit(row["official_url"])
+    target = urlsplit(candidate)
+    if (target.scheme, target.netloc) != (listed.scheme, listed.netloc):
+        return None
+    if target.path.rsplit("/", 1)[0] != listed.path.rsplit("/", 1)[0]:
+        return None
+
+    evidence = dict(row.get("convention_evidence") or {})
+    key = str(evidence.get("publisher_key") or "")
+    if not key or key not in Path(target.path).name:
+        return None
+
+    try:
+        payload, content_type = downloader(candidate, timeout=timeout)
+    except (error.URLError, TimeoutError, OSError):
+        return None
+    if not payload:
+        return None
+
+    evidence.update({
+        "broken_listing_url": row["official_url"],
+        "fetched_url": candidate,
+        "same_host_and_directory": True,
+        "publisher_key_in_candidate_filename": True,
+        "http_status": 200,
+        "review_status": "evidenced_correction_pending_review",
+        "limitation": (
+            "the publisher's listing still points at the broken URL; this correction is evidenced by "
+            "the publisher's own naming convention and label, not by an updated listing"
+        ),
+    })
+    return payload, content_type, candidate, evidence
 
 
 def acquire_row(
@@ -193,7 +305,7 @@ def acquire_row(
         return {**base, "outcome": "skipped_unlisted", "reason": row["reason"],
                 "sha256": row.get("retained_sha256"), "byte_count": None, "saved_path": None}
 
-    destination = target_path(output_dir, row)
+    stored = held_versions(output_dir, row)
 
     # Bytes we already hold, from the retained seed or an earlier run here.
     held_sha: str | None = None
@@ -209,8 +321,12 @@ def acquire_row(
                             f"retained original hashes to {held_sha} but the manifest records "
                             f"{row.get('retained_sha256')}; refusing to reuse unverified bytes"
                         )}
-    if held_sha is None and destination.exists():
-        held_path, held_sha = destination, sha256_file(destination)
+    if held_sha is None and previous and previous.get("remote_sha256") in stored:
+        held_sha = previous["remote_sha256"]
+        held_path = version_path(output_dir, row, held_sha)
+    elif held_sha is None and len(stored) == 1:
+        held_sha = stored[0]
+        held_path = version_path(output_dir, row, held_sha)
 
     # Resume, not caching. An item is skipped only when THIS run already
     # confirmed it against the publisher (so an interrupted run does not redo
@@ -221,10 +337,11 @@ def acquire_row(
     if held_sha and previous and previous.get("remote_sha256") == held_sha and (
         already_confirmed_this_run or trust_checkpoint
     ):
-        return {**base, "outcome": "reused_verified" if held_path != destination else "unchanged_remote",
+        return {**base, "outcome": "reused_verified" if held_path and seed in held_path.parents else "unchanged_remote",
                 "sha256": held_sha, "remote_sha256": held_sha,
                 "byte_count": held_path.stat().st_size if held_path else None,
                 "saved_path": str(held_path) if held_path else None,
+                "versions": stored,
                 "run_id": run_id,
                 "reason": (
                     "already confirmed against the publisher in this run" if already_confirmed_this_run
@@ -234,42 +351,67 @@ def acquire_row(
     try:
         payload, content_type = downloader(row["official_url"], timeout=timeout)
     except error.HTTPError as exc:
-        if exc.code in {404, 410}:
+        if exc.code not in {404, 410}:
+            return {**base, "outcome": "failed", "sha256": held_sha, "byte_count": None,
+                    "saved_path": str(held_path) if held_path else None,
+                    "http_status": exc.code, "error": f"{type(exc).__name__}: {exc}"}
+
+        corrected = _evidenced_correction(row, timeout=timeout, downloader=downloader)
+        if corrected is None:
             return {**base, "outcome": "unavailable_at_source", "sha256": held_sha, "byte_count": None,
                     "saved_path": str(held_path) if held_path else None,
                     "http_status": exc.code,
+                    "listing_url": row["official_url"],
                     "error": f"HTTP {exc.code} at the publisher's own link",
                     "reason": (
-                        "the publisher lists this document but the URL it links does not resolve. "
-                        "This is recorded, not repaired: substituting a guessed URL would invent "
-                        "provenance for bytes we never retrieved"
+                        "the publisher lists this document but the URL it links does not resolve, "
+                        "and no evidenced correction on the official host was available. Recorded, "
+                        "not repaired: a guessed URL would invent provenance"
                     )}
-        return {**base, "outcome": "failed", "sha256": held_sha, "byte_count": None,
-                "saved_path": str(held_path) if held_path else None,
-                "http_status": exc.code, "error": f"{type(exc).__name__}: {exc}"}
+
+        payload, content_type, fetched_url, evidence = corrected
+        # The broken listing URL is retained beside the one that actually served
+        # the bytes, so the correction is auditable rather than a silent swap.
+        base = {**base, "listing_url": row["official_url"], "fetched_url": fetched_url,
+                "url_resolution": "evidenced_correction", "correction_evidence": evidence,
+                "listing_url_status": exc.code}
     except (error.URLError, TimeoutError, OSError) as exc:
         return {**base, "outcome": "failed", "sha256": held_sha, "byte_count": None,
                 "saved_path": str(held_path) if held_path else None,
                 "error": f"{type(exc).__name__}: {exc}"}
 
+    corrected_fetch = base.get("url_resolution") == "evidenced_correction"
     remote_sha = sha256_bytes(payload)
     if held_sha == remote_sha:
-        outcome = "unchanged_remote" if held_path == destination else "reused_verified"
+        outcome = "reused_verified" if held_path and seed in held_path.parents else "unchanged_remote"
         return {**base, "outcome": outcome, "sha256": remote_sha, "remote_sha256": remote_sha,
                 "byte_count": len(payload), "saved_path": str(held_path),
-                "content_type": content_type,
+                "versions": stored, "content_type": content_type,
                 "reason": "publisher still serves the bytes we hold; no copy written"}
 
+    destination = version_path(output_dir, row, remote_sha)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_bytes(payload)
+    if not destination.exists():
+        # Content-addressed, so this path is new by construction. Write to a
+        # temporary name and rename, so an interrupted write cannot leave a
+        # truncated file sitting at a hash that claims to describe it.
+        staging = destination.with_name(destination.name + ".partial")
+        staging.write_bytes(payload)
+        staging.replace(destination)
+    versions = sorted(set(stored) | {remote_sha})
     return {
         **base,
-        "outcome": "downloaded_changed" if held_sha else "downloaded_new",
+        "outcome": (
+            "downloaded_corrected_url" if corrected_fetch
+            else "downloaded_changed" if held_sha else "downloaded_new"
+        ),
         "sha256": remote_sha,
         "remote_sha256": remote_sha,
         "prior_sha256": held_sha,
+        "prior_saved_path": str(held_path) if held_sha and held_path else None,
         "byte_count": len(payload),
         "saved_path": str(destination),
+        "versions": versions,
         "content_type": content_type,
     }
 
@@ -301,6 +443,7 @@ def main() -> int:
 
     run_id = f"{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}-{args.worklist.stat().st_mtime_ns:x}"
     checkpoint = Checkpoint.load(args.output_dir / "acquisition-checkpoint.jsonl")
+    observations = ObservationLog(args.output_dir / "acquisition-observations.jsonl")
     counts: dict[str, int] = {outcome: 0 for outcome in OUTCOMES}
     failures: list[dict[str, Any]] = []
     processed = 0
@@ -312,11 +455,10 @@ def main() -> int:
             break
 
         if args.dry_run:
-            destination = target_path(args.output_dir, row)
             would = (
                 "skipped_unlisted" if row["outcome"] == "retained_but_unlisted"
                 else "reused_verified" if row["outcome"] == "verify_then_reuse"
-                else "unchanged_remote" if destination.exists()
+                else "unchanged_remote" if held_versions(args.output_dir, row)
                 else "downloaded_new"
             )
             counts[would] += 1
@@ -337,13 +479,21 @@ def main() -> int:
             print(f"FAIL {row['source_document_id']} reached unknown outcome {result['outcome']!r}")
             return 1
         counts[result["outcome"]] += 1
-        if result["outcome"] in {"failed", "unavailable_at_source"}:
+        if result["outcome"] in {"failed", "unavailable_at_source", "downloaded_corrected_url"}:
             failures.append(result)
         if result["outcome"] in {"downloaded_new", "downloaded_changed"} or "content_type" in result:
             fetched += 1
             if args.delay:
                 time.sleep(args.delay)
         checkpoint.record(result)
+        observations.append({
+            key: result.get(key)
+            for key in (
+                "source_document_id", "collection_id", "official_url", "observed_at", "run_id",
+                "outcome", "sha256", "remote_sha256", "prior_sha256", "byte_count", "saved_path",
+                "http_status", "content_type", "fetched_url", "url_resolution",
+            )
+        })
         processed += 1
 
     reconciled = sum(counts.values())
@@ -356,12 +506,14 @@ def main() -> int:
         "dry_run": args.dry_run,
         "worklist": str(args.worklist),
         "output_dir": str(args.output_dir),
+        "observation_log": str(observations.path),
         "worklist_rows": len(rows),
         "processed": processed,
         "publisher_requests": fetched,
         "outcomes": counts,
         "failure_count": counts["failed"],
         "unavailable_at_source_count": counts["unavailable_at_source"],
+        "corrected_url_count": counts["downloaded_corrected_url"],
         "failures": failures[:50],
         "remaining": len(rows) - processed,
         "passed": reconciled == processed and not counts["failed"],
@@ -376,8 +528,13 @@ def main() -> int:
     for outcome in OUTCOMES:
         print(f"  {outcome:20s} {counts[outcome]}")
     for failure in failures[:10]:
-        label = "FAILED" if failure["outcome"] == "failed" else "UNAVAILABLE"
-        print(f"  {label} {failure['source_document_id']}: {failure.get('error','')[:100]}")
+        label = {
+            "failed": "FAILED",
+            "unavailable_at_source": "UNAVAILABLE",
+            "downloaded_corrected_url": "CORRECTED",
+        }[failure["outcome"]]
+        detail = failure.get("error") or f"listed {failure.get('listing_url','')} -> fetched {failure.get('fetched_url','')}"
+        print(f"  {label} {failure['source_document_id']}: {detail[:120]}")
     print(f"report             {target}")
     print(f"result             {'PASS' if report['passed'] else 'FAIL'}")
     return 0 if report["passed"] else 1

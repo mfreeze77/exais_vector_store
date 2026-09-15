@@ -1,0 +1,123 @@
+{
+  "already_done": {
+    "local_docx_extractions": 23,
+    "note": "neither is re-extracted; retained Marker output is reused by hash",
+    "retained_marker_extractions": 364
+  },
+  "artifact": "topeka_extraction_plan",
+  "billable_remote_workload": {
+    "documents": 549,
+    "estimated_cost": 10.59,
+    "page_estimate": 2647,
+    "page_estimate_basis": {
+      "byte_size_heuristic": 2,
+      "page_object_scan": 448,
+      "page_tree_count": 99
+    },
+    "page_estimate_caveat": "an estimate, not a measurement: page_tree_count is authoritative, page_object_scan undercounts compressed files, byte_size_heuristic is a size proxy. Reconcile against the pilot's actual billed pages before authorizing stage 2"
+  },
+  "bounded_pilot": {
+    "document_count": 10,
+    "documents": [
+      {
+        "byte_count": 143029,
+        "page_estimate": 2,
+        "source_document_id": "ks:city:topeka:resolutions:resolution:09749"
+      },
+      {
+        "byte_count": 15215,
+        "page_estimate": 1,
+        "source_document_id": "ks:city:topeka:ordinances:ordinance:20632"
+      },
+      {
+        "byte_count": 115817,
+        "page_estimate": 1,
+        "source_document_id": "ks:city:topeka:ordinances:ordinance:20681"
+      },
+      {
+        "byte_count": 139057,
+        "page_estimate": 1,
+        "source_document_id": "ks:city:topeka:ordinances:ordinance:20682"
+      },
+      {
+        "byte_count": 100236,
+        "page_estimate": 1,
+        "source_document_id": "ks:city:topeka:ordinances:ordinance:20683"
+      },
+      {
+        "byte_count": 6955,
+        "page_estimate": 1,
+        "source_document_id": "ks:city:topeka:resolutions:resolution:09380"
+      },
+      {
+        "byte_count": 164334,
+        "page_estimate": 1,
+        "source_document_id": "ks:city:topeka:resolutions:resolution:09491"
+      },
+      {
+        "byte_count": 88002,
+        "page_estimate": 1,
+        "source_document_id": "ks:city:topeka:resolutions:resolution:09507"
+      },
+      {
+        "byte_count": 79237,
+        "page_estimate": 1,
+        "source_document_id": "ks:city:topeka:resolutions:resolution:09516"
+      },
+      {
+        "byte_count": 130755,
+        "page_estimate": 1,
+        "source_document_id": "ks:city:topeka:resolutions:resolution:09519"
+      }
+    ],
+    "estimated_cost": 0.04,
+    "gate": "the pilot's extracted text must validate through the document release contract before any further spend; a degraded result stops the run",
+    "page_estimate": 11,
+    "rationale": "Resolution 9749 first because it is the owner's named example and the one document the starter release is waiting on; then the smallest remaining documents, so a quality problem surfaces cheaply before the bulk run"
+  },
+  "by_format": [
+    {
+      "billable": false,
+      "byte_count": 12070802,
+      "documents": 23,
+      "entrypoint": "scripts/release/topeka-docx-extract.py",
+      "note": "a DOCX is a ZIP holding word/document.xml; extracted locally with the standard library",
+      "path": "local_docx_xml",
+      "suffix": ".docx"
+    },
+    {
+      "billable": true,
+      "byte_count": 204325004,
+      "documents": 913,
+      "entrypoint": "scripts/release/topeka-ordinance-pdf-extract.py",
+      "note": "external RunPod Marker; the only path in this plan that costs money",
+      "path": "bounded_remote_marker",
+      "suffix": ".pdf"
+    }
+  ],
+  "extraction_service_called": false,
+  "notes": [
+    "No TMC re-crawl is required: the retained corpus is complete and hash-verified, so no Decodo token is needed for this work.",
+    "The DOCX path costs nothing and is already run; it is not part of any cap."
+  ],
+  "offline": true,
+  "planned_at": "2026-09-15T23:32:59Z",
+  "remaining_after_pilot": {
+    "documents": 539,
+    "estimated_cost": 10.54,
+    "page_estimate": 2636
+  },
+  "schema_version": "1.0",
+  "spend_incurred": 0,
+  "spending_cap": {
+    "enforcement": "MARKER_MAX_ATTEMPTS bounds retries per document. A run that would exceed its stage's page cap stops rather than continuing, and stage 2 needs its own authorization even after the pilot passes",
+    "hard_cap_pages": 2647,
+    "not_enforced_in_code_yet": true,
+    "stage_1_pilot_cap_pages": 11,
+    "stage_2_bulk_cap_pages": 2636,
+    "structure": "two-stage, each stage separately authorized"
+  },
+  "unit_price_per_page": 0.004,
+  "unit_price_source": "operator input",
+  "unsupported_formats": []
+}

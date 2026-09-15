@@ -27,7 +27,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib import error, request
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import urljoin, urlsplit, urlunsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -282,13 +282,112 @@ def derive_publisher_key(link: DiscoveredLink, spec: CollectionSpec) -> str:
     Traffic Ordinance identifiable.
     """
     label = link.label.strip()
-    if re.fullmatch(r"[A-Za-z]?\d{1,6}[A-Za-z]?", label):
+    # The listing prints bare numbers for most members, and sometimes repeats the
+    # document-type prefix ("Resolution09828-A"). Strip the prefix so the key is
+    # the publisher's number, not a restatement of the collection.
+    label = re.sub(r"^(?:charter\s*)?(?:ordinance|resolution)\s*(?:no\.?|#)?\s*", "", label, flags=re.I).strip()
+    if re.fullmatch(r"\d{1,6}[-_]?[A-Za-z]?", label):
         return label
     stem = Path(urlsplit(canonical_source_url(link.url)).path).stem
+    stem = re.sub(r"^(?:charter\s*)?(?:ordinance|resolution)\s*", "", stem, flags=re.I).strip()
     match = re.search(r"(\d{2,6})\s*$", stem)
     if match and spec.slug != "municipal-code":
         return match.group(1)
     return stem
+
+
+def filename_pattern(url: str, publisher_key: str) -> str | None:
+    """The publisher's filename shape with this document's key blanked out.
+
+    ``.../2023/Ordinance20407.pdf`` with key ``20407`` becomes
+    ``Ordinance{key}.pdf``. Comparing these across a group is how the convention
+    is discovered from the data, rather than written down here and drifting.
+    """
+    name = Path(urlsplit(canonical_source_url(url)).path).name
+    if not publisher_key or publisher_key not in name:
+        return None
+    return name.replace(publisher_key, "{key}", 1)
+
+
+def convention_candidate(documents: list[dict[str, Any]]) -> None:
+    """Annotate documents whose URL departs from their group's naming convention.
+
+    The candidate is the group's dominant filename pattern applied to this
+    document's own publisher key -- constructed from the publisher's other
+    members, never invented here. It is a candidate only: acquisition still has
+    to fetch it and corroborate, and the annotation says so.
+    """
+    groups: dict[tuple[str | None, str | None], Counter] = defaultdict(Counter)
+    for row in documents:
+        pattern = filename_pattern(row["official_url"], row["publisher_key"])
+        if pattern:
+            groups[(row["listing_category"], row["listing_group"])][pattern] += 1
+
+    for row in documents:
+        patterns = groups.get((row["listing_category"], row["listing_group"]))
+        if not patterns:
+            continue
+        dominant, dominant_count = patterns.most_common(1)[0]
+        if dominant_count < 3:
+            continue  # too few members to call anything a convention
+
+        parts = urlsplit(row["official_url"])
+        name = Path(parts.path).name
+        suffix = Path(parts.path).suffix.lower()
+
+        # A different file format is not a broken URL. The .docx instruments are
+        # served correctly; proposing a .pdf for them would be inventing a
+        # document the publisher has not listed.
+        if Path(dominant).suffix.lower() != suffix:
+            continue
+        if filename_pattern(row["official_url"], row["publisher_key"]) == dominant:
+            continue
+
+        # If the filename carries a *different* key from the listing label, the
+        # publisher contradicts itself and the document's identity is ambiguous.
+        # That is reported for review; it is emphatically not corrected here,
+        # because either the label or the href could be the wrong one.
+        other = re.search(r"(\d{3,6})", name)
+        own_number = re.search(r"(\d{3,6})", row["publisher_key"])
+        # Compare numerically: the listing writes 09380 where the file is named
+        # 9380, which is zero padding, not a different document.
+        conflicting = bool(
+            other and own_number and int(other.group(1)) != int(own_number.group(1))
+        )
+        if conflicting:
+            row["identity_conflict"] = {
+                "listing_label": row["label"],
+                "publisher_key_from_label": row["publisher_key"],
+                "key_in_filename": other.group(1),
+                "official_url": row["official_url"],
+                "review_status": "identity_ambiguous_review_needed",
+                "note": (
+                    "the listing label and the linked filename name different documents. No correction "
+                    "is proposed: either could be the publisher's error, and guessing would mis-identify "
+                    "the document"
+                ),
+            }
+            continue
+
+        candidate = urlunsplit((
+            parts.scheme, parts.netloc,
+            f"{parts.path.rsplit('/', 1)[0]}/{dominant.replace('{key}', row['publisher_key'])}",
+            "", "",
+        ))
+        if candidate == row["official_url"]:
+            continue
+        row["convention_candidate_url"] = candidate
+        row["convention_evidence"] = {
+            "group": row["listing_group"] or row["listing_category"],
+            "dominant_pattern": dominant,
+            "members_following_pattern": dominant_count,
+            "listing_label": row["label"],
+            "publisher_key": row["publisher_key"],
+            "note": (
+                "candidate only. Acquisition must fetch it successfully and corroborate before it is "
+                "used, and the broken listing URL is retained either way"
+            ),
+        }
 
 
 def _group_for(index: dict, link: DiscoveredLink) -> DeclaredGroup | None:
@@ -404,6 +503,8 @@ def discover_listing(listing: str, *, html_bytes: bytes, source_url: str) -> dic
                 existing["membership"] = "document_centre"
                 existing["listing_category"] = link.category_label
                 existing["listing_group"] = link.group_label
+
+    convention_candidate(list(documents.values()))
 
     for row in documents.values():
         official = row["official_url"]
@@ -538,6 +639,33 @@ def reconcile(result: dict[str, Any]) -> list[dict[str, Any]]:
             ),
         })
 
+    conflicts = [d for d in result["documents"] if d.get("identity_conflict")]
+    if conflicts:
+        findings.append({
+            "severity": "warning",
+            "code": "LABEL_HREF_IDENTITY_CONFLICT",
+            "group": result["listing"],
+            "detail": (
+                f"{len(conflicts)} document(s) have a listing label naming one number and a linked "
+                f"filename naming another "
+                f"({[(d['identity_conflict']['publisher_key_from_label'], d['identity_conflict']['key_in_filename']) for d in conflicts]}); "
+                "identity is ambiguous and no correction is proposed"
+            ),
+        })
+
+    candidates = [d for d in result["documents"] if d.get("convention_candidate_url")]
+    if candidates:
+        findings.append({
+            "severity": "warning",
+            "code": "CONVENTION_CANDIDATE_AVAILABLE",
+            "group": result["listing"],
+            "detail": (
+                f"{len(candidates)} document(s) depart from their group's filename convention; a "
+                "candidate derived from the publisher's own pattern is recorded for acquisition to try "
+                "only if the listed URL fails"
+            ),
+        })
+
     unsupported = [d for d in result["documents"] if not d["extraction_supported"]]
     if unsupported:
         by_type = Counter(d["media_type"] for d in unsupported)
@@ -585,6 +713,8 @@ def build_worklist(results: list[dict[str, Any]], seed: Path) -> dict[str, Any]:
                 "source_document_id": doc_id,
                 "collection_id": row["collection_id"],
                 "official_url": row["official_url"],
+                "convention_candidate_url": row.get("convention_candidate_url"),
+                "convention_evidence": row.get("convention_evidence"),
                 "outcome": "acquire_new",
                 "reason": "listed by the publisher with no retained original",
             })
@@ -593,6 +723,8 @@ def build_worklist(results: list[dict[str, Any]], seed: Path) -> dict[str, Any]:
             "source_document_id": doc_id,
             "collection_id": row["collection_id"],
             "official_url": row["official_url"],
+            "convention_candidate_url": row.get("convention_candidate_url"),
+            "convention_evidence": row.get("convention_evidence"),
             "retained_sha256": record["sha256"],
             "retained_path": record["saved_path"],
             "outcome": "verify_then_reuse",

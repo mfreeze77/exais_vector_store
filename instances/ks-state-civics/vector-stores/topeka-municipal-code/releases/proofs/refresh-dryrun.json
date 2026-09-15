@@ -1,0 +1,36 @@
+{
+  "artifact": "topeka_collection_refresh",
+  "mode": "dry_run",
+  "observed_at": "2026-09-15T23:28:55Z",
+  "offline": false,
+  "passed": true,
+  "release_id": "topeka-source-2026-09-15-refresh",
+  "schema_version": "1.0",
+  "stages": [
+    {
+      "command": "/usr/local/bin/python /work/scripts/release/topeka-collection-discover.py --listing all --output-dir /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/discovery --save-listing-html",
+      "stage": "discover",
+      "status": "dry_run"
+    },
+    {
+      "command": "/usr/local/bin/python /work/scripts/release/topeka-collection-acquire.py --worklist /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/discovery/worklist.jsonl --output-dir /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/acquisition --delay 0.35",
+      "stage": "acquire",
+      "status": "dry_run"
+    },
+    {
+      "command": "/usr/local/bin/python /work/scripts/release/topeka-destination-manifests.py --checkpoint /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/acquisition/acquisition-checkpoint.jsonl --worklist /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/discovery/worklist.jsonl --output-dir /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations",
+      "stage": "destination-manifests",
+      "status": "dry_run"
+    },
+    {
+      "command": "/usr/local/bin/python /work/scripts/release/topeka-source-release-export.py --select tmc:14.40.010 --select ordinance:20407 --select charter-ordinance:126 --output-dir /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/topeka-source-2026-09-15-refresh --release-id topeka-source-2026-09-15-refresh --bundle-kind starter",
+      "stage": "export-release",
+      "status": "dry_run"
+    },
+    {
+      "command": "/usr/local/bin/python /work/scripts/release/jurisdiction-release-validate.py --bundle /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/topeka-source-2026-09-15-refresh --output /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/proofs/topeka-source-2026-09-15-refresh-validation.json",
+      "stage": "validate-release",
+      "status": "dry_run"
+    }
+  ]
+}

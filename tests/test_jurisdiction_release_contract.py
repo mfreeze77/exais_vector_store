@@ -206,8 +206,8 @@ def codes(report) -> set[str]:
 # schemas
 # --------------------------------------------------------------------------
 
-def test_published_schemas_are_fully_executable():
-    """Every keyword in the shipped schemas is one the evaluator enforces."""
+def test_published_schemas_are_valid_draft_2020_12():
+    """Loading runs check_schema, so a malformed contract fails here, not silently."""
     release, document = contract.load_release_schemas()
     assert release.schema_id == contract.RELEASE_MANIFEST_SCHEMA_ID
     assert document.schema_id == contract.SOURCE_DOCUMENT_SCHEMA_ID
@@ -215,9 +215,39 @@ def test_published_schemas_are_fully_executable():
     assert len(release.sha256) == 64 and len(document.sha256) == 64
 
 
-def test_evaluator_refuses_a_schema_keyword_it_cannot_enforce():
-    with pytest.raises(ValueError, match="unsupported schema keyword"):
-        contract.SchemaValidator({"type": "object", "dependentRequired": {"a": ["b"]}})
+def test_a_malformed_schema_is_refused_at_construction():
+    with pytest.raises(Exception):
+        contract.SchemaValidator({"type": "not-a-real-type"})
+
+
+@pytest.mark.parametrize(
+    "label,schema,instance",
+    [
+        # Regression probes. A hand-rolled evaluator shipped here previously and
+        # accepted every one of these: Python makes `True == 1`, `multipleOf` was
+        # declared supported but never implemented, and 1 vs 1.0 compared unequal
+        # through JSON text rather than as numbers.
+        ("bool against const int", {"const": 1}, True),
+        ("bool against enum int", {"enum": [1]}, True),
+        ("multipleOf ignored", {"type": "number", "multipleOf": 3}, 7),
+        ("1 and 1.0 are the same number", {"type": "array", "uniqueItems": True}, [1, 1.0]),
+    ],
+)
+def test_keywords_a_hand_rolled_evaluator_got_wrong(label, schema, instance):
+    assert contract.SchemaValidator(schema).validate(instance), label
+
+
+@pytest.mark.parametrize(
+    "schema,instance",
+    [
+        ({"const": 1}, 1),
+        ({"enum": [1]}, 1),
+        ({"type": "number", "multipleOf": 3}, 9),
+        ({"type": "array", "uniqueItems": True}, [1, 2]),
+    ],
+)
+def test_the_valid_forms_of_those_keywords_still_pass(schema, instance):
+    assert contract.SchemaValidator(schema).validate(instance) == []
 
 
 def test_evaluator_enforces_core_keywords():

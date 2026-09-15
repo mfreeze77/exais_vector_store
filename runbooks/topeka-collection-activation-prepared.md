@@ -56,29 +56,41 @@ python scripts/release/cell-smoke.py --cell ks-state-civics
 Gate: smoke passes and the API reports healthy. Rollback:
 `python scripts/release/cell-down.py --cell ks-state-civics`.
 
-### 2. Count-only dry runs — no spend
+### 2. Per-destination dry runs — no spend, no network
+
+Each destination is proved on **its own** manifest slice. A combined batch shows
+that documents exist; it shows nothing about where each one lands.
 
 ```bash
-python scripts/release/topeka-code-ingest.py --cell ks-state-civics --dry-run
+python scripts/release/topeka-destination-manifests.py \
+  --output-dir instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations
+
+python scripts/release/topeka-code-ingest.py --cell ks-state-civics \
+  --source-output .tmp/topeka-decodo-window-batches-20260827220454/combined-full-corpus-20260828-v2 --dry-run
 python scripts/release/topeka-ordinance-pdf-ingest.py --cell ks-state-civics \
-  --manifest instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-ordinances/seed/manifests/ordinances.jsonl \
-  --dry-run
+  --manifest instances/.../destinations/ordinances.ingest-slice.jsonl \
+  --extracted-dir instances/.../sources/topeka-ordinances/seed/extracted --dry-run
+python scripts/release/topeka-ordinance-pdf-ingest.py --cell ks-state-civics \
+  --manifest instances/.../destinations/charter-ordinances.ingest-slice.jsonl \
+  --extracted-dir instances/.../sources/topeka-ordinances/seed/extracted --dry-run
 ```
 
-Gate: the printed payload counts equal the split plan's per-destination counts.
+**These have been run, 2026-09-15, under `docker run --network none`.** Receipt:
+`releases/proofs/topeka-destination-dryruns-20260915.txt`.
 
-**This step has been run, 2026-09-15.** Both dry-runs execute offline (they skip
-`ensure_vector_store` and every API call), and their receipts are committed:
+| Destination | `payload_count` | `skipped_count` | `submitted_count` |
+| --- | --- | --- | --- |
+| `ks:city:topeka:municipal-code` | 2,702 | — | 0 |
+| `ks:city:topeka:ordinances` | 323 | 0 | 0 |
+| `ks:city:topeka:charter-ordinances` | 41 | 0 | 0 |
+| `ks:city:topeka:resolutions` | no ingest path yet — 542 acquired and routed, none extracted | — | — |
 
-| Receipt | `payload_count` | `submitted_count` |
-| --- | --- | --- |
-| `releases/proofs/topeka-code-ingest-dryrun-20260915.txt` | 2,702 | 0 |
-| `releases/proofs/topeka-ordinance-ingest-dryrun-20260915.txt` | 364 | 0 |
+Routing is proved separately and offline: `topeka-destination-manifests.py`
+re-derives every record's destination from the registry **and** sweeps all four
+registered collections to confirm none of them also claims it. 3,635 records,
+0 issues, networking disabled.
 
-Both agree with the split plan (2,702 code; 323 + 41 = 364 ordinance PDFs) and
-both wrote nothing. `vector_store_id` reads `vs_topeka_municipal_code_pending`,
-the placeholder the scripts use when no store is resolved — confirming no store
-was contacted or created.
+Gate: each destination's count equals its manifest, and `submitted_count` is 0.
 
 ### 3. Create destination stores through the API
 
@@ -128,30 +140,76 @@ queryable throughout, which is what makes rollback cheap:
 `python scripts/release/cell-down.py --cell ks-state-civics` returns the host to
 its current state.
 
-## Assignment 4: update entrypoint
+## Assignment 4: the wired refresh runner
 
-`scripts/release/instance-source-update.py` already requires exactly one of
-`--dry-run` or `--execute`. The refresh loop for these collections is:
+`scripts/release/topeka-collection-refresh.py` is a single entrypoint that runs
+the loop in order — discover, acquire, destination manifests with the routing
+proof, export, validate — and, like `instance-source-update.py`, requires
+exactly one of `--dry-run` or `--execute`.
 
 ```bash
-python scripts/release/topeka-collection-discover.py --listing all \
-  --output-dir instances/ks-state-civics/vector-stores/topeka-municipal-code/discovery
-python scripts/release/topeka-collection-acquire.py \
-  --worklist instances/.../discovery/worklist.jsonl \
-  --output-dir instances/.../acquisition --delay 0.35
-python scripts/release/topeka-source-release-export.py --select ... \
-  --previous-manifest <prior release-manifest.json> --output-dir <next bundle>
-python scripts/release/jurisdiction-release-validate.py --bundle <next bundle>
+python scripts/release/topeka-collection-refresh.py --dry-run
+python scripts/release/topeka-collection-refresh.py --execute --offline
+python scripts/release/topeka-collection-refresh.py --execute --trust-checkpoint
 ```
 
-Discovery and acquisition are already runnable and proven on live data.
+Every command it emits is fully formed; there are no placeholders to fill in.
+`--offline` skips the two stages that contact the publisher and runs the rest,
+which is how the routing and validation proofs run with external calls disabled.
+
+**Executed 2026-09-15 under `--network none`** with `--execute --offline`: the
+destination, export and validate stages all passed, and the export correctly
+reported all three documents `unchanged` against the prior release manifest.
+Receipt: `releases/proofs/refresh-run.json`.
+
 Scheduling is **not** configured: do not report this as scheduled on the
-strength of these commands existing. A scheduler entry plus an execution
-receipt is what would make that claim true.
+strength of the runner existing. A scheduler entry plus an execution receipt is
+what would make that claim true.
 
 Re-running acquisition asks the publisher again by default, so changed bytes are
 detected; `--trust-checkpoint` skips that re-check and is opt-in precisely
 because it trades change detection for speed.
+
+## Extraction, by actual format
+
+Not every acquired document needs the paid path.
+
+| Format | Documents held | Path | Cost |
+| --- | --- | --- | --- |
+| `.docx` | 23 | `topeka-docx-extract.py`, local, stdlib | **none** |
+| `.pdf` | 913 | bounded remote Marker | billable |
+
+**The DOCX path is implemented and already run**, offline, at zero cost: a DOCX
+is a ZIP holding `word/document.xml`. 23 documents, 84,739 characters, 1,233
+blocks including 10 structured tables, 0 failures. It declares page coordinates
+unavailable (a DOCX has no fixed pagination) and reports tracked changes rather
+than flattening them — the defect already recorded against the Marker output.
+
+Of the 913 held PDFs, 364 already have retained Marker extractions reused by
+hash. That leaves **549 documents, ~2,647 estimated pages** as the only billable
+work. `topeka-extraction-plan.py` sizes it and refuses to invent a unit price:
+
+```bash
+python scripts/release/topeka-extraction-plan.py --unit-price-per-page <operator rate>
+```
+
+| Stage | Documents | Pages | At an illustrative $0.004/page |
+| --- | --- | --- | --- |
+| Pilot | 10, starting with Resolution 9749 | 11 | $0.04 |
+| Bulk | 539 | 2,636 | $10.54 |
+| Hard cap | 549 | 2,647 | $10.59 |
+
+The pilot starts with Resolution 9749 because it is the owner's named example
+and the one document the starter release is waiting on, then takes the smallest
+remaining documents so a quality problem surfaces cheaply. Its extracted text
+must validate through the document release contract before any further spend,
+and stage 2 needs its own authorization even after the pilot passes.
+
+The page figure is an **estimate, not a measurement**: 99 documents by
+authoritative page-tree `/Count`, 448 by page-object scan (which undercounts
+compressed files), 2 by byte-size heuristic. Reconcile against the pilot's
+actual billed pages before authorizing stage 2. The caps are stated but **not
+yet enforced in code**.
 
 ## What execution would still not establish
 

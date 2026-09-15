@@ -377,6 +377,74 @@ def test_a_later_run_asks_the_publisher_again_rather_than_trusting_the_checkpoin
     assert "--trust-checkpoint" in third["reason"]
 
 
+def test_a_changed_document_does_not_destroy_the_version_we_already_held(tmp_path, seed):
+    """Two-run reproduction: the first receipt's hash must still resolve after a change.
+
+    Storage is content-addressed, so a revision lands beside its predecessor
+    rather than on top of it. Overwriting would invalidate every acquisition
+    receipt that cited the earlier bytes.
+    """
+    row = make_row(
+        "ks:city:topeka:ordinances:ordinance:20662",
+        "https://files.topeka.gov/community/ordinances/2026/Ordinance20662.pdf",
+        "acquire_new",
+    )
+    out = tmp_path / "out"
+    v1, v2 = b"%PDF original bytes", b"%PDF revised bytes, longer"
+
+    first = acquire.acquire_row(row, output_dir=out, seed=seed, previous=None,
+                                timeout=5, downloader=downloader_for(v1), run_id="run-1")
+    second = acquire.acquire_row(row, output_dir=out, seed=seed, previous=first,
+                                 timeout=5, downloader=downloader_for(v2), run_id="run-2")
+
+    assert first["outcome"] == "downloaded_new"
+    assert second["outcome"] == "downloaded_changed"
+    assert second["prior_sha256"] == first["sha256"]
+
+    # Both receipts still resolve, to the exact bytes each one recorded.
+    for receipt, expected in ((first, v1), (second, v2)):
+        stored = Path(receipt["saved_path"])
+        assert stored.exists(), f"{receipt['sha256'][:12]} is no longer retrievable"
+        assert stored.read_bytes() == expected
+        assert sha(stored.read_bytes()) == receipt["sha256"]
+
+    assert first["saved_path"] != second["saved_path"]
+    assert set(second["versions"]) == {first["sha256"], second["sha256"]}
+    assert len(list(acquire.document_dir(out, row).iterdir())) == 2
+
+
+def test_reacquiring_identical_bytes_adds_no_second_copy(tmp_path, seed):
+    row = make_row(
+        "ks:city:topeka:ordinances:ordinance:20662",
+        "https://files.topeka.gov/community/ordinances/2026/Ordinance20662.pdf",
+        "acquire_new",
+    )
+    out = tmp_path / "out"
+    payload = b"%PDF stable bytes"
+    first = acquire.acquire_row(row, output_dir=out, seed=seed, previous=None,
+                                timeout=5, downloader=downloader_for(payload), run_id="run-1")
+    second = acquire.acquire_row(row, output_dir=out, seed=seed, previous=first,
+                                 timeout=5, downloader=downloader_for(payload), run_id="run-2")
+    assert second["outcome"] == "unchanged_remote"
+    assert second["saved_path"] == first["saved_path"]
+    assert len(list(acquire.document_dir(out, row).iterdir())) == 1
+
+
+def test_observation_history_survives_a_checkpoint_rewrite(tmp_path):
+    """The checkpoint is rewritten wholesale each flush, so history lives elsewhere."""
+    log = acquire.ObservationLog(tmp_path / "observations.jsonl")
+    log.append({"source_document_id": "a", "sha256": "1" * 64, "observed_at": "t1"})
+    log.append({"source_document_id": "b", "sha256": "2" * 64, "observed_at": "t1"})
+    log.append({"source_document_id": "a", "sha256": "3" * 64, "observed_at": "t2"})
+
+    checkpoint = acquire.Checkpoint.load(tmp_path / "checkpoint.jsonl")
+    checkpoint.record({"source_document_id": "a", "outcome": "downloaded_changed"})
+
+    history = log.observations_for("a")
+    assert [row["sha256"] for row in history] == ["1" * 64, "3" * 64]
+    assert [row["observed_at"] for row in history] == ["t1", "t2"]
+
+
 def test_changed_publisher_bytes_are_recorded_with_the_prior_hash(tmp_path, seed):
     row = make_row(
         "ks:city:topeka:ordinances:ordinance:20662",
@@ -490,3 +558,156 @@ def test_a_non_404_error_is_not_retried_as_a_different_url(monkeypatch):
     with pytest.raises(urlerror.HTTPError):
         acquire.fetch("https://files.topeka.gov/community/ordinances/2026/Ordinance20670+.docx", timeout=5)
     assert len(tried) == 1
+
+
+# --------------------------------------------------------------------------
+# evidenced URL correction
+# --------------------------------------------------------------------------
+
+CORRECTION_ROW = {
+    "source_document_id": "ks:city:topeka:ordinances:ordinance:20632",
+    "collection_id": "ks:city:topeka:ordinances",
+    "official_url": "https://files.topeka.gov/community/ordinances/2026/Ordinancec.pdf",
+    "outcome": "acquire_new",
+    "reason": "fixture",
+    "convention_candidate_url": "https://files.topeka.gov/community/ordinances/2026/Ordinance20632.pdf",
+    "convention_evidence": {
+        "dominant_pattern": "Ordinance{key}.pdf",
+        "group": "2026",
+        "listing_label": "20632",
+        "members_following_pattern": 44,
+        "publisher_key": "20632",
+    },
+}
+
+
+def correcting_downloader(payload: bytes, *, serves: str):
+    from urllib import error as urlerror
+
+    calls: list[str] = []
+
+    def download(url: str, *, timeout: int):
+        calls.append(url)
+        if url != serves:
+            raise urlerror.HTTPError(url, 404, "Not Found", {}, None)
+        return payload, "application/pdf"
+
+    download.calls = calls  # type: ignore[attr-defined]
+    return download
+
+
+def test_an_evidenced_correction_retains_both_urls_and_the_evidence(tmp_path, seed):
+    payload = b"%PDF ordinance 20632"
+    result = acquire.acquire_row(
+        CORRECTION_ROW, output_dir=tmp_path / "out", seed=seed, previous=None, timeout=5,
+        downloader=correcting_downloader(payload, serves=CORRECTION_ROW["convention_candidate_url"]),
+        run_id="run-1",
+    )
+    assert result["outcome"] == "downloaded_corrected_url"
+    assert result["listing_url"] == CORRECTION_ROW["official_url"], "the broken listing URL must be kept"
+    assert result["listing_url_status"] == 404
+    assert result["fetched_url"] == CORRECTION_ROW["convention_candidate_url"]
+    assert result["sha256"] == sha(payload)
+    assert Path(result["saved_path"]).read_bytes() == payload
+
+    evidence = result["correction_evidence"]
+    assert evidence["broken_listing_url"] == CORRECTION_ROW["official_url"]
+    assert evidence["http_status"] == 200
+    assert evidence["same_host_and_directory"] is True
+    assert evidence["publisher_key_in_candidate_filename"] is True
+    assert evidence["members_following_pattern"] == 44
+    assert evidence["review_status"] == "evidenced_correction_pending_review"
+
+
+def test_a_correction_off_the_official_host_is_refused(tmp_path, seed):
+    row = {**CORRECTION_ROW, "convention_candidate_url": "https://example.invalid/2026/Ordinance20632.pdf"}
+    result = acquire.acquire_row(
+        row, output_dir=tmp_path / "out", seed=seed, previous=None, timeout=5,
+        downloader=correcting_downloader(b"x", serves=row["convention_candidate_url"]),
+        run_id="run-1",
+    )
+    assert result["outcome"] == "unavailable_at_source"
+
+
+def test_a_correction_into_another_directory_is_refused(tmp_path, seed):
+    row = {**CORRECTION_ROW,
+           "convention_candidate_url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20632.pdf"}
+    result = acquire.acquire_row(
+        row, output_dir=tmp_path / "out", seed=seed, previous=None, timeout=5,
+        downloader=correcting_downloader(b"x", serves=row["convention_candidate_url"]),
+        run_id="run-1",
+    )
+    assert result["outcome"] == "unavailable_at_source"
+
+
+def test_a_200_alone_is_not_enough_without_the_publisher_key_in_the_name(tmp_path, seed):
+    row = {**CORRECTION_ROW,
+           "convention_candidate_url": "https://files.topeka.gov/community/ordinances/2026/Something.pdf"}
+    result = acquire.acquire_row(
+        row, output_dir=tmp_path / "out", seed=seed, previous=None, timeout=5,
+        downloader=correcting_downloader(b"x", serves=row["convention_candidate_url"]),
+        run_id="run-1",
+    )
+    assert result["outcome"] == "unavailable_at_source"
+
+
+def test_with_no_candidate_a_broken_link_stays_unavailable(tmp_path, seed):
+    row = {k: v for k, v in CORRECTION_ROW.items() if not k.startswith("convention_")}
+    result = acquire.acquire_row(
+        row, output_dir=tmp_path / "out", seed=seed, previous=None, timeout=5,
+        downloader=correcting_downloader(b"x", serves="https://nowhere.invalid/x.pdf"),
+        run_id="run-1",
+    )
+    assert result["outcome"] == "unavailable_at_source"
+    assert "would invent provenance" in result["reason"]
+
+
+def test_a_different_file_format_is_never_proposed_as_a_url_correction():
+    """The .docx instruments are served correctly; a .pdf is a different document."""
+    docs = [
+        {"official_url": f"https://files.topeka.gov/community/ordinances/2026/Ordinance{n}.pdf",
+         "publisher_key": str(n), "listing_category": "Ordinances", "listing_group": "2026",
+         "label": str(n)}
+        for n in range(20600, 20610)
+    ]
+    docs.append({
+        "official_url": "https://files.topeka.gov/community/ordinances/2026/Ordinance20666.docx",
+        "publisher_key": "20666", "listing_category": "Ordinances", "listing_group": "2026",
+        "label": "20666",
+    })
+    discover.convention_candidate(docs)
+    assert "convention_candidate_url" not in docs[-1]
+
+
+def test_a_label_that_contradicts_its_href_is_reported_not_corrected():
+    docs = [
+        {"official_url": f"https://files.topeka.gov/community/ordinances/2024/Ordinance{n}.pdf",
+         "publisher_key": str(n), "listing_category": "Ordinances", "listing_group": "2024",
+         "label": str(n)}
+        for n in range(20500, 20510)
+    ]
+    docs.append({
+        "official_url": "https://files.topeka.gov/community/ordinances/2024/Ordinance20521.pdf",
+        "publisher_key": "20520", "listing_category": "Ordinances", "listing_group": "2024",
+        "label": "20520",
+    })
+    discover.convention_candidate(docs)
+    conflicted = docs[-1]
+    assert "convention_candidate_url" not in conflicted, "identity is ambiguous; do not guess"
+    assert conflicted["identity_conflict"]["key_in_filename"] == "20521"
+    assert conflicted["identity_conflict"]["review_status"] == "identity_ambiguous_review_needed"
+
+
+def test_zero_padding_is_not_an_identity_conflict():
+    """The listing writes 09380 where the file is named 9380 -- same document."""
+    docs = [
+        {"official_url": f"https://files.topeka.gov/community/resolutions/2025/Resolution{n}.pdf",
+         "publisher_key": str(n), "listing_category": "2025", "listing_group": "2025", "label": str(n)}
+        for n in range(9370, 9380)
+    ]
+    docs.append({
+        "official_url": "https://files.topeka.gov/community/resolutions/2025/Resolution9380.pdf",
+        "publisher_key": "09380", "listing_category": "2025", "listing_group": "2025", "label": "09380",
+    })
+    discover.convention_candidate(docs)
+    assert "identity_conflict" not in docs[-1]

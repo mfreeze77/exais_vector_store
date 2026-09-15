@@ -1,0 +1,42 @@
+# Per-destination ingestion dry-runs, 2026-09-15
+# Run with external calls disabled (docker run --network none).
+# Each destination is proved on its own manifest slice, not as one combined batch.
+
+## ks:city:topeka:municipal-code  (entrypoint: topeka-code-ingest.py)
+{
+  "dry_run": true,
+  "payload_count": 2702,
+  "sample_source_uris": [
+    "https://topeka.municipal.codes/TMC/1.05.010",
+    "https://topeka.municipal.codes/TMC/1.10.010",
+    "https://topeka.municipal.codes/TMC/1.10.020"
+  ],
+  "source_output": ".tmp/topeka-decodo-window-batches-20260827220454/combined-full-corpus-20260828-v2",
+  "submitted_count": 0,
+  "vector_store_id": "vs_topeka_municipal_code_pending"
+}
+
+## ks:city:topeka:ordinances  (entrypoint: topeka-ordinance-pdf-ingest.py, ordinances slice)
+  "manifest": "instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/ordinances.ingest-slice.jsonl",
+  "marker_note": "This script only consumes precomputed markdown; RunPod Marker/operator extraction remains external.",
+  "payload_count": 323,
+  "skipped": [],
+  "skipped_count": 0,
+  "submitted_count": 0,
+  "vector_store_id": "vs_topeka_municipal_code_pending"
+}
+
+## ks:city:topeka:charter-ordinances  (entrypoint: topeka-ordinance-pdf-ingest.py, charter slice)
+  "manifest": "instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/charter-ordinances.ingest-slice.jsonl",
+  "marker_note": "This script only consumes precomputed markdown; RunPod Marker/operator extraction remains external.",
+  "payload_count": 41,
+  "skipped": [],
+  "skipped_count": 0,
+  "submitted_count": 0,
+  "vector_store_id": "vs_topeka_municipal_code_pending"
+}
+
+## ks:city:topeka:resolutions
+No ingestion dry-run is possible yet. 542 documents are acquired and routed, but none has been
+through an extraction path, and the contract refuses a document with empty extraction.
+Destination manifest: destinations/resolutions.manifest.jsonl (542 records, routing proven).
