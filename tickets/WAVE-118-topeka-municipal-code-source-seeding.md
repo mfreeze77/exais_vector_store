@@ -287,3 +287,157 @@ docker run --rm -v "${PWD}/instances/ks-state-civics/vector-stores/topeka-munici
 - Playwright implementation proof is recorded in `instances/ks-state-civics/vector-stores/topeka-municipal-code/sources/topeka-codified-code/source.lock.json`.
 - The scraper now emits `citation-url-map.jsonl`; ingestion should set codified-code document `source_uri` from each section row's `citation_url`.
 - The operator-owned publisher-gated acquisition slot plugs in only by producing the same JSONL artifacts as the compliant scraper. The ExAIS repo validates and ingests those artifacts, but does not own bypass logic.
+
+## Implementation 2026-09-15: assignment 1, document release contract
+
+Branch `feat/WAVE-118-jurisdiction-document-release-contract`, commits
+`5191794` (contract, exporter, validator, audit, tests) and `b3b7ccb`
+(starter release, source-package wiring). Not pushed; no main commits.
+
+### Delivered
+
+| Item | Path |
+| --- | --- |
+| Release manifest schema v1.0.0 | `contracts/jurisdiction-document-release.schema.json` |
+| Source document schema v1.0.0 | `contracts/jurisdiction-source-document.schema.json` |
+| Shared contract code | `scripts/release/jurisdiction_release_contract.py` |
+| Exporter | `scripts/release/topeka-source-release-export.py` |
+| Validator | `scripts/release/jurisdiction-release-validate.py` |
+| Retained-input audit | `scripts/release/topeka-retained-input-audit.py` |
+| Contract documentation | `docs/JURISDICTION_DOCUMENT_RELEASE_CONTRACT.md` |
+| Starter release | `instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/topeka-source-2026-09-15-r1/` |
+| Tests | `tests/test_jurisdiction_release_contract.py` (38 cases) |
+
+Both schemas are jurisdiction-neutral; Topeka is a producer, not a schema
+variant. `contracts/vector-store-source-package.schema.json` gained an optional
+`documentRelease` block rather than a second package format, and both Topeka
+source packages now declare the contract, the four registered collections and
+the exporter/validator/audit commands.
+
+All four scripts are stdlib-only and run with no embeddings, no ExAIS API and
+no StateCivics database.
+
+### Starter release
+
+`topeka-source-2026-09-15-r1`, bundle kind `starter`, producer commit
+`51917941852d07cc1ac26f80a93149cf38777426` from a clean worktree.
+
+| | |
+| --- | --- |
+| manifest SHA-256 | `666bfa7f2f88d852f727acff984c68f1fd34894ee340649b1ee4d72ce9242faf` |
+| `inventory_sha256` | `99de2e5f0fd302c2237a8a61365a75e9ccfcd5e6183d1c7698c33352263ab7b5` |
+| documents / files | 3 / 15 |
+| validation | PASS, 0 errors, 0 warnings |
+
+| Document | Collection | `document_version_id` | `payload_sha256` (16) |
+| --- | --- | --- | --- |
+| TMC 14.40.010 | `ks:city:topeka:municipal-code` | `…:tmc:14.40.010@b4402bc01b8101bf` | `878470877ad5b2b8` |
+| Ordinance 20407 | `ks:city:topeka:ordinances` | `…:ordinance:20407@1c2df1f61e25ddf4` | `9d7a4a6a25b0518e` |
+| Charter Ordinance 126 | `ks:city:topeka:charter-ordinances` | `…:charter-ordinance:126@f4754ab0c48657d5` | `ebc2e38d81d9f996` |
+
+39 evidence spans resolve byte-for-byte against the delivered artifacts.
+3 coordinates are published as explicitly unavailable, all of them PDF page
+coordinates: the retained Markdown has no page markers and Markdown line
+numbers are not converted into page numbers.
+
+Resolution 9749 is **not** in this release; it joins as soon as the resolutions
+collector exists. The three-document handoff was not held for it.
+
+### STO provenance, resolved
+
+The extraction manifest records `308ea5ee…` for
+`extracted/topeka-ordinance-b03282aaf10640134b3ac4a4.md`; the file on disk
+hashes to `55f552ab…`. The difference is exactly one appended terminal LF:
+re-hashing the file without its final byte reproduces `308ea5ee…` (566,900 vs
+566,901 bytes). Content is otherwise byte-identical.
+
+Both hashes are retained. The transformation publishes as a
+`terminal_newline_appended` lineage step on the document record. The expected
+hash was not edited. Any extraction mismatch that is *not* this transformation
+fails the export closed.
+
+The STO also now has a stable identity despite carrying no ordinance number:
+`ks:city:topeka:ordinances:ordinance:sto`, derived from the publisher's file
+stem, with `publisher_number: null` recording a determined absence rather than
+an unknown.
+
+### Retained-input audit, re-measured 2026-09-15
+
+Proof: `instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/proofs/topeka-retained-input-audit-20260915.json`
+
+| Measure | Value |
+| --- | --- |
+| TMC section records | 2,702 (332 in Title 18, 64 in chapter 14.55) |
+| TMC captures hash-verified | 2,702 of 2,702; 0 missing, 0 mismatched |
+| Retained PDFs | 364 — 323 `ordinance` category (322 numbered + the STO), 41 `charter_ordinance` |
+| Raw PDF hashes | 364 matched, 0 unexplained, 0 missing |
+| Extraction hashes | 363 matched, 1 `terminal_newline_appended`, 0 unexplained |
+| Routing | 323 → `ks:city:topeka:ordinances`, 41 → `ks:city:topeka:charter-ordinances`, 0 unrouted |
+
+Captures resolve by content hash, not by rebuilding the crawler's filename:
+appendix citations such as `AxB Art. III § 1` are sanitised into names no rule
+here reproduces, and a filename-based lookup under-reports 295 sections as
+missing when all 2,702 are present and verifiable.
+
+### Routing acceptance
+
+Both owner examples are covered by parametrised tests, alongside ordinary and
+code controls:
+
+| Input | Collection |
+| --- | --- |
+| `…s3.us-east-1.amazonaws.com/files.topeka.gov/community/resolutions/2026/Resolution09749.pdf` | `ks:city:topeka:resolutions` |
+| `…files.topeka.gov/community/ordinances/charter/CharterOrdinance126.pdf` | `ks:city:topeka:charter-ordinances` |
+| `…files.topeka.gov/community/ordinances/2023/Ordinance20407.pdf` | `ks:city:topeka:ordinances` |
+| `…files.topeka.gov/community/ordinances/other-ordinances/STO.pdf` | `ks:city:topeka:ordinances` |
+| `https://topeka.municipal.codes/TMC/14.40.010` | `ks:city:topeka:municipal-code` |
+
+Host aliases and the `#undefined` fragment canonicalise away. A URL matching no
+registered collection is refused rather than given a store of its own.
+
+### Test regime and baseline
+
+Docker image `exais-grant-intelligence/exai-vector-store-api:0.9.8-production-candidate`
+(the `localhost:5000/expertaiservices/…` image named in WAVE-119 is not present
+on this host).
+
+| Run | Result |
+| --- | --- |
+| New contract suite | 38 passed |
+| Contract + projection + source-package + artifact-quality | 55 passed |
+| Full suite, baseline `f44c97f` | 10 failed, 918 passed, 67 skipped, 106 errors, 27 collection errors |
+| Full suite, candidate `b3b7ccb` | 10 failed, **956** passed, 67 skipped, 106 errors, 27 collection errors |
+
+No regression: identical failure and error counts, +38 passing. Every one of the
+27 collection errors is `ModuleNotFoundError: No module named 'jsonschema'` —
+an image gap, not a code defect, and the reason the contract validator
+deliberately carries its own stdlib evaluator.
+
+`validate-instance-source-packages.py --instance ks-state-civics`: PASS,
+5 packages, 0 issues.
+
+Roughly half the new tests are negative controls asserting specific rejection
+codes. An adversarial check confirmed the validator catches a one-character
+shift in the reading text *after* every dependent hash was honestly re-stamped,
+because it re-resolves each evidence span against the delivered bytes.
+
+### Hosted CI
+
+Checked 2026-09-15 on `main`: `ci` **cancelled** (run 34924799222),
+`image-release` **cancelled** (34924799117), `migration-tests` **success**
+(34924799097). The `ci-repair-post-8c7eecc` branch's `ci` run is a **failure**
+and remains that separate branch's work, not absorbed here. The feature branch
+is unpushed, so it has no hosted run of its own.
+
+### Still open
+
+- Assignment 2: complete ordinary/charter/resolution discovery. `topeka.gov`
+  listings answer 200; `topeka.municipal.codes` answers 403 to plain HTTP, as
+  before.
+- Assignment 3/4: no `ks-state-civics` cell is running on this host. API
+  ingestion, vector retrieval and graph proof need the cell up and incur
+  embedding spend, so they need owner authorization before execution.
+- Every document reports `vector_indexing` and `graph` as `pending`, and every
+  collection reports `coverage.state: partial`. Nothing here claims otherwise.
+- StateCivics KS-539/KS-540 A-side acceptance (importer, Topeka reader, FTS,
+  agent context, packet handling) remains open and is not ExAIS work.
