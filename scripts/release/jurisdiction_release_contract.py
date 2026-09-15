@@ -165,6 +165,11 @@ class CollectionSpec:
     # Prefixes that belong to a sibling collection and must lose the tie-break
     # even though they sit under this collection's prefix.
     excluded_path_prefixes: tuple[str, ...] = ()
+    # (host, path prefix) pairs where the publisher still links documents of this
+    # collection from a superseded location. They route here so the document
+    # keeps one identity instead of gaining a second one; they are reported as
+    # legacy so the stale link is visible rather than silently equivalent.
+    legacy_locations: tuple[tuple[str, str], ...] = ()
     vector_store_id: str | None = None
 
     @property
@@ -193,6 +198,10 @@ TOPEKA_COLLECTIONS: tuple[CollectionSpec, ...] = (
         hosts=("files.topeka.gov", "topeka.gov"),
         path_prefixes=("/community/ordinances/",),
         excluded_path_prefixes=("/community/ordinances/charter/",),
+        # The ordinances listing still carries a stale link to the Standard
+        # Traffic Ordinance on the retired WordPress bucket, alongside the live
+        # files.topeka.gov one. Same document, two URLs, one identity.
+        legacy_locations=(("cot-wp-uploads.s3.amazonaws.com", "/wp-content/uploads/legal/"),),
     ),
     CollectionSpec(
         slug="charter-ordinances",
@@ -286,6 +295,9 @@ def route_document(
     parts = urlsplit(canonical)
     matches: list[tuple[int, CollectionSpec]] = []
     for spec in collections:
+        for host, prefix in spec.legacy_locations:
+            if parts.netloc == host and parts.path.startswith(prefix):
+                return spec
         if parts.netloc not in spec.hosts:
             continue
         if any(parts.path.startswith(excluded) for excluded in spec.excluded_path_prefixes):

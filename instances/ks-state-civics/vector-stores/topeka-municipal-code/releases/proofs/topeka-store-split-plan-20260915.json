@@ -1,0 +1,86 @@
+{
+  "artifact": "topeka_store_split_plan",
+  "destinations": [
+    {
+      "collection_id": "ks:city:topeka:municipal-code",
+      "destination": "municipal-code",
+      "name": "Topeka Municipal Code",
+      "planned_document_count": 2702,
+      "vector_store_id": null
+    },
+    {
+      "collection_id": "ks:city:topeka:ordinances",
+      "destination": "ordinances",
+      "name": "Topeka Ordinances",
+      "planned_document_count": 323,
+      "vector_store_id": null
+    },
+    {
+      "collection_id": "ks:city:topeka:charter-ordinances",
+      "destination": "charter-ordinances",
+      "name": "Topeka Charter Ordinances",
+      "planned_document_count": 41,
+      "vector_store_id": null
+    }
+  ],
+  "executed": false,
+  "execution": {
+    "blocked_on": [
+      "owner authorization for cell activation and embedding spend",
+      "a running ks-state-civics cell (none is up on this host)"
+    ],
+    "ordered_steps": [
+      "python scripts/release/cell-up.py --cell ks-state-civics",
+      "python scripts/release/topeka-code-ingest.py --cell ks-state-civics --dry-run  # counts only",
+      "create the three destination stores through the supported API, never by direct DB write",
+      "ingest each destination from its manifest slice and verify per-store document counts",
+      "run retrieval and citation checks against each destination store",
+      "switch ExAIS routing only after every destination verifies"
+    ],
+    "rollback": [
+      "vs_d4185d1004604f08a55299fa is not mutated by the split and stays queryable throughout",
+      "routing reverts to the combined store by restoring store.yaml vectorStore.id",
+      "destination stores are deleted through the API; no retained artifact is removed"
+    ],
+    "status": "not_executed"
+  },
+  "passed": true,
+  "planned_at": "2026-09-15T23:02:11Z",
+  "problems": [],
+  "reconciliation": [
+    {
+      "agrees": true,
+      "field": "documentCount",
+      "planned_from_manifests": 3066,
+      "recorded_in_store_yaml": 3066
+    },
+    {
+      "agrees": true,
+      "field": "codifiedDocumentCount",
+      "planned_from_manifests": 2702,
+      "recorded_in_store_yaml": 2702
+    },
+    {
+      "agrees": true,
+      "field": "ordinancePdfDocumentCount",
+      "planned_from_manifests": 364,
+      "recorded_in_store_yaml": 364
+    }
+  ],
+  "schema_version": "1.0",
+  "source_store": {
+    "mutated_by_this_plan": false,
+    "role": "combined code and ordinance store, retained for rollback",
+    "vector_store_id": "vs_d4185d1004604f08a55299fa"
+  },
+  "unassigned_count": 0,
+  "unnumbered_records": [
+    {
+      "destination": "ordinances",
+      "legacy_id": "topeka-ordinance:b03282aaf10640134b3ac4a4",
+      "note": "unnumbered instrument; it has a destination and is not dropped from the split",
+      "source_document_id": "ks:city:topeka:ordinances:ordinance:sto",
+      "source_uri": "https://files.topeka.gov/community/ordinances/other-ordinances/STO.pdf"
+    }
+  ]
+}
