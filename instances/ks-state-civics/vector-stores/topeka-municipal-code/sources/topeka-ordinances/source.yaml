@@ -178,3 +178,73 @@ eval:
   expectedProofArtifacts:
     - .release/cells/ks-state-civics/topeka-code-recall-eval.json
     - .release/cells/ks-state-civics/evals/topeka-ordinance-recall-20260828.json
+
+documentRelease:
+  contract:
+    manifestSchema: contracts/jurisdiction-document-release.schema.json
+    documentSchema: contracts/jurisdiction-source-document.schema.json
+    version: 1.0.0
+    docs: docs/JURISDICTION_DOCUMENT_RELEASE_CONTRACT.md
+    jurisdictionKey: ks:city:topeka
+    jurisdictionAliases:
+      - ks-topeka
+  collections:
+    - collectionId: ks:city:topeka:municipal-code
+      name: Topeka Municipal Code
+      masterSourceUrl: https://topeka.municipal.codes/TMC
+      listingCategory: null
+      vectorStoreId: null
+    - collectionId: ks:city:topeka:ordinances
+      name: Topeka Ordinances
+      masterSourceUrl: https://topeka.gov/community/ordinances/index.php
+      listingCategory: ordinance
+      vectorStoreId: null
+    - collectionId: ks:city:topeka:charter-ordinances
+      name: Topeka Charter Ordinances
+      masterSourceUrl: https://topeka.gov/community/ordinances/index.php
+      listingCategory: charter_ordinance
+      vectorStoreId: null
+    - collectionId: ks:city:topeka:resolutions
+      name: Topeka Resolutions
+      masterSourceUrl: https://topeka.gov/community/resolutions/index.php
+      listingCategory: resolution
+      vectorStoreId: null
+  exporter:
+    - python
+    - scripts/release/topeka-source-release-export.py
+    - --select
+    - tmc:14.40.010
+    - --select
+    - ordinance:20407
+    - --select
+    - charter-ordinance:126
+    - --output-dir
+    - ${TOPEKA_RELEASE_BUNDLE}
+    - --release-id
+    - ${TOPEKA_RELEASE_ID}
+    - --bundle-kind
+    - starter
+  validator:
+    - python
+    - scripts/release/jurisdiction-release-validate.py
+    - --bundle
+    - ${TOPEKA_RELEASE_BUNDLE}
+    - --output
+    - ${TOPEKA_RELEASE_VALIDATION_PROOF}
+  audit:
+    - python
+    - scripts/release/topeka-retained-input-audit.py
+    - --output
+    - ${TOPEKA_AUDIT_REPORT}
+  lastRelease:
+    releaseId: topeka-source-2026-09-15-r1
+    bundleKind: starter
+    bundlePath: instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/topeka-source-2026-09-15-r1
+    manifestSha256: 666bfa7f2f88d852f727acff984c68f1fd34894ee340649b1ee4d72ce9242faf
+    inventorySha256: 99de2e5f0fd302c2237a8a61365a75e9ccfcd5e6183d1c7698c33352263ab7b5
+    producerCommit: 51917941852d07cc1ac26f80a93149cf38777426
+    documentCount: 3
+    observedAt: '2026-09-15'
+    validationProof: instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/proofs/topeka-source-2026-09-15-r1-validation.json
+    validationResult: pass_0_errors_0_warnings
+    durableUris: []
