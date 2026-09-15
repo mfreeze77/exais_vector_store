@@ -1,5 +1,8 @@
 # WAVE-133: Project canonical identities and typed structured evidence into the fiscal graph
 
+> **Civic Impact work paused by owner — 2026-09-14.**
+> [Current delivery, pending CI and resume order](../runbooks/civic-impact-pause.md) supersede older dispatch instructions. Historical proof and unmet acceptance criteria remain.
+
 Status: landed 2026-09-13. landed_by: aaa8bf6 (merge), ad41770 (branch tip). Parent: WAVE-132 (reopened). Filed 2026-09-10.
 
 **Pin label vs pin content.** The three per-branch digests are pinned at StateCivics commit `314beafe`. That commit is a LABEL FOR THE FILE'S CONTENT, not a claim about A's current tip: `contracts/civic-impact/retrieval-export-record.schema.json` hashes to `899b541a8ba03431e0a129c09a8a3733b2d43057e4bb260b8bdb010dece2e8a7` at `314beafe`, at `9f8ed9b3` (the KS-650 B1.2 merge, which touched nothing under `contracts/`) and at A's `main` `38258704`; `git log 314beafe..38258704 -- contracts/` is empty and `314beafe` is an ancestor of `main`. So the pin is correct and only the label is older than A's main. `test_the_fixture_is_the_upstream_contract_at_the_pinned_commit` asserts both the byte-identity and the ancestry, and fails rather than skips when `SVS_STATECIVICS_REPO` is unset.

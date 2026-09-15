@@ -1,5 +1,7 @@
 # Tickets
 
+Civic Impact / ExAIS fiscal work is paused by owner. [Current state and resume order](../runbooks/civic-impact-pause.md) cover WAVE-132–136 and the unmerged CI repair.
+
 This folder contains the ExAIS Vector Store roadmap and implementation tickets.
 
 Use `WAVE-*` tickets for release or production-hardening waves. Use

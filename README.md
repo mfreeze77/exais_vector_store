@@ -1,5 +1,7 @@
 # exai_vector_store v0.9.8 Production Candidate
 
+Civic Impact / Kansas fiscal work is paused. Read the [pause and resume handoff](runbooks/civic-impact-pause.md); local candidate delivery is real and CI repair remains unmerged.
+
 Expert AI Services self-hosted, OpenAI-compatible, multi-tenant retrieval/vectorization platform for micro-production cells, business instances, and user vaults.
 
 - Domain: `expertaiservices.com`

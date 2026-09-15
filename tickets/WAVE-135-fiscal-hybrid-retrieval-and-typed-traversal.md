@@ -1,5 +1,8 @@
 # WAVE-135: Combine exact and semantic retrieval with validated typed traversal
 
+> **Civic Impact work paused by owner — 2026-09-14.**
+> [Current delivery, pending CI and resume order](../runbooks/civic-impact-pause.md) supersede older dispatch instructions. Historical proof and unmet acceptance criteria remain.
+
 Status: proposed. Parent: WAVE-132 (reopened). Filed 2026-09-10.
 
 ## Summary

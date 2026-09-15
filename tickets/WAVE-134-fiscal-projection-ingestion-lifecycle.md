@@ -1,6 +1,9 @@
 # WAVE-134: Ingest scoped projections with consistent eligibility and lifecycle
 
-Status: in progress — lane B LANDED (adapter: 1565a84 / 830ccb7; entrypoint integration: 0b15b6a / 5aef516). The two runtime follow-ups are CLOSED (WAVE-148, merged). Item 8 is blocked only on re-deriving the release proposal for `ks-fiscal-local`. Parent: WAVE-132 (reopened). Filed 2026-09-10.
+> **Civic Impact work paused by owner — 2026-09-14.**
+> [Current delivery, pending CI and resume order](../runbooks/civic-impact-pause.md) supersede older dispatch instructions. Historical proof and unmet acceptance criteria remain.
+
+Status: paused by owner — local HB 2513 candidate ingestion/retrieval is merged and pushed. CI repair is pushed but unmerged pending the scoped upstream secret and hosted green run. Broader publication/lifecycle acceptance remains open. The old Item 8 block is not the current candidate-runtime state; see the pause record.
 
 ## Summary
 

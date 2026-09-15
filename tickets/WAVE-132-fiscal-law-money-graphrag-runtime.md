@@ -1,5 +1,8 @@
 # WAVE-132 Fiscal law-and-money GraphRAG runtime
 
+> **Civic Impact work paused by owner — 2026-09-14.**
+> [Current delivery, pending CI and resume order](../runbooks/civic-impact-pause.md) supersede older dispatch instructions. Historical proof and unmet acceptance criteria remain.
+
 Status: reopened — owner requires real fiscal data to govern design and acceptance.
 The prior synthetic/runtime QC remains historical mechanics proof and does not
 establish product acceptance or answer quality.
