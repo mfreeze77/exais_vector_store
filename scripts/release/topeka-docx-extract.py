@@ -117,18 +117,31 @@ def extract_docx(payload: bytes) -> dict[str, Any]:
             })
         elif child.tag == f"{W}tbl":
             rows: list[list[str]] = []
+            table_revisions = {"insertions": 0, "deletions": 0}
             for row in child.findall(f"{W}tr"):
                 cells = []
                 for cell in row.findall(f"{W}tc"):
-                    cell_text = " ".join(
-                        " ".join(_paragraph_text(p)[0].split())
-                        for p in cell.findall(f"{W}p")
-                    ).strip()
-                    cells.append(cell_text)
+                    pieces = []
+                    for paragraph in cell.findall(f"{W}p"):
+                        text, marks = _paragraph_text(paragraph)
+                        # A revision inside a table is the most consequential kind:
+                        # it is usually a changed figure. Counting it here is what
+                        # keeps "100 became 200" from being published as a clean 200.
+                        table_revisions["insertions"] += marks["insertions"]
+                        table_revisions["deletions"] += marks["deletions"]
+                        revisions["insertions"] += marks["insertions"]
+                        revisions["deletions"] += marks["deletions"]
+                        pieces.append(" ".join(text.split()))
+                    cells.append(" ".join(piece for piece in pieces if piece).strip())
                 rows.append(cells)
             if rows:
                 index = len(tables)
-                tables.append({"order": index, "rows": rows, "row_count": len(rows)})
+                tables.append({
+                    "order": index,
+                    "rows": rows,
+                    "row_count": len(rows),
+                    "revisions": table_revisions,
+                })
                 blocks.append({
                     "kind": "table",
                     "order": len(blocks),
@@ -140,13 +153,20 @@ def extract_docx(payload: bytes) -> dict[str, Any]:
     normalized = (text.strip() + "\n") if text.strip() else ""
 
     limitations: list[dict[str, str]] = []
+    table_revisions = sum(
+        table["revisions"]["insertions"] + table["revisions"]["deletions"] for table in tables
+    )
     if revisions["insertions"] or revisions["deletions"]:
+        detail = (
+            f" {table_revisions} of them are inside tables, where a revision is usually a changed "
+            "figure." if table_revisions else ""
+        )
         limitations.append({
             "code": "unresolved_tracked_changes",
             "description": (
                 f"the file carries {revisions['insertions']} tracked insertion(s) and "
                 f"{revisions['deletions']} deletion(s). Deleted runs are excluded from the reading "
-                "text and the document needs review against the publisher's own rendering."
+                f"text and the document needs review against the publisher's own rendering.{detail}"
             ),
             "affects": "readable_text",
         })
@@ -201,7 +221,12 @@ def main() -> int:
             failures.append({"path": str(path), "error": "extraction produced no usable text"})
             continue
 
-        target = args.output_dir / collection / document_key
+        # Extracted artifacts are versioned by the hash of the source they came
+        # from, exactly as the acquired originals are. Writing every version of a
+        # document to one path destroys the earlier extraction and leaves its
+        # receipt pointing at bytes that are no longer there.
+        source_sha = sha256_bytes(payload)
+        target = args.output_dir / collection / document_key / source_sha[:16]
         target.mkdir(parents=True, exist_ok=True)
         text_path = target / "normalized.txt"
         structured_path = target / "structured.json"
@@ -217,7 +242,7 @@ def main() -> int:
             "collection": collection,
             "document_key": document_key,
             "source_path": str(path),
-            "source_sha256": sha256_bytes(payload),
+            "source_sha256": source_sha,
             "normalized_path": str(text_path),
             "normalized_sha256": sha256_text(extracted["normalized_text"]),
             "char_count": len(extracted["normalized_text"]),

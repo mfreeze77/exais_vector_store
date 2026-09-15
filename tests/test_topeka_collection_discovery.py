@@ -138,10 +138,23 @@ def test_two_categories_on_one_page_stay_separate_collections(result):
 
 
 def test_non_pdf_instruments_are_inventoried_not_dropped(result):
+    """A .docx instrument is a member document, not something to skip."""
     docx = by_id(result)["ks:city:topeka:ordinances:ordinance:20661"]
     assert docx["media_type"].endswith("wordprocessingml.document")
-    assert docx["extraction_supported"] is False
-    assert codes(discover.reconcile(result)) >= {"EXTRACTION_UNSUPPORTED_MEDIA"}
+    # DOCX now has an implemented local extraction path, so it is supported.
+    assert docx["extraction_supported"] is True
+
+
+def test_a_format_with_no_extraction_path_is_reported_as_unsupported():
+    """Support is claimed only for formats a path actually handles."""
+    html = ORDINANCE_HTML.replace(
+        "https://files.topeka.gov/community/ordinances/2023/Ordinance20407.pdf",
+        "https://files.topeka.gov/community/ordinances/2023/Ordinance20407.xlsx",
+    )
+    result = discover.discover_listing("ordinances", html_bytes=html.encode(), source_url=ORDINANCE_LISTING)
+    spreadsheet = by_id(result)["ks:city:topeka:ordinances:ordinance:20407"]
+    assert spreadsheet["extraction_supported"] is False
+    assert "EXTRACTION_UNSUPPORTED_MEDIA" in codes(discover.reconcile(result))
 
 
 def test_repeated_listing_entry_counts_once_as_a_document(result):

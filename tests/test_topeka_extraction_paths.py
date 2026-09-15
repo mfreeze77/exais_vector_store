@@ -5,6 +5,7 @@ against a real DOCX built here rather than a recorded fixture.
 """
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import io
 import json
@@ -31,6 +32,10 @@ def _load(filename: str, module_name: str):
 
 docx = _load("topeka-docx-extract.py", "topeka_docx_extract")
 destinations = _load("topeka-destination-manifests.py", "topeka_destination_manifests")
+
+def sha(payload: bytes) -> str:
+    return hashlib.sha256(payload).hexdigest()
+
 
 NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"'
 
@@ -196,3 +201,105 @@ def test_a_corrected_url_is_carried_into_the_destination_manifest(tmp_path):
     assert record["listing_url"].endswith("Ordinancec.pdf"), "the broken listing URL must survive"
     assert record["url_resolution"] == "evidenced_correction"
     assert not result["issues"]
+
+
+# --------------------------------------------------------------------------
+# review-round regressions
+# --------------------------------------------------------------------------
+
+def test_tracked_changes_inside_a_table_are_counted_and_flagged():
+    """A table cell going from 100 to 200 must not publish as a clean 200."""
+    cell = (
+        "<w:tc><w:p>"
+        "<w:del><w:r><w:delText>100</w:delText></w:r></w:del>"
+        "<w:ins><w:r><w:t>200</w:t></w:r></w:ins>"
+        "</w:p></w:tc>"
+    )
+    body = f"<w:tbl><w:tr><w:tc>{para('Amount')}</w:tc>{cell}</w:tr></w:tbl>"
+    result = docx.extract_docx(build_docx(body))
+
+    assert result["tables"][0]["rows"] == [["Amount", "200"]]
+    assert result["revisions"] == {"insertions": 1, "deletions": 1}
+    assert result["tables"][0]["revisions"] == {"insertions": 1, "deletions": 1}
+    codes = {item["code"] for item in result["limitations"]}
+    assert "unresolved_tracked_changes" in codes
+    detail = next(i["description"] for i in result["limitations"] if i["code"] == "unresolved_tracked_changes")
+    assert "inside tables" in detail
+
+
+def test_paragraph_and_table_revisions_are_both_counted():
+    body = (
+        '<w:p><w:ins><w:r><w:t>new clause</w:t></w:r></w:ins></w:p>'
+        f"<w:tbl><w:tr><w:tc><w:p><w:del><w:r><w:delText>old</w:delText></w:r></w:del></w:p></w:tc></w:tr></w:tbl>"
+    )
+    result = docx.extract_docx(build_docx(body))
+    assert result["revisions"]["insertions"] == 1
+    assert result["revisions"]["deletions"] == 1
+
+
+def test_docx_extraction_versions_its_output_by_source_hash(tmp_path):
+    """Two versions of one document must not share an output path."""
+    import subprocess
+
+    acquisition = tmp_path / "acq" / "ordinances" / "raw" / "30002"
+    acquisition.mkdir(parents=True)
+    first, second = build_docx(para("version one")), build_docx(para("version two, revised"))
+    for payload in (first, second):
+        (acquisition / f"{sha(payload)[:16]}.docx").write_bytes(payload)
+
+    result = subprocess.run(
+        [sys.executable, str(RELEASE / "topeka-docx-extract.py"),
+         "--acquisition-dir", str(tmp_path / "acq"), "--output-dir", str(tmp_path / "ex")],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    report = json.loads((tmp_path / "ex" / "docx-extraction-report.json").read_text())
+    assert len(report["results"]) == 2
+    paths = {row["normalized_path"] for row in report["results"]}
+    assert len(paths) == 2, "each version needs its own output path"
+    for row in report["results"]:
+        text = Path(row["normalized_path"]).read_text(encoding="utf-8")
+        assert hashlib.sha256(text.encode("utf-8")).hexdigest() == row["normalized_sha256"]
+
+
+def test_acquisition_reads_a_stored_file_before_trusting_its_name(tmp_path):
+    """A hash-named path is a claim about its contents, not proof of them."""
+    acquire_mod = _load("topeka-collection-acquire.py", "topeka_collection_acquire_probe")
+    row = {
+        "source_document_id": "ks:city:topeka:ordinances:ordinance:20662",
+        "collection_id": "ks:city:topeka:ordinances",
+        "official_url": "https://files.topeka.gov/community/ordinances/2026/Ordinance20662.pdf",
+        "outcome": "acquire_new",
+    }
+    payload = b"%PDF the real bytes"
+    destination = acquire_mod.version_path(tmp_path / "out", row, sha(payload))
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(b"CORRUPTED")
+
+    def downloader(url, *, timeout):
+        return payload, "application/pdf"
+
+    result = acquire_mod.acquire_row(
+        row, output_dir=tmp_path / "out", seed=tmp_path / "seed",
+        previous={"source_document_id": row["source_document_id"],
+                  "remote_sha256": sha(payload), "run_id": "r1"},
+        timeout=5, downloader=downloader, run_id="r1", trust_checkpoint=True,
+    )
+    on_disk = sha(Path(result["saved_path"]).read_bytes())
+    assert result["sha256"] == on_disk, "the receipt must describe the bytes that are there"
+    assert on_disk == sha(payload)
+    assert result["repaired_corrupt_stored_copy"] is True
+
+
+def test_held_versions_reports_what_files_contain_not_what_they_are_named(tmp_path):
+    acquire_mod = _load("topeka-collection-acquire.py", "topeka_collection_acquire_probe2")
+    row = {
+        "source_document_id": "ks:city:topeka:ordinances:ordinance:20662",
+        "collection_id": "ks:city:topeka:ordinances",
+        "official_url": "https://files.topeka.gov/community/ordinances/2026/Ordinance20662.pdf",
+    }
+    folder = acquire_mod.document_dir(tmp_path / "out", row)
+    folder.mkdir(parents=True)
+    (folder / "deadbeefdeadbeef.pdf").write_bytes(b"actually different bytes")
+    assert acquire_mod.held_versions(tmp_path / "out", row) == [sha(b"actually different bytes")]
+    assert acquire_mod.verified_path(tmp_path / "out", row, "de" + "a" * 62) is None

@@ -90,9 +90,14 @@ DOCUMENT_MEDIA_TYPES: dict[str, str] = {
     ".txt": "text/plain",
     ".csv": "text/csv",
 }
-# Extraction today is the bounded remote PDF path. Other types are acquired and
-# inventoried, but their extraction support is stated, never assumed.
-EXTRACTABLE_MEDIA_TYPES = frozenset({"application/pdf"})
+# Formats an implemented extraction path actually handles. PDF goes through the
+# bounded remote Marker path; DOCX is read locally by topeka-docx-extract.py.
+# Anything else is acquired and inventoried, with its lack of a path stated
+# rather than assumed away.
+EXTRACTABLE_MEDIA_TYPES = frozenset({
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+})
 
 
 def utc_now() -> str:
@@ -705,6 +710,31 @@ def build_worklist(results: list[dict[str, Any]], seed: Path) -> dict[str, Any]:
 
     discovered = {row["source_document_id"]: row for result in results for row in result["documents"]}
 
+    def carried(row: dict[str, Any]) -> dict[str, Any]:
+        """Everything downstream must keep knowing about this document.
+
+        Discovery is where doubt is discovered, so discovery is where it has to
+        be attached. A worklist row that drops the doubt lets an ambiguous
+        document arrive at ingestion looking exactly like a settled one.
+        """
+        flags: list[str] = []
+        if row.get("identity_conflict"):
+            flags.append("identity_ambiguous")
+        if row.get("membership") and row["membership"] != "document_centre":
+            flags.append("membership_review_needed")
+        if not row.get("extraction_supported", True):
+            flags.append("extraction_path_unsupported")
+        return {
+            "convention_candidate_url": row.get("convention_candidate_url"),
+            "convention_evidence": row.get("convention_evidence"),
+            "identity_conflict": row.get("identity_conflict"),
+            "membership": row.get("membership"),
+            "media_type": row.get("media_type"),
+            "extraction_supported": row.get("extraction_supported"),
+            "review_flags": flags,
+            "review_status": "review_needed" if flags else "clear",
+        }
+
     reuse, acquire, absent = [], [], []
     for doc_id, row in sorted(discovered.items()):
         record = retained.get(doc_id)
@@ -713,8 +743,7 @@ def build_worklist(results: list[dict[str, Any]], seed: Path) -> dict[str, Any]:
                 "source_document_id": doc_id,
                 "collection_id": row["collection_id"],
                 "official_url": row["official_url"],
-                "convention_candidate_url": row.get("convention_candidate_url"),
-                "convention_evidence": row.get("convention_evidence"),
+                **carried(row),
                 "outcome": "acquire_new",
                 "reason": "listed by the publisher with no retained original",
             })
@@ -723,8 +752,7 @@ def build_worklist(results: list[dict[str, Any]], seed: Path) -> dict[str, Any]:
             "source_document_id": doc_id,
             "collection_id": row["collection_id"],
             "official_url": row["official_url"],
-            "convention_candidate_url": row.get("convention_candidate_url"),
-            "convention_evidence": row.get("convention_evidence"),
+            **carried(row),
             "retained_sha256": record["sha256"],
             "retained_path": record["saved_path"],
             "outcome": "verify_then_reuse",

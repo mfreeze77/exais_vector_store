@@ -31,6 +31,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from jurisdiction_release_contract import (  # noqa: E402
     CONTRACT_VERSION,
+    COLLECTIONS_BY_ID,
     COLLECTIONS_BY_SLUG,
     JURISDICTION_ALIASES,
     JURISDICTION_KEY,
@@ -989,6 +990,306 @@ def build_ordinance(
 
 
 # --------------------------------------------------------------------------
+# documents acquired and extracted by this pipeline
+# --------------------------------------------------------------------------
+
+def build_acquired_document(entry: dict[str, Any], *, include_original: bool) -> BuiltDocument:
+    """Release a document this pipeline acquired and extracted locally.
+
+    ``entry`` is one row of a release selection: the acquisition receipt joined
+    to its extraction result. Everything the contract needs is already recorded
+    by those two stages, so nothing is re-derived from the publisher here.
+    """
+    spec = COLLECTIONS_BY_ID[entry["collection_id"]]
+    doc_id = entry["source_document_id"]
+
+    original = Path(entry["retained_artifact"])
+    if not original.exists():
+        raise SystemExit(f"{doc_id}: acquired original is missing at {original}")
+    original_bytes = original.read_bytes()
+    original_sha = sha256_bytes(original_bytes)
+    if original_sha != entry["sha256"]:
+        raise SystemExit(
+            f"{doc_id}: acquired original hashes to {original_sha}, the receipt records {entry['sha256']}"
+        )
+
+    normalized_path = Path(entry["normalized_path"])
+    structured_source = Path(entry["structured_path"])
+    if not normalized_path.exists() or not structured_source.exists():
+        raise SystemExit(f"{doc_id}: extraction artifacts are missing; it cannot be released as extracted")
+
+    verbatim_bytes = structured_source.read_bytes()
+    verbatim_sha = sha256_bytes(verbatim_bytes)
+    raw_text = normalized_path.read_text(encoding="utf-8")
+    normalized, normalizations = normalize_reading_text(raw_text)
+    normalized_sha = sha256_text(normalized)
+    if not normalized.strip():
+        raise SystemExit(f"{doc_id}: normalizes to empty text; it must not be released as extracted")
+
+    version_id = document_version_id(doc_id, original_sha)
+    extractor = entry.get("extractor") or {}
+    parsed = json.loads(verbatim_bytes.decode("utf-8"))
+
+    root_key = f"{doc_id}:document"
+    components: list[dict[str, Any]] = [{
+        "schema": WORKBENCH_COMPONENT_SCHEMA,
+        "source_component_key": root_key,
+        "workbench_component_id": component_id(root_key),
+        "parent_source_component_key": None,
+        "type": "instrument",
+        "ordinal": 0,
+        "citation": entry.get("publisher_key") or doc_id,
+        "heading": None,
+        "citation_url": entry["source_uri"],
+        "source_url": entry["source_uri"],
+        "content_hash": normalized_sha,
+        "text": None,
+        "attributes": {"media_type": entry.get("media_type"), "origin": "acquisition"},
+    }]
+    references: list[dict[str, Any]] = []
+    search_from = 0
+    for block in parsed.get("blocks", []):
+        order = int(block.get("order", len(components)))
+        key = f"{doc_id}:block:{order}"
+        block_text = str(block.get("text") or "")
+        components.append({
+            "schema": WORKBENCH_COMPONENT_SCHEMA,
+            "source_component_key": key,
+            "workbench_component_id": component_id(key),
+            "parent_source_component_key": root_key,
+            "type": str(block.get("kind") or "paragraph"),
+            "ordinal": order,
+            "citation": entry.get("publisher_key") or doc_id,
+            "heading": block_text if block.get("kind") == "heading" else None,
+            "citation_url": entry["source_uri"],
+            "source_url": entry["source_uri"],
+            "content_hash": sha256_text(block_text),
+            "text": block_text,
+            "attributes": {"block_kind": str(block.get("kind") or "paragraph")},
+        })
+        span = char_span(normalized, block_text, start=search_from)
+        if span:
+            search_from = span[1]
+        references.append({
+            "ref_id": f"{key}#text",
+            "artifact": "normalized_text",
+            "availability": "available" if span else "unavailable",
+            "unavailable_reason": None if span else "block text is not contiguous in the reading text",
+            "locator": (
+                {"convention": "utf8_char_offset", "start": span[0], "end": span[1],
+                 "block_index": order, "component_id": component_id(key),
+                 "source_component_key": key} if span else None
+            ),
+            "quote": block_text if span else None,
+            "label": f"{doc_id.rsplit(':', 1)[-1]} block {order}",
+        })
+
+    references.append({
+        "ref_id": f"{doc_id}#page",
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "unavailable_reason": (
+            entry.get("page_unavailable_reason")
+            or "the source format carries no fixed pagination, so no page coordinate is known"
+        ),
+        "locator": None,
+        "quote": None,
+        "label": "page coordinates",
+    })
+
+    structured = {
+        "schema": "exais.jurisdiction.structured_content.v1",
+        "component_schema": WORKBENCH_COMPONENT_SCHEMA,
+        "component_id_namespace": str(WORKBENCH_COMPONENT_NAMESPACE),
+        "root_source_component_key": root_key,
+        "components": components,
+    }
+    structured_bytes = canonical_json_bytes(structured)
+
+    lineage = [{
+        "step": "download",
+        "tool": ORDINANCE_CONNECTOR,
+        "tool_version": "topeka-collection-acquire",
+        "input_sha256": original_sha,
+        "output_sha256": original_sha,
+        "note": "publisher bytes retained unmodified",
+    }]
+    if entry.get("url_resolution"):
+        lineage.append({
+            "step": "evidenced_url_correction",
+            "tool": "scripts/release/topeka-collection-acquire.py",
+            "tool_version": CONTRACT_VERSION,
+            "input_sha256": original_sha,
+            "output_sha256": original_sha,
+            "note": (
+                f"the listed URL {entry.get('listing_url')} did not resolve; bytes came from "
+                f"{entry['source_uri']}, corroborated by the publisher's own naming convention"
+            ),
+        })
+    lineage += [
+        {
+            "step": "extract",
+            "tool": extractor.get("name", "unknown"),
+            "tool_version": extractor.get("version", "unknown"),
+            "input_sha256": original_sha,
+            "output_sha256": verbatim_sha,
+        },
+        {
+            "step": "normalize",
+            "tool": EXPORTER_PATH,
+            "tool_version": CONTRACT_VERSION,
+            "input_sha256": verbatim_sha,
+            "output_sha256": normalized_sha,
+        },
+        {
+            "step": "structure",
+            "tool": EXPORTER_PATH,
+            "tool_version": CONTRACT_VERSION,
+            "input_sha256": verbatim_sha,
+            "output_sha256": sha256_bytes(structured_bytes),
+        },
+    ]
+
+    limitations = [
+        {"code": item, "description": entry["limitation_descriptions"][item], "affects": "readable_text"}
+        for item in entry.get("limitations", [])
+        if item in entry.get("limitation_descriptions", {})
+    ]
+    needs_review = any(item["code"] == "unresolved_tracked_changes" for item in limitations)
+
+    record = {
+        "schema": SOURCE_DOCUMENT_SCHEMA_ID,
+        "schema_version": CONTRACT_VERSION,
+        "identity": {
+            "jurisdiction_key": JURISDICTION_KEY,
+            "jurisdiction_aliases": list(JURISDICTION_ALIASES),
+            "collection_id": spec.collection_id,
+            "source_document_id": doc_id,
+            "document_version_id": version_id,
+            "version_ordinal": 1,
+            "prior_version_id": None,
+            "legacy_ids": [],
+            "supersedes": [],
+            "component_id_namespace": str(WORKBENCH_COMPONENT_NAMESPACE),
+        },
+        "source": {
+            "official_url": entry["source_uri"],
+            "listing_url": entry.get("listing_url") or spec.master_source_url,
+            "retained_original": {
+                "reference_uri": f"acquisition://{spec.slug}/{original.parent.name}/{original.name}",
+                "local_path": f"files/{original.name}" if include_original else None,
+                "media_type": entry.get("media_type") or "application/octet-stream",
+                "byte_count": len(original_bytes),
+                "sha256": original_sha,
+                "retrieved_at": entry["observed_at"],
+            },
+            "acquisition": {
+                "acquired_at": entry["observed_at"],
+                "method": "official_city_document_center_download",
+                "connector_entrypoint": "scripts/release/topeka-collection-acquire.py",
+                "connector_revision": entry.get("run_id") or "unversioned",
+            },
+            "extractor": {
+                "name": extractor.get("name", "unknown"),
+                "version": extractor.get("version", "unknown"),
+                "mode": extractor.get("mode", "unknown"),
+            },
+            "source_schema_version": "topeka_acquisition_v1",
+            "lineage": lineage,
+        },
+        "content": {
+            "verbatim": {
+                "form": "extractor_structured_json",
+                "path": "verbatim.json",
+                "sha256": verbatim_sha,
+                "byte_count": len(verbatim_bytes),
+                "char_count": len(verbatim_bytes.decode("utf-8")),
+            },
+            "normalized_text": {
+                "path": "normalized.txt",
+                "sha256": normalized_sha,
+                "char_count": len(normalized),
+                "normalizations": normalizations,
+            },
+            "structured": {
+                "path": "structured.json",
+                "sha256": sha256_bytes(structured_bytes),
+                "block_count": len(parsed.get("blocks", [])),
+                "table_count": len(parsed.get("tables", [])),
+                "definition_count": 0,
+                "component_schema": WORKBENCH_COMPONENT_SCHEMA,
+                "root_component_id": component_id(root_key),
+                "root_source_component_key": root_key,
+            },
+        },
+        "evidence": {
+            "source_revision": {
+                "kind": "acquired_publisher_file",
+                "value": original.name,
+                "artifact_sha256": original_sha,
+                "captured_at": entry["observed_at"],
+            },
+            "coordinate_conventions": [{
+                "name": "utf8_char_offset",
+                "unit": "unicode codepoint",
+                "origin": "0 at the first character of normalized.txt",
+                "applies_to": "normalized_text",
+                "note": "half-open [start, end); end is exclusive",
+            }],
+            "references": references,
+        },
+        "meaning": {
+            "document_type": spec.document_type,
+            "document_subtype": None,
+            "title": entry.get("title") or None,
+            "publisher_number": entry.get("publisher_key") or None,
+            "status": {
+                "value": "adopted",
+                "basis": f"listed by the publisher in its official {spec.name} library",
+                "evidence_ref": None,
+            },
+            "dates": [],
+            "citations": [{
+                "label": entry.get("publisher_key") or doc_id,
+                "url": entry["source_uri"],
+                "scope": "document",
+            }],
+            "relationships": [],
+            "extraction_quality": {
+                "grade": "degraded" if needs_review else "good",
+                "usable_text": True,
+                "limitations": limitations,
+            },
+            "review": {
+                "status": "review_needed" if needs_review else "unreviewed",
+                "reviewer": None,
+                "reviewed_at": None,
+                "notes": [item["code"] for item in limitations],
+            },
+        },
+        "readiness": {
+            "acquisition": stage("complete", detail="publisher bytes retained and hash-verified"),
+            "extraction": stage("complete", detail=f"extracted by {extractor.get('name')}"),
+            "validation": stage("complete", detail="validated by jurisdiction-release-validate.py"),
+            "review": stage("pending" if needs_review else "not_applicable",
+                            detail="tracked changes need a human read" if needs_review else ""),
+            "artifact_publication": stage("complete", detail="record and artifacts written to this bundle"),
+            "vector_indexing": stage("pending", detail="not ingested through the ExAIS API in this release"),
+            "graph": stage("pending", detail="graph edges not built or loaded for this release"),
+        },
+    }
+
+    files = {
+        "verbatim": ("verbatim.json", verbatim_bytes),
+        "normalized_text": ("normalized.txt", normalized.encode("utf-8")),
+        "structured": ("structured.json", structured_bytes),
+    }
+    if include_original:
+        files["retained_original"] = (f"files/{original.name}", original_bytes)
+    return BuiltDocument(spec, record, files, original, include_original)
+
+
+# --------------------------------------------------------------------------
 # selection and assembly
 # --------------------------------------------------------------------------
 
@@ -1042,6 +1343,7 @@ def write_bundle(
     bundle_kind: str,
     previous_manifest: Path | None,
     command: list[str],
+    released_state: Path | None = None,
 ) -> dict[str, Any]:
     release_schema, document_schema = load_release_schemas()
     commit, dirty = git_commit()
@@ -1050,11 +1352,20 @@ def write_bundle(
     previous: dict[str, Any] | None = None
     if previous_manifest and previous_manifest.exists():
         previous = json.loads(previous_manifest.read_text(encoding="utf-8"))
+    # The baseline must be the same cumulative state the selection step used, or
+    # the two disagree about what "changed" means: a document published two
+    # releases ago and revised now would export as new.
     previous_versions: dict[str, str] = {}
     if previous:
         previous_versions = {
             entry["source_document_id"]: entry["document_version_id"] for entry in previous.get("documents", [])
         }
+    if released_state and released_state.exists():
+        with released_state.open("r", encoding="utf-8") as handle:
+            for line in handle:
+                if line.strip():
+                    row = json.loads(line)
+                    previous_versions[row["source_document_id"]] = row["document_version_id"]
 
     manifest_documents: list[dict[str, Any]] = []
     unchanged: list[str] = []
@@ -1220,7 +1531,10 @@ def write_bundle(
             ],
         },
         "update": {
-            "previous_release_id": (previous or {}).get("release", {}).get("release_id"),
+            "previous_release_id": (
+                (previous or {}).get("release", {}).get("release_id")
+                or ("released-state-ledger" if previous_versions else None)
+            ),
             "outcomes": {
                 "unchanged": sorted(unchanged),
                 "new": sorted(new),
@@ -1282,18 +1596,27 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--select", action="append", default=[], metavar="KIND:KEY",
                         help="tmc:14.40.010 | ordinance:20407 | charter-ordinance:126 | resolution:09749")
+    parser.add_argument("--selection", type=Path, default=None,
+                        help="JSONL of acquired+extracted documents to release, from "
+                             "topeka-release-selection.py")
     parser.add_argument("--tmc-corpus", type=Path, default=DEFAULT_TMC_CORPUS)
     parser.add_argument("--ordinance-seed", type=Path, default=DEFAULT_ORDINANCE_SEED)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--release-id", default=None)
     parser.add_argument("--bundle-kind", choices=["production", "starter", "fixture"], default="starter")
     parser.add_argument("--previous-manifest", type=Path, default=None)
+    parser.add_argument("--released-state", type=Path, default=None,
+                        help="cumulative ledger from topeka-release-ledger.py; must be the same "
+                             "baseline topeka-release-selection.py was given")
+    parser.add_argument("--allow-empty", action="store_true",
+                        help="a selection with nothing eligible is a normal quiet refresh, not a "
+                             "failure; write a no-op receipt and exit 0 instead of a release")
     parser.add_argument("--reference-originals", action="store_true",
                         help="record retained originals by URI and hash instead of copying them into the bundle")
     args = parser.parse_args()
 
-    if not args.select:
-        parser.error("at least one --select is required")
+    if not args.select and not args.selection:
+        parser.error("at least one --select, or a --selection file, is required")
 
     release_id = args.release_id or f"topeka-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{args.bundle_kind}"
     documents = [
@@ -1305,6 +1628,35 @@ def main() -> int:
         )
         for selector in args.select
     ]
+    if args.selection:
+        with args.selection.open("r", encoding="utf-8") as handle:
+            for line in handle:
+                if line.strip():
+                    documents.append(
+                        build_acquired_document(
+                            json.loads(line), include_original=not args.reference_originals
+                        )
+                    )
+    if not documents:
+        if not args.allow_empty:
+            raise SystemExit("the selection is empty; there is nothing eligible to release")
+        # No manifest is written: the release schema requires at least one
+        # document, and an empty "release" would be a claim that something was
+        # published. The receipt records the no-op instead.
+        args.output_dir.mkdir(parents=True, exist_ok=True)
+        receipt = {
+            "artifact": "jurisdiction_document_release_noop",
+            "release_id": release_id,
+            "released_at": utc_now(),
+            "reason": "nothing was eligible to release; no manifest written and no release claimed",
+            "selection": str(args.selection) if args.selection else None,
+        }
+        (args.output_dir / "no-release.json").write_text(
+            json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
+        print(f"release_id            {release_id}")
+        print("documents             0 — nothing eligible; no release written")
+        return 0
 
     seen: dict[str, str] = {}
     for built in documents:
@@ -1319,6 +1671,7 @@ def main() -> int:
         release_id=release_id,
         bundle_kind=args.bundle_kind,
         previous_manifest=args.previous_manifest,
+        released_state=args.released_state,
         command=["python", EXPORTER_PATH, *sys.argv[1:]],
     )
 

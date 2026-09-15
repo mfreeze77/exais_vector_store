@@ -214,11 +214,28 @@ def version_path(output_dir: Path, row: dict[str, Any], content_sha256: str) -> 
 
 
 def held_versions(output_dir: Path, row: dict[str, Any]) -> list[str]:
-    """Content hashes already stored for this document, oldest-agnostic."""
+    """Content hashes already stored for this document, read from the bytes.
+
+    Every entry is the hash of what the file actually contains, not what its
+    name claims. A file whose name and contents disagree therefore appears here
+    under its real hash, and never satisfies a lookup for the hash it is named
+    after.
+    """
     folder = document_dir(output_dir, row)
     if not folder.is_dir():
         return []
     return sorted(sha256_file(path) for path in folder.iterdir() if path.is_file())
+
+
+def verified_path(output_dir: Path, row: dict[str, Any], content_sha256: str) -> Path | None:
+    """The stored file that genuinely hashes to ``content_sha256``, if any."""
+    folder = document_dir(output_dir, row)
+    if not folder.is_dir():
+        return None
+    for path in sorted(folder.iterdir()):
+        if path.is_file() and sha256_file(path) == content_sha256:
+            return path
+    return None
 
 
 def _evidenced_correction(
@@ -299,7 +316,24 @@ def acquire_row(
         "official_url": row["official_url"],
         "observed_at": utc_now(),
         "run_id": run_id,
+        # Doubt recorded at discovery travels with the receipt. Without this a
+        # document that is known-ambiguous arrives downstream indistinguishable
+        # from a settled one.
+        "review_flags": list(row.get("review_flags") or []),
+        "review_status": row.get("review_status") or "clear",
+        "identity_conflict": row.get("identity_conflict"),
+        "membership": row.get("membership"),
     }
+    if previous and previous.get("url_resolution"):
+        # A correction proved on an earlier run stays attached on reuse; dropping
+        # it would leave later runs unable to say where the bytes came from.
+        base.update({
+            "listing_url": previous.get("listing_url"),
+            "fetched_url": previous.get("fetched_url"),
+            "url_resolution": previous.get("url_resolution"),
+            "correction_evidence": previous.get("correction_evidence"),
+            "listing_url_status": previous.get("listing_url_status"),
+        })
 
     if row["outcome"] == "retained_but_unlisted":
         return {**base, "outcome": "skipped_unlisted", "reason": row["reason"],
@@ -323,10 +357,14 @@ def acquire_row(
                         )}
     if held_sha is None and previous and previous.get("remote_sha256") in stored:
         held_sha = previous["remote_sha256"]
-        held_path = version_path(output_dir, row, held_sha)
+        held_path = verified_path(output_dir, row, held_sha)
     elif held_sha is None and len(stored) == 1:
         held_sha = stored[0]
-        held_path = version_path(output_dir, row, held_sha)
+        held_path = verified_path(output_dir, row, held_sha)
+    if held_sha is not None and held_path is None:
+        # The hash came from the bytes, so a missing path here means the file was
+        # removed between the scan and now. Treat it as not held.
+        held_sha = None
 
     # Resume, not caching. An item is skipped only when THIS run already
     # confirmed it against the publisher (so an interrupted run does not redo
@@ -391,10 +429,18 @@ def acquire_row(
 
     destination = version_path(output_dir, row, remote_sha)
     destination.parent.mkdir(parents=True, exist_ok=True)
+    repaired = False
+    if destination.exists():
+        # A hash-named path is a claim about its contents, not proof of them. The
+        # file can be truncated, corrupted on disk, or left over from an earlier
+        # bug. Read it before accepting it, or the receipt records a hash the
+        # bytes do not have.
+        if sha256_file(destination) != remote_sha:
+            repaired = True
+            destination.unlink()
     if not destination.exists():
-        # Content-addressed, so this path is new by construction. Write to a
-        # temporary name and rename, so an interrupted write cannot leave a
-        # truncated file sitting at a hash that claims to describe it.
+        # Write to a temporary name and rename, so an interrupted write cannot
+        # leave a truncated file sitting at a hash that claims to describe it.
         staging = destination.with_name(destination.name + ".partial")
         staging.write_bytes(payload)
         staging.replace(destination)
@@ -413,6 +459,7 @@ def acquire_row(
         "saved_path": str(destination),
         "versions": versions,
         "content_type": content_type,
+        "repaired_corrupt_stored_copy": repaired,
     }
 
 

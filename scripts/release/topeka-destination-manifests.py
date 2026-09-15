@@ -112,12 +112,13 @@ def build(assignments: Path, checkpoint: Path, worklist: Path) -> dict[str, Any]
     # is run state and can still hold documents under an identity a later
     # discovery superseded; those must not reach a destination manifest.
     current = {row["source_document_id"] for row in read_jsonl(worklist)}
-    records: list[dict[str, Any]] = []
+    by_id: dict[str, dict[str, Any]] = {}
+    replaced: list[dict[str, Any]] = []
 
     for row in read_jsonl(assignments):
         if not row.get("collection_id"):
             continue
-        records.append({
+        by_id[row["source_document_id"]] = {
             "source_document_id": row["source_document_id"],
             "collection_id": row["collection_id"],
             "source_uri": row["source_uri"],
@@ -125,14 +126,13 @@ def build(assignments: Path, checkpoint: Path, worklist: Path) -> dict[str, Any]
             "retained_artifact": row["retained_artifact"],
             "record_kind": row["record_kind"],
             "origin": "retained_split",
-        })
+            "review_flags": [],
+            "review_status": "clear",
+        }
 
-    known = {row["source_document_id"] for row in records}
     superseded: list[dict[str, Any]] = []
     for row in read_jsonl(checkpoint):
         if row.get("outcome") not in HELD_OUTCOMES:
-            continue
-        if row["source_document_id"] in known:
             continue
         if current and row["source_document_id"] not in current:
             superseded.append({
@@ -144,7 +144,26 @@ def build(assignments: Path, checkpoint: Path, worklist: Path) -> dict[str, Any]
                 ),
             })
             continue
-        records.append({
+
+        existing = by_id.get(row["source_document_id"])
+        if existing is not None and existing["sha256"] == row["sha256"]:
+            # Same bytes from both sides: keep the retained-split record, but note
+            # that acquisition re-confirmed it against the publisher.
+            existing["reconfirmed_by_acquisition"] = True
+            continue
+        if existing is not None:
+            # The publisher now serves different bytes from the ones the combined
+            # store holds. Selecting the retained hash here is how a refresh
+            # silently ingests stale content, so the acquired revision wins and
+            # the superseded hash is recorded rather than dropped.
+            replaced.append({
+                "source_document_id": row["source_document_id"],
+                "retained_sha256": existing["sha256"],
+                "acquired_sha256": row["sha256"],
+                "detail": "acquired revision supersedes the retained-split hash for ingestion",
+            })
+
+        by_id[row["source_document_id"]] = {
             "source_document_id": row["source_document_id"],
             "collection_id": row["collection_id"],
             # The URL that actually served the bytes, with the listed one kept
@@ -152,12 +171,18 @@ def build(assignments: Path, checkpoint: Path, worklist: Path) -> dict[str, Any]
             "source_uri": row.get("fetched_url") or row["official_url"],
             "listing_url": row.get("listing_url"),
             "url_resolution": row.get("url_resolution"),
+            "correction_evidence": row.get("correction_evidence"),
             "sha256": row["sha256"],
             "retained_artifact": row.get("saved_path"),
             "record_kind": "acquired_document",
             "origin": "acquisition",
-        })
+            "supersedes_sha256": existing["sha256"] if existing else None,
+            "review_flags": list(row.get("review_flags") or []),
+            "review_status": row.get("review_status") or "clear",
+            "identity_conflict": row.get("identity_conflict"),
+        }
 
+    records = list(by_id.values())
     issues: list[dict[str, Any]] = []
     seen: dict[str, str] = {}
     for record in records:
@@ -184,11 +209,17 @@ def build(assignments: Path, checkpoint: Path, worklist: Path) -> dict[str, Any]
             })
         seen[location] = record["collection_id"]
 
+    # Two lanes per destination. A record carrying unresolved doubt is held out
+    # of the clean ingestion lane rather than ingested with a flag nobody reads.
     by_destination: dict[str, list[dict[str, Any]]] = {}
+    review_lane: dict[str, list[dict[str, Any]]] = {}
     for record in records:
-        by_destination.setdefault(record["collection_id"], []).append(record)
+        target = review_lane if record.get("review_flags") else by_destination
+        target.setdefault(record["collection_id"], []).append(record)
     return {
         "records": records,
+        "review_lane": review_lane,
+        "replaced": replaced,
         "by_destination": by_destination,
         "issues": issues,
         "superseded": superseded,
@@ -227,6 +258,15 @@ def main() -> int:
         )
         path = args.output_dir / f"{spec.slug}.manifest.jsonl"
         path.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in rows), encoding="utf-8")
+        review_rows = sorted(
+            result["review_lane"].get(spec.collection_id, []),
+            key=lambda row: row["source_document_id"],
+        )
+        review_path = args.output_dir / f"{spec.slug}.review.jsonl"
+        review_path.write_text(
+            "".join(json.dumps(row, sort_keys=True) + "\n" for row in review_rows), encoding="utf-8"
+        )
+
         slice_rows = [
             legacy_by_doc[row["source_document_id"]]
             for row in rows if row["source_document_id"] in legacy_by_doc
@@ -238,6 +278,11 @@ def main() -> int:
             )
 
         destinations.append({
+            "review_manifest": str(review_path),
+            "held_for_review": len(review_rows),
+            "review_reasons": dict(Counter(
+                flag for row in review_rows for flag in row.get("review_flags", [])
+            )),
             "ingest_slice": str(slice_path) if slice_rows else None,
             "ingest_slice_rows": len(slice_rows),
             "ingest_path_available": bool(slice_rows),
@@ -265,6 +310,11 @@ def main() -> int:
             "claim_sweep_across_all_registered_collections": True,
         },
         "superseded_identities": result["superseded"],
+        "acquired_revisions_superseding_retained": result["replaced"],
+        "review_lane_note": (
+            "records carrying unresolved doubt are written to <slug>.review.jsonl and excluded from "
+            "<slug>.manifest.jsonl, so the clean ingestion lane holds only settled documents"
+        ),
         "issues": result["issues"],
         "passed": not result["issues"],
     }
@@ -273,9 +323,15 @@ def main() -> int:
     )
 
     for destination in destinations:
-        print(f"  {destination['slug']:20s} {destination['document_count']:5d}  "
-              f"store={destination['vector_store_id'] or 'not yet created'}  {destination['origins']}")
+        held = destination["held_for_review"]
+        print(f"  {destination['slug']:20s} {destination['document_count']:5d} clean  "
+              f"{held:3d} held for review  {destination['origins']}")
+        if held:
+            print(f"  {'':20s}       review reasons: {destination['review_reasons']}")
     print(f"  {'total':20s} {report['total_records']:5d}")
+    for row in result["replaced"][:10]:
+        print(f"  SUPERSEDED-HASH {row['source_document_id']}: retained {row['retained_sha256'][:12]} "
+              f"-> acquired {row['acquired_sha256'][:12]}")
     for row in result["superseded"][:10]:
         print(f"  SUPERSEDED {row['record']} (excluded)")
     for issue in result["issues"][:10]:

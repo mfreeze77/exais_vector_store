@@ -140,6 +140,44 @@ queryable throughout, which is what makes rollback cheap:
 `python scripts/release/cell-down.py --cell ks-state-civics` returns the host to
 its current state.
 
+## The pipeline, end to end
+
+`topeka-collection-refresh.py` runs seven stages in order:
+
+    discover -> acquire -> extract -> destination manifests -> release selection
+      -> export -> validate -> record released state
+
+Two lanes come out of the destination stage. `<slug>.manifest.jsonl` holds
+settled documents; `<slug>.review.jsonl` holds anything carrying unresolved
+doubt, and those are excluded from the release. Doubt found at discovery
+(`identity_ambiguous`, `membership_review_needed`, `extraction_path_unsupported`)
+travels on the acquisition receipt and into the destination record, so a
+known-ambiguous document can never arrive downstream looking settled.
+
+The release baseline is `releases/released-state.jsonl`, a cumulative ledger
+updated **after** a release validates. A single prior manifest is not the
+released state: a document published in release 1 and not republished in
+release 2 is still published, and comparing against release 2 alone would
+re-release it as new.
+
+Measured run, 2026-09-16, `--execute --offline --reference-originals`:
+
+| Bucket | Count |
+| --- | --- |
+| eligible_new | 23 |
+| eligible_changed | 0 |
+| unchanged | 0 |
+| pending_extraction | 3,610 |
+| held_for_review | 2 |
+| **accounted for** | **3,635** |
+
+Release `topeka-source-2026-09-16-r2`: 26 documents across all four
+collections, 1,269 evidence references resolved, 29 coordinates unavailable,
+validator PASS. The ledger went from 3 tracked documents to 26.
+
+Pending extraction is the paid PDF work, still unauthorized. The 2 held
+documents are the label/href identity conflicts.
+
 ## Assignment 4: the wired refresh runner
 
 `scripts/release/topeka-collection-refresh.py` is a single entrypoint that runs
