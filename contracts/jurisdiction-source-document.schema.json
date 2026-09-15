@@ -1,0 +1,472 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.exais.ai/exai-vector-store/jurisdiction/source-document/1-0-0",
+  "title": "exai_vector_store Jurisdiction Clean Source Document",
+  "description": "One released source document version for a registered jurisdiction master collection. Jurisdiction-neutral: Topeka is a consumer of this schema, not a variant of it. Presence semantics: a required property MUST be present and non-null; a nullable property MAY be null and null asserts a determined absence; absence of knowledge is NEVER expressed by null or by omission but by an explicit 'unknown' enum member or an availability object with a reason.",
+  "type": "object",
+  "required": [
+    "schema",
+    "schema_version",
+    "identity",
+    "source",
+    "content",
+    "evidence",
+    "meaning",
+    "readiness"
+  ],
+  "properties": {
+    "schema": {"const": "exais.jurisdiction.source_document.v1"},
+    "schema_version": {"$ref": "#/$defs/semver"},
+
+    "identity": {
+      "type": "object",
+      "description": "Publisher-derived identity. Identity MUST NOT be derived from checkout commit, normalized content text, chunk order or row position.",
+      "required": [
+        "jurisdiction_key",
+        "collection_id",
+        "source_document_id",
+        "document_version_id",
+        "version_ordinal",
+        "prior_version_id",
+        "legacy_ids"
+      ],
+      "properties": {
+        "jurisdiction_key": {"$ref": "#/$defs/jurisdiction_key"},
+        "jurisdiction_aliases": {
+          "type": "array",
+          "description": "Legacy jurisdiction identifiers recorded explicitly so existing IDs are mapped rather than silently replaced.",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "collection_id": {"$ref": "#/$defs/collection_id"},
+        "source_document_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable across every version of this document. Derived from publisher identity (listing category plus publisher document key or official URL path), never from bytes."
+        },
+        "document_version_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Identifies one version of source_document_id. Distinct from identity; changes when the publisher's retained original changes."
+        },
+        "version_ordinal": {"type": "integer", "minimum": 1},
+        "prior_version_id": {
+          "type": ["string", "null"],
+          "description": "null asserts this is the first retained version. Unknown lineage is expressed as readiness/review state, not null."
+        },
+        "legacy_ids": {
+          "type": "array",
+          "description": "Prior identifiers this document was published under. Required (may be empty) so consumers can map instead of re-key.",
+          "items": {
+            "type": "object",
+            "required": ["system", "id"],
+            "properties": {
+              "system": {"type": "string", "minLength": 1},
+              "id": {"type": "string", "minLength": 1},
+              "note": {"type": "string"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "component_id_namespace": {
+          "type": "string",
+          "description": "UUID namespace used to mint deterministic component IDs, so a consumer can recompute them."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "source": {
+      "type": "object",
+      "required": [
+        "official_url",
+        "listing_url",
+        "retained_original",
+        "acquisition",
+        "extractor",
+        "lineage"
+      ],
+      "properties": {
+        "official_url": {"type": "string", "minLength": 1},
+        "listing_url": {
+          "type": ["string", "null"],
+          "description": "The publisher master list this document was discovered on. Listing membership determines collection assignment."
+        },
+        "retained_original": {
+          "type": "object",
+          "description": "The preserved publisher bytes. reference_uri always resolves; local_path is set only when the original travels inside the bundle.",
+          "required": ["reference_uri", "media_type", "byte_count", "sha256", "retrieved_at", "local_path"],
+          "properties": {
+            "reference_uri": {"type": "string", "minLength": 1},
+            "local_path": {"type": ["string", "null"]},
+            "media_type": {"type": "string", "minLength": 1},
+            "byte_count": {"type": "integer", "minimum": 1},
+            "sha256": {"$ref": "#/$defs/sha256"},
+            "retrieved_at": {"$ref": "#/$defs/timestamp"}
+          },
+          "additionalProperties": false
+        },
+        "acquisition": {
+          "type": "object",
+          "required": ["acquired_at", "method", "connector_entrypoint", "connector_revision"],
+          "properties": {
+            "acquired_at": {"$ref": "#/$defs/timestamp"},
+            "method": {"type": "string", "minLength": 1},
+            "connector_entrypoint": {"type": "string", "minLength": 1},
+            "connector_revision": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": false
+        },
+        "extractor": {
+          "type": "object",
+          "required": ["name", "version", "mode"],
+          "properties": {
+            "name": {"type": "string", "minLength": 1},
+            "version": {"type": "string", "minLength": 1},
+            "mode": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": false
+        },
+        "source_schema_version": {"type": "string", "minLength": 1},
+        "lineage": {
+          "type": "array",
+          "description": "Ordered transformation record from retained original to released artifacts. Each step's input_sha256 must be an artifact hash present in this record or the previous step's output.",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["step", "tool", "input_sha256", "output_sha256"],
+            "properties": {
+              "step": {"type": "string", "minLength": 1},
+              "tool": {"type": "string", "minLength": 1},
+              "tool_version": {"type": "string"},
+              "input_sha256": {"$ref": "#/$defs/sha256"},
+              "output_sha256": {"$ref": "#/$defs/sha256"},
+              "note": {"type": "string"}
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "content": {
+      "type": "object",
+      "description": "Verbatim extractor output is preserved separately from normalized text; each artifact carries its own hash.",
+      "required": ["verbatim", "normalized_text", "structured"],
+      "properties": {
+        "verbatim": {
+          "type": "object",
+          "description": "Untouched output of the extractor/capture step, before any ExAIS normalization.",
+          "required": ["form", "path", "sha256", "byte_count", "char_count"],
+          "properties": {
+            "form": {"type": "string", "minLength": 1},
+            "path": {"type": "string", "minLength": 1},
+            "sha256": {"$ref": "#/$defs/sha256"},
+            "byte_count": {"type": "integer", "minimum": 0},
+            "char_count": {"type": "integer", "minimum": 0}
+          },
+          "additionalProperties": false
+        },
+        "normalized_text": {
+          "type": "object",
+          "description": "Readable text a consumer may display. MUST be non-empty for a document released as extraction-complete.",
+          "required": ["path", "sha256", "char_count", "normalizations"],
+          "properties": {
+            "path": {"type": "string", "minLength": 1},
+            "sha256": {"$ref": "#/$defs/sha256"},
+            "char_count": {"type": "integer", "minimum": 0},
+            "normalizations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "description"],
+                "properties": {
+                  "name": {"type": "string", "minLength": 1},
+                  "description": {"type": "string", "minLength": 1}
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "structured": {
+          "type": "object",
+          "description": "Sections/blocks/tables. component_ids are deterministic and recomputable from source_component_key.",
+          "required": ["path", "sha256", "block_count", "table_count", "component_schema"],
+          "properties": {
+            "path": {"type": "string", "minLength": 1},
+            "sha256": {"$ref": "#/$defs/sha256"},
+            "block_count": {"type": "integer", "minimum": 0},
+            "table_count": {"type": "integer", "minimum": 0},
+            "definition_count": {"type": "integer", "minimum": 0},
+            "component_schema": {"type": "string", "minLength": 1},
+            "root_component_id": {"type": ["string", "null"]},
+            "root_source_component_key": {"type": ["string", "null"]}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "evidence": {
+      "type": "object",
+      "description": "Resolvable pointers back into retained artifacts. Coordinate conventions are declared explicitly; a coordinate that was not measured is marked unavailable with a reason and MUST NOT be inferred from another coordinate space.",
+      "required": ["source_revision", "coordinate_conventions", "references"],
+      "properties": {
+        "source_revision": {
+          "type": "object",
+          "required": ["kind", "value", "artifact_sha256"],
+          "properties": {
+            "kind": {"type": "string", "minLength": 1},
+            "value": {"type": "string", "minLength": 1},
+            "artifact_sha256": {"$ref": "#/$defs/sha256"},
+            "captured_at": {"$ref": "#/$defs/timestamp"}
+          },
+          "additionalProperties": false
+        },
+        "coordinate_conventions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name", "unit", "origin", "applies_to"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "unit": {"type": "string", "minLength": 1},
+              "origin": {"type": "string", "minLength": 1},
+              "applies_to": {"type": "string", "minLength": 1},
+              "note": {"type": "string"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "references": {
+          "type": "array",
+          "description": "Every citation target a consumer may render. An available reference MUST resolve against the named artifact; a dangling reference is a release defect.",
+          "items": {"$ref": "#/$defs/evidence_reference"}
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "meaning": {
+      "type": "object",
+      "description": "Interpretation kept separate from source fact. Extraction never by itself establishes adoption, legal completeness or a final outcome.",
+      "required": [
+        "document_type",
+        "status",
+        "dates",
+        "citations",
+        "relationships",
+        "extraction_quality",
+        "review"
+      ],
+      "properties": {
+        "document_type": {"type": "string", "minLength": 1},
+        "document_subtype": {"type": ["string", "null"]},
+        "title": {"type": ["string", "null"]},
+        "publisher_number": {
+          "type": ["string", "null"],
+          "description": "null asserts the publisher issued no number for this document (for example a named standard ordinance), which is not a reason to drop it."
+        },
+        "status": {
+          "type": "object",
+          "required": ["value", "basis", "evidence_ref"],
+          "properties": {
+            "value": {
+              "enum": ["proposed", "adopted", "superseded", "repealed", "unknown"],
+              "description": "'unknown' is the honest value when the release has no evidence of legal status; it is never inferred from the fact that text was extracted."
+            },
+            "basis": {"type": "string", "minLength": 1},
+            "evidence_ref": {"type": ["string", "null"]}
+          },
+          "additionalProperties": false
+        },
+        "dates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind", "value", "precision", "evidence_ref"],
+            "properties": {
+              "kind": {"type": "string", "minLength": 1},
+              "value": {"type": "string", "minLength": 1},
+              "precision": {"enum": ["day", "month", "year", "unknown"]},
+              "evidence_ref": {"type": ["string", "null"]},
+              "note": {"type": "string"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "citations": {
+          "type": "array",
+          "description": "Human-facing citations for this document itself.",
+          "items": {
+            "type": "object",
+            "required": ["label", "url"],
+            "properties": {
+              "label": {"type": "string", "minLength": 1},
+              "url": {"type": "string", "minLength": 1},
+              "scope": {"type": "string"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "relationships": {
+          "type": "array",
+          "description": "Evidenced links to other instruments, cases/matters, meetings and bodies. resolved=false keeps an unresolved link explicit; no fuzzy join may be published as resolved.",
+          "items": {
+            "type": "object",
+            "required": ["predicate", "target", "resolved", "basis", "evidence_ref"],
+            "properties": {
+              "predicate": {"type": "string", "minLength": 1},
+              "target": {
+                "type": "object",
+                "required": ["kind", "value"],
+                "properties": {
+                  "kind": {"enum": ["source_document_id", "collection_id", "citation", "url", "external_key"]},
+                  "value": {"type": "string", "minLength": 1},
+                  "collection_id": {"type": ["string", "null"]}
+                },
+                "additionalProperties": false
+              },
+              "resolved": {"type": "boolean"},
+              "basis": {"type": "string", "minLength": 1},
+              "evidence_ref": {"type": ["string", "null"]},
+              "note": {"type": "string"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "extraction_quality": {
+          "type": "object",
+          "description": "Measured extraction condition. Distinct from human review status.",
+          "required": ["grade", "usable_text", "limitations"],
+          "properties": {
+            "grade": {"enum": ["good", "degraded", "unusable", "unknown"]},
+            "usable_text": {"type": "boolean"},
+            "limitations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["code", "description"],
+                "properties": {
+                  "code": {"type": "string", "minLength": 1},
+                  "description": {"type": "string", "minLength": 1},
+                  "affects": {"type": "string"}
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "review": {
+          "type": "object",
+          "description": "Human review, never implied by successful extraction.",
+          "required": ["status"],
+          "properties": {
+            "status": {"enum": ["unreviewed", "review_needed", "reviewed", "rejected"]},
+            "reviewer": {"type": ["string", "null"]},
+            "reviewed_at": {"anyOf": [{"$ref": "#/$defs/timestamp"}, {"type": "null"}]},
+            "notes": {"type": "array", "items": {"type": "string"}}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "readiness": {
+      "type": "object",
+      "description": "Independent stages. A consumer may publish a validated document while vector_indexing and graph are still pending; a failed later stage never retracts an earlier one.",
+      "required": [
+        "acquisition",
+        "extraction",
+        "validation",
+        "review",
+        "artifact_publication",
+        "vector_indexing",
+        "graph"
+      ],
+      "properties": {
+        "acquisition": {"$ref": "#/$defs/readiness_stage"},
+        "extraction": {"$ref": "#/$defs/readiness_stage"},
+        "validation": {"$ref": "#/$defs/readiness_stage"},
+        "review": {"$ref": "#/$defs/readiness_stage"},
+        "artifact_publication": {"$ref": "#/$defs/readiness_stage"},
+        "vector_indexing": {"$ref": "#/$defs/readiness_stage"},
+        "graph": {"$ref": "#/$defs/readiness_stage"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+
+  "$defs": {
+    "semver": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "minLength": 20},
+    "jurisdiction_key": {
+      "type": "string",
+      "pattern": "^[a-z]{2}:(state|county|city|district):[a-z0-9-]+$"
+    },
+    "collection_id": {
+      "type": "string",
+      "pattern": "^[a-z]{2}:(state|county|city|district):[a-z0-9-]+:[a-z0-9-]+$",
+      "description": "One registered master collection. Never minted per PDF, URL, year folder, page, download attempt or fragment."
+    },
+    "readiness_stage": {
+      "type": "object",
+      "required": ["state"],
+      "properties": {
+        "state": {"enum": ["pending", "in_progress", "complete", "failed", "unavailable", "not_applicable"]},
+        "observed_at": {"anyOf": [{"$ref": "#/$defs/timestamp"}, {"type": "null"}]},
+        "detail": {"type": "string"},
+        "proof_ref": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "evidence_reference": {
+      "type": "object",
+      "required": ["ref_id", "artifact", "availability"],
+      "properties": {
+        "ref_id": {"type": "string", "minLength": 1},
+        "artifact": {
+          "enum": ["retained_original", "verbatim", "normalized_text", "structured", "source_revision"],
+          "description": "Which released artifact the locator is measured against."
+        },
+        "availability": {"enum": ["available", "unavailable"]},
+        "unavailable_reason": {
+          "type": ["string", "null"],
+          "description": "Required when availability is 'unavailable'. Marks a coordinate that was never measured; it is not a licence to infer one."
+        },
+        "locator": {
+          "type": ["object", "null"],
+          "required": ["convention"],
+          "properties": {
+            "convention": {"type": "string", "minLength": 1},
+            "start": {"type": ["integer", "null"], "minimum": 0},
+            "end": {"type": ["integer", "null"], "minimum": 0},
+            "page": {"type": ["integer", "null"], "minimum": 1},
+            "block_index": {"type": ["integer", "null"], "minimum": 0},
+            "component_id": {"type": ["string", "null"]},
+            "source_component_key": {"type": ["string", "null"]}
+          },
+          "additionalProperties": false
+        },
+        "quote": {
+          "type": ["string", "null"],
+          "description": "Exact text at the locator. When present the validator re-reads the artifact and requires a byte-for-byte match."
+        },
+        "label": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

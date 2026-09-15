@@ -1,0 +1,326 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.exais.ai/exai-vector-store/jurisdiction/document-release/1-0-0",
+  "title": "exai_vector_store Jurisdiction Document Release Manifest",
+  "description": "Immutable inventory for one released set of jurisdiction source documents. Jurisdiction-neutral. Presence semantics match the source-document schema: required means present and non-null; null means a determined absence; absence of knowledge is expressed by an explicit 'unknown'/'unavailable' member with a reason, never by omission.",
+  "type": "object",
+  "required": [
+    "schema",
+    "schema_version",
+    "release",
+    "jurisdiction",
+    "collections",
+    "documents",
+    "inventory",
+    "update",
+    "limitations"
+  ],
+  "properties": {
+    "schema": {"const": "exais.jurisdiction.document_release.v1"},
+    "schema_version": {"$ref": "#/$defs/semver"},
+
+    "release": {
+      "type": "object",
+      "description": "The release identity both products record. Stable for the life of the bundle; re-exporting identical inputs reproduces it.",
+      "required": ["release_id", "released_at", "producer", "schemas", "bundle_kind"],
+      "properties": {
+        "release_id": {"type": "string", "minLength": 1},
+        "released_at": {"$ref": "#/$defs/timestamp"},
+        "bundle_kind": {
+          "enum": ["production", "starter", "fixture"],
+          "description": "'fixture' labels a demonstration bundle. A fixture is never reported as a durable production release."
+        },
+        "producer": {
+          "type": "object",
+          "required": ["repository", "commit", "exporter", "exporter_sha256", "dirty_worktree"],
+          "properties": {
+            "repository": {"type": "string", "minLength": 1},
+            "commit": {"type": "string", "minLength": 7},
+            "dirty_worktree": {
+              "type": "boolean",
+              "description": "true means the exporter ran against uncommitted changes; consumers must treat commit as non-reproducing."
+            },
+            "exporter": {"type": "string", "minLength": 1},
+            "exporter_sha256": {"$ref": "#/$defs/sha256"},
+            "command": {"type": "array", "items": {"type": "string"}}
+          },
+          "additionalProperties": false
+        },
+        "schemas": {
+          "type": "array",
+          "description": "Every schema this bundle was produced and validated against, by path, version and content hash.",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["role", "path", "schema_id", "version", "sha256"],
+            "properties": {
+              "role": {"enum": ["release_manifest", "source_document"]},
+              "path": {"type": "string", "minLength": 1},
+              "schema_id": {"type": "string", "minLength": 1},
+              "version": {"$ref": "#/$defs/semver"},
+              "sha256": {"$ref": "#/$defs/sha256"}
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "jurisdiction": {
+      "type": "object",
+      "required": ["key", "name", "aliases"],
+      "properties": {
+        "key": {"$ref": "#/$defs/jurisdiction_key"},
+        "name": {"type": "string", "minLength": 1},
+        "aliases": {
+          "type": "array",
+          "description": "Legacy jurisdiction identifiers recorded explicitly rather than replaced.",
+          "items": {"type": "string", "minLength": 1}
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "collections": {
+      "type": "array",
+      "description": "Registered master collections represented in this release. One entry per publisher master list or category, never per document.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "collection_id",
+          "name",
+          "master_source_url",
+          "listing_category",
+          "vector_store_id",
+          "document_count",
+          "coverage"
+        ],
+        "properties": {
+          "collection_id": {"$ref": "#/$defs/collection_id"},
+          "name": {"type": "string", "minLength": 1},
+          "master_source_url": {"type": "string", "minLength": 1},
+          "listing_category": {
+            "type": ["string", "null"],
+            "description": "The publisher category on master_source_url that determines membership. null when the master list has a single category."
+          },
+          "vector_store_id": {
+            "type": ["string", "null"],
+            "description": "null asserts no destination store is assigned yet. Vector-store assignment is independent of document release."
+          },
+          "document_count": {"type": "integer", "minimum": 0},
+          "coverage": {
+            "type": "object",
+            "description": "What this release claims about the collection as a whole. 'partial' must never be reported as complete coverage.",
+            "required": ["state", "basis"],
+            "properties": {
+              "state": {"enum": ["complete", "partial", "unknown"]},
+              "basis": {"type": "string", "minLength": 1},
+              "discovered_count": {"type": ["integer", "null"], "minimum": 0},
+              "released_count": {"type": "integer", "minimum": 0}
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "documents": {
+      "type": "array",
+      "description": "Immutable inventory. Each entry pins one document version and the exact files that carry it.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "source_document_id",
+          "document_version_id",
+          "collection_id",
+          "record_path",
+          "record_sha256",
+          "payload_sha256",
+          "files",
+          "readiness"
+        ],
+        "properties": {
+          "source_document_id": {"type": "string", "minLength": 1},
+          "document_version_id": {"type": "string", "minLength": 1},
+          "collection_id": {"$ref": "#/$defs/collection_id"},
+          "record_path": {"type": "string", "minLength": 1},
+          "record_sha256": {"$ref": "#/$defs/sha256"},
+          "payload_sha256": {
+            "$ref": "#/$defs/sha256",
+            "description": "Canonical-JSON hash of the document record with volatile fields excluded, so the same content reproduces the same value across runs."
+          },
+          "files": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["path", "role", "sha256", "byte_count", "present"],
+              "properties": {
+                "path": {"type": "string", "minLength": 1},
+                "role": {"enum": ["record", "retained_original", "verbatim", "normalized_text", "structured"]},
+                "sha256": {"$ref": "#/$defs/sha256"},
+                "byte_count": {"type": "integer", "minimum": 0},
+                "present": {
+                  "type": "boolean",
+                  "description": "false means the file is referenced by hash but does not travel in the bundle; reference_uri on the record must resolve it."
+                },
+                "reference_uri": {"type": ["string", "null"]}
+              },
+              "additionalProperties": false
+            }
+          },
+          "readiness": {
+            "type": "object",
+            "required": ["artifact_publication", "vector_indexing", "graph"],
+            "properties": {
+              "artifact_publication": {"type": "string", "minLength": 1},
+              "vector_indexing": {"type": "string", "minLength": 1},
+              "graph": {"type": "string", "minLength": 1}
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "inventory": {
+      "type": "object",
+      "description": "Independently derivable totals. A validator recomputes them from documents[] and fails on disagreement.",
+      "required": ["document_count", "file_count", "present_byte_count", "inventory_sha256"],
+      "properties": {
+        "document_count": {"type": "integer", "minimum": 1},
+        "file_count": {"type": "integer", "minimum": 1},
+        "present_byte_count": {"type": "integer", "minimum": 0},
+        "referenced_only_count": {"type": "integer", "minimum": 0},
+        "inventory_sha256": {
+          "$ref": "#/$defs/sha256",
+          "description": "Canonical-JSON hash over the sorted (source_document_id, document_version_id, payload_sha256) triples."
+        },
+        "by_collection": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["collection_id", "document_count"],
+            "properties": {
+              "collection_id": {"$ref": "#/$defs/collection_id"},
+              "document_count": {"type": "integer", "minimum": 0}
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "update": {
+      "type": "object",
+      "description": "How this release relates to the previous one. Disappearance from a publisher listing is recorded as 'unavailable', never as a repeal.",
+      "required": ["previous_release_id", "outcomes", "stale_consumer_detection"],
+      "properties": {
+        "previous_release_id": {"type": ["string", "null"]},
+        "outcomes": {
+          "type": "object",
+          "required": ["unchanged", "new", "changed", "unavailable"],
+          "properties": {
+            "unchanged": {"type": "array", "items": {"type": "string", "minLength": 1}},
+            "new": {"type": "array", "items": {"type": "string", "minLength": 1}},
+            "changed": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["source_document_id", "prior_version_id", "document_version_id"],
+                "properties": {
+                  "source_document_id": {"type": "string", "minLength": 1},
+                  "prior_version_id": {"type": "string", "minLength": 1},
+                  "document_version_id": {"type": "string", "minLength": 1},
+                  "prior_retained": {
+                    "type": "boolean",
+                    "description": "true asserts the prior version's artifacts are still resolvable; a changed document never silently loses its history."
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "unavailable": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["source_document_id", "reason"],
+                "properties": {
+                  "source_document_id": {"type": "string", "minLength": 1},
+                  "reason": {"type": "string", "minLength": 1},
+                  "last_seen_release_id": {"type": ["string", "null"]}
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "stale_consumer_detection": {
+          "type": "object",
+          "description": "How a consumer recognises it is holding a superseded version without re-fetching the corpus.",
+          "required": ["method", "compare_field"],
+          "properties": {
+            "method": {"type": "string", "minLength": 1},
+            "compare_field": {"type": "string", "minLength": 1},
+            "note": {"type": "string"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "durable_pointers": {
+      "type": "array",
+      "description": "Where this bundle durably lives beyond the producing checkout, plus backups.",
+      "items": {
+        "type": "object",
+        "required": ["kind", "uri"],
+        "properties": {
+          "kind": {"enum": ["git", "object_store", "backup", "mirror"]},
+          "uri": {"type": "string", "minLength": 1},
+          "sha256": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+          "note": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "limitations": {
+      "type": "array",
+      "description": "What this release does NOT establish. Required (may be empty only when nothing is withheld).",
+      "items": {
+        "type": "object",
+        "required": ["code", "description"],
+        "properties": {
+          "code": {"type": "string", "minLength": 1},
+          "description": {"type": "string", "minLength": 1},
+          "scope": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+
+  "$defs": {
+    "semver": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "minLength": 20},
+    "jurisdiction_key": {
+      "type": "string",
+      "pattern": "^[a-z]{2}:(state|county|city|district):[a-z0-9-]+$"
+    },
+    "collection_id": {
+      "type": "string",
+      "pattern": "^[a-z]{2}:(state|county|city|district):[a-z0-9-]+:[a-z0-9-]+$"
+    }
+  }
+}
