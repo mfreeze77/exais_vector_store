@@ -441,3 +441,168 @@ is unpushed, so it has no hosted run of its own.
   collection reports `coverage.state: partial`. Nothing here claims otherwise.
 - StateCivics KS-539/KS-540 A-side acceptance (importer, Topeka reader, FTS,
   agent context, packet handling) remains open and is not ExAIS work.
+
+## Implementation 2026-09-15: assignment 2, collection discovery and acquisition
+
+Commit `cae5293` on `feat/WAVE-118-jurisdiction-document-release-contract`.
+Assignments 3 and 4 are prepared and unfired; see
+[the prepared activation runbook](../runbooks/topeka-collection-activation-prepared.md).
+
+### Delivered
+
+| Item | Path |
+| --- | --- |
+| Listing discovery | `scripts/release/topeka-collection-discover.py` |
+| Resumable acquisition | `scripts/release/topeka-collection-acquire.py` |
+| Store-split planner | `scripts/release/topeka-store-split-plan.py` |
+| Discovery manifests | `instances/.../topeka-municipal-code/discovery/` |
+| Acquisition checkpoint and reports | `instances/.../topeka-municipal-code/acquisition/` |
+| Tests | `tests/test_topeka_collection_discovery.py` (29 cases) |
+
+### Discovery, reconciled against the publisher's own counts
+
+Both listings are Revize document centres that print their own per-category and
+per-year document counts. Those counts are independently authored, so the run
+checks the parse against them instead of trusting itself. Every declared group
+matched exactly on 2026-09-15:
+
+| Listing | Category | Group | Publisher count | Parsed entries | Distinct documents |
+| --- | --- | --- | --- | --- | --- |
+| ordinances | Charter Ordinances | — | 41 | 41 | 41 |
+| ordinances | Ordinances | 2026 | 59 | 59 | 58 |
+| ordinances | Ordinances | 2025 | 83 | 83 | 83 |
+| ordinances | Ordinances | 2024 | 67 | 67 | 67 |
+| ordinances | Ordinances | 2023 | 73 | 73 | 73 |
+| ordinances | Ordinances | 2022 | 67 | 67 | 67 |
+| resolutions | 2026 | — | 91 | 91 | 91 |
+| resolutions | 2025 | — | 136 | 136 | 136 |
+| resolutions | 2024 | — | 119 | 119 | 119 |
+| resolutions | 2023 | — | 109 | 109 | 109 |
+| resolutions | 2022 | — | 93 | 93 | 87 |
+
+**935 distinct documents**: 41 charter ordinances, 351 ordinances, 543
+resolutions. Where distinct is below the publisher's count, repeated listing
+entries account for the difference and are named. A declared group that parses
+empty is an error, never an empty successful listing.
+
+The Ordinances category counter (350) is one higher than its year counters (349)
+because Ordinance 20684 is listed directly under the category, in no year group.
+That is reported, not smoothed over.
+
+### What the live listings actually contained
+
+These are findings, not assumptions, and none of them is visible to a PDF-only
+parse of the page:
+
+- **25 instruments are published only as `.docx`** (14 ordinances in 2026, 11
+  resolutions). They are inventoried and acquired. Extraction support is stated
+  as PDF-only rather than assumed, because the configured bounded remote path is
+  Marker.
+- **7 repeated listing entries** (1 in ordinances 2026, 6 in resolutions 2022)
+  point at a document already listed in the same group. Each resolves to one
+  identity; no duplicate active document is created.
+- **The Standard Traffic Ordinance is linked twice**, once from the retired
+  `cot-wp-uploads.s3.amazonaws.com` bucket. That location is registered as a
+  legacy location of the ordinances collection, so it routes to the same
+  identity and can never win as the official URL.
+- **`s3.us-east-1.amazonaws.com/files.topeka.gov/...` aliases appear in the
+  live HTML**, confirming the alias canonicalisation is load-bearing rather than
+  hypothetical.
+- **Two links sit outside the document centre** (the STO and a Topeka Way to
+  Work program overview). Both are admitted as `review_needed`: a page link
+  alone does not establish collection membership, and the program overview is
+  not an instrument.
+- **The city states that only ordinances from the last four years are published
+  online.** The listing is therefore incomplete by publisher policy. A retained
+  document absent from it is recorded as a listing window, never a repeal.
+
+### Acquisition
+
+Resumable, checkpointed after every item. Measured over all 935 worklist rows:
+
+| Outcome | Count |
+| --- | --- |
+| `reused_verified` | 364 |
+| `unchanged_remote` | 568 |
+| `unavailable_at_source` | 3 |
+| `downloaded_changed` | 0 |
+| `failed` | 0 |
+
+**All 364 retained originals still hash to the bytes the publisher serves
+today**, so not one was re-downloaded. 568 new documents are held (131 MB, kept
+out of Git; the manifests, checkpoint and reports are the committed proof).
+Resolution 9749 — the owner's example — is acquired, 143,029 bytes,
+`049b6f231af4079b9d4c6251f8daab77582503d6429894bdb1778f8924ca6a9f`.
+
+Resume is not caching. A later run re-asks the publisher by default, so changed
+bytes are detected; `--trust-checkpoint` skips that re-check and is opt-in
+precisely because it trades change detection for speed. The retry after the
+fix made exactly 1 publisher request across 935 rows.
+
+Topeka writes some hrefs with `+` where the stored filename has a trailing space
+— query-string semantics applied to a URL path. A 404 on the literal form
+retries that single re-interpretation of the publisher's own href and records
+`url_resolution=plus_decoded_as_space`; this recovered Ordinance 20670.
+
+Three documents remain `unavailable_at_source`, all the publisher's own broken
+links, and are **not** repaired:
+
+| Document | Publisher link | Status |
+| --- | --- | --- |
+| Ordinance 20632 | `.../2026/Ordinancec.pdf` | 404 (href appears to be a typo; `Ordinance20632.pdf` answers 200, but substituting it would invent provenance for bytes we never retrieved through the listed link) |
+| Topeka Way to Work overview | `.../2026 Internet TWTW Program Overview.docx` | 404; also `review_needed`, not an instrument |
+
+A publisher 404 is a terminal, reportable outcome, distinct from a retryable
+`failed`. The run passes with them recorded; it never counts them as acquired.
+
+### Store split, planned not executed
+
+`scripts/release/topeka-store-split-plan.py`, proof at
+`releases/proofs/topeka-store-split-plan-20260915.json`:
+
+| Destination | Planned documents |
+| --- | --- |
+| `ks:city:topeka:municipal-code` | 2,702 |
+| `ks:city:topeka:ordinances` | 323 |
+| `ks:city:topeka:charter-ordinances` | 41 |
+| unassigned | **0** |
+
+3,066 total, reconciling against `store.yaml`'s recorded 3,066 / 2,702 / 364
+from the live 2026-08-28 ingestion — two independently derived numbers that
+agree. The unnumbered STO has an explicit destination and is not dropped.
+`vs_d4185d1004604f08a55299fa` is not mutated and stays queryable for rollback.
+
+Both ingest dry-runs were executed offline and wrote nothing:
+`topeka-code-ingest.py` reports `payload_count: 2702`, `submitted_count: 0`;
+`topeka-ordinance-pdf-ingest.py` reports `payload_count: 364`,
+`submitted_count: 0`. Both agree with the plan.
+
+### Not done, and why
+
+- **No cell was started, no store created or mutated, no embedding purchased,
+  ExAIS routing unchanged.** No `ks-state-civics` cell exists on this host and
+  activation/spend is gated on owner authorization.
+- **Resolution 9749 is acquired but not released.** The contract refuses a
+  document with empty extraction, and the 543 acquired resolutions have not been
+  through the bounded remote extraction path. Acquisition complete, extraction
+  pending, release pending.
+- **The three new WAVE-117 source packages are not written.**
+  `instance_source_packages.py` requires a non-empty `vectorStore.id`; writing
+  them before the stores exist would commit a placeholder or break
+  `validate-instance-source-packages.py` (still PASS, 5 packages, 0 issues).
+- **`DECODO_API_TOKEN` is declared in `.env.example` but not populated** in the
+  cell env. It is needed only to re-crawl `topeka.municipal.codes`, which
+  answers 403 to plain HTTP. The retained TMC corpus is complete and
+  hash-verified, so no re-crawl was required.
+
+### Test regime
+
+| Run | Result |
+| --- | --- |
+| New discovery/acquisition suite | 29 passed |
+| Full suite, baseline `f44c97f` | 10 failed, 918 passed, 67 skipped, 106 errors |
+| Full suite, candidate `cae5293` | 10 failed, **985** passed, 67 skipped, 106 errors |
+
+No regression: identical failure and error counts, +67 passing (38 contract +
+29 discovery). The starter release bundle still validates PASS after the
+collection-registry change.
