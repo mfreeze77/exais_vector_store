@@ -2,7 +2,141 @@
 
 ## Summary
 
-Create the Topeka Municipal Code vector-store source pipeline for the `ks-state-civics` instance, including codified TMC sections, official ordinance PDFs, reproducible seed folders, compliant Playwright endpoint discovery, API-only ingestion, and GraphRAG proof.
+Create reproducible Topeka source pipelines for the `ks-state-civics` instance,
+with quality-gated structured artifacts feeding collection-specific vector
+stores, cited GraphRAG and the StateCivics jurisdiction document UI. Reuse the
+retained codified TMC sections, official ordinance PDFs and their extractions.
+
+## 2026-09-15 owner direction: master collections and the KS-539 handoff
+
+Status of this extension: specified; implementation and activation pending.
+The prior combined-store receipts below remain historical evidence. They do
+not prove the new collection split, additional sources or jurisdiction UI
+handoff. This direction concerns Topeka source/document publication; the
+paused Kansas fiscal/appropriations work is not resumed by it.
+
+The product acceptance ticket is
+[StateCivics KS-539](https://github.com/mfreeze77/state-civics-ai/blob/main/tickets/KS-539-publish-complete-topeka-meeting-corpus.md).
+WAVE-117 and the [jurisdiction playbook](../docs/JURISDICTION_VECTOR_STORE_PLAYBOOK.md)
+already establish source packages and artifact quality before vectorization.
+Extend those paths rather than building a second source store or extractor
+inside StateCivics.
+
+### Collection granularity — explicit owner correction
+
+One vector store belongs to one registered master collection. A unique PDF
+or page URL is a member document, NEVER a reason to create another store.
+Collection boundaries are the publisher's master lists/categories, not the
+number of links, files, source pages, or download attempts.
+
+| Master collection | Discovery source | Member records |
+| --- | --- | --- |
+| Topeka Municipal Code | `https://topeka.municipal.codes/TMC` | Code sections/subsections and source structure, including Title 18 and local amendments |
+| Topeka ordinances | `https://topeka.gov/community/ordinances/index.php`, Ordinances category | Individual ordinary ordinance PDFs |
+| Topeka charter ordinances | Same page, Charter Ordinances category | Individual charter ordinance PDFs |
+| Topeka resolutions | `https://topeka.gov/community/resolutions/index.php` | Individual resolutions across the library's year categories |
+
+Charter ordinances and resolutions each get their own vector store. The
+`#undefined` UI fragment is not a source identity or an additional store.
+Two categories on the same page remain distinct collections; pagination/year
+navigation does not split a collection into per-page/per-year stores. A code
+hub linking an already-known amendment adds a source relationship without
+minting another document/store for those same bytes.
+
+The owner's concrete member-document examples must be retained in the
+collection-routing acceptance test:
+
+| Individual PDF | Parent vector store |
+| --- | --- |
+| `https://s3.us-east-1.amazonaws.com/files.topeka.gov/community/resolutions/2026/Resolution09749.pdf` | Topeka Resolutions |
+| `https://files.topeka.gov/community/ordinances/charter/CharterOrdinance126.pdf` | Topeka Charter Ordinances |
+
+Each PDF is downloaded/versioned and extracted into structured content by its
+parent collection's pipeline. Neither creates a new store or bespoke pipeline.
+Their released content feeds both retrieval and the Topeka document UI.
+
+Assign explicit collection IDs, vector-store IDs and WAVE-117 source packages.
+Additional master collections (meeting-document collections by body, budgets,
+plans, applications, GIS and other registered sources) must declare their
+boundaries before activation. Reuse shared connector code across collections.
+Do not generate collections from arbitrary discovered links or search keywords.
+
+The existing `vs_d4185d1004604f08a55299fa` combines TMC and ordinance data.
+Prepare its split from the retained manifests, including a destination for
+the unnumbered STO document; it must not disappear because it is not a numbered
+ordinary ordinance. Reconcile all records, verify destination retrieval and
+citations, then switch routing. Keep the old store available for rollback;
+this ticket update does not migrate or delete it.
+
+### One released artifact feeds both products
+
+```text
+master collection -> discover/download/version -> extract and structure
+  -> validate source content, schema, coverage and evidence
+  -> immutable clean JSON/JSONL + readable text + original-file/citation manifest
+       -> ExAIS API ingest -> semantic/vector index and cited graph/lens search
+       -> StateCivics import -> Topeka document reader, FTS and scoped agent context
+```
+
+- Inventory every PDF and supported non-PDF item within the declared collection
+  scope. Preserve inline agenda HTML, spreadsheets, tables, maps and exhibits;
+  title-only discovery does not count as extraction. Record missing/failed/
+  visual/review-needed outcomes and reconcile all discovered records to them.
+- Reuse validated raw captures and existing Marker results by source identity
+  and hash. New/changed PDFs use the configured bounded remote extraction path.
+  Do not re-spend on unchanged verified files or blindly trust an existing path.
+- Preserve original bytes/hash, extracted-content hash, structured payload hash,
+  source/extractor/schema versions, document identity/version, timestamps and
+  evidenced page/block/table references. JSON must contain usable content, not
+  only a filename/URL. Missing page coordinates remain explicit; do not infer
+  PDF page numbers from Markdown line numbers or apparent headings.
+- Retain existing structured TMC blocks, sections, definitions, tables and
+  ordinance history. Keep proposed/adopted/superseded status, known effective
+  dates, local amendments and incorporated editions distinct. Extracted text
+  is not automatically a reviewed legal fact. Resolutions can record operative
+  approvals/funding decisions and must not all be labeled mere commentary.
+- Derive graph nodes/edges with stable source identities and evidence references;
+  validate graph artifacts before graph loading. An empty/unavailable graph
+  lens must not be reported as graph-backed retrieval. Pin embedding profile
+  and routing per target store through the existing guards.
+- Publish a versioned artifact manifest in durable storage with backup and
+  portable pointers. Both consumers record the same artifact release and
+  document/payload hashes. StateCivics imports the released source data through
+  its supported publication boundary under `ks:city:topeka`, not via direct
+  ExAIS database access or reconstruction from search chunks.
+- Keep extraction/release, vector indexing, graph readiness and local publication
+  statuses independent. The Topeka reader can display validated documents while
+  embedding/graph jobs are pending. A failed graph build cannot erase usable
+  document content. Changes retain earlier versions and identify stale consumers.
+- The document/matter model must support cross-meeting applications, staff
+  recommendations, hearings, commission votes, council action and final
+  instruments. Meeting-date body membership and late minutes/decisions are
+  evidenced inputs, not values guessed from the current roster or event title.
+
+### Acceptance for the extension
+
+- A manifest-driven split assigns every retained item to its declared master
+  collection with no per-PDF stores, unexplained omissions or duplicate active
+  versions. Counts are derived from the manifests and actual destination runs.
+- Audit the reusable inputs before publishing. KS-539's measured inventory is
+  2,702 TMC section records and 364 retained PDFs (322 numbered ordinances,
+  41 charter ordinances, one STO). All raw PDF hashes matched on 2026-09-15;
+  the STO Markdown hash differs from its extraction manifest. Resolve and
+  document that transformation/provenance before accepting it. The current city
+  library comparison is not yet a complete added/changed/removed worklist.
+- Through real ExAIS and StateCivics entrypoints, the same document/version/hash
+  is retrievable, opens in the Topeka reader, has working evidence references
+  and reaches scoped meeting context. Test fresh and repair agent paths;
+  KS-539 records the currently missing fresh-path tools and packet-discard bug.
+- Prove one real Planning Commission matter end to end and repeat on another
+  body. Account for every attachment and link only evidenced outcomes; unknown
+  or pending decisions remain explicit. A source registration alone is no proof.
+- Exercise a changed source, a late-published document and repeat processing:
+  old versions survive, changed consumers refresh, unchanged work is reused,
+  duplicate documents are not created, and pending/failed work is reported.
+- Report artifact/code versions, collection assignments, acquisition/extraction
+  coverage, actual vector/graph results and StateCivics UI/search/context proof.
+  Package configuration or this documentation commit is not an execution proof.
 
 ## Background
 
@@ -23,7 +157,9 @@ The Topeka corpus needs both current codified code and ordinance history. The co
 - Run and harden the Playwright codified-code crawler for the full TMC corpus, starting from `/TMC` but avoiding false success on title/container-only pages.
 - Preserve rendered HTML, network logs, manifest files, `citation-url-map.jsonl`, and graph JSONL files in the codified-code seed layout.
 - Implement the official Topeka ordinance PDF collector.
-- Implement API-only ingestion for codified sections and ordinance PDFs into one `topeka-municipal-code` vector store.
+- Implement API-only ingestion using the master-collection store boundaries
+  above. The combined `topeka-municipal-code` store in earlier receipts is the
+  historical arrangement to reconcile, not the target for new collection work.
 - Implement graph extraction/loading/eval for TMC references, definitions, ordinance history, and ordinance-to-section relationships.
 - Add recall tests covering current-code questions and amendment-history questions.
 
