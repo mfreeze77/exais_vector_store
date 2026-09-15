@@ -1,0 +1,59 @@
+{
+  "ci": {
+    "collection_errors": 0,
+    "deselected": 34,
+    "failed": 0,
+    "passed": 1661,
+    "selected": 1805,
+    "setup_errors": 0,
+    "skipped": 144
+  },
+  "ci_excluded_marker": "workstation_corpus",
+  "corpus": {
+    "collection_errors": 0,
+    "failed": 0,
+    "passed": 34,
+    "selected": 34,
+    "setup_errors": 0,
+    "skipped": 0
+  },
+  "corpus_fixture_preflight": {
+    "tests/test_kansas_statute_rollout.py": true,
+    "tests/test_kansas_statute_tranches.py": true
+  },
+  "github_ci_result": "pending scoped upstream credential and fresh QC",
+  "local_evidence_directory": "/Users/mfrieson/Developer/exais-backups/ci-repair-20260914",
+  "network": "none",
+  "provenance": {
+    "set": {
+      "exit_code": 0,
+      "line": "provenance SET: 7 passed, 0 failed, 0 setup errors, 0 skipped",
+      "tests": [
+        "tests/test_kansas_fiscal_entity_ingest_integration.py::test_the_document_path_produces_the_identical_loaded_manifest",
+        "tests/test_kansas_fiscal_entity_ingest_integration.py::test_the_document_path_refuses_identically",
+        "tests/test_kansas_fiscal_entity_ingest_integration.py::test_the_missing_schema_refusal_is_unchanged",
+        "tests/test_kansas_fiscal_entity_ingest_integration.py::test_load_manifest_keeps_its_signature",
+        "tests/test_statecivics_contract_pin.py::test_candidate_payload_contracts_and_durable_manifest_are_exact_upstream_artifacts",
+        "tests/test_statecivics_contract_pin.py::test_historical_digests_are_reproducible_at_their_recorded_commit",
+        "tests/test_statecivics_contract_pin.py::test_the_fixture_is_the_upstream_contract_at_the_pinned_commit"
+      ]
+    },
+    "unset": {
+      "exit_code": 1,
+      "line": "provenance UNSET: 0 passed, 1 failed, 0 setup errors, 0 skipped (required intentional refusal)",
+      "tests": [
+        "tests/test_statecivics_contract_pin.py::test_the_fixture_is_the_upstream_contract_at_the_pinned_commit"
+      ]
+    }
+  },
+  "required_corpus_variables_derived_from_helper_calls": [
+    "SVS_STATUTE_CANARY_STATE",
+    "SVS_STATUTE_CORPUS_ROOT",
+    "SVS_STATUTE_CUSTODY_ROOT",
+    "SVS_STATUTE_EXPORT_ROOT",
+    "SVS_STATUTE_ROLLOUT_SEED"
+  ],
+  "runtime": "Python 3.12.14",
+  "test_image": "sha256:bf0aedb0b53d43065a47fb318a72fe1a77171698333b9b1a6e40ea10d2778aa0",
+  "tested_code_commit": "ae45e7c"
+}

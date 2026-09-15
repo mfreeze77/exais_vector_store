@@ -87,3 +87,39 @@ plus the two existing request components and the nested hit. Its pre-existing
 157-component baseline is retained after subtracting this named extension.
 No response schema assertion is removed. The running cell is not rebuilt by
 this CI repair; the change will be included in its next reviewed API release.
+
+
+## Item 5 — profile decision
+
+WAVE-134's old example profile and preparation spend paragraph now point to the
+implemented candidate profile decision. Codex selected OpenAI small at 5e24383;
+the existing registry/gateway and isolated candidate collection are the reason.
+It is the current candidate decision, not a Voyage bridge. Actual billed USD is
+not available in the delivery receipts; successful descriptor/query counts,
+uncounted failed attempts and the measured snapshot size are recorded instead.
+No fabricated billing number or unchosen re-embedding project is introduced.
+
+
+## Executed local proof
+
+At executable code `ae45e7c`, the Python 3.12 Docker gate reports:
+
+```text
+workstation corpus deselected: derived=34, collected=34, actual=34; exact node-ID equality PASS
+Python run: 1661 passed, 0 failed, 0 setup_errors, 144 skipped, 0 collection_errors
+provenance SET: 7 passed, 0 failed, 0 setup errors, 0 skipped
+provenance UNSET: 0 passed, 1 failed, 0 setup errors, 0 skipped (required intentional refusal)
+corpus preflight: 2 retained fixtures PASS, 0 setup errors; 34 passed, 0 skipped
+```
+
+Both runs used `--network none`, the plain operator checkout and the new CI
+image. The corpus run mounted retained exports, harvest, custody and both seed
+states read-only. `python_gate.py collect` preceded `run` / `corpus` in separate
+pytest processes. The fixture-hook evidence confirms both actual retained
+fixtures completed; a nonempty environment alone cannot produce that line.
+The extra runtime skips remain recorded by node ID and reason. No test assertion
+or retained hash was changed. Details: [local proof](ci-repair-local-proof.json).
+
+GitHub CI run URL/result and fresh-QC verdict remain pending. The local proof is
+not a claim that the hosted run passed. The four history consumers and three
+upstream consumers are listed in the proof's SET result.

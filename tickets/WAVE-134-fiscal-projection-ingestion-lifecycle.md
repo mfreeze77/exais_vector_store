@@ -103,9 +103,15 @@ from `business_instance_id` + `embedding_profile_id` + index-version suffix —
 `vector_store_id` is not an input. A new store on the same instance with
 `voyage_4_docs_1024` lands its points in exactly the shared collection that the
 instruction forbids, beside the 83,858 statute + fiscal document points. Keeping
-entity points out of it requires a **distinct embedding profile**, e.g.
-`voyage_4_entities_1024`, giving `svs_biz_ks_state_civics_voyage_4_entities_1024`.
-That is an owner decision: it is a new profile, not a rename.
+entity points out of it requires a **distinct index profile**. The implemented
+candidate decision is `statecivics_candidates_openai_small_v1`, giving
+`svs_biz_ks_state_civics_statecivics_candidates_openai_small_v1`, backed by
+`openai_text_embedding_3_small_1536` (OpenAI text-embedding-3-small, 1,536
+coordinates). `voyage_4_entities_1024` was an earlier proposal, not the deployed
+profile. Codex selected the current profile at `5e24383` under the owner's
+instruction to take over and complete candidate delivery. See the profile
+decision and measured-cost record below; this is the candidate decision, not a
+bridge with an automatic Voyage re-embedding step.
 
 **Lifecycle.** `ingestion.action == "remove"` DELETES the point; it does not
 write a tombstone. A's removal record is identity-minimal by construction (no
@@ -125,8 +131,11 @@ on `export_record_id` alone — A derives it from entity kind, logical id,
 revision and exporter version, so an exporter version bump would re-embed the
 whole store for no semantic change.
 
-**Spend.** See WAVE-133's note: fake embedding provider in tests, one real run of
-at most 20 descriptions in `ks-fiscal-local`, under 5,000 tokens total.
+**Spend.** The earlier preparation allowance was one real run of at most 20
+descriptions / 5,000 tokens. The subsequent owner-directed pilot and full-bill
+delivery exceeded that original preparation scope; their actual activity is
+recorded below. Test providers remain fake. No historical dollar total is
+invented from successful-record counters.
 
 ## Deliverables
 
@@ -1327,3 +1336,39 @@ cited review items; candidates were not promoted and the VPS UI was not deployed
 Receipt: `runbooks/statecivics-bulk-delivery-20260914.json`. Commands:
 `runbooks/statecivics-candidate-bulk.md`. The historical pilot runbook now points
 to the full manifest and no longer suggests replaying superseded export metadata.
+
+
+### CI repair item 5 — candidate profile decision (2026-09-14)
+
+**Who and why.** Codex chose the profile in `5e24383`, acting on the owner's
+instruction to take over and complete real candidate delivery. The owner did
+not separately name OpenAI or choose between benchmarked embedding models.
+`openai_text_embedding_3_small_1536` already existed in the runtime registry and
+model gateway. The implementation could use that configured provider/model
+while a separate candidate index name enforced isolation from both document
+collections and the future live-entity collection. There is no measured claim
+here that OpenAI beats Voyage on Kansas recall.
+
+**Decision, not bridge.** This is the current candidate-index decision. The old
+Voyage name was an example proposal. There is no pending automatic conversion
+or re-embedding obligation, and no re-embedding spend ticket is being created
+for a migration that has not been chosen. A future model change requires a new
+quality/cost decision and a separately reviewed operation; this entry does not
+select a model for public live-authority answers.
+
+**What it cost, and what is unknown.** Committed receipts record 2 successful
+pilot descriptor embeddings and 2,588 successful bulk descriptor embeddings,
+plus one documented pilot query and three documented bulk queries. Two failed
+bulk attempts performed additional uncounted provider work before retry. Both
+completed import repeats report zero new embeddings. These are operation counts,
+not provider token or billing totals. The candidate store does not retain the
+provider's usage fields in those receipts; the actual billed USD amount is
+unverified and is not reported as zero. The complete candidate Qdrant snapshot
+is 41,414,656 bytes. References: `runbooks/statecivics-pilot-delivery-20260914.json`,
+`runbooks/statecivics-bulk-delivery-20260914.json`, and
+`configs/statecivics-candidates.yaml`.
+
+**CI closure requirement.** Delivery reports must include the branch/commit,
+GitHub CI run URL and result. Local focused tests and a successful push alone do
+not establish that the GitHub gate passed. The CI repair is not closed while
+its required upstream checkout or fresh QC remains unverified.
