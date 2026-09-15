@@ -6,6 +6,8 @@ import json
 import os
 from pathlib import Path
 import pytest
+
+pytestmark = pytest.mark.workstation_corpus
 from test_kansas_fiscal_document_ingest import CONTRACT_FIXTURE, _load_module, _write_manifest
 from svs_common.chunking import choose_chunker
 from svs_common.ingestion import _page_coordinate_evidence_context

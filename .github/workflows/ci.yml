@@ -47,8 +47,18 @@ jobs:
       - run: pip install -r apps/api/requirements.txt pytest
       - name: Prove history and upstream SET/UNSET behavior
         run: python scripts/ci/upstream_proof.py
-      - run: PYTHONPATH=packages/svs_common:apps/api:apps/worker:apps/model_gateway:apps/instance_agent python -m compileall -f packages apps tests
-      - run: PYTHONPATH=packages/svs_common:apps/api:apps/worker:apps/model_gateway:apps/instance_agent pytest -q
+      - run: python -m compileall -f packages apps tests
+      - name: Collect the reviewed workstation corpus boundary
+        run: python scripts/ci/python_gate.py collect
+      - name: Run CI tests and verify every deselection
+        run: python scripts/ci/python_gate.py run
+      - name: Preserve test and provenance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-gate-evidence
+          path: vector-store/ci-results/
+          if-no-files-found: warn
 
   postgres-rls-integration:
     runs-on: ubuntu-latest
