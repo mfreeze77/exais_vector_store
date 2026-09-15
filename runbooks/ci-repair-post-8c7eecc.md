@@ -70,3 +70,20 @@ The actual fixture preflights and all marked tests must pass locally.
 git and PostgreSQL tools for repeatable local checks. The old formatnongpl test
 image runs Python 3.11 and lacks psycopg; it cannot be quoted as CI equivalence.
 The inventory collection is provisional until repeated in the new image.
+
+
+## Item 4 — named candidate responses
+
+The ingestion route now declares CandidateIngestResponse; search declares
+CandidateSearchResponse, whose results contain CandidateSearchHit objects.
+The outer acknowledgement and hit metadata are typed; the complete upstream
+record remains a dictionary validated by the existing pinned KS payload gate.
+Response serialization must preserve it byte-for-field, not strip unknown
+entity fields. Runtime tests compare complete returned records and exercise
+plan, first apply, repeat and empty search.
+
+The OpenAPI test lists both routes and both response model names explicitly,
+plus the two existing request components and the nested hit. Its pre-existing
+157-component baseline is retained after subtracting this named extension.
+No response schema assertion is removed. The running cell is not rebuilt by
+this CI repair; the change will be included in its next reviewed API release.
