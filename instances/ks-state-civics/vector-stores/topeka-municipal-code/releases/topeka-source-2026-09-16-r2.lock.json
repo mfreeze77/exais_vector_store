@@ -1,0 +1,121 @@
+{
+  "artifact": "topeka_release_lock",
+  "backup_uri": null,
+  "bundle_byte_count": 101603229,
+  "bundle_file_count": 12353,
+  "bundle_kind": "starter",
+  "by_collection": [
+    {
+      "collection_id": "ks:city:topeka:charter-ordinances",
+      "document_count": 41
+    },
+    {
+      "collection_id": "ks:city:topeka:municipal-code",
+      "document_count": 2702
+    },
+    {
+      "collection_id": "ks:city:topeka:ordinances",
+      "document_count": 335
+    },
+    {
+      "collection_id": "ks:city:topeka:resolutions",
+      "document_count": 10
+    }
+  ],
+  "collections": [
+    {
+      "collection_id": "ks:city:topeka:charter-ordinances",
+      "coverage": "partial",
+      "document_count": 41,
+      "vector_store_id": null
+    },
+    {
+      "collection_id": "ks:city:topeka:municipal-code",
+      "coverage": "partial",
+      "document_count": 2702,
+      "vector_store_id": null
+    },
+    {
+      "collection_id": "ks:city:topeka:ordinances",
+      "coverage": "partial",
+      "document_count": 335,
+      "vector_store_id": null
+    },
+    {
+      "collection_id": "ks:city:topeka:resolutions",
+      "coverage": "partial",
+      "document_count": 10,
+      "vector_store_id": null
+    }
+  ],
+  "document_count": 3088,
+  "durable_publication": "NOT PUBLISHED \u2014 the bundle exists only at local_path on the producing host. No object store is configured for this instance, so it is not retrievable elsewhere and must not be cited as a durable release",
+  "durable_uri": null,
+  "file_count_in_manifest": 15440,
+  "inventory_sha256": "339d1ae2a9da0297e3f02060b0aa29184b3f2af0695140627699927cb4b22137",
+  "local_path": "instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/topeka-source-2026-09-16-r2",
+  "locked_at": "2026-09-16T01:57:37Z",
+  "manifest_byte_count": 7529265,
+  "manifest_sha256": "e8b6225f5edbec7e251912a403df62b46df005069a9e3fc7f9b698f8de3a991d",
+  "producer": {
+    "command": [
+      "python",
+      "scripts/release/topeka-source-release-export.py",
+      "--selection",
+      "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/release-selection.jsonl",
+      "--output-dir",
+      "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/topeka-source-2026-09-16-r2",
+      "--release-id",
+      "topeka-source-2026-09-16-r2",
+      "--bundle-kind",
+      "starter",
+      "--released-state",
+      "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/released-state.jsonl",
+      "--on-conflict",
+      "allocate",
+      "--release-pointer",
+      "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/proofs/last-release-pointer.json",
+      "--allow-empty",
+      "--reference-originals"
+    ],
+    "commit": "1c4b3ec8d7f81b6a09f072920137cec11496aeb0",
+    "dirty_code_paths": [],
+    "dirty_worktree": false,
+    "exporter": "scripts/release/topeka-source-release-export.py",
+    "exporter_sha256": "5b9dfc5d2e2956252294f8612396aefd70c61d0daee303ee85273caa86b531ca",
+    "repository": "exai_vector_store"
+  },
+  "release_id": "topeka-source-2026-09-16-r2",
+  "released_at": "2026-09-16T01:57:23Z",
+  "schema_version": "1.0",
+  "schemas": [
+    {
+      "path": "contracts/jurisdiction-document-release.schema.json",
+      "role": "release_manifest",
+      "schema_id": "exais.jurisdiction.document_release.v1",
+      "sha256": "ac7b2a860935bc4749b344745b2d3a9a1ab1a8c5ed11fe552fb97af070d2e2c3",
+      "version": "1.0.0"
+    },
+    {
+      "path": "contracts/jurisdiction-source-document.schema.json",
+      "role": "source_document",
+      "schema_id": "exais.jurisdiction.source_document.v1",
+      "sha256": "d1477f0d2a3c131396659bb2724d983d1459ade3ea1acab1cc06c603afa10557",
+      "version": "1.0.0"
+    }
+  ],
+  "validation": {
+    "error_count": 0,
+    "evidence_references_resolved": 28284,
+    "evidence_references_unavailable": 3091,
+    "passed": true,
+    "proof": "instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/proofs/topeka-source-2026-09-16-r2-validation.json",
+    "warning_count": 0
+  },
+  "verify_command": [
+    "python",
+    "scripts/release/jurisdiction-release-validate.py",
+    "--bundle",
+    "instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/topeka-source-2026-09-16-r2"
+  ]
+}
