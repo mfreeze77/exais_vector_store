@@ -712,3 +712,41 @@ def test_lock_verification_catches_a_bundle_that_gained_a_file(tmp_path):
     verify = pipeline.run("topeka-release-lock.py", "--bundle", bundle, "--output", lock, "--verify")
     assert verify.returncode == 1
     assert "bundle_file_count" in verify.stdout
+
+
+def test_lock_verification_catches_a_same_length_corruption(tmp_path):
+    """The reviewer's case: aggregate counts cannot see a byte flipped in place.
+
+    File count, byte total and the manifest hash are all unchanged by a
+    same-length edit to a document artifact, so the lock comparison alone passes
+    it. --verify must therefore always run the content validation too.
+    """
+    instance = tmp_path / "instances" / "ks-state-civics" / "vector-stores" / "topeka-municipal-code"
+    _stage_docx(tmp_path, "the original body text")
+    assert run_refresh(tmp_path, "daily").returncode == 0
+    bundle = instance / "releases" / "daily"
+    lock = instance / "releases" / "daily.lock.json"
+
+    pipeline = Pipeline(tmp_path)
+    assert pipeline.run("topeka-release-lock.py", "--bundle", bundle, "--output", lock).returncode == 0
+
+    target = next(bundle.rglob("normalized.txt"))
+    original = target.read_bytes()
+    # Flip one byte in place. Same length, same file count, same byte total.
+    index = original.index(b"original")
+    corrupted = original[:index] + b"0riginal" + original[index + 8:]
+    assert len(corrupted) == len(original), "the probe must not change the file's length"
+    assert corrupted != original
+    target.write_bytes(corrupted)
+
+    # The aggregates are untouched, which is exactly why the lock alone is not enough.
+    files = [path for path in bundle.rglob("*") if path.is_file()]
+    recorded = json.loads(lock.read_text(encoding="utf-8"))
+    assert recorded["bundle_file_count"] == len(files)
+    assert recorded["bundle_byte_count"] == sum(path.stat().st_size for path in files)
+    assert recorded["manifest_sha256"] == sha((bundle / "release-manifest.json").read_bytes())
+
+    verify = pipeline.run("topeka-release-lock.py", "--bundle", bundle, "--output", lock, "--verify")
+    assert verify.returncode == 1, "the publication gate must reject a same-length corruption"
+    assert "lock identity and counts   PASS" in verify.stdout
+    assert "bundle content             FAIL" in verify.stdout

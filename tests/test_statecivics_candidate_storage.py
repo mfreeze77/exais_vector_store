@@ -179,6 +179,39 @@ def test_api_writes_then_retrieves_through_real_adapter(records, client, store):
     assert {hit['record']['record_digest_sha256'] for hit in found.json()['results']} == {
         r['record_digest_sha256'] for r in records
     }
+    # Named response serialization must preserve the complete envelope, not
+    # merely the digest field that identifies it.
+    assert {hit['record']['entity_logical_id']: hit['record'] for hit in found.json()['results']} == {
+        r['entity_logical_id']: r for r in records
+    }
+
+
+def test_named_ingest_response_preserves_plan_apply_and_repeat(records, client, store):
+    body, sha = manifest(records)
+    for apply in (False, True, True):
+        before = len(store.embedding_calls)
+        response = client.post('/api/v1/statecivics/entities/ingest', json={
+            'manifest': body, 'manifest_sha256': sha, 'path': 'candidate', 'apply': apply,
+        })
+        assert response.status_code == 200, response.text
+        value = response.json()
+        assert value['applied'] == apply and value['record_count'] == len(records)
+        assert value['manifest_sha256'] == sha
+        assert value['point_ids'] == [store.point_id(r) for r in records]
+        assert value['embedded'] == len(store.embedding_calls) - before
+        assert value['written'] == value['embedded']
+        assert value['unchanged'] == (len(records) if before else 0)
+
+
+def test_named_search_response_preserves_an_empty_result(client, store):
+    response = client.post('/api/v1/statecivics/entities/candidate/search', json={'query': 'absent fund'})
+    assert response.status_code == 200
+    assert response.json() == {
+        'entity_path': 'candidate',
+        'collection': store.adapter.collection_name(PRINCIPAL.business_instance_id, store.policy['candidate_index_profile']),
+        'results': [],
+    }
+    assert not store.embedding_calls
 
 
 def test_operator_command_submits_the_exact_manifest_to_the_candidate_api(records, client, monkeypatch, tmp_path):

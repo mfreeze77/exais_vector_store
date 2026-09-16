@@ -14,6 +14,7 @@ bundle says so, rather than implying it is retrievable somewhere it is not.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import sys
 from collections import Counter
@@ -24,6 +25,15 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from jurisdiction_release_contract import sha256_bytes, sha256_file  # noqa: E402
+
+
+def _load_validator():
+    """The bundle validator, imported from its hyphenated module."""
+    path = Path(__file__).resolve().parent / "jurisdiction-release-validate.py"
+    spec = importlib.util.spec_from_file_location("jurisdiction_release_validate", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def utc_now() -> str:
@@ -39,8 +49,9 @@ def main() -> int:
     parser.add_argument("--backup-uri", default=None)
     parser.add_argument("--validation-proof", type=Path, default=None)
     parser.add_argument("--verify", action="store_true",
-                        help="check an existing lock against the bundle instead of writing one; "
-                             "run this before durable publication")
+                        help="publication gate: check the recorded lock against the bundle AND "
+                             "re-validate every file in it. Both, because the lock alone cannot see "
+                             "a same-length corruption.")
     args = parser.parse_args()
 
     manifest_path = args.bundle / "release-manifest.json"
@@ -104,9 +115,14 @@ def main() -> int:
             if validation else None
         ),
         "verify_command": [
-            "python", "scripts/release/jurisdiction-release-validate.py",
-            "--bundle", str(args.bundle),
+            "python", "scripts/release/topeka-release-lock.py",
+            "--bundle", str(args.bundle), "--output", str(args.output), "--verify",
         ],
+        "verification_note": (
+            "--verify runs both checks: the lock's identity and aggregate counts, and a full "
+            "re-read of every file against its recorded hash. The lock alone cannot detect a "
+            "same-length in-place corruption, so neither check is sufficient on its own."
+        ),
     }
 
     if args.verify:
@@ -124,8 +140,22 @@ def main() -> int:
         ]
         for field, was, now in mismatches:
             print(f"  MISMATCH {field}: lock records {was}, bundle has {now}")
-        print(f"result             {'PASS' if not mismatches else 'FAIL'}")
-        return 0 if not mismatches else 1
+        print(f"  lock identity and counts   {'PASS' if not mismatches else 'FAIL'}")
+
+        # The lock records aggregates. A file corrupted in place to the same
+        # length leaves the file count, the byte total and the manifest hash
+        # untouched, so the lock alone cannot see it. Only re-reading every
+        # file against its recorded hash can, which is what the bundle
+        # validator does -- so the publication gate runs both, always.
+        report = _load_validator().validate_bundle(args.bundle)
+        for issue in report.errors[:10]:
+            print(f"  {issue}")
+        print(f"  bundle content             {'PASS' if report.passed else 'FAIL'} "
+              f"({len(report.errors)} error(s))")
+
+        passed = not mismatches and report.passed
+        print(f"result             {'PASS' if passed else 'FAIL'}")
+        return 0 if passed else 1
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(lock, indent=2, sort_keys=True) + "\n", encoding="utf-8")

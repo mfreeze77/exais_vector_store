@@ -1,0 +1,9 @@
+FROM python:3.12-slim
+RUN apt-get update && apt-get install -y --no-install-recommends git postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+COPY apps/api/requirements.txt /tmp/requirements.txt
+RUN python -m pip install --upgrade pip && pip install --no-cache-dir -r /tmp/requirements.txt
+WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONPATH=/app/packages/svs_common:/app/apps/api:/app/apps/worker:/app/apps/model_gateway:/app/apps/instance_agent
+CMD ["python", "scripts/ci/python_gate.py", "run"]

@@ -12,6 +12,8 @@ from types import SimpleNamespace
 
 import pytest
 
+pytestmark = pytest.mark.workstation_corpus
+
 
 def module():
     path = Path(__file__).parents[1] / 'scripts/release/kansas-statute-rollout.py'

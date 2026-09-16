@@ -17,3 +17,4 @@ builder = "mfrieson@expertaiservices.com"
 [tool.pytest.ini_options]
 pythonpath = ["packages/svs_common", "apps/api", "apps/worker", "apps/model_gateway", "apps/instance_agent"]
 testpaths = ["tests"]
+markers = ["workstation_corpus: requires the retained workstation corpus and seed states; reviewed node IDs are recorded in scripts/ci/workstation-corpus-nodeids.json"]

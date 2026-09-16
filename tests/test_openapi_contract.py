@@ -3,6 +3,7 @@ from __future__ import annotations
 from fastapi.testclient import TestClient
 
 from svs_api import main as api_main
+from svs_api.statecivics_candidates import CandidateIngestResponse, CandidateSearchResponse
 from svs_common.schemas import (
     AdminSessionResponse,
     AuditEventListResponse,
@@ -84,6 +85,8 @@ delete /v1/experts/{expert_id}/sessions/{session_id}/memory/{memory_event_id}
 post /api/v1/ingestion/preview
 post /api/v1/documents/ingest
 post /api/v1/documents/upload
+post /api/v1/statecivics/entities/ingest
+post /api/v1/statecivics/entities/candidate/search
 get /api/v1/jobs
 get /api/v1/jobs/{job_id}
 post /api/v1/jobs/{job_id}/retry
@@ -152,6 +155,15 @@ post /v1/vector_stores/{vector_store_id}/search
 '''.strip().splitlines()
 }
 
+CANDIDATE_RESPONSE_MODELS = {
+    '/api/v1/statecivics/entities/ingest': CandidateIngestResponse,
+    '/api/v1/statecivics/entities/candidate/search': CandidateSearchResponse,
+}
+CANDIDATE_COMPONENT_NAMES = {
+    'CandidateIngestRequest', 'CandidateSearchRequest',
+    'CandidateIngestResponse', 'CandidateSearchResponse', 'CandidateSearchHit',
+}
+
 
 def _ref_name(ref: str) -> str:
     return ref.rsplit("/", 1)[-1]
@@ -189,9 +201,12 @@ def test_every_documented_operation_uses_named_request_and_success_components():
         for method in path_item
         if method in HTTP_METHODS
     }
-    assert len(spec['paths']) == 64
-    assert len(components) == 157
+    assert len(spec['paths']) == 64 + len(CANDIDATE_RESPONSE_MODELS)
+    assert CANDIDATE_COMPONENT_NAMES <= set(components)
+    assert len(set(components) - CANDIDATE_COMPONENT_NAMES) == 157
     assert operations == EXPECTED_OPERATIONS
+    for path, model in CANDIDATE_RESPONSE_MODELS.items():
+        assert _ref_name(_response_schema(spec, path)['$ref']) == model.__name__
 
     request_media: set[tuple[str, str, str]] = set()
     response_media: set[tuple[str, str, str]] = set()
