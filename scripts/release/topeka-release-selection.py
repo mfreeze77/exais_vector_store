@@ -33,6 +33,10 @@ INSTANCE = ROOT / "instances" / "ks-state-civics" / "vector-stores" / "topeka-mu
 DEFAULT_DESTINATIONS = INSTANCE / "destinations"
 DEFAULT_EXTRACTION = INSTANCE / "extraction"
 DEFAULT_CHECKPOINT = INSTANCE / "acquisition" / "acquisition-checkpoint.jsonl"
+DEFAULT_SEED = INSTANCE / "sources" / "topeka-ordinances" / "seed"
+DEFAULT_TMC_CORPUS = (
+    ROOT / ".tmp" / "topeka-decodo-window-batches-20260827220454" / "combined-full-corpus-20260828-v2"
+)
 
 BUCKETS = (
     "eligible_new",
@@ -54,21 +58,61 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
         return [json.loads(line) for line in handle if line.strip()]
 
 
-def extraction_index(extraction_dir: Path) -> dict[str, dict[str, Any]]:
-    """Extraction results keyed by the hash of the source they came from.
+def extraction_index(
+    extraction_dir: Path, tmc_corpus: Path, ordinance_seed: Path
+) -> dict[str, dict[str, Any]]:
+    """Every extraction this project holds, keyed by the source hash it came from.
+
+    One index over all three sources, because "is this document extracted?" has
+    one answer regardless of which pipeline produced it. An index that knew only
+    about DOCX reported 2,702 retained TMC sections and 364 retained Marker
+    extractions as pending, which is the opposite of true.
 
     Keying on the source hash, not the document key, is what makes a changed
     document's old extraction unusable for its new bytes: the lookup simply
     misses, and the document lands in pending_extraction instead of being
     released with stale text.
     """
-    report = extraction_dir / "docx-extraction-report.json"
-    if not report.exists():
-        return {}
-    payload = json.loads(report.read_text(encoding="utf-8"))
     index: dict[str, dict[str, Any]] = {}
-    for row in payload.get("results", []):
-        index[row["source_sha256"]] = row
+
+    # 1. Retained TMC sections. The parser record in sections.jsonl is the
+    #    extraction, and the destination record's hash is the captured HTML hash.
+    sections = tmc_corpus / "sections.jsonl"
+    if sections.exists():
+        for row in read_jsonl(sections):
+            if row.get("source_html_hash"):
+                index[row["source_html_hash"]] = {
+                    "builder": "tmc_section",
+                    "citation": row["citation"],
+                    "extractor": {"name": "topeka-code-scraper", "version": "0.1.1",
+                                  "mode": "playwright_html_parse"},
+                    "limitations": [],
+                }
+
+    # 2. Retained ordinance and charter Marker extractions, joined to the PDF
+    #    hash through the ordinance manifest.
+    pdf_sha_by_id = {
+        row["id"]: row["sha256"]
+        for row in read_jsonl(ordinance_seed / "manifests" / "ordinances.jsonl")
+    }
+    for row in read_jsonl(ordinance_seed / "manifests" / "ordinance-extractions.jsonl"):
+        pdf_sha = pdf_sha_by_id.get(row["id"])
+        if not pdf_sha or not (ordinance_seed / row["markdown_path"]).exists():
+            continue
+        index[pdf_sha] = {
+            "builder": "retained_ordinance",
+            "legacy_id": row["id"],
+            "extractor": {"name": "marker", "version": "runpod-hosted-2026-08",
+                          "mode": "remote_pdf_to_markdown"},
+            "limitations": [],
+        }
+
+    # 3. Documents this pipeline extracted locally.
+    report = extraction_dir / "docx-extraction-report.json"
+    if report.exists():
+        payload = json.loads(report.read_text(encoding="utf-8"))
+        for row in payload.get("results", []):
+            index[row["source_sha256"]] = {**row, "builder": "acquired_document"}
     return index
 
 
@@ -92,6 +136,8 @@ def main() -> int:
     parser.add_argument("--destinations-dir", type=Path, default=DEFAULT_DESTINATIONS)
     parser.add_argument("--extraction-dir", type=Path, default=DEFAULT_EXTRACTION)
     parser.add_argument("--checkpoint", type=Path, default=DEFAULT_CHECKPOINT)
+    parser.add_argument("--tmc-corpus", type=Path, default=DEFAULT_TMC_CORPUS)
+    parser.add_argument("--ordinance-seed", type=Path, default=DEFAULT_SEED)
     parser.add_argument("--previous-manifest", type=Path, default=None,
                         help="a single prior manifest; use --released-state for cumulative state")
     parser.add_argument("--released-state", type=Path, default=None,
@@ -102,7 +148,7 @@ def main() -> int:
     parser.add_argument("--report", type=Path, default=None)
     args = parser.parse_args()
 
-    extractions = extraction_index(args.extraction_dir)
+    extractions = extraction_index(args.extraction_dir, args.tmc_corpus, args.ordinance_seed)
     receipts = {row["source_document_id"]: row for row in read_jsonl(args.checkpoint)}
     descriptions = limitation_descriptions()
 
@@ -164,18 +210,26 @@ def main() -> int:
                 version_id = f"{doc_id}@{record['sha256'][:16]}"
                 selection = {
                     **entry,
+                    "builder": extraction["builder"],
                     "media_type": receipt.get("content_type") or "application/octet-stream",
                     "observed_at": receipt.get("observed_at") or utc_now(),
                     "run_id": receipt.get("run_id"),
-                    "normalized_path": extraction["normalized_path"],
-                    "structured_path": str(Path(extraction["normalized_path"]).with_name("structured.json")),
                     "extractor": extraction["extractor"],
                     "limitations": extraction.get("limitations", []),
                     "limitation_descriptions": descriptions,
-                    "page_unavailable_reason": (
-                        "a DOCX has no fixed pagination, so no page coordinate is known for any span"
-                    ),
                 }
+                if extraction["builder"] == "tmc_section":
+                    selection["citation"] = extraction["citation"]
+                elif extraction["builder"] == "retained_ordinance":
+                    selection["legacy_id"] = extraction["legacy_id"]
+                else:
+                    selection["normalized_path"] = extraction["normalized_path"]
+                    selection["structured_path"] = str(
+                        Path(extraction["normalized_path"]).with_name("structured.json")
+                    )
+                    selection["page_unavailable_reason"] = (
+                        "a DOCX has no fixed pagination, so no page coordinate is known for any span"
+                    )
                 prior = previous_versions.get(doc_id)
                 if prior is None:
                     buckets["eligible_new"].append(selection)
@@ -208,6 +262,7 @@ def main() -> int:
         "documents_accounted_for": total,
         "selection_written": len(eligible),
         "selection_capped": bool(args.limit) and len(eligible) < len(buckets["eligible_new"]) + len(buckets["eligible_changed"]),
+        "eligible_by_builder": dict(Counter(row["builder"] for row in eligible)),
         "pending_extraction_by_collection": dict(Counter(
             row["collection_id"] for row in buckets["pending_extraction"]
         )),

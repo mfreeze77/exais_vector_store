@@ -38,6 +38,7 @@ from jurisdiction_release_contract import (  # noqa: E402
     RoutingError,
     canonical_source_url,
     route_document,
+    sha256_file,
     source_document_id,
 )
 
@@ -145,11 +146,25 @@ def build(assignments: Path, checkpoint: Path, worklist: Path) -> dict[str, Any]
             })
             continue
 
+        incoming_flags = list(row.get("review_flags") or [])
+
         existing = by_id.get(row["source_document_id"])
         if existing is not None and existing["sha256"] == row["sha256"]:
-            # Same bytes from both sides: keep the retained-split record, but note
-            # that acquisition re-confirmed it against the publisher.
+            # Same bytes from both sides. That settles the CONTENT question and
+            # nothing else: uncertainty discovered at this run's discovery (a
+            # membership question, an ambiguous identity) is about the document,
+            # not about its bytes, and unchanged bytes are no reason to drop it.
+            # Clearing a flag needs an explicit resolution, never hash equality.
             existing["reconfirmed_by_acquisition"] = True
+            merged = sorted(set(existing.get("review_flags") or []) | set(incoming_flags))
+            existing["review_flags"] = merged
+            existing["review_status"] = "review_needed" if merged else "clear"
+            if row.get("identity_conflict"):
+                existing["identity_conflict"] = row["identity_conflict"]
+            if row.get("url_resolution"):
+                existing["listing_url"] = row.get("listing_url")
+                existing["url_resolution"] = row.get("url_resolution")
+                existing["correction_evidence"] = row.get("correction_evidence")
             continue
         if existing is not None:
             # The publisher now serves different bytes from the ones the combined
@@ -177,8 +192,8 @@ def build(assignments: Path, checkpoint: Path, worklist: Path) -> dict[str, Any]
             "record_kind": "acquired_document",
             "origin": "acquisition",
             "supersedes_sha256": existing["sha256"] if existing else None,
-            "review_flags": list(row.get("review_flags") or []),
-            "review_status": row.get("review_status") or "clear",
+            "review_flags": incoming_flags,
+            "review_status": "review_needed" if incoming_flags else (row.get("review_status") or "clear"),
             "identity_conflict": row.get("identity_conflict"),
         }
 
@@ -239,17 +254,37 @@ def main() -> int:
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     # The existing ordinance ingest path consumes ordinances.jsonl rows. Slicing
-    # that manifest per destination is what lets each store be dry-run on its
-    # own, instead of one combined 364-document batch that proves nothing about
-    # where each document lands.
-    seed_rows = {}
-    for row in read_jsonl(args.ordinance_seed / "manifests" / "ordinances.jsonl"):
-        seed_rows[row["id"]] = row
+    # per destination is what lets each store be dry-run on its own, instead of
+    # one combined batch that proves nothing about where each document lands.
+    #
+    # The slice is built from the SELECTED revision, not from the legacy seed
+    # row. Copying the seed row is how the destination manifest ended up naming
+    # new bytes while the thing actually fed to ingestion named the old ones.
+    seed_rows = {row["id"]: row for row in read_jsonl(args.ordinance_seed / "manifests" / "ordinances.jsonl")}
     legacy_by_doc = {}
     for row in read_jsonl(args.assignments):
         if row.get("source_document_id") and row.get("legacy_id") in seed_rows:
             legacy_by_doc[row["source_document_id"]] = seed_rows[row["legacy_id"]]
 
+    def ingest_row(record: dict[str, Any]) -> dict[str, Any] | None:
+        """One ordinances.jsonl-shaped row describing the selected revision.
+
+        Returns None when the selected bytes have no retained extraction, because
+        feeding the legacy row in its place would hand ingestion a different
+        document from the one the destination manifest names.
+        """
+        legacy = legacy_by_doc.get(record["source_document_id"])
+        if legacy is None or legacy.get("sha256") != record["sha256"]:
+            return None
+        return {
+            **legacy,
+            "sha256": record["sha256"],
+            "pdf_url": record["source_uri"],
+            "exais_source_document_id": record["source_document_id"],
+            "exais_collection_id": record["collection_id"],
+        }
+
+    issues_local: list[dict[str, Any]] = []
     destinations = []
     for spec in TOPEKA_COLLECTIONS:
         rows = sorted(
@@ -267,17 +302,47 @@ def main() -> int:
             "".join(json.dumps(row, sort_keys=True) + "\n" for row in review_rows), encoding="utf-8"
         )
 
-        slice_rows = [
-            legacy_by_doc[row["source_document_id"]]
-            for row in rows if row["source_document_id"] in legacy_by_doc
-        ]
+        slice_rows = []
+        slice_gaps = []
+        for row in rows:
+            built = ingest_row(row)
+            if built is None:
+                if row["source_document_id"] in legacy_by_doc:
+                    slice_gaps.append({
+                        "source_document_id": row["source_document_id"],
+                        "destination_sha256": row["sha256"],
+                        "retained_extraction_sha256": legacy_by_doc[row["source_document_id"]].get("sha256"),
+                        "reason": (
+                            "the selected revision has no retained extraction; it is excluded from the "
+                            "ingestion slice rather than substituted with the superseded one"
+                        ),
+                    })
+                continue
+            slice_rows.append(built)
         slice_path = args.output_dir / f"{spec.slug}.ingest-slice.jsonl"
         if slice_rows:
             slice_path.write_text(
                 "".join(json.dumps(row, sort_keys=True) + "\n" for row in slice_rows), encoding="utf-8"
             )
 
+        # Destination record, ingestion payload and source artifact must agree.
+        by_doc = {row["source_document_id"]: row for row in rows}
+        for built in slice_rows:
+            doc_id = built["exais_source_document_id"]
+            if by_doc[doc_id]["sha256"] != built["sha256"]:
+                issues_local.append({
+                    "code": "SLICE_HASH_DISAGREEMENT", "record": doc_id,
+                    "detail": f"destination {by_doc[doc_id]['sha256']} vs slice {built['sha256']}",
+                })
+            artifact = args.ordinance_seed / built["saved_path"]
+            if artifact.exists() and sha256_file(artifact) != built["sha256"]:
+                issues_local.append({
+                    "code": "SLICE_ARTIFACT_DISAGREEMENT", "record": doc_id,
+                    "detail": f"{built['saved_path']} does not hash to {built['sha256']}",
+                })
+
         destinations.append({
+            "ingest_slice_gaps": slice_gaps,
             "review_manifest": str(review_path),
             "held_for_review": len(review_rows),
             "review_reasons": dict(Counter(
@@ -315,8 +380,8 @@ def main() -> int:
             "records carrying unresolved doubt are written to <slug>.review.jsonl and excluded from "
             "<slug>.manifest.jsonl, so the clean ingestion lane holds only settled documents"
         ),
-        "issues": result["issues"],
-        "passed": not result["issues"],
+        "issues": result["issues"] + issues_local,
+        "passed": not (result["issues"] + issues_local),
     }
     (args.output_dir / "destination-report.json").write_text(
         json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
@@ -334,7 +399,7 @@ def main() -> int:
               f"-> acquired {row['acquired_sha256'][:12]}")
     for row in result["superseded"][:10]:
         print(f"  SUPERSEDED {row['record']} (excluded)")
-    for issue in result["issues"][:10]:
+    for issue in (result["issues"] + issues_local)[:10]:
         print(f"  ISSUE {issue['code']} {issue['record']}: {issue['detail']}")
     print(f"result                 {'PASS' if report['passed'] else 'FAIL'}")
     return 0 if report["passed"] else 1

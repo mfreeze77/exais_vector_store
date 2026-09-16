@@ -9,6 +9,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import subprocess
 import sys
 import zipfile
 from pathlib import Path
@@ -303,3 +304,116 @@ def test_held_versions_reports_what_files_contain_not_what_they_are_named(tmp_pa
     (folder / "deadbeefdeadbeef.pdf").write_bytes(b"actually different bytes")
     assert acquire_mod.held_versions(tmp_path / "out", row) == [sha(b"actually different bytes")]
     assert acquire_mod.verified_path(tmp_path / "out", row, "de" + "a" * 62) is None
+
+
+# --------------------------------------------------------------------------
+# stage-seam regressions (third review round)
+# --------------------------------------------------------------------------
+
+def _seam_fixture(tmp_path: Path, *, acquired: bytes, flags: list[str], outcome: str):
+    """A retained-split record and an acquisition receipt for the same document."""
+    doc = "ks:city:topeka:ordinances:ordinance:20407"
+    url = "https://files.topeka.gov/community/ordinances/2023/Ordinance20407.pdf"
+    retained = b"%PDF retained bytes"
+
+    seed = tmp_path / "seed" / "manifests"
+    seed.mkdir(parents=True)
+    (tmp_path / "seed" / "raw" / "pdfs").mkdir(parents=True)
+    (tmp_path / "seed" / "raw" / "pdfs" / "20407.pdf").write_bytes(retained)
+    (seed / "ordinances.jsonl").write_text(json.dumps({
+        "id": "topeka-ordinance:legacy", "category": "ordinance", "ordinance_number": "20407",
+        "pdf_url": url, "saved_path": "raw/pdfs/20407.pdf", "sha256": sha(retained),
+    }) + "\n", encoding="utf-8")
+
+    assignments = tmp_path / "assignments.jsonl"
+    assignments.write_text(json.dumps({
+        "source_document_id": doc, "collection_id": "ks:city:topeka:ordinances", "source_uri": url,
+        "content_sha256": sha(retained), "retained_artifact": "raw/pdfs/20407.pdf",
+        "record_kind": "ordinance_pdf", "legacy_id": "topeka-ordinance:legacy",
+    }) + "\n", encoding="utf-8")
+
+    acquired_path = tmp_path / "acquired.pdf"
+    acquired_path.write_bytes(acquired)
+    checkpoint = tmp_path / "checkpoint.jsonl"
+    checkpoint.write_text(json.dumps({
+        "source_document_id": doc, "collection_id": "ks:city:topeka:ordinances", "official_url": url,
+        "sha256": sha(acquired), "outcome": outcome, "saved_path": str(acquired_path),
+        "observed_at": "2026-09-16T00:00:00Z", "run_id": "seam",
+        "review_flags": flags, "review_status": "review_needed" if flags else "clear",
+    }) + "\n", encoding="utf-8")
+
+    worklist = tmp_path / "worklist.jsonl"
+    worklist.write_text(json.dumps({"source_document_id": doc}) + "\n", encoding="utf-8")
+
+    out = tmp_path / "dest"
+    result = subprocess.run(
+        [sys.executable, str(RELEASE / "topeka-destination-manifests.py"),
+         "--assignments", str(assignments), "--checkpoint", str(checkpoint),
+         "--worklist", str(worklist), "--output-dir", str(out),
+         "--ordinance-seed", str(tmp_path / "seed")],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    return doc, out, sha(retained)
+
+
+def _rows(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def test_the_ingestion_slice_never_names_bytes_the_destination_superseded(tmp_path):
+    """The destination selected new bytes; the slice must not feed the old ones."""
+    doc, out, retained_sha = _seam_fixture(
+        tmp_path, acquired=b"%PDF new publisher bytes", flags=[], outcome="downloaded_changed"
+    )
+    manifest = _rows(out / "ordinances.manifest.jsonl")
+    assert manifest and manifest[0]["sha256"] != retained_sha, "destination takes the acquired revision"
+
+    for row in _rows(out / "ordinances.ingest-slice.jsonl"):
+        assert row["sha256"] != retained_sha, "the slice must not carry the superseded bytes"
+        assert row["sha256"] == manifest[0]["sha256"]
+
+    report = json.loads((out / "destination-report.json").read_text(encoding="utf-8"))
+    gaps = [g for d in report["destinations"] for g in d.get("ingest_slice_gaps", [])]
+    assert any(g["source_document_id"] == doc for g in gaps), (
+        "a revision with no matching extraction is reported, not substituted"
+    )
+
+
+def test_destination_ingestion_and_artifact_agree_when_bytes_are_unchanged(tmp_path):
+    doc, out, retained_sha = _seam_fixture(
+        tmp_path, acquired=b"%PDF retained bytes", flags=[], outcome="unchanged_remote"
+    )
+    manifest = _rows(out / "ordinances.manifest.jsonl")
+    slice_rows = _rows(out / "ordinances.ingest-slice.jsonl")
+    assert manifest[0]["sha256"] == retained_sha
+    assert slice_rows and slice_rows[0]["sha256"] == retained_sha
+    assert slice_rows[0]["exais_source_document_id"] == doc
+    report = json.loads((out / "destination-report.json").read_text(encoding="utf-8"))
+    assert report["passed"], report["issues"]
+
+
+def test_unchanged_bytes_do_not_erase_newly_discovered_uncertainty(tmp_path):
+    """Hash equality settles the content question and nothing else."""
+    doc, out, retained_sha = _seam_fixture(
+        tmp_path, acquired=b"%PDF retained bytes",
+        flags=["membership_review_needed"], outcome="unchanged_remote",
+    )
+    clean = _rows(out / "ordinances.manifest.jsonl")
+    review = _rows(out / "ordinances.review.jsonl")
+    assert [row["source_document_id"] for row in review] == [doc]
+    assert not clean, "a flagged document must not sit in the clean ingestion lane"
+    assert review[0]["review_flags"] == ["membership_review_needed"]
+    assert review[0]["review_status"] == "review_needed"
+    assert review[0]["reconfirmed_by_acquisition"] is True
+
+
+def test_a_flag_is_cleared_only_by_an_explicit_resolution(tmp_path):
+    """Re-running with no flags does not silently clear one already recorded."""
+    doc, out, _ = _seam_fixture(
+        tmp_path, acquired=b"%PDF retained bytes",
+        flags=["membership_review_needed"], outcome="unchanged_remote",
+    )
+    assert _rows(out / "ordinances.review.jsonl"), "flag recorded on the first pass"

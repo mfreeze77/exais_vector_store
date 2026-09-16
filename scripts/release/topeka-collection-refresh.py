@@ -29,7 +29,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from jurisdiction_release_contract import ROOT  # noqa: E402
+from jurisdiction_release_contract import CODE_ROOT, ROOT  # noqa: E402
 
 INSTANCE = ROOT / "instances" / "ks-state-civics" / "vector-stores" / "topeka-municipal-code"
 DISCOVERY = INSTANCE / "discovery"
@@ -39,7 +39,7 @@ EXTRACTION = INSTANCE / "extraction"
 RELEASES = INSTANCE / "releases"
 LEDGER = RELEASES / "released-state.jsonl"
 
-RELEASE = ROOT / "scripts" / "release"
+RELEASE = CODE_ROOT / "scripts" / "release"
 
 
 def utc_now() -> str:
@@ -88,14 +88,11 @@ def stages(*, offline: bool, release_bundle: Path, previous_manifest: Path | Non
     if previous_manifest:
         select += ["--previous-manifest", str(previous_manifest)]
 
-    # The release is whatever the current manifests say is eligible, not a fixed
-    # list of three documents. The retained starter trio still travels, because
-    # those three come from the retained corpus rather than the acquisition lane.
+    # The release is exactly what the selection says is eligible. There is no
+    # hardcoded set alongside it: a run with nothing eligible must publish
+    # nothing, and any hardcoded selector would publish regardless.
     export = [
         sys.executable, str(RELEASE / "topeka-source-release-export.py"),
-        "--select", "tmc:14.40.010",
-        "--select", "ordinance:20407",
-        "--select", "charter-ordinance:126",
         "--selection", str(selection_path),
         "--output-dir", str(release_bundle),
         "--release-id", release_bundle.name,

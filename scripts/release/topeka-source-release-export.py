@@ -1331,6 +1331,38 @@ def resolve_selection(
     raise SystemExit(f"unknown selector kind {kind!r}")
 
 
+def build_from_selection(
+    entry: dict[str, Any],
+    *,
+    tmc_corpus: Path,
+    ordinance_seed: Path,
+    include_original: bool,
+) -> BuiltDocument:
+    """Dispatch one selection row to the builder its extraction came from.
+
+    The selection is a single eligibility set across retained TMC sections,
+    retained Marker extractions and locally extracted documents, so the exporter
+    has to be able to build any of them. Keeping a separate hardcoded list of
+    "starter" documents alongside it is what let a run with nothing eligible
+    still publish three documents.
+    """
+    builder = entry.get("builder")
+    if builder == "tmc_section":
+        return build_tmc_section(entry["citation"], tmc_corpus, include_original=include_original)
+    if builder == "retained_ordinance":
+        rows, extractions = _ordinance_rows(ordinance_seed)
+        row = next((item for item in rows if item["id"] == entry["legacy_id"]), None)
+        if row is None:
+            raise SystemExit(f"{entry['source_document_id']}: retained row {entry['legacy_id']} is absent")
+        extraction = extractions.get(row["id"])
+        if extraction is None:
+            raise SystemExit(f"{entry['source_document_id']}: retained extraction is absent")
+        return build_ordinance(row, extraction, ordinance_seed, include_original=include_original)
+    if builder in {"acquired_document", None}:
+        return build_acquired_document(entry, include_original=include_original)
+    raise SystemExit(f"{entry['source_document_id']}: unknown selection builder {builder!r}")
+
+
 def document_dir_name(doc_id: str) -> str:
     return doc_id.replace(":", "__")
 
@@ -1631,12 +1663,16 @@ def main() -> int:
     if args.selection:
         with args.selection.open("r", encoding="utf-8") as handle:
             for line in handle:
-                if line.strip():
-                    documents.append(
-                        build_acquired_document(
-                            json.loads(line), include_original=not args.reference_originals
-                        )
+                if not line.strip():
+                    continue
+                documents.append(
+                    build_from_selection(
+                        json.loads(line),
+                        tmc_corpus=args.tmc_corpus,
+                        ordinance_seed=args.ordinance_seed,
+                        include_original=not args.reference_originals,
                     )
+                )
     if not documents:
         if not args.allow_empty:
             raise SystemExit("the selection is empty; there is nothing eligible to release")

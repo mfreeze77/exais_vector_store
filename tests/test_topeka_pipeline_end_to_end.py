@@ -281,3 +281,79 @@ def test_both_versions_survive_acquisition_and_extraction(cycles):
     extractions = list((pipeline.extraction / "ordinances" / key).iterdir())
     assert len(originals) == 2, "the superseded original must not be overwritten"
     assert len(extractions) == 2, "the superseded extraction must not be overwritten"
+
+
+# --------------------------------------------------------------------------
+# the actual refresh command
+# --------------------------------------------------------------------------
+
+@pytest.fixture
+def refresh_tree(tmp_path: Path) -> Path:
+    """A disposable instance tree the real refresh command can run against."""
+    instance = tmp_path / "instances" / "ks-state-civics" / "vector-stores" / "topeka-municipal-code"
+    for name in ("acquisition", "extraction", "destinations", "releases", "discovery"):
+        (instance / name).mkdir(parents=True, exist_ok=True)
+
+    folder = instance / "acquisition" / "ordinances" / "raw" / "30001"
+    folder.mkdir(parents=True)
+    payload = VERSION_1[NEW]
+    (folder / f"{sha(payload)[:16]}.docx").write_bytes(payload)
+
+    (instance / "acquisition" / "acquisition-checkpoint.jsonl").write_text(
+        json.dumps({
+            "source_document_id": NEW,
+            "collection_id": "ks:city:topeka:ordinances",
+            "official_url": URLS[NEW],
+            "sha256": sha(payload),
+            "outcome": "downloaded_new",
+            "saved_path": str(folder / f"{sha(payload)[:16]}.docx"),
+            "observed_at": "2026-09-16T00:00:00Z",
+            "run_id": "refresh-test",
+            "content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "review_flags": [],
+            "review_status": "clear",
+        }) + "\n", encoding="utf-8"
+    )
+    (instance / "discovery" / "worklist.jsonl").write_text(
+        json.dumps({"source_document_id": NEW}) + "\n", encoding="utf-8"
+    )
+    return tmp_path
+
+
+def run_refresh(tree: Path, release_id: str) -> subprocess.CompletedProcess:
+    """Invoke the real command, with its own ROOT, offline."""
+    env = {
+        "PATH": "/usr/local/bin:/usr/bin:/bin",
+        "PYTHONPATH": str(ROOT / "scripts" / "release"),
+        "EXAIS_ROOT_OVERRIDE": str(tree),
+    }
+    return subprocess.run(
+        [sys.executable, str(RELEASE / "topeka-collection-refresh.py"),
+         "--execute", "--offline", "--release-id", release_id],
+        cwd=tree, capture_output=True, text=True, env=env,
+    )
+
+
+def test_the_refresh_command_publishes_what_is_eligible_then_nothing(refresh_tree):
+    """The reviewer's case: a second run with nothing eligible must publish nothing."""
+    instance = refresh_tree / "instances" / "ks-state-civics" / "vector-stores" / "topeka-municipal-code"
+
+    first = run_refresh(refresh_tree, "refresh-1")
+    assert first.returncode == 0, first.stdout + first.stderr
+    first_manifest = instance / "releases" / "refresh-1" / "release-manifest.json"
+    assert first_manifest.exists(), "the eligible document should have been released"
+    released = json.loads(first_manifest.read_text(encoding="utf-8"))
+    assert [entry["source_document_id"] for entry in released["documents"]] == [NEW]
+
+    second = run_refresh(refresh_tree, "refresh-2")
+    assert second.returncode == 0, second.stdout + second.stderr
+    second_bundle = instance / "releases" / "refresh-2"
+    assert not (second_bundle / "release-manifest.json").exists(), (
+        "a run with nothing eligible must not publish a release"
+    )
+    assert (second_bundle / "no-release.json").exists()
+
+    report = json.loads((instance / "releases" / "proofs" / "release-selection.json").read_text())
+    assert report["counts"]["eligible_new"] == 0
+    assert report["counts"]["eligible_changed"] == 0
+    assert report["counts"]["unchanged"] == 1

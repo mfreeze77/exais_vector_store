@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import uuid
 
@@ -27,8 +28,13 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 from urllib.parse import urlsplit, urlunsplit
 
-ROOT = Path(__file__).resolve().parents[2]
-CONTRACTS = ROOT / "contracts"
+# Two roots, deliberately. CODE_ROOT is where the scripts and schemas live and
+# never moves; ROOT is the instance data tree, which tests and operators can
+# point elsewhere. Conflating them sends the pipeline looking for its own
+# schemas inside a disposable working copy.
+CODE_ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(os.environ.get("EXAIS_ROOT_OVERRIDE") or CODE_ROOT)
+CONTRACTS = CODE_ROOT / "contracts"
 RELEASE_MANIFEST_SCHEMA_PATH = CONTRACTS / "jurisdiction-document-release.schema.json"
 SOURCE_DOCUMENT_SCHEMA_PATH = CONTRACTS / "jurisdiction-source-document.schema.json"
 
