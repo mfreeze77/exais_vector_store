@@ -606,3 +606,62 @@ Both ingest dry-runs were executed offline and wrote nothing:
 No regression: identical failure and error counts, +67 passing (38 contract +
 29 discovery). The starter release bundle still validates PASS after the
 collection-registry change.
+
+## Delivery 2026-09-16: display handoff transferred to StateCivics
+
+Package `topeka-portable-2026-09-16`, 3,088 documents, self-contained.
+
+| | |
+| --- | --- |
+| Destination | `/Users/mfrieson/Dropbox/AI_Projects/exai_projects/Statecivicsai/data/exais-handoffs/topeka-portable-2026-09-16/` |
+| Archive | `topeka-portable-2026-09-16.tar.gz`, 119,541,658 bytes |
+| Archive SHA-256 | `8ffa4d6d12b587724183be1b7ca3c8f633e2d64c4d56100624e167eac25b23d1` |
+| Source/destination hash | match |
+| Extracted to | `<destination>/package/` (297 MB) |
+
+Re-verified **at the destination**, in a bare `python:3.12-slim` with
+`--network none` and the package mounted read-only — no checkout, no network,
+no installed dependency:
+
+```
+documents          3088
+files verified     15447
+citations resolved 3088
+evidence spans     28284
+result             PASS (0 errors)
+```
+
+The destination is under StateCivics' git-ignored `data/` tree, so this is a
+data drop, not a change to that repository. Nothing in the StateCivics checkout
+was modified.
+
+### What the package contains
+
+| Collection | Documents |
+| --- | --- |
+| `ks:city:topeka:municipal-code` | 2,702 |
+| `ks:city:topeka:ordinances` | 335 |
+| `ks:city:topeka:charter-ordinances` | 41 |
+| `ks:city:topeka:resolutions` | 10 |
+
+3,088 citations in `citations.jsonl`; both contract schemas; `IMPORT.md`;
+`verify.py` (stdlib only); `package-manifest.json` with every file's hash.
+
+**Resolutions is 10, not 542.** Only the DOCX resolutions are extracted; 532
+resolution PDFs are among the 544 pending the unauthorized paid path. A reader
+demo that expects a rich resolutions collection will not find one yet.
+
+### Explicitly not in the package
+
+- 544 documents pending extraction — 532 resolution PDFs, 12 ordinance PDFs.
+- 3 documents held for review — `20520` and `20610` (`identity_ambiguous`),
+  `sto` (`membership_review_needed`).
+- Coverage is `partial` on every collection, and says so.
+- No embeddings, no graph. `readiness.vector_indexing` and `readiness.graph`
+  read `pending` on every document.
+
+### Still outstanding
+
+Package verification is complete. The consumer import and the live UI proof
+under KS-539 are StateCivics' work and remain unproved. Activation, retrieval,
+graph and scheduling remain open on the ExAIS side.

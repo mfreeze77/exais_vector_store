@@ -9,7 +9,11 @@ from pathlib import Path
 from typing import Any
 
 from extraction_budget import Budget, estimate_for
-from svs_common.marker_client import MarkerRunpodClient, extract_markdown
+from svs_common.marker_client import (
+    DEFAULT_MARKER_MAX_ATTEMPTS,
+    MarkerRunpodClient,
+    extract_markdown,
+)
 from topeka_pipeline_common import ORDINANCE_SEED, read_jsonl, safe_filename, sha256_bytes, sha256_text, utc_now, write_json, write_jsonl
 
 
@@ -364,6 +368,14 @@ async def extract_rows(
     # described in a plan, so an authorized stage cannot quietly overrun.
     budget = budget or Budget.unlimited()
     requested_count = len(selected)
+    # The provider bills per attempt, so the cap must reserve exactly the number
+    # of attempts this run can make. That number belongs to the client: a budget
+    # that assumed its own default reserved one attempt while the client
+    # permitted two, so a ten-page admission could bill twenty page-attempts.
+    # A client that does not declare its retry setting falls back to the library
+    # default, never to 1: under-reserving is the failure that costs money.
+    client_attempts = getattr(client, "max_attempts", DEFAULT_MARKER_MAX_ATTEMPTS)
+    budget.attempts = max(1, int(attempts if attempts is not None else client_attempts))
     if budget.enforced:
         admitted: list[dict[str, Any]] = []
         for row in selected:
@@ -502,8 +514,10 @@ def main() -> None:
                 max_documents=args.max_documents,
                 max_spend=args.max_spend,
                 unit_price_per_page=args.unit_price_per_page,
-                # Every attempt may be billed, so the cap reserves the worst case.
-                attempts=args.attempts or int(os.environ.get("MARKER_MAX_ATTEMPTS") or 1),
+                # attempts is NOT set here. It is derived inside extract_rows from
+                # the client's own resolved retry setting, so the budget cannot
+                # reserve a different number of attempts from the one the client
+                # will actually make.
             ),
             concurrency=args.concurrency,
             client=client,

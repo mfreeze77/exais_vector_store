@@ -6,6 +6,7 @@ costs money when it is wrong.
 """
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -191,3 +192,122 @@ def test_retries_and_money_compose():
     assert budget.admit("a", 4) is True, "4 x 2 x 0.01 = 0.08"
     assert budget.admit("b", 2) is False, "would reach 0.12"
     assert budget.as_dict()["attempts_charged_per_document"] == 2
+
+
+# --------------------------------------------------------------------------
+# the wiring, not just the class
+# --------------------------------------------------------------------------
+
+def _run_extract_rows(monkeypatch, tmp_path, *, client_max_attempts, cli_attempts, max_pages):
+    """Drive extract_rows the way the command does, with a stub client."""
+    import asyncio
+
+    extractor = _extractor()
+    pdf = tmp_path / "raw" / "pdfs" / "20407.pdf"
+    pdf.parent.mkdir(parents=True)
+    # 5 pages by the page-tree reading.
+    pdf.write_bytes(b"%PDF-1.4 /Type /Pages /Count 5 >> " + b"/Type /Page x " * 5)
+    manifest = tmp_path / "manifests" / "ordinances.jsonl"
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text(json.dumps({
+        "id": "topeka-ordinance:a", "ordinance_number": "20407", "category": "ordinance",
+        "pdf_url": "https://files.topeka.gov/community/ordinances/2023/Ordinance20407.pdf",
+        "saved_path": "raw/pdfs/20407.pdf", "sha256": "0" * 64,
+    }) + "\n", encoding="utf-8")
+
+    class StubClient:
+        max_attempts = client_max_attempts
+
+    rows = [json.loads(line) for line in manifest.read_text().splitlines() if line.strip()]
+    budget = Budget(max_pages=max_pages)
+    report = asyncio.run(extractor.extract_rows(
+        rows,
+        manifest_path=manifest,
+        extracted_dir=tmp_path / "extracted",
+        pdf_dir=None,
+        output_manifest=tmp_path / "out.jsonl",
+        report_path=tmp_path / "report.json",
+        offset=0, limit=0, concurrency=1,
+        client=StubClient(),
+        dry_run=True,
+        # These assertions are about admission, not extraction; the stub client
+        # cannot extract, and a failure there must not mask the budget result.
+        allow_failures=True,
+        attempts=cli_attempts,
+        budget=budget,
+    ))
+    return budget, report
+
+
+def test_the_budget_reserves_the_attempts_the_client_will_actually_make(monkeypatch, tmp_path):
+    """Budget default 1 vs client default 2 let a 10-page admission bill 20."""
+    budget, report = _run_extract_rows(
+        monkeypatch, tmp_path, client_max_attempts=2, cli_attempts=None, max_pages=10,
+    )
+    assert budget.attempts == 2, "the budget must take the client's resolved retry setting"
+    # 5 pages x 2 attempts = 10, which exactly fills a 10-page cap.
+    assert budget.admitted_pages == 10
+    assert report["refused_by_budget_count"] == 0
+
+
+def test_a_client_that_retries_more_shrinks_what_the_same_cap_admits(tmp_path):
+    budget, report = _run_extract_rows(
+        None, tmp_path, client_max_attempts=3, cli_attempts=None, max_pages=10,
+    )
+    assert budget.attempts == 3
+    # 5 x 3 = 15 > 10, so the one document is refused.
+    assert budget.admitted_pages == 0
+    assert report["refused_by_budget_count"] == 1
+    assert report["status"] in {"capped", "pending"}
+
+
+def test_an_explicit_attempts_flag_overrides_the_client_default(tmp_path):
+    budget, _ = _run_extract_rows(
+        None, tmp_path, client_max_attempts=5, cli_attempts=1, max_pages=10,
+    )
+    assert budget.attempts == 1, "--attempts is what the client will be told to use"
+    assert budget.admitted_pages == 5
+
+
+def test_the_client_default_is_not_one():
+    """If this ever becomes 1, the earlier mismatch stops being possible --
+    and this test should be the thing that notices."""
+    from svs_common.marker_client import DEFAULT_MARKER_MAX_ATTEMPTS
+
+    assert DEFAULT_MARKER_MAX_ATTEMPTS >= 1
+    assert DEFAULT_MARKER_MAX_ATTEMPTS == 2, (
+        "the budget derives attempts from the client at runtime, so this is a "
+        "notification that the provider default moved, not a constraint"
+    )
+
+
+def test_a_client_without_a_declared_retry_setting_falls_back_to_the_library_default(tmp_path):
+    """Never to 1: under-reserving is the failure that costs money."""
+    from svs_common.marker_client import DEFAULT_MARKER_MAX_ATTEMPTS
+
+    class ClientWithoutTheAttribute:
+        pass
+
+    extractor = _extractor()
+    import asyncio
+
+    pdf = tmp_path / "raw" / "pdfs" / "20407.pdf"
+    pdf.parent.mkdir(parents=True)
+    pdf.write_bytes(b"%PDF-1.4 /Type /Pages /Count 5 >> " + b"/Type /Page x " * 5)
+    manifest = tmp_path / "manifests" / "ordinances.jsonl"
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text(json.dumps({
+        "id": "topeka-ordinance:a", "ordinance_number": "20407", "category": "ordinance",
+        "pdf_url": "https://files.topeka.gov/x.pdf", "saved_path": "raw/pdfs/20407.pdf",
+        "sha256": "0" * 64,
+    }) + "\n", encoding="utf-8")
+
+    budget = Budget(max_pages=1)
+    asyncio.run(extractor.extract_rows(
+        [json.loads(line) for line in manifest.read_text().splitlines() if line.strip()],
+        manifest_path=manifest, extracted_dir=tmp_path / "e", pdf_dir=None,
+        output_manifest=tmp_path / "o.jsonl", report_path=tmp_path / "r.json",
+        offset=0, limit=0, concurrency=1, client=ClientWithoutTheAttribute(),
+        dry_run=True, allow_failures=True, budget=budget,
+    ))
+    assert budget.attempts == DEFAULT_MARKER_MAX_ATTEMPTS
