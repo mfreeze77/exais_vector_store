@@ -1467,8 +1467,6 @@ def write_bundle(
         except (json.JSONDecodeError, KeyError):
             existing_inventory = "unreadable"
 
-    output_dir.mkdir(parents=True, exist_ok=True)
-
     previous: dict[str, Any] | None = None
     if previous_manifest and previous_manifest.exists():
         previous = json.loads(previous_manifest.read_text(encoding="utf-8"))
@@ -1502,6 +1500,22 @@ def write_bundle(
             "A release identifier is immutable. Allocate a new one, or pass --on-conflict allocate "
             "to have one allocated automatically."
         )
+    if existing_inventory == planned_inventory:
+        # Identical content under an identifier that already holds it. Rewriting
+        # would move released_at and therefore the manifest hash, invalidating
+        # every lock and receipt that cites this release -- for no change at all.
+        # An idempotent retry must be a no-op on disk, not a re-render.
+        existing_bytes = existing_manifest.read_bytes()
+        return {
+            "manifest": json.loads(existing_bytes.decode("utf-8")),
+            "manifest_path": existing_manifest,
+            "manifest_sha256": sha256_bytes(existing_bytes),
+            "release_id": release_id,
+            "output_dir": output_dir,
+            "rewritten": False,
+        }
+
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     manifest_documents: list[dict[str, Any]] = []
     unchanged: list[str] = []
@@ -1726,7 +1740,14 @@ def write_bundle(
     manifest_path = output_dir / "release-manifest.json"
     manifest_bytes = json.dumps(manifest, indent=2, sort_keys=True, ensure_ascii=False).encode("utf-8") + b"\n"
     manifest_path.write_bytes(manifest_bytes)
-    return {"manifest": manifest, "manifest_path": manifest_path, "manifest_sha256": sha256_bytes(manifest_bytes)}
+    return {
+        "manifest": manifest,
+        "manifest_path": manifest_path,
+        "manifest_sha256": sha256_bytes(manifest_bytes),
+        "release_id": release_id,
+        "output_dir": output_dir,
+        "rewritten": True,
+    }
 
 
 def main() -> int:
@@ -1741,6 +1762,9 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--release-id", default=None)
     parser.add_argument("--bundle-kind", choices=["production", "starter", "fixture"], default="starter")
+    parser.add_argument("--release-pointer", type=Path, default=None,
+                        help="write the release id and path actually used here, so downstream "
+                             "stages act on the release that exists rather than the one requested")
     parser.add_argument("--on-conflict", choices=["refuse", "allocate"], default="refuse",
                         help="what to do when the release id already holds different content: refuse "
                              "(default) or allocate the next free suffixed id")
@@ -1798,6 +1822,15 @@ def main() -> int:
         (args.output_dir / "no-release.json").write_text(
             json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"
         )
+        if args.release_pointer:
+            args.release_pointer.parent.mkdir(parents=True, exist_ok=True)
+            args.release_pointer.write_text(json.dumps({
+                "release_id": release_id,
+                "output_dir": str(args.output_dir),
+                "manifest_path": None,
+                "released": False,
+                "reason": "nothing eligible",
+            }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(f"release_id            {release_id}")
         print("documents             0 — nothing eligible; no release written")
         return 0
@@ -1825,7 +1858,25 @@ def main() -> int:
     )
 
     manifest = result["manifest"]
-    print(f"release_id            {manifest['release']['release_id']}")
+    # Downstream stages must act on the release that was actually written, which
+    # is not necessarily the one that was requested: --on-conflict allocate can
+    # move it. Emitting a machine-readable pointer is how the runner learns that
+    # without re-deriving it and getting it wrong.
+    if args.release_pointer:
+        args.release_pointer.parent.mkdir(parents=True, exist_ok=True)
+        args.release_pointer.write_text(json.dumps({
+            "release_id": result["release_id"],
+            "output_dir": str(result["output_dir"]),
+            "manifest_path": str(result["manifest_path"]),
+            "manifest_sha256": result["manifest_sha256"],
+            "rewritten": result["rewritten"],
+            "document_count": manifest["inventory"]["document_count"],
+        }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    print(f"release_id            {result['release_id']}")
+    print(f"output_dir            {result['output_dir']}")
+    if not result["rewritten"]:
+        print("bundle                unchanged — identical content already released under this id")
     print(f"manifest              {result['manifest_path']}")
     print(f"manifest_sha256       {result['manifest_sha256']}")
     print(f"documents             {manifest['inventory']['document_count']}")

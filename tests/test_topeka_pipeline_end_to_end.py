@@ -455,3 +455,118 @@ def test_allocate_gives_changed_content_its_own_release(tmp_path):
     original = json.loads((bundle / "release-manifest.json").read_text(encoding="utf-8"))
     new = json.loads((allocated / "release-manifest.json").read_text(encoding="utf-8"))
     assert original["inventory"]["inventory_sha256"] != new["inventory"]["inventory_sha256"]
+
+
+# --------------------------------------------------------------------------
+# transitions through the real runner, under one requested id
+# --------------------------------------------------------------------------
+
+def _stage_docx(tree: Path, text: str) -> str:
+    """Put one version of the document in place and return its hash."""
+    instance = tree / "instances" / "ks-state-civics" / "vector-stores" / "topeka-municipal-code"
+    payload = docx_bytes(text)
+    folder = instance / "acquisition" / "ordinances" / "raw" / "30001"
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / f"{sha(payload)[:16]}.docx").write_bytes(payload)
+    (instance / "acquisition" / "acquisition-checkpoint.jsonl").write_text(
+        json.dumps({
+            "source_document_id": NEW,
+            "collection_id": "ks:city:topeka:ordinances",
+            "official_url": URLS[NEW],
+            "sha256": sha(payload),
+            "outcome": "downloaded_new",
+            "saved_path": str(folder / f"{sha(payload)[:16]}.docx"),
+            "observed_at": "2026-09-16T00:00:00Z",
+            "run_id": "t",
+            "content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "review_flags": [],
+            "review_status": "clear",
+        }) + "\n", encoding="utf-8"
+    )
+    (instance / "discovery").mkdir(parents=True, exist_ok=True)
+    (instance / "discovery" / "worklist.jsonl").write_text(
+        json.dumps({"source_document_id": NEW}) + "\n", encoding="utf-8"
+    )
+    return sha(payload)
+
+
+def test_new_then_changed_then_unchanged_through_the_real_runner(tmp_path):
+    """One requested id across three transitions. Nothing may be rewritten."""
+    instance = tmp_path / "instances" / "ks-state-civics" / "vector-stores" / "topeka-municipal-code"
+    releases = instance / "releases"
+    ledger_path = releases / "released-state.jsonl"
+
+    def ledger_versions() -> dict[str, str]:
+        if not ledger_path.exists():
+            return {}
+        return {
+            json.loads(line)["source_document_id"]: json.loads(line)["document_version_id"]
+            for line in ledger_path.read_text(encoding="utf-8").splitlines() if line.strip()
+        }
+
+    def bundle_hashes(bundle: Path) -> dict[str, str]:
+        manifest = json.loads((bundle / "release-manifest.json").read_text(encoding="utf-8"))
+        files = {
+            entry["path"]: entry["sha256"]
+            for document in manifest["documents"] for entry in document["files"] if entry["present"]
+        }
+        files["release-manifest.json"] = sha((bundle / "release-manifest.json").read_bytes())
+        return files
+
+    # 1. new
+    first_sha = _stage_docx(tmp_path, "the original body text")
+    assert run_refresh(tmp_path, "daily").returncode == 0
+    first = releases / "daily"
+    assert (first / "release-manifest.json").exists()
+    first_hashes = bundle_hashes(first)
+    assert ledger_versions()[NEW].endswith(first_sha[:16])
+
+    # 2. changed, same requested id
+    second_sha = _stage_docx(tmp_path, "a materially different revised body")
+    assert run_refresh(tmp_path, "daily").returncode == 0
+    allocated = releases / "daily-002"
+    assert (allocated / "release-manifest.json").exists(), "changed content needs its own release"
+
+    for path, digest in first_hashes.items():
+        assert sha((first / path).read_bytes()) == digest, f"{path} in the first release was rewritten"
+
+    assert ledger_versions()[NEW].endswith(second_sha[:16]), (
+        "the ledger must record the release that was actually written, not the requested id"
+    )
+    proof = releases / "proofs" / "daily-002-validation.json"
+    assert proof.exists(), "validation must target the allocated release"
+    assert json.loads(proof.read_text(encoding="utf-8"))["passed"]
+
+    # 3. unchanged rerun
+    assert run_refresh(tmp_path, "daily").returncode == 0
+    assert not (releases / "daily-003").exists(), "an unchanged rerun must not allocate a release"
+    assert ledger_versions()[NEW].endswith(second_sha[:16])
+    for path, digest in bundle_hashes(allocated).items():
+        assert sha((allocated / path).read_bytes()) == digest
+
+
+def test_an_identical_re_export_does_not_touch_a_single_byte(tmp_path):
+    """released_at must not move, or every lock citing the release is invalidated."""
+    pipeline = Pipeline(tmp_path)
+    bundle = pipeline.releases / "daily"
+    selection = _one_document_selection(tmp_path, pipeline, "stable text", "a")
+
+    assert pipeline.run("topeka-source-release-export.py", "--selection", selection,
+                        "--output-dir", bundle, "--release-id", "daily",
+                        "--bundle-kind", "fixture").returncode == 0
+    before = {
+        path.relative_to(bundle).as_posix(): sha(path.read_bytes())
+        for path in sorted(bundle.rglob("*")) if path.is_file()
+    }
+    manifest_mtime = (bundle / "release-manifest.json").stat().st_mtime_ns
+
+    result = pipeline.run("topeka-source-release-export.py", "--selection", selection,
+                          "--output-dir", bundle, "--release-id", "daily", "--bundle-kind", "fixture")
+    assert result.returncode == 0
+    after = {
+        path.relative_to(bundle).as_posix(): sha(path.read_bytes())
+        for path in sorted(bundle.rglob("*")) if path.is_file()
+    }
+    assert after == before, "an identical retry must be a no-op on disk"
+    assert (bundle / "release-manifest.json").stat().st_mtime_ns == manifest_mtime
+    assert "unchanged" in result.stdout

@@ -503,3 +503,71 @@ def test_a_resolution_without_an_author_or_reason_does_not_clear(tmp_path):
     _seam_fixture(tmp_path, acquired=b"%PDF retained bytes", flags=[],
                   outcome="unchanged_remote", tag="third")
     assert _rows(out / "ordinances.review.jsonl"), "an unsigned resolution is not a resolution"
+
+
+def test_a_hold_survives_the_document_vanishing_from_a_run(tmp_path):
+    """held -> absent from the worklist -> returns unflagged. The hold must persist.
+
+    A document can drop out of a run for reasons that say nothing about its
+    review state: a listing hiccup, a narrowed --collection, a discovery
+    failure. Rebuilding the holds ledger from only what is present deletes the
+    hold, and the next run that sees the document releases it.
+    """
+    doc, out, _ = _seam_fixture(
+        tmp_path, acquired=b"%PDF retained bytes",
+        flags=["membership_review_needed"], outcome="unchanged_remote", tag="first",
+    )
+    assert [row["source_document_id"] for row in _rows(out / "ordinances.review.jsonl")] == [doc]
+
+    # Run 2: the document is absent from every input -- it vanished from this
+    # run entirely, which is what a listing hiccup or a narrowed --collection
+    # looks like.
+    empty = tmp_path / "empty.jsonl"
+    empty.write_text("", encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, str(RELEASE / "topeka-destination-manifests.py"),
+         "--assignments", str(empty), "--checkpoint", str(empty), "--worklist", str(empty),
+         "--output-dir", str(out), "--ordinance-seed", str(tmp_path / "seed")],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+
+    holds = _rows(out / "review-holds.jsonl")
+    assert [row["source_document_id"] for row in holds] == [doc], (
+        "a hold must not be deleted because the document was absent for one run"
+    )
+    report = json.loads((out / "destination-report.json").read_text(encoding="utf-8"))
+    assert any(
+        row["source_document_id"] == doc
+        for row in report["holds_on_documents_absent_this_run"]
+    )
+
+    # Run 3: the document returns, with no flag on the receipt and no resolution.
+    _seam_fixture(tmp_path, acquired=b"%PDF retained bytes", flags=[],
+                  outcome="unchanged_remote", tag="third")
+    review = _rows(out / "ordinances.review.jsonl")
+    assert [row["source_document_id"] for row in review] == [doc], "still held"
+    assert review[0]["review_flags"] == ["membership_review_needed"]
+    assert not _rows(out / "ordinances.manifest.jsonl"), "must not reach the clean lane"
+
+
+def test_an_absent_document_s_hold_still_clears_with_a_resolution(tmp_path):
+    doc, out, _ = _seam_fixture(
+        tmp_path, acquired=b"%PDF retained bytes",
+        flags=["membership_review_needed"], outcome="unchanged_remote", tag="first",
+    )
+    (out / "review-resolutions.jsonl").write_text(json.dumps({
+        "source_document_id": doc, "review_flag": "membership_review_needed",
+        "resolved_by": "records-clerk", "reason": "confirmed with the City Clerk",
+    }) + "\n", encoding="utf-8")
+
+    empty = tmp_path / "empty.jsonl"
+    empty.write_text("", encoding="utf-8")
+    assert subprocess.run(
+        [sys.executable, str(RELEASE / "topeka-destination-manifests.py"),
+         "--assignments", str(empty), "--checkpoint", str(empty), "--worklist", str(empty),
+         "--output-dir", str(out), "--ordinance-seed", str(tmp_path / "seed")],
+        cwd=ROOT, capture_output=True, text=True,
+    ).returncode == 0
+
+    assert _rows(out / "review-holds.jsonl") == [], "a signed resolution clears even an absent hold"

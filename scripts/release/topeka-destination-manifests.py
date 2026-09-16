@@ -253,6 +253,23 @@ def build(
         record["review_flags"] = sorted(flags)
         record["review_status"] = "review_needed" if flags else "clear"
 
+    surviving_holds: dict[str, list[str]] = {}
+    for doc_id, flags in prior_holds.items():
+        remaining = sorted(flags - set(resolutions.get(doc_id, {})))
+        if remaining:
+            surviving_holds[doc_id] = remaining
+    absent_holds = [
+        {"source_document_id": doc_id, "review_flags": flags,
+         "detail": "held, and not present in this run's inputs; the hold is kept"}
+        for doc_id, flags in sorted(surviving_holds.items())
+        if doc_id not in by_id
+    ]
+    for record in by_id.values():
+        if record["review_flags"]:
+            surviving_holds[record["source_document_id"]] = sorted(record["review_flags"])
+        else:
+            surviving_holds.pop(record["source_document_id"], None)
+
     records = list(by_id.values())
     issues: list[dict[str, Any]] = []
     seen: dict[str, str] = {}
@@ -292,11 +309,15 @@ def build(
         "review_lane": review_lane,
         "replaced": replaced,
         "carried_holds": carried_holds,
+        "holds_on_absent_documents": absent_holds,
         "cleared_by_resolution": cleared,
-        "holds": {
-            record["source_document_id"]: record["review_flags"]
-            for record in records if record["review_flags"]
-        },
+        # The holds ledger is the record of unresolved doubt, not a snapshot of
+        # this run's inputs. A document can drop out of a worklist for a run --
+        # a listing hiccup, a narrowed --collection, a discovery failure -- and
+        # rebuilding the ledger from only what is present deletes its hold, so
+        # the next run that sees it again releases it. Absent documents keep
+        # their holds; only a signed resolution removes one.
+        "holds": surviving_holds,
         "by_destination": by_destination,
         "issues": issues,
         "superseded": superseded,
@@ -464,6 +485,7 @@ def main() -> int:
         "review_holds_ledger": str(holds_path),
         "review_resolutions_ledger": str(resolutions_path),
         "holds_carried_from_earlier_runs": result["carried_holds"],
+        "holds_on_documents_absent_this_run": result["holds_on_absent_documents"],
         "holds_cleared_by_resolution": result["cleared_by_resolution"],
         "superseded_identities": result["superseded"],
         "acquired_revisions_superseding_retained": result["replaced"],
@@ -485,6 +507,8 @@ def main() -> int:
         if held:
             print(f"  {'':20s}       review reasons: {destination['review_reasons']}")
     print(f"  {'total':20s} {report['total_records']:5d}")
+    for row in result["holds_on_absent_documents"][:10]:
+        print(f"  HOLD-KEPT    {row['source_document_id']}: {row['review_flags']} (absent this run)")
     for row in result["carried_holds"][:10]:
         print(f"  HOLD-CARRIED {row['source_document_id']}: {row['carried_flags']}")
     for row in result["cleared_by_resolution"][:10]:

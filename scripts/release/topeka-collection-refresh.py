@@ -38,12 +38,23 @@ DESTINATIONS = INSTANCE / "destinations"
 EXTRACTION = INSTANCE / "extraction"
 RELEASES = INSTANCE / "releases"
 LEDGER = RELEASES / "released-state.jsonl"
+POINTER = RELEASES / "proofs" / "last-release-pointer.json"
 
 RELEASE = CODE_ROOT / "scripts" / "release"
 
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def read_pointer() -> dict[str, Any] | None:
+    """Where the export stage said it actually wrote, if it wrote at all."""
+    if not POINTER.exists():
+        return None
+    try:
+        return json.loads(POINTER.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
 
 
 def stages(*, offline: bool, release_bundle: Path, previous_manifest: Path | None,
@@ -102,6 +113,7 @@ def stages(*, offline: bool, release_bundle: Path, previous_manifest: Path | Non
         # published. Allocating a new id keeps every published one immutable
         # rather than failing the run or rewriting history.
         "--on-conflict", "allocate",
+        "--release-pointer", str(POINTER),
         "--allow-empty",
     ]
     if reference_originals:
@@ -111,15 +123,19 @@ def stages(*, offline: bool, release_bundle: Path, previous_manifest: Path | Non
     if previous_manifest:
         export += ["--previous-manifest", str(previous_manifest)]
 
+    # Validation and the ledger must target the release that was actually
+    # written. --on-conflict allocate can move it to a suffixed id, and a stage
+    # that re-derives the path from the REQUESTED id validates and records the
+    # wrong bundle while still exiting 0.
     validate = [
         sys.executable, str(RELEASE / "jurisdiction-release-validate.py"),
-        "--bundle", str(release_bundle),
-        "--output", str(RELEASES / "proofs" / f"{release_bundle.name}-validation.json"),
+        "--bundle", "@release_dir",
+        "--output", "@validation_proof",
     ]
 
     ledger = [
         sys.executable, str(RELEASE / "topeka-release-ledger.py"),
-        "--manifest", str(release_bundle / "release-manifest.json"),
+        "--manifest", "@release_manifest",
         "--ledger", str(LEDGER),
     ]
 
@@ -166,6 +182,9 @@ def main() -> int:
         reference_originals=args.reference_originals,
     )
 
+    if not args.dry_run and POINTER.exists():
+        POINTER.unlink()
+
     results: list[dict[str, Any]] = []
     failed = False
     for stage in planned:
@@ -184,15 +203,25 @@ def main() -> int:
             print(f"  SKIP     {stage['name']} (an earlier stage failed)")
             continue
 
-        if stage["name"] in {"validate-release", "record-released-state"} and \
-                not (release_bundle_path / "release-manifest.json").exists():
-            results.append({"stage": stage["name"], "status": "skipped_nothing_released",
-                            "command": printable})
-            print(f"  SKIP     {stage['name']} (nothing was eligible; no release was written)")
-            continue
+        command = list(stage["command"])
+        if any(str(token).startswith("@") for token in command):
+            pointer = read_pointer()
+            if pointer is None or not pointer.get("manifest_path"):
+                results.append({"stage": stage["name"], "status": "skipped_nothing_released",
+                                "command": printable})
+                print(f"  SKIP     {stage['name']} (nothing was eligible; no release was written)")
+                continue
+            release_dir = Path(pointer["output_dir"])
+            substitutions = {
+                "@release_dir": str(release_dir),
+                "@release_manifest": pointer["manifest_path"],
+                "@validation_proof": str(RELEASES / "proofs" / f"{pointer['release_id']}-validation.json"),
+            }
+            command = [substitutions.get(str(token), token) for token in command]
+            printable = " ".join(map(str, command))
 
         print(f"  RUN      {stage['name']}")
-        completed = subprocess.run(stage["command"], cwd=ROOT, capture_output=True, text=True)
+        completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
         status = "passed" if completed.returncode == 0 else "failed"
         failed = failed or completed.returncode != 0
         results.append({
@@ -205,8 +234,10 @@ def main() -> int:
         for line in results[-1]["tail"]:
             print(f"             {line}")
 
+    pointer = read_pointer()
     receipt = {
         "artifact": "topeka_collection_refresh",
+        "release_written": pointer,
         "schema_version": "1.0",
         "observed_at": utc_now(),
         "mode": "dry_run" if args.dry_run else "execute",
