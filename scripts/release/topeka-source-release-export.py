@@ -84,6 +84,15 @@ _MD_HEADING = re.compile(r"^(#{2,6})\s+(.*\S)\s*$")
 _MARGIN_NUMBER = re.compile(r"^\d{1,3}$")
 
 
+def relative_to_root(path: Path) -> str:
+    """Repo-relative where possible, so a pointer written inside a container is
+    still meaningful on the host that reads it."""
+    try:
+        return path.resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(path)
+
+
 def utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -1826,7 +1835,7 @@ def main() -> int:
             args.release_pointer.parent.mkdir(parents=True, exist_ok=True)
             args.release_pointer.write_text(json.dumps({
                 "release_id": release_id,
-                "output_dir": str(args.output_dir),
+                "output_dir": relative_to_root(args.output_dir),
                 "manifest_path": None,
                 "released": False,
                 "reason": "nothing eligible",
@@ -1866,8 +1875,8 @@ def main() -> int:
         args.release_pointer.parent.mkdir(parents=True, exist_ok=True)
         args.release_pointer.write_text(json.dumps({
             "release_id": result["release_id"],
-            "output_dir": str(result["output_dir"]),
-            "manifest_path": str(result["manifest_path"]),
+            "output_dir": relative_to_root(result["output_dir"]),
+            "manifest_path": relative_to_root(result["manifest_path"]),
             "manifest_sha256": result["manifest_sha256"],
             "rewritten": result["rewritten"],
             "document_count": manifest["inventory"]["document_count"],
