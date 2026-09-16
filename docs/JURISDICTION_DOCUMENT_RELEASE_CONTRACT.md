@@ -22,7 +22,7 @@ accepted `true` against `const: 1` and `enum: [1]` (Python makes `True == 1`),
 ignored `multipleOf` entirely, and treated `[1, 1.0]` as unique. Its
 keyword-coverage guard had itself listed `multipleOf` as supported while never
 implementing it — the exact failure a guard like that cannot catch. Run these
-through the repository's Docker path (`infra/test-runner.Dockerfile`).
+through the repository's Docker path (`Dockerfile.ci`).
 
 ## Presence semantics
 
