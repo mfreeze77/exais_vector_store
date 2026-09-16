@@ -214,7 +214,7 @@ def test_unchanged_documents_are_not_re_released_alongside_a_change(cycles):
 def test_a_quiet_rerun_releases_nothing_and_claims_nothing(cycles):
     third = cycles["third"]
     assert third["manifest"] is None, "no manifest means no release was claimed"
-    assert (third["bundle"] / "no-release.json").exists()
+    assert (third["bundle"].parent / "proofs" / "proof-3-no-release.json").exists()
     assert third["selection"]["counts"]["eligible_new"] == 0
     assert third["selection"]["counts"]["eligible_changed"] == 0
 
@@ -351,7 +351,10 @@ def test_the_refresh_command_publishes_what_is_eligible_then_nothing(refresh_tre
     assert not (second_bundle / "release-manifest.json").exists(), (
         "a run with nothing eligible must not publish a release"
     )
-    assert (second_bundle / "no-release.json").exists()
+    assert not second_bundle.exists() or not any(second_bundle.iterdir()), (
+        "a quiet run must not create or add to a release directory"
+    )
+    assert (instance / "releases" / "proofs" / "refresh-2-no-release.json").exists()
 
     report = json.loads((instance / "releases" / "proofs" / "release-selection.json").read_text())
     assert report["counts"]["eligible_new"] == 0
@@ -597,6 +600,12 @@ def test_a_retry_after_an_interrupted_ledger_update_reuses_the_same_release(tmp_
     assert run_refresh(tmp_path, "daily").returncode == 0
     assert ledger_version().endswith(first_sha[:16])
 
+    # Capture the ledger exactly as it stands before the revision is published.
+    # Restoring these bytes verbatim is what a crash before the ledger write
+    # actually leaves behind; reconstructing the rows by editing a field would
+    # keep metadata the pre-crash ledger never had.
+    pre_crash_ledger = ledger_path.read_bytes()
+
     # 2. publish a revision, then simulate the crash: the bundle and its
     #    validation exist, but the ledger update never happened.
     second_sha = _stage_docx(tmp_path, "a materially different revised body")
@@ -604,21 +613,7 @@ def test_a_retry_after_an_interrupted_ledger_update_reuses_the_same_release(tmp_
     allocated = releases / "daily-002"
     assert (allocated / "release-manifest.json").exists()
 
-    # Roll the ledger back to what it held before the crash: the document is
-    # still recorded, at its previous version.
-    rows = []
-    for line in ledger_path.read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
-        row = json.loads(line)
-        if row["source_document_id"] == NEW:
-            row = {**row, "document_version_id": f"{NEW}@{first_sha[:16]}"}
-            row.pop("prior_version_id", None)
-            row.pop("prior_release_id", None)
-        rows.append(row)
-    ledger_path.write_text(
-        "".join(json.dumps(row, sort_keys=True) + "\n" for row in rows), encoding="utf-8"
-    )
+    ledger_path.write_bytes(pre_crash_ledger)
     assert ledger_version().endswith(first_sha[:16]), "the ledger is back to pre-crash state"
     before = {
         path.relative_to(allocated).as_posix(): sha(path.read_bytes())
@@ -670,3 +665,50 @@ def test_an_explicit_retry_against_the_allocated_id_is_recognised(tmp_path):
     assert retry.returncode == 0, retry.stdout + retry.stderr
     assert "unchanged" in retry.stdout
     assert sha((second / "release-manifest.json").read_bytes()) == before
+
+
+def test_a_quiet_run_does_not_add_a_file_to_a_published_bundle(tmp_path):
+    """A no-op receipt inside an immutable bundle makes every lock count stale."""
+    instance = tmp_path / "instances" / "ks-state-civics" / "vector-stores" / "topeka-municipal-code"
+    releases = instance / "releases"
+
+    _stage_docx(tmp_path, "the original body text")
+    assert run_refresh(tmp_path, "daily").returncode == 0
+    bundle = releases / "daily"
+
+    lock = releases / "daily.lock.json"
+    pipeline = Pipeline(tmp_path)
+    assert pipeline.run("topeka-release-lock.py", "--bundle", bundle, "--output", lock).returncode == 0
+    before = {
+        path.relative_to(bundle).as_posix(): sha(path.read_bytes())
+        for path in sorted(bundle.rglob("*")) if path.is_file()
+    }
+
+    # Nothing has changed, so the next run is quiet.
+    assert run_refresh(tmp_path, "daily").returncode == 0
+    after = {
+        path.relative_to(bundle).as_posix(): sha(path.read_bytes())
+        for path in sorted(bundle.rglob("*")) if path.is_file()
+    }
+    assert after == before, "a quiet run must not touch a published bundle"
+    assert not (bundle / "no-release.json").exists()
+    assert (releases / "proofs" / "daily-no-release.json").exists(), "the receipt goes beside, not inside"
+
+    verify = pipeline.run("topeka-release-lock.py", "--bundle", bundle, "--output", lock, "--verify")
+    assert verify.returncode == 0, verify.stdout + verify.stderr
+
+
+def test_lock_verification_catches_a_bundle_that_gained_a_file(tmp_path):
+    instance = tmp_path / "instances" / "ks-state-civics" / "vector-stores" / "topeka-municipal-code"
+    _stage_docx(tmp_path, "the original body text")
+    assert run_refresh(tmp_path, "daily").returncode == 0
+    bundle = instance / "releases" / "daily"
+    lock = instance / "releases" / "daily.lock.json"
+
+    pipeline = Pipeline(tmp_path)
+    assert pipeline.run("topeka-release-lock.py", "--bundle", bundle, "--output", lock).returncode == 0
+    (bundle / "stray.json").write_text("{}", encoding="utf-8")
+
+    verify = pipeline.run("topeka-release-lock.py", "--bundle", bundle, "--output", lock, "--verify")
+    assert verify.returncode == 1
+    assert "bundle_file_count" in verify.stdout

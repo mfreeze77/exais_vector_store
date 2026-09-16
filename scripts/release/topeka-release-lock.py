@@ -38,6 +38,9 @@ def main() -> int:
                         help="object-store URI the bundle has actually been published to")
     parser.add_argument("--backup-uri", default=None)
     parser.add_argument("--validation-proof", type=Path, default=None)
+    parser.add_argument("--verify", action="store_true",
+                        help="check an existing lock against the bundle instead of writing one; "
+                             "run this before durable publication")
     args = parser.parse_args()
 
     manifest_path = args.bundle / "release-manifest.json"
@@ -105,6 +108,24 @@ def main() -> int:
             "--bundle", str(args.bundle),
         ],
     }
+
+    if args.verify:
+        if not args.output.exists():
+            print(f"FAIL lock {args.output} is absent")
+            return 1
+        recorded = json.loads(args.output.read_text(encoding="utf-8"))
+        mismatches = [
+            (field, recorded.get(field), lock[field])
+            for field in (
+                "release_id", "manifest_sha256", "inventory_sha256",
+                "document_count", "bundle_file_count", "bundle_byte_count",
+            )
+            if recorded.get(field) != lock[field]
+        ]
+        for field, was, now in mismatches:
+            print(f"  MISMATCH {field}: lock records {was}, bundle has {now}")
+        print(f"result             {'PASS' if not mismatches else 'FAIL'}")
+        return 0 if not mismatches else 1
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(lock, indent=2, sort_keys=True) + "\n", encoding="utf-8")

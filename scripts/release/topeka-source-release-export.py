@@ -1796,6 +1796,9 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--release-id", default=None)
     parser.add_argument("--bundle-kind", choices=["production", "starter", "fixture"], default="starter")
+    parser.add_argument("--no-release-receipt", type=Path, default=None,
+                        help="where to record a quiet run (default: <releases>/proofs/"
+                             "<release-id>-no-release.json). Never inside the release directory.")
     parser.add_argument("--release-pointer", type=Path, default=None,
                         help="write the release id and path actually used here, so downstream "
                              "stages act on the release that exists rather than the one requested")
@@ -1845,7 +1848,11 @@ def main() -> int:
         # No manifest is written: the release schema requires at least one
         # document, and an empty "release" would be a claim that something was
         # published. The receipt records the no-op instead.
-        args.output_dir.mkdir(parents=True, exist_ok=True)
+        #
+        # It goes BESIDE the release directory, never inside it. A quiet run
+        # against an id that already holds a release would otherwise add a file
+        # to a published bundle, which mutates something immutable and leaves
+        # every lock's file count stale.
         receipt = {
             "artifact": "jurisdiction_document_release_noop",
             "release_id": release_id,
@@ -1853,7 +1860,11 @@ def main() -> int:
             "reason": "nothing was eligible to release; no manifest written and no release claimed",
             "selection": str(args.selection) if args.selection else None,
         }
-        (args.output_dir / "no-release.json").write_text(
+        receipt_path = args.no_release_receipt or (
+            args.output_dir.parent / "proofs" / f"{release_id}-no-release.json"
+        )
+        receipt_path.parent.mkdir(parents=True, exist_ok=True)
+        receipt_path.write_text(
             json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"
         )
         if args.release_pointer:
@@ -1864,9 +1875,11 @@ def main() -> int:
                 "manifest_path": None,
                 "released": False,
                 "reason": "nothing eligible",
+                "no_release_receipt": relative_to_root(receipt_path),
             }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(f"release_id            {release_id}")
         print("documents             0 — nothing eligible; no release written")
+        print(f"no-release receipt    {receipt_path}")
         return 0
 
     seen: dict[str, str] = {}
