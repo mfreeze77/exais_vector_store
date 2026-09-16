@@ -665,3 +665,43 @@ demo that expects a rich resolutions collection will not find one yet.
 Package verification is complete. The consumer import and the live UI proof
 under KS-539 are StateCivics' work and remain unproved. Activation, retrieval,
 graph and scheduling remain open on the ExAIS side.
+
+## Milestone closed 2026-09-16: data handoff
+
+Independent review PASSED the display handoff at `0e485cb8`. WAVE-118 itself
+stays open.
+
+**Delivered and verified at the destination:** 3,088 documents and citations,
+15,447 files, 28,284 evidence spans, zero verification errors, offline and
+without the producer checkout. Import guide at
+`Statecivicsai/data/exais-handoffs/topeka-portable-2026-09-16/IMPORT.md`.
+
+### Coverage, kept visible
+
+| | |
+| --- | --- |
+| Delivered | 2,702 code sections, 335 ordinances, 41 charter ordinances, **10 resolutions** |
+| Pending extraction | 544 — **532 resolution PDFs** and 12 ordinance PDFs, awaiting the unauthorized paid path |
+| Held for review | 3 — `20520`, `20610` (`identity_ambiguous`), `sto` (`membership_review_needed`) |
+
+Ten resolutions, not 542. Anything built around the resolutions collection will
+look thin until the paid extraction stage runs.
+
+### Open, in the order the ticket's goal needs them
+
+1. **KS-539 consumer proof** (StateCivics, not ExAIS): importer, readable
+   document display, original downloads, search results, meeting-context access.
+   Unblocked now — it does not wait on anything below.
+2. **Paid extraction** of the 544. Enforced caps are wired and tested
+   (`extraction_budget.py`); the pilot is 10 documents starting with Resolution
+   9749. Needs authorization, and the actual billed pages must be reconciled
+   against the ~2,647-page estimate before the bulk stage.
+3. **Activation**: cell up, API ingestion, vector and graph retrieval proof per
+   collection, then the routing switch. Blocked additionally by a host issue —
+   the pinned images are gone and the local registry cannot bind port 5000,
+   which macOS AirPlay Receiver holds.
+4. **Scheduling**: the refresh runner exists and is proven; no scheduler entry
+   is configured, and none should be claimed.
+5. **Hosted CI merge gate**: the CI repair is merged into this branch and CI now
+   fails at exactly one explicit gate — the absent `STATECIVICS_READ_TOKEN`
+   repository secret. `migration-tests` and `image-release` pass.
