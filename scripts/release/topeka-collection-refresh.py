@@ -98,6 +98,10 @@ def stages(*, offline: bool, release_bundle: Path, previous_manifest: Path | Non
         "--release-id", release_bundle.name,
         "--bundle-kind", "starter",
         "--released-state", str(LEDGER),
+        # A refresh runs on a schedule against an id that may already be
+        # published. Allocating a new id keeps every published one immutable
+        # rather than failing the run or rewriting history.
+        "--on-conflict", "allocate",
         "--allow-empty",
     ]
     if reference_originals:

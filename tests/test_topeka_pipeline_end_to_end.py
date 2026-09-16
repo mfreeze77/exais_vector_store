@@ -357,3 +357,101 @@ def test_the_refresh_command_publishes_what_is_eligible_then_nothing(refresh_tre
     assert report["counts"]["eligible_new"] == 0
     assert report["counts"]["eligible_changed"] == 0
     assert report["counts"]["unchanged"] == 1
+
+
+# --------------------------------------------------------------------------
+# release identity is immutable
+# --------------------------------------------------------------------------
+
+def _one_document_selection(tmp_path: Path, pipeline: "Pipeline", text: str, tag: str) -> Path:
+    """Acquire, extract and select a single document with the given body text."""
+    payload = docx_bytes(text)
+    folder = pipeline.acquisition / "ordinances" / "raw" / "30001"
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / f"{sha(payload)[:16]}.docx").write_bytes(payload)
+    assert pipeline.run("topeka-docx-extract.py", "--acquisition-dir", pipeline.acquisition,
+                        "--output-dir", pipeline.extraction).returncode == 0
+
+    report = json.loads(
+        (pipeline.extraction / "docx-extraction-report.json").read_text(encoding="utf-8")
+    )
+    extraction = next(row for row in report["results"] if row["source_sha256"] == sha(payload))
+    selection = tmp_path / f"selection-{tag}.jsonl"
+    selection.write_text(json.dumps({
+        "source_document_id": NEW,
+        "collection_id": "ks:city:topeka:ordinances",
+        "source_uri": URLS[NEW],
+        "sha256": sha(payload),
+        "retained_artifact": str(folder / f"{sha(payload)[:16]}.docx"),
+        "publisher_key": "30001",
+        "builder": "acquired_document",
+        "media_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "observed_at": "2026-09-16T00:00:00Z",
+        "run_id": tag,
+        "normalized_path": extraction["normalized_path"],
+        "structured_path": str(Path(extraction["normalized_path"]).with_name("structured.json")),
+        "extractor": extraction["extractor"],
+        "limitations": [],
+        "limitation_descriptions": {},
+    }) + "\n", encoding="utf-8")
+    return selection
+
+
+def test_a_release_id_cannot_be_rewritten_with_different_content(tmp_path):
+    """The default id is daily, so this is an ordinary Tuesday, not an exotic case."""
+    pipeline = Pipeline(tmp_path)
+    bundle = pipeline.releases / "daily"
+
+    first = pipeline.run("topeka-source-release-export.py",
+                         "--selection", _one_document_selection(tmp_path, pipeline, "version one", "a"),
+                         "--output-dir", bundle, "--release-id", "daily", "--bundle-kind", "fixture")
+    assert first.returncode == 0, first.stdout + first.stderr
+    manifest = json.loads((bundle / "release-manifest.json").read_text(encoding="utf-8"))
+    receipt = {
+        entry["path"]: entry["sha256"]
+        for document in manifest["documents"] for entry in document["files"] if entry["present"]
+    }
+
+    second = pipeline.run(
+        "topeka-source-release-export.py",
+        "--selection", _one_document_selection(tmp_path, pipeline, "version two, different", "b"),
+        "--output-dir", bundle, "--release-id", "daily", "--bundle-kind", "fixture",
+    )
+    assert second.returncode != 0, "a published id must not accept different content"
+    assert "immutable" in (second.stdout + second.stderr)
+
+    for path, digest in receipt.items():
+        assert (bundle / path).exists(), f"{path} was removed by the refused run"
+        assert sha((bundle / path).read_bytes()) == digest, f"{path} no longer matches its receipt"
+
+
+def test_re_exporting_identical_content_under_the_same_id_is_allowed(tmp_path):
+    pipeline = Pipeline(tmp_path)
+    bundle = pipeline.releases / "daily"
+    selection = _one_document_selection(tmp_path, pipeline, "stable text", "a")
+    for _ in range(2):
+        result = pipeline.run("topeka-source-release-export.py", "--selection", selection,
+                              "--output-dir", bundle, "--release-id", "daily", "--bundle-kind", "fixture")
+        assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_allocate_gives_changed_content_its_own_release(tmp_path):
+    pipeline = Pipeline(tmp_path)
+    bundle = pipeline.releases / "daily"
+    first = pipeline.run("topeka-source-release-export.py",
+                         "--selection", _one_document_selection(tmp_path, pipeline, "version one", "a"),
+                         "--output-dir", bundle, "--release-id", "daily", "--bundle-kind", "fixture")
+    assert first.returncode == 0
+
+    second = pipeline.run(
+        "topeka-source-release-export.py",
+        "--selection", _one_document_selection(tmp_path, pipeline, "version two, different", "b"),
+        "--output-dir", bundle, "--release-id", "daily", "--bundle-kind", "fixture",
+        "--on-conflict", "allocate",
+    )
+    assert second.returncode == 0, second.stdout + second.stderr
+    allocated = pipeline.releases / "daily-002"
+    assert (allocated / "release-manifest.json").exists(), "changed content gets its own id"
+    original = json.loads((bundle / "release-manifest.json").read_text(encoding="utf-8"))
+    new = json.loads((allocated / "release-manifest.json").read_text(encoding="utf-8"))
+    assert original["inventory"]["inventory_sha256"] != new["inventory"]["inventory_sha256"]

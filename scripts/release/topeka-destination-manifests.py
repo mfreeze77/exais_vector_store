@@ -108,11 +108,43 @@ def prove_routing(record: dict[str, Any]) -> tuple[str | None, list[str]]:
     return derived, claimants
 
 
-def build(assignments: Path, checkpoint: Path, worklist: Path) -> dict[str, Any]:
+def load_holds(path: Path) -> dict[str, set[str]]:
+    """Review holds recorded by earlier runs, still unresolved."""
+    holds: dict[str, set[str]] = {}
+    for row in read_jsonl(path):
+        holds.setdefault(row["source_document_id"], set()).update(row.get("review_flags") or [])
+    return holds
+
+
+def load_resolutions(path: Path) -> dict[str, dict[str, dict[str, Any]]]:
+    """Explicit resolutions: the only thing that clears a hold.
+
+    A resolution is a human act recorded in a file, naming the document, the
+    flag, who resolved it and why. An observation that simply arrives without
+    the flag is not a resolution -- it usually means the run did not look.
+    """
+    resolved: dict[str, dict[str, dict[str, Any]]] = {}
+    for row in read_jsonl(path):
+        if not row.get("resolved_by") or not row.get("reason"):
+            continue
+        resolved.setdefault(row["source_document_id"], {})[row["review_flag"]] = row
+    return resolved
+
+
+def build(
+    assignments: Path,
+    checkpoint: Path,
+    worklist: Path,
+    *,
+    holds_path: Path | None = None,
+    resolutions_path: Path | None = None,
+) -> dict[str, Any]:
     # Identities the current discovery run actually knows about. The checkpoint
     # is run state and can still hold documents under an identity a later
     # discovery superseded; those must not reach a destination manifest.
     current = {row["source_document_id"] for row in read_jsonl(worklist)}
+    prior_holds = load_holds(holds_path) if holds_path else {}
+    resolutions = load_resolutions(resolutions_path) if resolutions_path else {}
     by_id: dict[str, dict[str, Any]] = {}
     replaced: list[dict[str, Any]] = []
 
@@ -197,6 +229,30 @@ def build(assignments: Path, checkpoint: Path, worklist: Path) -> dict[str, Any]
             "identity_conflict": row.get("identity_conflict"),
         }
 
+    # Carry forward every unresolved hold from earlier runs. A flag observed once
+    # stays until a resolution clears it; otherwise a run that simply did not
+    # re-observe the condition would silently release a held document.
+    carried_holds: list[dict[str, Any]] = []
+    cleared: list[dict[str, Any]] = []
+    for record in by_id.values():
+        doc_id = record["source_document_id"]
+        flags = set(record.get("review_flags") or []) | prior_holds.get(doc_id, set())
+        for flag in sorted(flags & set(resolutions.get(doc_id, {}))):
+            entry = resolutions[doc_id][flag]
+            cleared.append({
+                "source_document_id": doc_id, "review_flag": flag,
+                "resolved_by": entry["resolved_by"], "reason": entry["reason"],
+            })
+        flags -= set(resolutions.get(doc_id, {}))
+        if flags - set(record.get("review_flags") or []):
+            carried_holds.append({
+                "source_document_id": doc_id,
+                "carried_flags": sorted(flags - set(record.get("review_flags") or [])),
+                "detail": "recorded by an earlier run and still unresolved",
+            })
+        record["review_flags"] = sorted(flags)
+        record["review_status"] = "review_needed" if flags else "clear"
+
     records = list(by_id.values())
     issues: list[dict[str, Any]] = []
     seen: dict[str, str] = {}
@@ -235,6 +291,12 @@ def build(assignments: Path, checkpoint: Path, worklist: Path) -> dict[str, Any]
         "records": records,
         "review_lane": review_lane,
         "replaced": replaced,
+        "carried_holds": carried_holds,
+        "cleared_by_resolution": cleared,
+        "holds": {
+            record["source_document_id"]: record["review_flags"]
+            for record in records if record["review_flags"]
+        },
         "by_destination": by_destination,
         "issues": issues,
         "superseded": superseded,
@@ -248,9 +310,18 @@ def main() -> int:
     parser.add_argument("--worklist", type=Path, default=DEFAULT_WORKLIST)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--ordinance-seed", type=Path, default=DEFAULT_SEED)
+    parser.add_argument("--holds", type=Path, default=None,
+                        help="ledger of unresolved review holds (default: <output-dir>/review-holds.jsonl)")
+    parser.add_argument("--resolutions", type=Path, default=None,
+                        help="explicit hold resolutions (default: <output-dir>/review-resolutions.jsonl)")
     args = parser.parse_args()
 
-    result = build(args.assignments, args.checkpoint, args.worklist)
+    holds_path = args.holds or (args.output_dir / "review-holds.jsonl")
+    resolutions_path = args.resolutions or (args.output_dir / "review-resolutions.jsonl")
+    result = build(
+        args.assignments, args.checkpoint, args.worklist,
+        holds_path=holds_path, resolutions_path=resolutions_path,
+    )
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     # The existing ordinance ingest path consumes ordinances.jsonl rows. Slicing
@@ -324,6 +395,11 @@ def main() -> int:
             slice_path.write_text(
                 "".join(json.dumps(row, sort_keys=True) + "\n" for row in slice_rows), encoding="utf-8"
             )
+        elif slice_path.exists():
+            # Writing only when there is something to write leaves the previous
+            # run's file in place, so a report saying "0 slice rows" sits beside
+            # a file still offering the superseded revision to ingestion.
+            slice_path.unlink()
 
         # Destination record, ingestion payload and source artifact must agree.
         by_doc = {row["source_document_id"]: row for row in rows}
@@ -361,6 +437,17 @@ def main() -> int:
             "corrected_urls": sum(1 for row in rows if row.get("url_resolution")),
         })
 
+    # Persist the holds so the next run starts from them, not from whatever this
+    # run happened to observe.
+    holds_path.parent.mkdir(parents=True, exist_ok=True)
+    holds_path.write_text(
+        "".join(
+            json.dumps({"source_document_id": doc_id, "review_flags": flags}, sort_keys=True) + "\n"
+            for doc_id, flags in sorted(result["holds"].items())
+        ),
+        encoding="utf-8",
+    )
+
     report = {
         "artifact": "topeka_destination_manifests",
         "schema_version": "1.0",
@@ -374,6 +461,10 @@ def main() -> int:
             "derived_from_url_rules": True,
             "claim_sweep_across_all_registered_collections": True,
         },
+        "review_holds_ledger": str(holds_path),
+        "review_resolutions_ledger": str(resolutions_path),
+        "holds_carried_from_earlier_runs": result["carried_holds"],
+        "holds_cleared_by_resolution": result["cleared_by_resolution"],
         "superseded_identities": result["superseded"],
         "acquired_revisions_superseding_retained": result["replaced"],
         "review_lane_note": (
@@ -394,6 +485,10 @@ def main() -> int:
         if held:
             print(f"  {'':20s}       review reasons: {destination['review_reasons']}")
     print(f"  {'total':20s} {report['total_records']:5d}")
+    for row in result["carried_holds"][:10]:
+        print(f"  HOLD-CARRIED {row['source_document_id']}: {row['carried_flags']}")
+    for row in result["cleared_by_resolution"][:10]:
+        print(f"  HOLD-CLEARED {row['source_document_id']}: {row['review_flag']} by {row['resolved_by']}")
     for row in result["replaced"][:10]:
         print(f"  SUPERSEDED-HASH {row['source_document_id']}: retained {row['retained_sha256'][:12]} "
               f"-> acquired {row['acquired_sha256'][:12]}")

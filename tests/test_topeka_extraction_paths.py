@@ -310,15 +310,16 @@ def test_held_versions_reports_what_files_contain_not_what_they_are_named(tmp_pa
 # stage-seam regressions (third review round)
 # --------------------------------------------------------------------------
 
-def _seam_fixture(tmp_path: Path, *, acquired: bytes, flags: list[str], outcome: str):
+def _seam_fixture(tmp_path: Path, *, acquired: bytes, flags: list[str], outcome: str,
+                  out_name: str = "dest", tag: str = "seam"):
     """A retained-split record and an acquisition receipt for the same document."""
     doc = "ks:city:topeka:ordinances:ordinance:20407"
     url = "https://files.topeka.gov/community/ordinances/2023/Ordinance20407.pdf"
     retained = b"%PDF retained bytes"
 
     seed = tmp_path / "seed" / "manifests"
-    seed.mkdir(parents=True)
-    (tmp_path / "seed" / "raw" / "pdfs").mkdir(parents=True)
+    seed.mkdir(parents=True, exist_ok=True)
+    (tmp_path / "seed" / "raw" / "pdfs").mkdir(parents=True, exist_ok=True)
     (tmp_path / "seed" / "raw" / "pdfs" / "20407.pdf").write_bytes(retained)
     (seed / "ordinances.jsonl").write_text(json.dumps({
         "id": "topeka-ordinance:legacy", "category": "ordinance", "ordinance_number": "20407",
@@ -332,20 +333,20 @@ def _seam_fixture(tmp_path: Path, *, acquired: bytes, flags: list[str], outcome:
         "record_kind": "ordinance_pdf", "legacy_id": "topeka-ordinance:legacy",
     }) + "\n", encoding="utf-8")
 
-    acquired_path = tmp_path / "acquired.pdf"
+    acquired_path = tmp_path / f"acquired-{tag}.pdf"
     acquired_path.write_bytes(acquired)
-    checkpoint = tmp_path / "checkpoint.jsonl"
+    checkpoint = tmp_path / f"checkpoint-{tag}.jsonl"
     checkpoint.write_text(json.dumps({
         "source_document_id": doc, "collection_id": "ks:city:topeka:ordinances", "official_url": url,
         "sha256": sha(acquired), "outcome": outcome, "saved_path": str(acquired_path),
-        "observed_at": "2026-09-16T00:00:00Z", "run_id": "seam",
+        "observed_at": "2026-09-16T00:00:00Z", "run_id": tag,
         "review_flags": flags, "review_status": "review_needed" if flags else "clear",
     }) + "\n", encoding="utf-8")
 
     worklist = tmp_path / "worklist.jsonl"
     worklist.write_text(json.dumps({"source_document_id": doc}) + "\n", encoding="utf-8")
 
-    out = tmp_path / "dest"
+    out = tmp_path / out_name
     result = subprocess.run(
         [sys.executable, str(RELEASE / "topeka-destination-manifests.py"),
          "--assignments", str(assignments), "--checkpoint", str(checkpoint),
@@ -417,3 +418,88 @@ def test_a_flag_is_cleared_only_by_an_explicit_resolution(tmp_path):
         flags=["membership_review_needed"], outcome="unchanged_remote",
     )
     assert _rows(out / "ordinances.review.jsonl"), "flag recorded on the first pass"
+
+
+# --------------------------------------------------------------------------
+# repeat-run regressions (fourth review round)
+# --------------------------------------------------------------------------
+
+def test_an_empty_slice_removes_the_previous_run_s_file(tmp_path):
+    """A report saying 0 slice rows must not sit beside a file offering one."""
+    doc, out, retained_sha = _seam_fixture(
+        tmp_path, acquired=b"%PDF retained bytes", flags=[], outcome="unchanged_remote", tag="first"
+    )
+    slice_path = out / "ordinances.ingest-slice.jsonl"
+    assert len(_rows(slice_path)) == 1, "the first run has one ingestable row"
+
+    # Second run into the SAME directory: the selected revision changed and has
+    # no retained extraction, so nothing is ingestable.
+    _seam_fixture(tmp_path, acquired=b"%PDF a newer publisher revision",
+                  flags=[], outcome="downloaded_changed", tag="second")
+
+    report = json.loads((out / "destination-report.json").read_text(encoding="utf-8"))
+    declared = sum(entry["ingest_slice_rows"] for entry in report["destinations"])
+    assert declared == 0
+    assert _rows(slice_path) == [], "the superseded row must not survive in the file"
+
+
+def test_a_hold_survives_a_later_run_that_does_not_observe_it(tmp_path):
+    """Not re-observing a condition is not the same as resolving it."""
+    doc, out, _ = _seam_fixture(
+        tmp_path, acquired=b"%PDF retained bytes",
+        flags=["membership_review_needed"], outcome="unchanged_remote", tag="first",
+    )
+    assert [row["source_document_id"] for row in _rows(out / "ordinances.review.jsonl")] == [doc]
+
+    # Second run into the same directory, with no flag on the receipt.
+    _seam_fixture(tmp_path, acquired=b"%PDF retained bytes", flags=[],
+                  outcome="unchanged_remote", tag="second")
+
+    review = _rows(out / "ordinances.review.jsonl")
+    assert [row["source_document_id"] for row in review] == [doc], "the hold must persist"
+    assert review[0]["review_flags"] == ["membership_review_needed"]
+    assert not _rows(out / "ordinances.manifest.jsonl"), "still out of the clean lane"
+
+    report = json.loads((out / "destination-report.json").read_text(encoding="utf-8"))
+    carried = report["holds_carried_from_earlier_runs"]
+    assert any(row["source_document_id"] == doc for row in carried)
+
+
+def test_a_hold_clears_only_with_a_recorded_resolution(tmp_path):
+    doc, out, _ = _seam_fixture(
+        tmp_path, acquired=b"%PDF retained bytes",
+        flags=["membership_review_needed"], outcome="unchanged_remote", tag="first",
+    )
+    assert _rows(out / "ordinances.review.jsonl")
+
+    (out / "review-resolutions.jsonl").write_text(json.dumps({
+        "source_document_id": doc,
+        "review_flag": "membership_review_needed",
+        "resolved_by": "records-clerk",
+        "reason": "confirmed with the City Clerk that the STO is a listed member of the ordinances library",
+        "resolved_at": "2026-09-16T12:00:00Z",
+    }) + "\n", encoding="utf-8")
+
+    _seam_fixture(tmp_path, acquired=b"%PDF retained bytes", flags=[],
+                  outcome="unchanged_remote", tag="third")
+
+    assert not _rows(out / "ordinances.review.jsonl"), "the resolution clears the hold"
+    clean = _rows(out / "ordinances.manifest.jsonl")
+    assert [row["source_document_id"] for row in clean] == [doc]
+    report = json.loads((out / "destination-report.json").read_text(encoding="utf-8"))
+    cleared = report["holds_cleared_by_resolution"]
+    assert cleared and cleared[0]["resolved_by"] == "records-clerk"
+
+
+def test_a_resolution_without_an_author_or_reason_does_not_clear(tmp_path):
+    doc, out, _ = _seam_fixture(
+        tmp_path, acquired=b"%PDF retained bytes",
+        flags=["membership_review_needed"], outcome="unchanged_remote", tag="first",
+    )
+    (out / "review-resolutions.jsonl").write_text(
+        json.dumps({"source_document_id": doc, "review_flag": "membership_review_needed"}) + "\n",
+        encoding="utf-8",
+    )
+    _seam_fixture(tmp_path, acquired=b"%PDF retained bytes", flags=[],
+                  outcome="unchanged_remote", tag="third")
+    assert _rows(out / "ordinances.review.jsonl"), "an unsigned resolution is not a resolution"

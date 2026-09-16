@@ -1371,6 +1371,39 @@ def resolve_selection(
     raise SystemExit(f"unknown selector kind {kind!r}")
 
 
+def allocate_free_release(
+    documents: list[BuiltDocument], *, release_id: str, output_dir: Path
+) -> tuple[str, Path]:
+    """The given id if it is free or already holds exactly this content, else the next free suffix.
+
+    Suffixing rather than overwriting keeps every published identifier pointing
+    at the bytes it was published with, which is what makes an old receipt still
+    checkable.
+    """
+    planned = inventory_fingerprint([
+        {
+            "source_document_id": built.record["identity"]["source_document_id"],
+            "document_version_id": built.record["identity"]["document_version_id"],
+            "payload_sha256": payload_fingerprint(built.record),
+        }
+        for built in documents
+    ])
+    candidate_id, candidate_dir = release_id, output_dir
+    for attempt in range(1, 1000):
+        manifest = candidate_dir / "release-manifest.json"
+        if not manifest.exists():
+            return candidate_id, candidate_dir
+        try:
+            existing = json.loads(manifest.read_text(encoding="utf-8"))["inventory"]["inventory_sha256"]
+        except (json.JSONDecodeError, KeyError):
+            existing = None
+        if existing == planned:
+            return candidate_id, candidate_dir  # identical: re-running is idempotent
+        candidate_id = f"{release_id}-{attempt + 1:03d}"
+        candidate_dir = output_dir.parent / candidate_id
+    raise SystemExit(f"could not allocate a free release id from {release_id!r}")
+
+
 def build_from_selection(
     entry: dict[str, Any],
     *,
@@ -1419,6 +1452,21 @@ def write_bundle(
 ) -> dict[str, Any]:
     release_schema, document_schema = load_release_schemas()
     commit, dirty, dirty_paths = git_commit()
+
+    # A release is immutable. Writing different content under an identifier that
+    # has already been published invalidates every receipt that cites it, and
+    # the daily default identifier makes that an ordinary Tuesday rather than an
+    # exotic case. Decide before a single byte is written.
+    existing_manifest = output_dir / "release-manifest.json"
+    existing_inventory: str | None = None
+    if existing_manifest.exists():
+        try:
+            existing_inventory = json.loads(
+                existing_manifest.read_text(encoding="utf-8")
+            )["inventory"]["inventory_sha256"]
+        except (json.JSONDecodeError, KeyError):
+            existing_inventory = "unreadable"
+
     output_dir.mkdir(parents=True, exist_ok=True)
 
     previous: dict[str, Any] | None = None
@@ -1438,6 +1486,22 @@ def write_bundle(
                 if line.strip():
                     row = json.loads(line)
                     previous_versions[row["source_document_id"]] = row["document_version_id"]
+
+    planned_inventory = inventory_fingerprint([
+        {
+            "source_document_id": built.record["identity"]["source_document_id"],
+            "document_version_id": built.record["identity"]["document_version_id"],
+            "payload_sha256": payload_fingerprint(built.record),
+        }
+        for built in documents
+    ])
+    if existing_inventory is not None and existing_inventory != planned_inventory:
+        raise SystemExit(
+            f"refusing to overwrite release {release_id!r} at {output_dir}: it already holds a "
+            f"different inventory ({existing_inventory[:16]}… vs {planned_inventory[:16]}…). "
+            "A release identifier is immutable. Allocate a new one, or pass --on-conflict allocate "
+            "to have one allocated automatically."
+        )
 
     manifest_documents: list[dict[str, Any]] = []
     unchanged: list[str] = []
@@ -1677,6 +1741,9 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--release-id", default=None)
     parser.add_argument("--bundle-kind", choices=["production", "starter", "fixture"], default="starter")
+    parser.add_argument("--on-conflict", choices=["refuse", "allocate"], default="refuse",
+                        help="what to do when the release id already holds different content: refuse "
+                             "(default) or allocate the next free suffixed id")
     parser.add_argument("--previous-manifest", type=Path, default=None)
     parser.add_argument("--released-state", type=Path, default=None,
                         help="cumulative ledger from topeka-release-ledger.py; must be the same "
@@ -1741,6 +1808,11 @@ def main() -> int:
         if doc_id in seen:
             raise SystemExit(f"{doc_id} selected twice; a release may not carry duplicate active documents")
         seen[doc_id] = built.record["identity"]["document_version_id"]
+
+    if args.on_conflict == "allocate":
+        release_id, args.output_dir = allocate_free_release(
+            documents, release_id=release_id, output_dir=args.output_dir
+        )
 
     result = write_bundle(
         documents,
