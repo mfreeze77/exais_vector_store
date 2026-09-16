@@ -705,3 +705,52 @@ look thin until the paid extraction stage runs.
 5. **Hosted CI merge gate**: the CI repair is merged into this branch and CI now
    fails at exactly one explicit gate — the absent `STATECIVICS_READ_TOKEN`
    repository secret. `migration-tests` and `image-release` pass.
+
+## 2026-09-16 consumer deployment and owner-browser acceptance
+
+Supersedes the earlier statement that the consumer import is unproved.
+StateCivics runtime is merged and pushed at
+`382f35bfc558d31cb96dab9f01cf0764c0b989ea`. The same portable package is now
+retained on the VPS and imported into the live Topeka database: **3,088 new,
+zero changed, 3,088 distinct normalized records**, with the four collection
+counts above re-read from the database. Pending PDFs and review holds were not
+imported. StateCivics `DEPLOYMENT.md` records image pins, backup, commands and
+rollback; KS-539 records the consumer acceptance evidence.
+
+Observed in the owner's signed-in Chrome session:
+
+- All four document kinds open in the reader with retained text, citations,
+  original-file links and partial coverage.
+- Body-only search `701070` finds Resolution 09811 and opens its reader.
+- The assistant searches the retained `TMC 18.05.010`, returns a cited answer,
+  and its internal citation opens the correct code record. This proves retrieval
+  and citation navigation, not legal completeness of an answer from a bounded
+  search excerpt.
+- A production meeting-scoped context snapshot contains **3,088 / 3,088** release
+  documents. Both the live context service and actual Mac processing image read
+  the same TMC text, version and citations. Standing references remain
+  `jurisdiction_reference`; no meeting attachment is invented. This is a tool
+  access proof, not a claim that a new transcript has already been processed.
+
+The original-file HTTP endpoint returned exact retained PDF bytes. The browser
+click showed `ERR_BLOCKED_BY_CLIENT`; automation policy also refused the browser
+download manager. Browser download completion remains **unverified**. No policy
+bypass was attempted.
+
+### Extraction-quality work found by reading the product
+
+Charter Ordinance 086 repeats OCR table-cell text; Ordinance 20334 has damaged
+line/table reading order. These are defects in retained producer extraction,
+not a reason to edit the immutable package or production text manually. Correct
+them through new versioned extraction artifacts and a new release; verify the
+old release remains intact and the consumer displays the corrected revision.
+Hash-valid extraction must not be described as semantically clean.
+
+The display/import/search/context milestone is live. WAVE-118 remains open for
+the 544 pending PDFs, three holds, extraction-quality corrections, browser
+download acceptance, ExAIS activation/retrieval/graph, scheduling and hosted CI.
+No new paid extraction or embeddings were run for this delivery. A renewed
+request for the 10-document pilot (Resolution 9749 first, estimated $1 ceiling)
+is pending an owner answer; elapsed time does not authorize it. The most recent
+checked hosted CI run remains blocked at the scoped credential gate:
+https://github.com/mfreeze77/exais_vector_store/actions/runs/35059416676 .
