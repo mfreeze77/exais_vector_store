@@ -1,7 +1,7 @@
 {
   "artifact": "topeka_collection_refresh",
   "mode": "execute",
-  "observed_at": "2026-09-16T00:52:32Z",
+  "observed_at": "2026-09-16T01:13:20Z",
   "offline": true,
   "passed": true,
   "release_id": "topeka-source-2026-09-16-r2",
@@ -56,35 +56,25 @@
       "stage": "release-selection",
       "status": "passed",
       "tail": [
-        "eligible_new            3088",
+        "eligible_new               0",
         "  eligible_changed           0",
-        "  unchanged                  0",
+        "  unchanged               3088",
         "  pending_extraction       544",
         "  held_for_review            3",
         "  accounted for           3635",
-        "selection written        3088 -> /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/release-selection.jsonl",
+        "selection written        0 -> /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/release-selection.jsonl",
         "pending extraction by    {'ks:city:topeka:ordinances': 12, 'ks:city:topeka:resolutions': 532}",
         "held for review by flag  {'identity_ambiguous': 2, 'membership_review_needed': 1}"
       ]
     },
     {
-      "command": "/usr/local/bin/python /work/scripts/release/topeka-source-release-export.py --selection /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/release-selection.jsonl --output-dir /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/topeka-source-2026-09-16-r2 --release-id topeka-source-2026-09-16-r2 --bundle-kind starter --released-state /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/released-state.jsonl --allow-empty --reference-originals",
+      "command": "/usr/local/bin/python /work/scripts/release/topeka-source-release-export.py --selection /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/release-selection.jsonl --output-dir /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/topeka-source-2026-09-16-r2 --release-id topeka-source-2026-09-16-r2 --bundle-kind starter --released-state /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/released-state.jsonl --on-conflict allocate --allow-empty --reference-originals",
       "exit_code": 0,
       "stage": "export-release",
       "status": "passed",
       "tail": [
-        "  ks:city:topeka:ordinances  ks:city:topeka:ordinances:ordinance:20678@d5c6d4664a710b28  payload=69698afeaf74e142",
-        "  ks:city:topeka:ordinances  ks:city:topeka:ordinances:ordinance:20679@766460ae06fe2108  payload=613b1073094bbc56",
-        "  ks:city:topeka:resolutions  ks:city:topeka:resolutions:resolution:09811@53efa18349845379  payload=334b3860c7d97d49",
-        "  ks:city:topeka:resolutions  ks:city:topeka:resolutions:resolution:09812@2b505e9f279e587a  payload=b68e105483d94025",
-        "  ks:city:topeka:resolutions  ks:city:topeka:resolutions:resolution:09813@33da1b25b82f95fd  payload=1c5664abf336caa2",
-        "  ks:city:topeka:resolutions  ks:city:topeka:resolutions:resolution:09814@c0b6292a1c08015a  payload=fdd3f4b7ddb96948",
-        "  ks:city:topeka:resolutions  ks:city:topeka:resolutions:resolution:09816@9973c908c41853ae  payload=8a420c1e0515bfeb",
-        "  ks:city:topeka:resolutions  ks:city:topeka:resolutions:resolution:09817@3161d68799db2f12  payload=78e7cc1b93e6bb12",
-        "  ks:city:topeka:resolutions  ks:city:topeka:resolutions:resolution:09818@fe93b837d335d461  payload=6410224afc84d3eb",
-        "  ks:city:topeka:resolutions  ks:city:topeka:resolutions:resolution:09819@0c56604934762902  payload=7f41899c9d78fefb",
-        "  ks:city:topeka:resolutions  ks:city:topeka:resolutions:resolution:09820@3677dfd6e83808cb  payload=60951f4127828033",
-        "  ks:city:topeka:resolutions  ks:city:topeka:resolutions:resolution:09821@fb6e8441141b5731  payload=9cabc225f47183ad"
+        "release_id            topeka-source-2026-09-16-r2",
+        "documents             0 \u2014 nothing eligible; no release written"
       ]
     },
     {
@@ -101,7 +91,7 @@
         "  evidence_references_unavailable    3091",
         "  file_count_recomputed              15440",
         "  inventory_sha256_recomputed        339d1ae2a9da0297e3f02060b0aa29184b3f2af0695140627699927cb4b22137",
-        "  manifest_sha256                    fb66f0b62757747fbeaf668b7905510b853da59d3ee746e4ca2501a1cab18abe",
+        "  manifest_sha256                    f7e6c734878b4807f600e2146fd75bc4b8c1598cb4ea03528b39c0a347d8bea6",
         "  present_byte_count_recomputed      94073964",
         "  release_id                         topeka-source-2026-09-16-r2",
         "result   PASS (0 error(s), 0 warning(s))"
@@ -115,9 +105,9 @@
       "tail": [
         "release            topeka-source-2026-09-16-r2",
         "ledger             /work/instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/released-state.jsonl",
-        "  newly released   3088",
+        "  newly released   0",
         "  version updated  0",
-        "  already recorded 0",
+        "  already recorded 3088",
         "  total tracked    3088"
       ]
     }
