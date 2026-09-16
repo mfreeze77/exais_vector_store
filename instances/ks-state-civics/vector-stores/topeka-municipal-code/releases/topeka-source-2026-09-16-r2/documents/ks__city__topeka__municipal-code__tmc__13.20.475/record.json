@@ -1,0 +1,481 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1500,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "f79c7cb37a6f09fc89ef39e5f731011f0a5bcb5edc318dfdfc8fffeead669c30"
+    },
+    "structured": {
+      "block_count": 15,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "f6bb211f-52b7-5f70-a37f-11caa7d13915",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:section",
+      "sha256": "54e67c40e0c04a948cb7c46bfc3de0bf6f1510384750b5b7e286b497aeba4c7f",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 4531,
+      "char_count": 4526,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "1046baaa6aca100519bcadc9a8904e0797e66c99619106a0faf5a14f8c306fac"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "73a4f15c-e237-5cc8-84fd-71793bd6776f",
+          "convention": "utf8_char_offset",
+          "end": 137,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:0",
+          "start": 0
+        },
+        "quote": "(a) The Utilities Director may revoke a wastewater discharge permit for good cause, including, but not limited to, the following reasons:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "c4f4c2bd-3c45-59e2-813f-2ceb4f73bdff",
+          "convention": "utf8_char_offset",
+          "end": 255,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:1",
+          "start": 138
+        },
+        "quote": "(1) Failure to notify the Utilities Director of significant changes to the wastewater prior to the changed discharge;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "6ac45c3e-8ff0-553a-9f48-0474c3457e68",
+          "convention": "utf8_char_offset",
+          "end": 376,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:2",
+          "start": 256
+        },
+        "quote": "(2) Failure to provide prior notification to the Utilities Director of changed conditions pursuant to TMC 13.20.520(f) ;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "6089add6-cc94-5eca-a41a-040dbffe2ef0",
+          "convention": "utf8_char_offset",
+          "end": 494,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:3",
+          "start": 377
+        },
+        "quote": "(3) Misrepresentation or failure to fully disclose all relevant facts in the wastewater discharge permit application;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "25f9bd84-500d-56ae-970f-12062d84f71c",
+          "convention": "utf8_char_offset",
+          "end": 563,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:4",
+          "start": 495
+        },
+        "quote": "(4) Falsifying self-monitoring reports and certification statements;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "19504632-19fd-57a8-b69e-2a16bb4385df",
+          "convention": "utf8_char_offset",
+          "end": 604,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:5",
+          "start": 564
+        },
+        "quote": "(5) Tampering with monitoring equipment;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "04806de7-dae6-5c1b-b089-819ce4da38aa",
+          "convention": "utf8_char_offset",
+          "end": 701,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:6",
+          "start": 605
+        },
+        "quote": "(6) Refusing to allow the Utilities Director timely access to the facility premises and records;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "b4b02617-fc09-5bd8-a59b-6fee85e96eb1",
+          "convention": "utf8_char_offset",
+          "end": 743,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:7",
+          "start": 702
+        },
+        "quote": "(7) Failure to meet effluent limitations;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "82c7adb3-b69f-5a29-b0b8-9253197e65ab",
+          "convention": "utf8_char_offset",
+          "end": 797,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:8",
+          "start": 744
+        },
+        "quote": "(8) Failure to pay administrative monetary penalties;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "82659e45-912d-50ad-a7de-278ae7381def",
+          "convention": "utf8_char_offset",
+          "end": 831,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:9",
+          "start": 798
+        },
+        "quote": "(9) Failure to pay sewer charges;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "c45d2813-ac0b-5cfe-b3bb-1128ae819867",
+          "convention": "utf8_char_offset",
+          "end": 874,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:10",
+          "start": 832
+        },
+        "quote": "(10) Failure to meet compliance schedules;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "4b1ec9f3-425d-5f05-85a4-561c690edafd",
+          "convention": "utf8_char_offset",
+          "end": 967,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:11",
+          "start": 875
+        },
+        "quote": "(11) Failure to complete a wastewater survey or the wastewater discharge permit application;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "67015485-7794-5610-b0fa-8ed803651ba5",
+          "convention": "utf8_char_offset",
+          "end": 1072,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:12",
+          "start": 968
+        },
+        "quote": "(12) Failure to provide advance notice of the transfer of business ownership of a permitted facility; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "00e1263f-72ad-51de-89cb-99fb3fc94cbd",
+          "convention": "utf8_char_offset",
+          "end": 1227,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:13",
+          "start": 1073
+        },
+        "quote": "(13) Violation of any pretreatment standard or requirement, or any terms of the wastewater discharge permit or Chapter 13.20 , 13.25 , 13.30 or 13.35 TMC.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.475 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "742189b8-0a38-5ba0-ab64-f7cdad7151c4",
+          "convention": "utf8_char_offset",
+          "end": 1499,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.475:block:14",
+          "start": 1228
+        },
+        "quote": "(b) Wastewater discharge permits shall be voidable upon cessation of operations or transfer of business ownership. All wastewater discharge permits issued to a user are void upon the issuance of a new wastewater discharge permit to that user. (Ord. 20089 § 70, 10-17-17.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20089",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1497,
+          "start": 1472
+        },
+        "quote": "Ord. 20089 § 70, 10-17-17",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.475#history:20089",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "88e957a841aaf24bc43dc210cfdb659e7a62a2bb21eb6f95b8ec04604c542c0e",
+      "captured_at": "2026-08-28T04:29:49.053550Z",
+      "kind": "rendered_html_capture",
+      "value": "13.20.475.88e957a841aa.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:13.20.475@88e957a841aaf24b",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:13.20.475",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:13.20.475",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 13.20.475",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/13.20.475"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.475#history:20089",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "10-17-17"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "13.20.475",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.475#history:20089",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20089"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.475#history:20089",
+      "value": "adopted"
+    },
+    "title": "Wastewater discharge permit – Revocation."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:29:49.053550Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "88e957a841aaf24bc43dc210cfdb659e7a62a2bb21eb6f95b8ec04604c542c0e",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "88e957a841aaf24bc43dc210cfdb659e7a62a2bb21eb6f95b8ec04604c542c0e",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "88e957a841aaf24bc43dc210cfdb659e7a62a2bb21eb6f95b8ec04604c542c0e",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "1046baaa6aca100519bcadc9a8904e0797e66c99619106a0faf5a14f8c306fac",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "1046baaa6aca100519bcadc9a8904e0797e66c99619106a0faf5a14f8c306fac",
+        "output_sha256": "f79c7cb37a6f09fc89ef39e5f731011f0a5bcb5edc318dfdfc8fffeead669c30",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "1046baaa6aca100519bcadc9a8904e0797e66c99619106a0faf5a14f8c306fac",
+        "output_sha256": "54e67c40e0c04a948cb7c46bfc3de0bf6f1510384750b5b7e286b497aeba4c7f",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/13.20.475",
+    "retained_original": {
+      "byte_count": 33094,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/13.20.475.88e957a841aa.html",
+      "retrieved_at": "2026-08-28T04:29:49.053550Z",
+      "sha256": "88e957a841aaf24bc43dc210cfdb659e7a62a2bb21eb6f95b8ec04604c542c0e"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

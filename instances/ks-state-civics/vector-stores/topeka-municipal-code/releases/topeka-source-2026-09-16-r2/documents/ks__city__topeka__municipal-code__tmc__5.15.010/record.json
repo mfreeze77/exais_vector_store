@@ -1,0 +1,433 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 2357,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "4a818893f8715133bf88ff1e2dddc90866cde73a9f30f296772c0d2594c2146f"
+    },
+    "structured": {
+      "block_count": 12,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 8,
+      "path": "structured.json",
+      "root_component_id": "9ef75a20-ef45-51ef-abd8-5976b21ebb2f",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.010:section",
+      "sha256": "95379ec5ed97bd2704cbbb77476b5a5b2e4ba635172677cacd949877af90de1e",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 6296,
+      "char_count": 6207,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "516d6465a29a2fa5be1e6df6ff7d725e753165ceeb7d82f57972206180b9eb5f"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.010 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "2767662d-f3bf-5a07-852d-115971b403f5",
+          "convention": "utf8_char_offset",
+          "end": 79,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.010:block:0",
+          "start": 0
+        },
+        "quote": "As used in this chapter, the following words shall have the following meanings:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.010:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.010 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "ecaea7ba-cbef-5c73-8ea2-7a9a3c4c9b0a",
+          "convention": "utf8_char_offset",
+          "end": 258,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.010:block:1",
+          "start": 80
+        },
+        "quote": "“Adequate insurance” shall mean insurance covering the alarm business and its agents and employees with coverage limits that meet or exceed the limits set forth in TMC 5.90.150 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.010:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.010 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "1ccdb2d4-5072-540e-8dfe-c6c2c98822c8",
+          "convention": "utf8_char_offset",
+          "end": 635,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.010:block:2",
+          "start": 259
+        },
+        "quote": "“Alarm business” means any business operated by a person who engages in the activity of selling, providing, altering, installing, leasing, maintaining, repairing, replacing, moving, or servicing an alarm system or which causes any of these activities to take place. Such term shall also include alarm servicing companies who engage in the activity of monitoring alarm systems.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.010:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.010 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "09fb8dd8-b270-5881-b706-08effc0f9208",
+          "convention": "utf8_char_offset",
+          "end": 1112,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.010:block:3",
+          "start": 636
+        },
+        "quote": "“Alarm system” means an assembly of equipment or devices or a single device arranged to signal the presence of a hazard requiring urgent attention and to which law enforcement, fire or emergency medical personnel are expected to respond; provided, however, that this term includes externally audible and/or visual on-premises alarm systems but does not include smoke detectors and other alarms designated to merely give internal on-premises notification of an alarm condition.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.010:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.010 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "bf237585-b0e6-5fd5-8d08-e3db412bea48",
+          "convention": "utf8_char_offset",
+          "end": 1200,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.010:block:4",
+          "start": 1113
+        },
+        "quote": "“Chief of Police” means the Chief of Police of the City or a designated representative.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.010:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.010 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "07a84e14-ac32-58e6-b6e4-7ff757913d20",
+          "convention": "utf8_char_offset",
+          "end": 1241,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.010:block:5",
+          "start": 1201
+        },
+        "quote": "“City” means the City of Topeka, Kansas.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.010:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.010 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "3fa9b413-b9e2-5046-a056-b28230888c45",
+          "convention": "utf8_char_offset",
+          "end": 1463,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.010:block:6",
+          "start": 1242
+        },
+        "quote": "“Conviction” shall mean a guilty finding or adjudication as a juvenile offender of a criminal offense prohibited by Federal, State or local law, and shall include expunged convictions, diversions or deferred prosecutions.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.010:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.010 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "5864d66e-46bc-536f-97f2-53e86679f59b",
+          "convention": "utf8_char_offset",
+          "end": 1794,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.010:block:7",
+          "start": 1464
+        },
+        "quote": "“External audible and/or visual on-premises alarm system” means an alarm system designed to emit audible and/or visual signals at or on the premises upon which the alarm system is installed and which causes notification of such alarm system activation to be made to the Shawnee County consolidated emergency communications center.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.010:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.010 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "7963cb61-7769-5e67-b2ff-d34a756c3a5f",
+          "convention": "utf8_char_offset",
+          "end": 2044,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.010:block:8",
+          "start": 1795
+        },
+        "quote": "“Monitor” means the person or business who shall be responsible for determining that an alarm system located within the City has been activated and who notifies the Shawnee County consolidated emergency communications center of the alarm activation.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.010:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.010 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "99bbca64-5536-52a7-9e20-2c6162e1d29d",
+          "convention": "utf8_char_offset",
+          "end": 2153,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.010:block:9",
+          "start": 2045
+        },
+        "quote": "“Person” means any person, firm, partnership, association, corporation, company or organization of any kind.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.010:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.010 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "a9880aa1-3080-53c1-92c6-dbb19e58aada",
+          "convention": "utf8_char_offset",
+          "end": 2300,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.010:block:10",
+          "start": 2154
+        },
+        "quote": "“User” means any person who has a functioning alarm system on premises under the person’s control. (Ord. 19370 § 21, 3-23-10. Code 1995 § 30-441.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.010:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.010 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "0cb3a10f-6b2d-5d2a-a79d-943664c8e1fd",
+          "convention": "utf8_char_offset",
+          "end": 2356,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.010:block:11",
+          "start": 2301
+        },
+        "quote": "Cross References: Definitions generally, TMC 1.10.020 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.010:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.010#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19370",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2278,
+          "start": 2254
+        },
+        "quote": "Ord. 19370 § 21, 3-23-10",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.010#history:19370",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "70032a36eaac5c1894ee4f4978f60eff786df40cf7ab61d43b5aaf92e5e6e751",
+      "captured_at": "2026-08-28T03:49:05.191678Z",
+      "kind": "rendered_html_capture",
+      "value": "5.15.010.70032a36eaac.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:5.15.010@70032a36eaac5c18",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:5.15.010",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:5.15.010",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 5.15.010",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/5.15.010"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.15.010#history:19370",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "3-23-10"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "5.15.010",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.15.010#history:19370",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19370"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.15.010#history:19370",
+      "value": "adopted"
+    },
+    "title": "Definitions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T03:49:05.191678Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "70032a36eaac5c1894ee4f4978f60eff786df40cf7ab61d43b5aaf92e5e6e751",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "70032a36eaac5c1894ee4f4978f60eff786df40cf7ab61d43b5aaf92e5e6e751",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "70032a36eaac5c1894ee4f4978f60eff786df40cf7ab61d43b5aaf92e5e6e751",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "516d6465a29a2fa5be1e6df6ff7d725e753165ceeb7d82f57972206180b9eb5f",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "516d6465a29a2fa5be1e6df6ff7d725e753165ceeb7d82f57972206180b9eb5f",
+        "output_sha256": "4a818893f8715133bf88ff1e2dddc90866cde73a9f30f296772c0d2594c2146f",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "516d6465a29a2fa5be1e6df6ff7d725e753165ceeb7d82f57972206180b9eb5f",
+        "output_sha256": "95379ec5ed97bd2704cbbb77476b5a5b2e4ba635172677cacd949877af90de1e",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/5.15.010",
+    "retained_original": {
+      "byte_count": 30759,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/5.15.010.70032a36eaac.html",
+      "retrieved_at": "2026-08-28T03:49:05.191678Z",
+      "sha256": "70032a36eaac5c1894ee4f4978f60eff786df40cf7ab61d43b5aaf92e5e6e751"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

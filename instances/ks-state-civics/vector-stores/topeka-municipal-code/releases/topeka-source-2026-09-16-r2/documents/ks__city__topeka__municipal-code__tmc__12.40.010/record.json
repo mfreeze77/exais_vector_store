@@ -1,0 +1,289 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 2522,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "bc3d5414230fb7ec79321bb968f148161fb8c1c1392223ffca4906c02cc04e69"
+    },
+    "structured": {
+      "block_count": 3,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "69003d6a-5570-5d39-b504-9d4af229ad36",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:12.40.010:section",
+      "sha256": "727c17647eb7311091628ea5e34d4b1c6ecb285a6cac294fbc79318785126e5c",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 5892,
+      "char_count": 5889,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "72e1542936c268368d1d78b351c39187d83e7c7a20f0aee8b27cc557c95d7d40"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.40.010 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "0d4cf6dc-8068-5c3e-aa58-0740de810704",
+          "convention": "utf8_char_offset",
+          "end": 1179,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.40.010:block:0",
+          "start": 0
+        },
+        "quote": "(a) Residential Property. It shall be unlawful for the owner of record of real property, with a zoning use group designation of R-1, R-2, R-3 or R-4 (single-family dwelling districts) or M-1 (multiple-family dwelling districts), immediately adjacent to a public sidewalk on public right-of-way to fail to remove from the sidewalk, within 48 hours after the end of a snow or ice event, determined by the City Manager or designee based on information from the National Weather Service for Topeka, any snow or ice accumulated on such sidewalk or obstructing such sidewalk. If ice has accumulated of such character as to make removal thereof impossible, the sprinkling or placement of sand, ash or other noncorrosive material thereon within the time specified for removal in such a manner as to make such sidewalk safe for travel of pedestrians shall be deemed compliance with the provisions of this chapter; provided, however, the residential property owner shall not be cited for an accumulation of snow or ice on the sidewalk when the accumulation is caused by the snow removal activity of the City, the State of Kansas, or any other political and taxing subdivision of the State.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.40.010:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.40.010 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "7be30e53-5b13-56fc-8e90-372570b6e85e",
+          "convention": "utf8_char_offset",
+          "end": 2243,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.40.010:block:1",
+          "start": 1180
+        },
+        "quote": "(b) Multifamily, Commercial and Nonresidential Property. It shall be unlawful for the owner of record of real property with a zoning use group designation of M-2, M-3, M-4, or E (multiple-family dwelling districts), D&O (multiple-family dwelling and office district) or C (commercial districts), O&I (office and institutional districts), D (downtown districts) or X (mixed use districts) immediately adjacent to a public sidewalk on public right-of-way to fail to remove from the sidewalk, within 24 hours after the end of a snow or ice event, determined by the City Manager or designee based on information from the National Weather Service for Topeka, any snow or ice accumulated on such sidewalk or obstructing such sidewalk. If ice has accumulated of such character as to make removal thereof impossible, the sprinkling or placement of sand, ash or other noncorrosive material thereon within the time specified for removal in such a manner as to make such sidewalk safe for travel of pedestrians shall be deemed compliance with the provisions of this chapter.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.40.010:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.40.010 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "92eb3bee-249c-5aa6-92c7-da1c0fb275bb",
+          "convention": "utf8_char_offset",
+          "end": 2521,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.40.010:block:2",
+          "start": 2244
+        },
+        "quote": "(c) It shall be unlawful to push, plow or otherwise move snow and/or ice which has accumulated in a public or private parking area, sidewalk, driveway, or roof onto any public sidewalk, alley, public street, street right-of-way, or handicapped stall. (Ord. 19692 § 1, 1-17-12.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.40.010:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.40.010#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19692",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2519,
+          "start": 2496
+        },
+        "quote": "Ord. 19692 § 1, 1-17-12",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.40.010#history:19692",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "718aee5d89bc5deb943b670e2d20737d8f56ec33f0990b543dbfca603c524ea8",
+      "captured_at": "2026-08-28T04:22:56.786003Z",
+      "kind": "rendered_html_capture",
+      "value": "12.40.010.718aee5d89bc.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:12.40.010@718aee5d89bc5deb",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:12.40.010",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:12.40.010",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 12.40.010",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/12.40.010"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.40.010#history:19692",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "1-17-12"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "12.40.010",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.40.010#history:19692",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19692"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.40.010#history:19692",
+      "value": "adopted"
+    },
+    "title": "Removal of snow or ice from public sidewalks."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:22:56.786003Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "718aee5d89bc5deb943b670e2d20737d8f56ec33f0990b543dbfca603c524ea8",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "718aee5d89bc5deb943b670e2d20737d8f56ec33f0990b543dbfca603c524ea8",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "718aee5d89bc5deb943b670e2d20737d8f56ec33f0990b543dbfca603c524ea8",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "72e1542936c268368d1d78b351c39187d83e7c7a20f0aee8b27cc557c95d7d40",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "72e1542936c268368d1d78b351c39187d83e7c7a20f0aee8b27cc557c95d7d40",
+        "output_sha256": "bc3d5414230fb7ec79321bb968f148161fb8c1c1392223ffca4906c02cc04e69",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "72e1542936c268368d1d78b351c39187d83e7c7a20f0aee8b27cc557c95d7d40",
+        "output_sha256": "727c17647eb7311091628ea5e34d4b1c6ecb285a6cac294fbc79318785126e5c",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/12.40.010",
+    "retained_original": {
+      "byte_count": 29616,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/12.40.010.718aee5d89bc.html",
+      "retrieved_at": "2026-08-28T04:22:56.786003Z",
+      "sha256": "718aee5d89bc5deb943b670e2d20737d8f56ec33f0990b543dbfca603c524ea8"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

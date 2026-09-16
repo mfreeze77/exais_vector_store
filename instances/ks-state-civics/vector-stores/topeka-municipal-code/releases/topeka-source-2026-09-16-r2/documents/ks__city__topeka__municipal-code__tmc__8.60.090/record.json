@@ -1,0 +1,657 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 4500,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "a53a301cacb3bb9c465bed078c16944b3d5ca67c328916802fda6f97c5281b4b"
+    },
+    "structured": {
+      "block_count": 26,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "cd2ce80f-fffe-53ba-b205-918baddf8805",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:section",
+      "sha256": "5b4878d5d1f7127fbcc57cb72f1c3e50f029fc252b3f125c6ad466e618732d23",
+      "table_count": 1
+    },
+    "verbatim": {
+      "byte_count": 11105,
+      "char_count": 11088,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "4b1e59dd0b68110945e6ffb90f9cfb9e64121ae30be7483b6260372741206c17"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "b5820023-655e-5545-bf79-b8591ac44fba",
+          "convention": "utf8_char_offset",
+          "end": 127,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:0",
+          "start": 0
+        },
+        "quote": "Section 107.3, Prosecution of violation, is deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "e66b34fb-f0de-563d-aeba-da4b6453da04",
+          "convention": "utf8_char_offset",
+          "end": 687,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:1",
+          "start": 128
+        },
+        "quote": "(a) A person who fails to comply with a notice of violation served in accordance with Section 109.4, shall be guilty of a misdemeanor and, if convicted, may be punished in accordance with subsection (b). A violation of this chapter shall be deemed a strict liability offense. Abatement of a violation by the Code Official shall not be a defense or excuse to a violation. The pendency of an administrative hearing pursuant to section 8.60.110 or section 8.75.040 shall not be a defense to a violation or prevent prosecution and adjudication in Municipal Court.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "9562821d-77c5-5437-8bfb-a33350c2881a",
+          "convention": "utf8_char_offset",
+          "end": 829,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:2",
+          "start": 688
+        },
+        "quote": "(b) Punishment for a violation of the International Property Maintenance Code (IPMC), adopted pursuant to TMC 8.60.010 , shall be as follows:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "7cab4768-b9c8-58f6-8dd9-dd2a61f1a1cf",
+          "convention": "utf8_char_offset",
+          "end": 904,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:3",
+          "start": 830
+        },
+        "quote": "(1) Upon a first conviction, a fine of not more than one thousand dollars;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "b27d3ffb-271f-5445-a42e-7129c91c1a1b",
+          "convention": "utf8_char_offset",
+          "end": 1014,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:4",
+          "start": 905
+        },
+        "quote": "(2) Upon a second conviction, a fine of not less than one hundred dollars nor more than one thousand dollars;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "7a58ba69-930e-55a3-b5dd-28eb5579e8b8",
+          "convention": "utf8_char_offset",
+          "end": 1124,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:5",
+          "start": 1015
+        },
+        "quote": "(3) Upon a third conviction, a fine of not less than five hundred dollars nor more than one thousand dollars;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "6118be08-fff2-5d93-ad72-8ac90b46c6d8",
+          "convention": "utf8_char_offset",
+          "end": 1262,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:6",
+          "start": 1125
+        },
+        "quote": "(4) Upon a fourth or subsequent conviction, a fine of not less than one thousand dollars nor more than two thousand five hundred dollars;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "4344c76f-4f14-5081-ab46-9f536c0eebb6",
+          "convention": "utf8_char_offset",
+          "end": 1434,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:7",
+          "start": 1263
+        },
+        "quote": "(5) In addition to the preceding fines such person may be punished by a term of imprisonment which shall not exceed six (6) months, or by both such fines and imprisonment.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "8e03a194-ae68-58e3-8b5f-7144985c7ea5",
+          "convention": "utf8_char_offset",
+          "end": 1561,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:8",
+          "start": 1435
+        },
+        "quote": "(c) For the purposes of determining whether a conviction is a first or subsequent conviction in sentencing under this section:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "5da9f7fc-1c3d-5063-9258-a344e8d31a8b",
+          "convention": "utf8_char_offset",
+          "end": 1729,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:9",
+          "start": 1562
+        },
+        "quote": "(1) conviction includes being convicted of a violation of the IPMC, and it is irrelevant whether an offense occurred before or after conviction for a previous offense.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "aa80476e-621a-53aa-bd7b-7cc51694e359",
+          "convention": "utf8_char_offset",
+          "end": 1928,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:10",
+          "start": 1730
+        },
+        "quote": "(2) conviction includes being convicted of a violation of the IPMC or entering into a diversion agreement in lieu of further criminal proceedings on a complaint alleging a violation of this section.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "56433866-7258-54ac-8bc3-021eac5d60cb",
+          "convention": "utf8_char_offset",
+          "end": 2090,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:11",
+          "start": 1929
+        },
+        "quote": "(3) any convictions occurring during the three years prior to the date of the occurrence shall be taken into account when determining the sentence to be imposed.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "cdff2666-a0ee-51bc-9005-ccdc5d62c7fb",
+          "convention": "utf8_char_offset",
+          "end": 2239,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:12",
+          "start": 2091
+        },
+        "quote": "(d) Each day that any violation of this ordinance continues shall constitute a separate offense and be punishable hereunder as a separate violation.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "03629a01-8c9a-5dc7-af7c-6b7c80e1f012",
+          "convention": "utf8_char_offset",
+          "end": 2378,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:13",
+          "start": 2240
+        },
+        "quote": "(e) In addition to the penalties set forth above, the court may require that the owner register the property pursuant to Chapter 8.65 TMC.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "a19ca070-86f6-548e-8147-d3254416678b",
+          "convention": "utf8_char_offset",
+          "end": 2501,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:14",
+          "start": 2379
+        },
+        "quote": "Section 106.4, Violation penalties, is deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "1cfdf185-22db-5034-94e4-d85294646695",
+          "convention": "utf8_char_offset",
+          "end": 2527,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:15",
+          "start": 2502
+        },
+        "quote": "Administrative penalties.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "4e11dc6f-dc9a-5263-aed4-50063f386e76",
+          "convention": "utf8_char_offset",
+          "end": 2831,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:16",
+          "start": 2528
+        },
+        "quote": "(a) There shall be an administrative monetary penalty as prescribed by the City’s fee schedule imposed on the owner or, in the case of inoperative vehicles, the vehicle owner for each violation of this chapter that remains uncorrected after the time period stated in the notice of violation has elapsed.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "5c6ec65c-a6ce-5abe-986e-2eed4492acfa",
+          "convention": "utf8_char_offset",
+          "end": 3207,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:17",
+          "start": 2832
+        },
+        "quote": "(b) The administrative monetary penalty for a second or subsequent violation for which an administrative penalty has been imposed under this chapter that remains uncorrected after the time period stated in the notice of violation has elapsed for the same property within 12 months of the same or substantially same violation shall be as prescribed by the City’s fee schedule.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "9c1927ae-a112-5ab0-aff5-5c16623ae39d",
+          "convention": "utf8_char_offset",
+          "end": 3334,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:18",
+          "start": 3208
+        },
+        "quote": "Section 106.5, Abatement of violations, is deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "b04c6882-f112-5255-95c6-ac5a2c89ff2d",
+          "convention": "utf8_char_offset",
+          "end": 4072,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:19",
+          "start": 3335
+        },
+        "quote": "(a) Abatement. Upon the expiration of the compliance period stated in the notice of violation, the Code Official shall inspect the property. The Code Official may grant an extension of time if the owner demonstrates that due diligence is being exercised in abating the violation. If the owner has failed to comply within the compliance period or has failed to timely request an appeal hearing, the Code Official may abate the violation and assess the costs against the owner. If the costs are not paid within 30 days, the cost may be collected pursuant to K.S.A. 12-1,115 and amendments thereto and/or charged against the property pursuant to K.S.A. 12-1617e , K.S.A. 12-1617f , K.S.A. 12-1755 , or K.S.A. 17-4759 and amendments thereto.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "851c5271-c81d-54e7-a48c-4dcd68635732",
+          "convention": "utf8_char_offset",
+          "end": 4345,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:20",
+          "start": 4073
+        },
+        "quote": "(b) Fees. The costs incurred by the City for abatement, including any administrative costs, shall be paid by the owner or, in the case of inoperative vehicles, the vehicle owner. The administrative costs shall be as prescribed by the City’s fee schedule for the following:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "7a53a822-e27a-5195-9a61-fe68b96b41ee",
+          "convention": "utf8_char_offset",
+          "end": 4408,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:21",
+          "start": 4346
+        },
+        "quote": "General violations of the IPMC\nVegetation\nInoperative vehicles",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "7802d925-d4d3-5c4c-939b-d63a8d7cc7c5",
+          "convention": "utf8_char_offset",
+          "end": 4439,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:22",
+          "start": 4409
+        },
+        "quote": "General violations of the IPMC",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "24443373-9266-5efb-a017-dcd0e77db5bf",
+          "convention": "utf8_char_offset",
+          "end": 4450,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:23",
+          "start": 4440
+        },
+        "quote": "Vegetation",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "3a1647e1-1dd6-56e7-8456-4805368fec84",
+          "convention": "utf8_char_offset",
+          "end": 4471,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:24",
+          "start": 4451
+        },
+        "quote": "Inoperative vehicles",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.60.090 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "be547fbc-d9eb-5472-8f3d-4671f2ae0dff",
+          "convention": "utf8_char_offset",
+          "end": 4499,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.60.090:block:25",
+          "start": 4472
+        },
+        "quote": "(Ord. 20631 § 41, 1-13-26.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20631",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 4497,
+          "start": 4473
+        },
+        "quote": "Ord. 20631 § 41, 1-13-26",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.60.090#history:20631",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "6ff7f8d0f3fbbabcddba11010f589392e9be2ff4d717e8c11c660c1712d69b95",
+      "captured_at": "2026-08-28T04:07:19.795242Z",
+      "kind": "rendered_html_capture",
+      "value": "8.60.090.6ff7f8d0f3fb.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:8.60.090@6ff7f8d0f3fbbabc",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:8.60.090",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:8.60.090",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 8.60.090",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/8.60.090"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:8.60.090#history:20631",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "1-13-26"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "8.60.090",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:8.60.090#history:20631",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20631"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:8.60.090#history:20631",
+      "value": "adopted"
+    },
+    "title": "Section 107 – Violations."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:07:19.795242Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "6ff7f8d0f3fbbabcddba11010f589392e9be2ff4d717e8c11c660c1712d69b95",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "6ff7f8d0f3fbbabcddba11010f589392e9be2ff4d717e8c11c660c1712d69b95",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "6ff7f8d0f3fbbabcddba11010f589392e9be2ff4d717e8c11c660c1712d69b95",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "4b1e59dd0b68110945e6ffb90f9cfb9e64121ae30be7483b6260372741206c17",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "4b1e59dd0b68110945e6ffb90f9cfb9e64121ae30be7483b6260372741206c17",
+        "output_sha256": "a53a301cacb3bb9c465bed078c16944b3d5ca67c328916802fda6f97c5281b4b",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "4b1e59dd0b68110945e6ffb90f9cfb9e64121ae30be7483b6260372741206c17",
+        "output_sha256": "5b4878d5d1f7127fbcc57cb72f1c3e50f029fc252b3f125c6ad466e618732d23",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/8.60.090",
+    "retained_original": {
+      "byte_count": 32981,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/8.60.090.6ff7f8d0f3fb.html",
+      "retrieved_at": "2026-08-28T04:07:19.795242Z",
+      "sha256": "6ff7f8d0f3fbbabcddba11010f589392e9be2ff4d717e8c11c660c1712d69b95"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

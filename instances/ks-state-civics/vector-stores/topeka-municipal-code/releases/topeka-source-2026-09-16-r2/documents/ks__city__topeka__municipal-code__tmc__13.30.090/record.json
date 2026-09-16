@@ -1,0 +1,481 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 715,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "e819bf1543185c171f11a1fd0c28fe1891837a54c181c1c1d3e3b642dea9c34d"
+    },
+    "structured": {
+      "block_count": 15,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "16368757-db75-582a-aaca-dfa9cdb73cb4",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:section",
+      "sha256": "7074f03ff23e0acec9e89a16301814a9e0f9055beb1e7b1d46b23739cb7bfd30",
+      "table_count": 1
+    },
+    "verbatim": {
+      "byte_count": 3062,
+      "char_count": 2975,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "963cf53b727755e41cb6c948ccccd7690752080ac01c42cff04412b2b77773ef"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "fa48157a-8634-5f56-ac45-d76fe06a414b",
+          "convention": "utf8_char_offset",
+          "end": 226,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:0",
+          "start": 0
+        },
+        "quote": "All applications for a permit under this chapter shall be accompanied by a fee to cover the costs of plan review and inspection. Such fees shall be as prescribed by the City’s fee schedule and in accordance with the following:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "25cf3147-b61f-54fc-af97-9f6d1e013262",
+          "convention": "utf8_char_offset",
+          "end": 462,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:1",
+          "start": 227
+        },
+        "quote": "Removal or Increase of | LDA/Sq. Ft.\n0 – 100 cubic yards | 0 – 3,000\n101 – 1,000 cubic yards | 3,000 – 1 acre\n1,001 – 5,000 cubic yards | 1 – 5 acres\n5,001 – 500,000 cubic yards | 5 – 10 acres\n500,001 or greater cubic yards | 10+ acres",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "6b792a02-0bfb-5b1c-ab10-ea4c68c939c4",
+          "convention": "utf8_char_offset",
+          "end": 485,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:2",
+          "start": 463
+        },
+        "quote": "Removal or Increase of",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "a601b51a-984f-542c-a663-78537e0f802c",
+          "convention": "utf8_char_offset",
+          "end": 497,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:3",
+          "start": 486
+        },
+        "quote": "LDA/Sq. Ft.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "283b6b16-fd6d-5424-859d-3fd0a00662f2",
+          "convention": "utf8_char_offset",
+          "end": 517,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:4",
+          "start": 498
+        },
+        "quote": "0 – 100 cubic yards",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "595f622b-f66e-5b77-a2c2-38c10dbc228f",
+          "convention": "utf8_char_offset",
+          "end": 527,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:5",
+          "start": 518
+        },
+        "quote": "0 – 3,000",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "2b4e8676-8d25-503e-860a-fd4118263b82",
+          "convention": "utf8_char_offset",
+          "end": 551,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:6",
+          "start": 528
+        },
+        "quote": "101 – 1,000 cubic yards",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "e27d8d2f-6913-53a2-a973-8090d4a8a7ea",
+          "convention": "utf8_char_offset",
+          "end": 566,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:7",
+          "start": 552
+        },
+        "quote": "3,000 – 1 acre",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "c9fec846-a42b-59b0-937e-fcf95eb18ba9",
+          "convention": "utf8_char_offset",
+          "end": 592,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:8",
+          "start": 567
+        },
+        "quote": "1,001 – 5,000 cubic yards",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "a2022222-7bbd-547c-9d88-19bc4a892e76",
+          "convention": "utf8_char_offset",
+          "end": 604,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:9",
+          "start": 593
+        },
+        "quote": "1 – 5 acres",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "9a77310c-0a16-5073-8755-407c48a6702d",
+          "convention": "utf8_char_offset",
+          "end": 632,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:10",
+          "start": 605
+        },
+        "quote": "5,001 – 500,000 cubic yards",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "3dcf3d12-acd9-5b16-a923-cf71ddd23ed9",
+          "convention": "utf8_char_offset",
+          "end": 645,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:11",
+          "start": 633
+        },
+        "quote": "5 – 10 acres",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "dc762c17-a3f5-539d-84ab-d7b36ff1e7e6",
+          "convention": "utf8_char_offset",
+          "end": 676,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:12",
+          "start": 646
+        },
+        "quote": "500,001 or greater cubic yards",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "7afa7138-fdd0-5648-afea-36e0b6081735",
+          "convention": "utf8_char_offset",
+          "end": 686,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:13",
+          "start": 677
+        },
+        "quote": "10+ acres",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.090 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "28fbada2-6dae-504a-8048-fc155d1825c9",
+          "convention": "utf8_char_offset",
+          "end": 714,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.090:block:14",
+          "start": 687
+        },
+        "quote": "(Ord. 20631 § 46, 1-13-26.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20631",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 712,
+          "start": 688
+        },
+        "quote": "Ord. 20631 § 46, 1-13-26",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.090#history:20631",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "bb0a576cdd89dece0e352ac362fff4d585bee99b4ba7123dcfe525cc1f84514e",
+      "captured_at": "2026-08-28T04:32:31.898359Z",
+      "kind": "rendered_html_capture",
+      "value": "13.30.090.bb0a576cdd89.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:13.30.090@bb0a576cdd89dece",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:13.30.090",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:13.30.090",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 13.30.090",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/13.30.090"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.30.090#history:20631",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "1-13-26"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "13.30.090",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.30.090#history:20631",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20631"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.30.090#history:20631",
+      "value": "adopted"
+    },
+    "title": "Fees."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:32:31.898359Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "bb0a576cdd89dece0e352ac362fff4d585bee99b4ba7123dcfe525cc1f84514e",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "bb0a576cdd89dece0e352ac362fff4d585bee99b4ba7123dcfe525cc1f84514e",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "bb0a576cdd89dece0e352ac362fff4d585bee99b4ba7123dcfe525cc1f84514e",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "963cf53b727755e41cb6c948ccccd7690752080ac01c42cff04412b2b77773ef",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "963cf53b727755e41cb6c948ccccd7690752080ac01c42cff04412b2b77773ef",
+        "output_sha256": "e819bf1543185c171f11a1fd0c28fe1891837a54c181c1c1d3e3b642dea9c34d",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "963cf53b727755e41cb6c948ccccd7690752080ac01c42cff04412b2b77773ef",
+        "output_sha256": "7074f03ff23e0acec9e89a16301814a9e0f9055beb1e7b1d46b23739cb7bfd30",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/13.30.090",
+    "retained_original": {
+      "byte_count": 27414,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/13.30.090.bb0a576cdd89.html",
+      "retrieved_at": "2026-08-28T04:32:31.898359Z",
+      "sha256": "bb0a576cdd89dece0e352ac362fff4d585bee99b4ba7123dcfe525cc1f84514e"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

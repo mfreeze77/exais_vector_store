@@ -1,0 +1,353 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 2552,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "60292d3f12866f60c62f55a39f2a80a9d87855d437586eebfd81a4d7878d91b7"
+    },
+    "structured": {
+      "block_count": 7,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "e8665daa-9a56-515c-b5fc-7efd22ee9784",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:14.55.460:section",
+      "sha256": "f095f0a858f7d34fecefa6c647ee4e6495c1deaa80f9e79d7bf60b495d4074f4",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 6055,
+      "char_count": 6052,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "9d97f07bcd8a48161797c0fec3b884069cdf303f7488a1b04153b46f258ee30d"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.55.460 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "b6c218b2-d51f-53b7-acc7-9797e4d178e1",
+          "convention": "utf8_char_offset",
+          "end": 194,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.55.460:block:0",
+          "start": 0
+        },
+        "quote": "Section R403.1.3, Footing and stem wall reinforcing in Seismic Design Categories D 0 , D 1 and D 2 , is hereby deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.55.460:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.55.460 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "45afe7d4-b10e-58be-a27b-ee8691bf0e2e",
+          "convention": "utf8_char_offset",
+          "end": 542,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.55.460:block:1",
+          "start": 195
+        },
+        "quote": "Foundations with stem walls shall have installed a minimum of one No. 4 bar located in the top 12 inches of the wall and one No. 4 bar located 3 inches (76 mm) to 4 inches (102 mm) from the bottom of the footing. Horizontal bar spacing shall be 24 inches o.c. maximum. Vertical reinforcement shall be No. 4 bars spaced 24 inches on center maximum.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.55.460:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.55.460 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "3497b886-43ec-557c-9448-28b34b93d602",
+          "convention": "utf8_char_offset",
+          "end": 1297,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.55.460:block:2",
+          "start": 543
+        },
+        "quote": "R403.1.3.1, Concrete stem walls with concrete footings. Where a construction joint is created between a concrete footing and a concrete stem wall, not fewer than one No. 4 vertical bar shall be installed at not more than 2 feet (1219 mm) on center. The vertical bar shall have a standard hook and extend to the bottom of the footing and extend not less than 14 inches (357 mm) into the stem wall. Not fewer than one No. 4 horizontal bar shall be installed within 12 inches (305 mm) of the top of the stem wall and one No. 4 horizontal bar shall be located 3 to 4 inches (76 mm to 102 mm) from the bottom of the footing. Horizontal bar spacing shall be 24 inches o.c. maximum. Vertical reinforcement shall be No. 4 bars spaced 24 inches on center maximum.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.55.460:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.55.460 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "868d48d6-3882-5ecf-9330-b63b58ec01e6",
+          "convention": "utf8_char_offset",
+          "end": 2117,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.55.460:block:3",
+          "start": 1298
+        },
+        "quote": "R403.1.3.2, Masonry stem walls with concrete footings. Where a masonry stem wall is supported on a concrete footing, not fewer than one No. 4 vertical bar shall be installed at not more than 4 feet (1219 mm) on center. The vertical bar shall extend to the bottom of the footing and shall have support and cover as specified in Section R403.1.3.5.3 and extend not less than 14 inches (357 mm) into the stem wall. Not fewer than two No. 4 horizontal bar shall be installed within 8 inches (204 mm) of the top of the wall and one No. 4 horizontal bar shall be located 3 to 4 inches (76 mm to 102 mm) from the bottom of the footing. Horizontal bar spacing shall be 48 inches o.c. maximum. Vertical reinforcement shall be No. 4 bars spaced 24 inches on center maximum. Reinforced cells and bond beams shall be solid grouted.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.55.460:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.55.460 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "697f2345-e132-513d-8d60-6ac470928088",
+          "convention": "utf8_char_offset",
+          "end": 2180,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.55.460:block:4",
+          "start": 2118
+        },
+        "quote": "Section R403.1.3.3, Slabs-on-ground with turned-down footings.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.55.460:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.55.460 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "c75e37d8-4c12-582d-a673-ed63bb2ffa69",
+          "convention": "utf8_char_offset",
+          "end": 2523,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.55.460:block:5",
+          "start": 2181
+        },
+        "quote": "Slabs-on-ground with turned-down footings cast monolithically shall have a minimum of one No. 4 bar at the top and the bottom of the footing. Vertical reinforcement shall be No. 4 bars spaced 24 inches o.c. maximum. Floating footings for detached garages and storage sheds shall have reinforcement conforming to City of Topeka specifications.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.55.460:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.55.460 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "026334a0-9d78-5dd0-8d7f-7b2f3c674731",
+          "convention": "utf8_char_offset",
+          "end": 2551,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.55.460:block:6",
+          "start": 2524
+        },
+        "quote": "(Ord. 20467 § 24, 12-5-23.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.55.460:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.55.460#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20467",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2549,
+          "start": 2525
+        },
+        "quote": "Ord. 20467 § 24, 12-5-23",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.55.460#history:20467",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "a560dde40c1143de74f232034c7b4b81ad1a23545c95be64a07a96d227d42be1",
+      "captured_at": "2026-08-28T04:39:48.430974Z",
+      "kind": "rendered_html_capture",
+      "value": "14.55.460.a560dde40c11.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:14.55.460@a560dde40c1143de",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:14.55.460",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:14.55.460",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 14.55.460",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/14.55.460"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.55.460#history:20467",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-5-23"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "14.55.460",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.55.460#history:20467",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20467"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.55.460#history:20467",
+      "value": "adopted"
+    },
+    "title": "Foundations and stem walls."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:39:48.430974Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "a560dde40c1143de74f232034c7b4b81ad1a23545c95be64a07a96d227d42be1",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "a560dde40c1143de74f232034c7b4b81ad1a23545c95be64a07a96d227d42be1",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "a560dde40c1143de74f232034c7b4b81ad1a23545c95be64a07a96d227d42be1",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "9d97f07bcd8a48161797c0fec3b884069cdf303f7488a1b04153b46f258ee30d",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "9d97f07bcd8a48161797c0fec3b884069cdf303f7488a1b04153b46f258ee30d",
+        "output_sha256": "60292d3f12866f60c62f55a39f2a80a9d87855d437586eebfd81a4d7878d91b7",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "9d97f07bcd8a48161797c0fec3b884069cdf303f7488a1b04153b46f258ee30d",
+        "output_sha256": "f095f0a858f7d34fecefa6c647ee4e6495c1deaa80f9e79d7bf60b495d4074f4",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/14.55.460",
+    "retained_original": {
+      "byte_count": 30089,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/14.55.460.a560dde40c11.html",
+      "retrieved_at": "2026-08-28T04:39:48.430974Z",
+      "sha256": "a560dde40c1143de74f232034c7b4b81ad1a23545c95be64a07a96d227d42be1"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

@@ -1,0 +1,529 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 5499,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "13fd4dd547880ba7ef0ec58cd7c71db914ef040ee2fd9b4f85d7e8bf136c19a9"
+    },
+    "structured": {
+      "block_count": 18,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "dc9b9e5f-0c1f-517b-ac38-280c7bedb729",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:section",
+      "sha256": "6e61704ee724d53db86b0f804e4a97a544f9507b07de943c2de8c0e63c4279d1",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 12689,
+      "char_count": 12682,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "4d690e2d19893a83051c05925180436c0abf907635dd408d3ac50ccc86ea3047"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "6fcfcc88-2d28-5301-a87a-c5e1b2fc6f09",
+          "convention": "utf8_char_offset",
+          "end": 449,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:0",
+          "start": 0
+        },
+        "quote": "(a) No user of the POTW shall contribute or cause to be contributed, directly or indirectly, any pollutant or wastewater which will interfere with the operation or performance of the POTW or cause interference or pass-through. These general prohibitions apply to all such users of the POTW whether or not the user is subject to national categorical pretreatment standards or any other national, State or local pretreatment standards or requirements.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "7d172021-1beb-57f5-ae73-63fd951bd965",
+          "convention": "utf8_char_offset",
+          "end": 517,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:1",
+          "start": 450
+        },
+        "quote": "(b) A user may not contribute the following substances to the POTW:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "e67efce2-fbef-52ba-95cd-67015ab445f1",
+          "convention": "utf8_char_offset",
+          "end": 1469,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:2",
+          "start": 518
+        },
+        "quote": "(1) Any liquids, solids or gases which by reason of their nature or quantity are, or may be, sufficient either alone or by interaction with other substances to cause fire or explosion or be injurious in any other way to the POTW or to the operation of the POTW. At no time shall two successive readings on an explosion hazard meter, at the point of discharge into the system (or at any point in the system) be more than five percent nor any single reading over 10 percent of the lower explosive limit (LEL) of the meter. Prohibited materials include but are not limited to gasoline, kerosene, naphtha, benzene, toluene, xylene, ethers, alcohols, ketones, aldehydes, peroxides, chlorates, perchlorates, bromates, carbides, hydrides, sulfides, and any pollutant which creates a fire hazard or explosion hazard in the POTW, including but not limited to waste streams with a closed cup flashpoint of less than 140 degrees Fahrenheit or 60 degrees Celsius.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "05a90b18-4f0a-5226-9f8a-4c699572c915",
+          "convention": "utf8_char_offset",
+          "end": 2146,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:3",
+          "start": 1470
+        },
+        "quote": "(2) Solid or viscous substances which may cause obstruction to the flow in a sewer or other interference with the operation of the wastewater treatment facilities, such as but not limited to grease, garbage with particles greater than one-half inch in any dimension, animal guts or tissue, paunch manure, bones, hair, hides or fleshings, entrails, whole bloods, feathers, ashes, cinders, sand, spent lime, stone or marble dust, metal, glass, straw, shavings, grass clippings, rags, spent grains, spent hops, wastepaper, wood, plastics, gasoline, tar, asphalt, residues, residues from refining or processing of fuel or lubricating oil, mud or glass grinding or polishing waste.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "559d4ab3-a5c3-5ca1-bef3-156c0b123ae9",
+          "convention": "utf8_char_offset",
+          "end": 2357,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:4",
+          "start": 2147
+        },
+        "quote": "(3) Any wastewater having a pH of less than 5.5 or greater than 10.8, or wastewater having any other corrosive property capable of causing damage or hazard to structures, equipment and/or personnel of the POTW.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "3fa72119-60e9-5b71-acf8-a15a88e71f27",
+          "convention": "utf8_char_offset",
+          "end": 2835,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:5",
+          "start": 2358
+        },
+        "quote": "(4) Any wastewater containing pollutants in sufficient quantity, either singly or by interaction with other pollutants, to injure or interfere with any wastewater treatment process, constitute a hazard to humans or animals, create an interference in the receiving waters of the POTW, or to exceed the limitation set forth in a categorical pretreatment standard. Such pollutants shall include but not be limited to any pollutant identified pursuant to Section 307(a) of the Act.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "a4fce53f-1627-5c2e-8731-bf5edfde5f3a",
+          "convention": "utf8_char_offset",
+          "end": 3001,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:6",
+          "start": 2836
+        },
+        "quote": "(5) Any pollutants which result in the presence of toxic gases, vapors or fumes within the POTW in a quantity that may cause acute worker health and safety problems.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "30cb82ce-8485-5e10-92ac-fda10e457d51",
+          "convention": "utf8_char_offset",
+          "end": 3678,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:7",
+          "start": 3002
+        },
+        "quote": "(6) Any substance which may cause the POTW’s effluent or any other product of the POTW such as residues, sludges or scums to be unsuitable for reclamation and reuse or to interfere with the reclamation process. In no case shall a substance discharged to the POTW cause the POTW to be in noncompliance with sludge use or disposal criteria, guidelines or regulations developed under Section 405 of the Act, any criteria, guidelines or regulations affecting sludge use or disposal developed pursuant to the Solid Waste Disposal Act, the Clean Air Act, the Toxic Substance Control Act, or State criteria applicable to the sludge management method currently being used by the City.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "752699fe-7dca-5fc0-a1f0-a489aa466433",
+          "convention": "utf8_char_offset",
+          "end": 3822,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:8",
+          "start": 3679
+        },
+        "quote": "(7) Any substance which will cause the POTW to violate its NPDES and/or State discharge system permit or the receiving water quality standards.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "28e6d6b1-a1b2-5b20-9143-9cdb1b3e5bc7",
+          "convention": "utf8_char_offset",
+          "end": 3975,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:9",
+          "start": 3823
+        },
+        "quote": "(8) Any wastewater with objectionable color not removed in the treatment process, such as but not limited to dye wastes and vegetable tanning solutions.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "8b3ab28a-47f6-572d-a72b-ba6b85d67a6f",
+          "convention": "utf8_char_offset",
+          "end": 4247,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:10",
+          "start": 3976
+        },
+        "quote": "(9) Any wastewater having a temperature which will inhibit biological activity in the POTW treatment plant resulting in interference, but in no case wastewater with a temperature at the introduction into the POTW which exceeds 40 degrees Celsius (104 degrees Fahrenheit).",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "81f50e9c-93db-5893-8e5a-df8761b2c360",
+          "convention": "utf8_char_offset",
+          "end": 4706,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:11",
+          "start": 4248
+        },
+        "quote": "(10) Any pollutants, including oxygen-demanding pollutants (BOD, etc.) released at a flow rate and/or pollutant concentration which a user knows or has reason to know will cause interference to the POTW. In no case shall a slug load have a flow rate or contain concentration or quantities of pollutants that exceed for any time period longer than 15 minutes more than five times the average 24-hour concentrations, quantities or flow during normal operation.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "db08e0f2-1f1f-57b2-a363-b1d88ce7030f",
+          "convention": "utf8_char_offset",
+          "end": 4924,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:12",
+          "start": 4707
+        },
+        "quote": "(11) Any wastewater containing any radioactive waste or isotope of such half-life or concentration as may exceed limits established by the Utilities Director in compliance with applicable State or Federal regulations.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "801d2c7e-51ce-5055-8142-fca37028872c",
+          "convention": "utf8_char_offset",
+          "end": 5003,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:13",
+          "start": 4925
+        },
+        "quote": "(12) Any wastewater which causes a hazard to human life or creates a nuisance.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "155b5fce-c17c-502e-9af1-fdc761476da2",
+          "convention": "utf8_char_offset",
+          "end": 5219,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:14",
+          "start": 5004
+        },
+        "quote": "(c) When the Utilities Director determines that a user is contributing to the POTW any of the above-enumerated substances in such amounts as to interfere with the operation of the POTW, the Utilities Director shall:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "9508ebc4-c21c-58cc-8e7a-9b1095d75ac8",
+          "convention": "utf8_char_offset",
+          "end": 5290,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:15",
+          "start": 5220
+        },
+        "quote": "(1) Advise the user of the impact of the contribution on the POTW; and",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "a5331a17-fa70-594b-bc6a-3f1161f3201f",
+          "convention": "utf8_char_offset",
+          "end": 5380,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:16",
+          "start": 5291
+        },
+        "quote": "(2) Develop effluent limitations for such user to correct the interference with the POTW.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.280 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "0e4f4817-c13c-5d38-a07a-29d770e704cc",
+          "convention": "utf8_char_offset",
+          "end": 5498,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.280:block:17",
+          "start": 5381
+        },
+        "quote": "The Utilities Director will adopt and enforce an enforcement response plan, if required. (Ord. 20089 § 55, 10-17-17.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20089",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 5496,
+          "start": 5471
+        },
+        "quote": "Ord. 20089 § 55, 10-17-17",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.280#history:20089",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "0f26108ba904d0817b833b089bac2c1256c226f594748cde4165eb4306b709ec",
+      "captured_at": "2026-08-28T04:28:52.665337Z",
+      "kind": "rendered_html_capture",
+      "value": "13.20.280.0f26108ba904.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:13.20.280@0f26108ba904d081",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:13.20.280",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:13.20.280",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 13.20.280",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/13.20.280"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.280#history:20089",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "10-17-17"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "13.20.280",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.280#history:20089",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20089"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.280#history:20089",
+      "value": "adopted"
+    },
+    "title": "Unlawful waste discharges in sanitary sewer."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:28:52.665337Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "0f26108ba904d0817b833b089bac2c1256c226f594748cde4165eb4306b709ec",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "0f26108ba904d0817b833b089bac2c1256c226f594748cde4165eb4306b709ec",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "0f26108ba904d0817b833b089bac2c1256c226f594748cde4165eb4306b709ec",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "4d690e2d19893a83051c05925180436c0abf907635dd408d3ac50ccc86ea3047",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "4d690e2d19893a83051c05925180436c0abf907635dd408d3ac50ccc86ea3047",
+        "output_sha256": "13fd4dd547880ba7ef0ec58cd7c71db914ef040ee2fd9b4f85d7e8bf136c19a9",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "4d690e2d19893a83051c05925180436c0abf907635dd408d3ac50ccc86ea3047",
+        "output_sha256": "6e61704ee724d53db86b0f804e4a97a544f9507b07de943c2de8c0e63c4279d1",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/13.20.280",
+    "retained_original": {
+      "byte_count": 37302,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/13.20.280.0f26108ba904.html",
+      "retrieved_at": "2026-08-28T04:28:52.665337Z",
+      "sha256": "0f26108ba904d0817b833b089bac2c1256c226f594748cde4165eb4306b709ec"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

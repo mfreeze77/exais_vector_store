@@ -1,0 +1,399 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1601,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "4fc51b2f9e4e6918f8dd14f4dc63f913126bea51c37f113f32b1439d17e50596"
+    },
+    "structured": {
+      "block_count": 12,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "ae485d23-83a1-5f8d-bee2-e14bb1aab961",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.100:section",
+      "sha256": "55ddc25b41aa1d84c55f746be5819aa9d0777c25677d66126ed36e7bb5526cf8",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 4430,
+      "char_count": 4422,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "7b0e6f94d3a2d37af835b8c3fdb601a671cfa38d9138969ae7f685bbe0875e0f"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.125.100 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "4b32efa5-f3e9-5c56-aa27-0145cd0bb020",
+          "convention": "utf8_char_offset",
+          "end": 73,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.100:block:0",
+          "start": 0
+        },
+        "quote": "No license or any renewal thereof shall be granted under this chapter to:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.100:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.125.100 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "67e751cd-f08c-5c34-92f9-01d163074993",
+          "convention": "utf8_char_offset",
+          "end": 131,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.100:block:1",
+          "start": 74
+        },
+        "quote": "(a) Any person who is not a citizen of the United States;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.100:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.125.100 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "aa92218d-04f6-5b9a-b7ab-eab191a81b31",
+          "convention": "utf8_char_offset",
+          "end": 269,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.100:block:2",
+          "start": 132
+        },
+        "quote": "(b) Any person who has not been an actual resident of the State for at least two years immediately preceding the date of his application;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.100:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.125.100 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "f667454a-65f6-5036-b151-20994af1f487",
+          "convention": "utf8_char_offset",
+          "end": 587,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.100:block:3",
+          "start": 270
+        },
+        "quote": "(c) Any person who has been convicted of or has pleaded guilty to a felony under the laws of Kansas or any other state, or of the United States, or who shall have forfeited his bond to appear in court to answer charges for any such offense within 10 years immediately prior to such person’s application for a license;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.100:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.125.100 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "a4195a3b-cbe7-571b-8b20-24335737186f",
+          "convention": "utf8_char_offset",
+          "end": 695,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.100:block:4",
+          "start": 588
+        },
+        "quote": "(d) Any person who has had his license revoked for cause under the provisions of this chapter or State act;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.100:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.125.100 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "9abd030d-8d1d-5e47-baef-8165d351bfb3",
+          "convention": "utf8_char_offset",
+          "end": 747,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.100:block:5",
+          "start": 696
+        },
+        "quote": "(e) Any person who is not at least 21 years of age;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.100:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.125.100 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "02170163-7f83-5e4e-b2be-feb9b0dd0b94",
+          "convention": "utf8_char_offset",
+          "end": 911,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.100:block:6",
+          "start": 748
+        },
+        "quote": "(f) Any person who at the time of application for renewal of any license issued under this chapter would not be eligible for such license upon a first application;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.100:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.125.100 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "22b220c8-fc8d-557e-8305-de0c3afeacd8",
+          "convention": "utf8_char_offset",
+          "end": 1106,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.100:block:7",
+          "start": 912
+        },
+        "quote": "(g) Any person who does not own the premises for which a license is sought, unless he has a written lease therefor for at least three-fourths of the period for which the license is to be issued;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.100:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.125.100 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "17153591-8204-5783-beb5-604d513ab82a",
+          "convention": "utf8_char_offset",
+          "end": 1265,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.100:block:8",
+          "start": 1107
+        },
+        "quote": "(h) Any person whose spouse would be ineligible to receive a license under this chapter for any reason other than age, citizenship and residence requirements;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.100:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.125.100 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "3b5cb35a-e6e8-5abf-bf4b-9ecc8c626afd",
+          "convention": "utf8_char_offset",
+          "end": 1374,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.100:block:9",
+          "start": 1266
+        },
+        "quote": "(i) Any partnership, unless all of the partners shall be eligible to receive a license as an individual; and",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.100:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.125.100 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "bfbdc594-f003-5930-95f6-b86a65773753",
+          "convention": "utf8_char_offset",
+          "end": 1542,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.100:block:10",
+          "start": 1375
+        },
+        "quote": "(j) A corporation, if any officer, manager, director or stockholder would be ineligible to receive a license as an individual. (Code 1981 § 37-62. Code 1995 § 30-208.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.100:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.125.100 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "4d3e6fdb-aa7d-5cc0-afbf-0f242c50cf13",
+          "convention": "utf8_char_offset",
+          "end": 1600,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.100:block:11",
+          "start": 1543
+        },
+        "quote": "State Law References: Similar provisions, K.S.A. 16-708 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.100:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.100#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "eaaffe3ecf4e7eede6238c1722966ed1c60b78529dc5062d7a2cdfd5a2213e43",
+      "captured_at": "2026-08-28T03:59:42.054175Z",
+      "kind": "rendered_html_capture",
+      "value": "5.125.100.eaaffe3ecf4e.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:5.125.100@eaaffe3ecf4e7eed",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:5.125.100",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:5.125.100",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 5.125.100",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/5.125.100"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "5.125.100",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Qualifications of applicant."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T03:59:42.054175Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "eaaffe3ecf4e7eede6238c1722966ed1c60b78529dc5062d7a2cdfd5a2213e43",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "eaaffe3ecf4e7eede6238c1722966ed1c60b78529dc5062d7a2cdfd5a2213e43",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "eaaffe3ecf4e7eede6238c1722966ed1c60b78529dc5062d7a2cdfd5a2213e43",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "7b0e6f94d3a2d37af835b8c3fdb601a671cfa38d9138969ae7f685bbe0875e0f",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "7b0e6f94d3a2d37af835b8c3fdb601a671cfa38d9138969ae7f685bbe0875e0f",
+        "output_sha256": "4fc51b2f9e4e6918f8dd14f4dc63f913126bea51c37f113f32b1439d17e50596",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "7b0e6f94d3a2d37af835b8c3fdb601a671cfa38d9138969ae7f685bbe0875e0f",
+        "output_sha256": "55ddc25b41aa1d84c55f746be5819aa9d0777c25677d66126ed36e7bb5526cf8",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/5.125.100",
+    "retained_original": {
+      "byte_count": 31538,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/5.125.100.eaaffe3ecf4e.html",
+      "retrieved_at": "2026-08-28T03:59:42.054175Z",
+      "sha256": "eaaffe3ecf4e7eede6238c1722966ed1c60b78529dc5062d7a2cdfd5a2213e43"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

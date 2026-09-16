@@ -1,0 +1,769 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 6499,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "2edd3fccdb00a72f8ecac5c0d1d02d9d091bbafda11b59059fef5ecad98b8821"
+    },
+    "structured": {
+      "block_count": 33,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 23,
+      "path": "structured.json",
+      "root_component_id": "ae764f7d-80d1-5888-9a46-a257dcf02669",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:section",
+      "sha256": "1bd86fb2aad9ad1c6b0f0ad20c8dc19037d79f6e58f384558adb2251a3bf7ba1",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 16304,
+      "char_count": 16069,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "025170313893d34b9df6c888aa9f264cba760d4705c80bd92cb548b70bf5e454"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "1d85de48-fc74-5d85-8ccb-bf785536754c",
+          "convention": "utf8_char_offset",
+          "end": 189,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:0",
+          "start": 0
+        },
+        "quote": "The following words, terms and phrases, when used in this division, shall have the meanings ascribed to them in this section, except where the context clearly indicates a different meaning:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "3565e904-18ee-5228-b87f-11623103ae55",
+          "convention": "utf8_char_offset",
+          "end": 294,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:1",
+          "start": 190
+        },
+        "quote": "“Alley” means a public thoroughfare which affords only a secondary means of access to abutting property.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "aae71316-c110-5236-b550-ba2d29c97650",
+          "convention": "utf8_char_offset",
+          "end": 455,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:2",
+          "start": 295
+        },
+        "quote": "“Block” means a piece or parcel of land entirely surrounded by public highways, streets, streams, railroad rights-of-way, parks, etc., or a combination thereof.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "52b49eff-72a4-525a-b2e4-7d4fbdd758b3",
+          "convention": "utf8_char_offset",
+          "end": 474,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:3",
+          "start": 456
+        },
+        "quote": "Collector Streets.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "a6bd8e57-a6ae-5235-a8d3-4b3b8ad8d4ea",
+          "convention": "utf8_char_offset",
+          "end": 895,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:4",
+          "start": 475
+        },
+        "quote": "(1) Primary. This class of street serves the internal traffic movement within an area of the City such as a subdivision and connects this area with the arterial system. It is intended to equally serve abutting property while at the same time serving traffic movements for commercial and transit vehicles, and is normally spaced at one-half intervals between the major traffic thoroughfares in the normal gridiron system.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "dca05859-b214-5e64-9ac3-e7fabbf6d09d",
+          "convention": "utf8_char_offset",
+          "end": 1212,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:5",
+          "start": 896
+        },
+        "quote": "(2) Secondary. This class of street serves the internal traffic movement within an area of the City such as a subdivision and connects this area with the primary and arterial system. It is intended to serve abutting property while at the same time serving traffic movements excluding commercial and transit vehicles.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "69371cae-e69d-59b2-b50e-a1b53fad2190",
+          "convention": "utf8_char_offset",
+          "end": 1307,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:6",
+          "start": 1213
+        },
+        "quote": "“Comprehensive plan” means the comprehensive metropolitan plan described in Chapter 18.05 TMC.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "2e3fbdc0-ba1c-5f98-9649-8ac931006aaa",
+          "convention": "utf8_char_offset",
+          "end": 1442,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:7",
+          "start": 1308
+        },
+        "quote": "“Cul-de-sac” means a street having one end open to traffic and being permanently terminated by a vehicle turnaround at the closed end.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "d1742373-fdd6-5f8d-b4dd-d2c0e08042ec",
+          "convention": "utf8_char_offset",
+          "end": 1671,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:8",
+          "start": 1443
+        },
+        "quote": "“Design” means the location of streets, alignment of streets, grades and widths of streets, alignment and widths of easements and rights-of-way for drainage and sanitary sewers, and the designation of minimum lot area and width.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "ea4488cf-9105-5371-bb12-517cc4d24f6e",
+          "convention": "utf8_char_offset",
+          "end": 1813,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:9",
+          "start": 1672
+        },
+        "quote": "“Easement” means a grant by the property owner to a person or to the public of the right to the use of a strip of land for specific purposes.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "462839b3-0b15-59f8-9d60-4a44cf1ad18c",
+          "convention": "utf8_char_offset",
+          "end": 2099,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:10",
+          "start": 1814
+        },
+        "quote": "“Final plat” means a plan or map prepared in accordance with the provisions of this division and those of any other applicable City ordinances, which plat is prepared to be placed on record in the office of the county register of deeds for counties in which the subdivision is located.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "721c0f44-8923-5fbb-bd04-a25ce72437c0",
+          "convention": "utf8_char_offset",
+          "end": 2442,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:11",
+          "start": 2100
+        },
+        "quote": "“Improvements” means any improvement and all street work, utilities, trafficways and drainage facilities that are to be installed, or which the subdivider agrees to install on the land for public or private streets, highways, ways and easements as are necessary for the general use of the lot owners in the subdivision and local neighborhood.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "924f9876-e193-5817-bd68-ecbb573bac46",
+          "convention": "utf8_char_offset",
+          "end": 2592,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:12",
+          "start": 2443
+        },
+        "quote": "“Lot” means a portion of land in a subdivision, or other parcel of land, intended as a unit for the purposes of transfer of ownership or development.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "5dedcc84-fe32-50a0-b11e-835e786a2c99",
+          "convention": "utf8_char_offset",
+          "end": 2656,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:13",
+          "start": 2593
+        },
+        "quote": "“Lot line adjustment” means a relocation of existing lot lines.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "61e3a156-a246-5dfa-ab2e-07766d3d578b",
+          "convention": "utf8_char_offset",
+          "end": 2711,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:14",
+          "start": 2657
+        },
+        "quote": "“Lot split” means a lot that is divided into two lots.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "455245d1-c3d6-56a4-93cc-844c3c9e4f61",
+          "convention": "utf8_char_offset",
+          "end": 2928,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:15",
+          "start": 2712
+        },
+        "quote": "“Major plat approval” means a plan or map prepared in accordance with the provisions of this division and those of any other City ordinance which requires the approval of the Planning Commission and the City Council.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "ec37a8e6-3ad0-5525-ac4d-a51cd8ef3f55",
+          "convention": "utf8_char_offset",
+          "end": 2957,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:16",
+          "start": 2929
+        },
+        "quote": "Major Traffic Thoroughfares.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "8b01a23e-9bb8-524f-bb42-735ea28fd24c",
+          "convention": "utf8_char_offset",
+          "end": 3350,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:17",
+          "start": 2958
+        },
+        "quote": "(1) “Primary” means a street or road of great continuity with either a single roadway or a dual roadway which serves or is intended to serve major traffic flow, and is designated in the master plan or is otherwise designated as a limited access highway or freeway, highway, boulevard, parkway or other equivalent term, to identify those streets comprising the basic street system of the City.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "24dd602a-083e-5749-875d-7f272c8f58b7",
+          "convention": "utf8_char_offset",
+          "end": 3596,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:18",
+          "start": 3351
+        },
+        "quote": "(2) “Secondary” means a street or road of considerable continuity which serves or is intended to serve principal traffic flow between separated areas or districts and which is the main means of access to the residential street or roadway system.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "121f61ee-9ee5-567d-8118-be3fa901a680",
+          "convention": "utf8_char_offset",
+          "end": 3815,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:19",
+          "start": 3597
+        },
+        "quote": "“Marginal access streets” or “frontage roads” means a minor street which is generally parallel to or adjacent to a major traffic thoroughfare highway or railroad right-of-way and provides access to abutting properties.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "945aa0a1-a1c7-58f2-8bec-d57bad8dc26f",
+          "convention": "utf8_char_offset",
+          "end": 4684,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:20",
+          "start": 3816
+        },
+        "quote": "“Master plan” means the comprehensive plan made and adopted by the Planning Commission for the physical development of the metropolitan area and its environs indicating the general location, character and extent of streets, alleys, sewers, ways, viaducts, bridges, subways, parkways, parks, playgrounds, waterways, waterfronts, boulevards, squares, aviation fields and other public ways, grounds and open spaces, the general location of public buildings and other public property, and the general location and extent of public utilities and terminals; also the removal, location, widening, narrowing, vacating, abandonment, change of use, or extension of any public ways, grounds, open spaces, buildings, property, utilities or terminals, as well as a zoning plan for the control of the height, area, bulk, location, use and intensity of use of buildings and premises.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "22e78ada-8914-5fa1-8fa0-e1c55b202707",
+          "convention": "utf8_char_offset",
+          "end": 4921,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:21",
+          "start": 4685
+        },
+        "quote": "“Minor plat approval” means a plan or map of an area prepared in accordance with the provisions of this division and those of any other ordinance which requires only the joint approval of the Planning Director and Public Works Director.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "83c41049-714f-5f29-9363-6926ccb06087",
+          "convention": "utf8_char_offset",
+          "end": 5046,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:22",
+          "start": 4922
+        },
+        "quote": "“Minor street” means a street of limited continuity, which serves or is intended to serve the local needs of a neighborhood.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "60b800f2-aa80-51c4-b5f3-edd77d1fe444",
+          "convention": "utf8_char_offset",
+          "end": 5203,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:23",
+          "start": 5047
+        },
+        "quote": "“Pedestrian way” means a right-of-way dedicated to public use, which cuts across a block to facilitate pedestrian access to adjacent streets and properties.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "f9bfe74a-497a-549d-932c-a01f7fdbc105",
+          "convention": "utf8_char_offset",
+          "end": 5271,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:24",
+          "start": 5204
+        },
+        "quote": "“Planning Commission” means the City of Topeka Planning Commission.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "cf7cfec0-074b-551f-9eb9-99823d8364ad",
+          "convention": "utf8_char_offset",
+          "end": 5496,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:25",
+          "start": 5272
+        },
+        "quote": "“Preliminary plat” means a map made for the purpose of showing the design of a proposed subdivision and existing conditions in and around it; the map need not be based on an accurate or detailed final survey of the property.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 26",
+        "locator": {
+          "block_index": 26,
+          "component_id": "67e62e16-cba6-5621-86d8-68475c26d196",
+          "convention": "utf8_char_offset",
+          "end": 5629,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:26",
+          "start": 5497
+        },
+        "quote": "“Public water company” means any person who has a written permit from the State to supply water for domestic purposes to the public.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 27",
+        "locator": {
+          "block_index": 27,
+          "component_id": "e19e815e-a7a7-5722-a758-5bb9846e204c",
+          "convention": "utf8_char_offset",
+          "end": 5822,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:27",
+          "start": 5630
+        },
+        "quote": "“Setback line” or “building line” means a line on a plat generally parallel to the street right-of-way, indicating the limit beyond which buildings or structures may not be erected or altered.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 28",
+        "locator": {
+          "block_index": 28,
+          "component_id": "08ce835c-51db-5110-b159-98b460168910",
+          "convention": "utf8_char_offset",
+          "end": 6017,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:28",
+          "start": 5823
+        },
+        "quote": "“Street” means a right-of-way dedicated to the public use, or a private right-of-way serving more than one owner, which provides principal vehicular and pedestrian access to adjacent properties.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:28#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 29",
+        "locator": {
+          "block_index": 29,
+          "component_id": "db08748d-7f88-50e7-836d-5f2d0cc707d2",
+          "convention": "utf8_char_offset",
+          "end": 6127,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:29",
+          "start": 6018
+        },
+        "quote": "“Subdivider” means any person who causes land to be divided into a subdivision, for themselves or for others.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:29#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 30",
+        "locator": {
+          "block_index": 30,
+          "component_id": "cd332f18-9aa4-560b-a397-08cd62c28a5d",
+          "convention": "utf8_char_offset",
+          "end": 6279,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:30",
+          "start": 6128
+        },
+        "quote": "“Subdivision” means the division of a parcel of land into two or more lots or parcels for the purpose of transfer of ownership or building development.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:30#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 31",
+        "locator": {
+          "block_index": 31,
+          "component_id": "3d8c3cb8-b920-564c-9cf2-42391e39ddbe",
+          "convention": "utf8_char_offset",
+          "end": 6442,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:31",
+          "start": 6280
+        },
+        "quote": "“Urban growth area” means the area identified in the land use and growth management plan which is an element of the comprehensive plan. (Ord. 19942 § 1, 3-10-15.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:31#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.30.010 block 32",
+        "locator": {
+          "block_index": 32,
+          "component_id": "f4b8e730-6a5f-5f3d-b59a-b2c13d7a5533",
+          "convention": "utf8_char_offset",
+          "end": 6498,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.30.010:block:32",
+          "start": 6443
+        },
+        "quote": "Cross References: Definitions generally, TMC 1.10.020 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010:block:32#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19942",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 6440,
+          "start": 6417
+        },
+        "quote": "Ord. 19942 § 1, 3-10-15",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.30.010#history:19942",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "678410f132ad28a7728dab514f153e254d9705095aba087c302bdd59d99c0e7e",
+      "captured_at": "2026-08-28T04:46:56.156470Z",
+      "kind": "rendered_html_capture",
+      "value": "18.30.010.678410f132ad.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:18.30.010@678410f132ad28a7",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:18.30.010",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:18.30.010",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 18.30.010",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/18.30.010"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.30.010#history:19942",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "3-10-15"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "18.30.010",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.30.010#history:19942",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19942"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.30.010#history:19942",
+      "value": "adopted"
+    },
+    "title": "Definitions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:46:56.156470Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "678410f132ad28a7728dab514f153e254d9705095aba087c302bdd59d99c0e7e",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "678410f132ad28a7728dab514f153e254d9705095aba087c302bdd59d99c0e7e",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "678410f132ad28a7728dab514f153e254d9705095aba087c302bdd59d99c0e7e",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "025170313893d34b9df6c888aa9f264cba760d4705c80bd92cb548b70bf5e454",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "025170313893d34b9df6c888aa9f264cba760d4705c80bd92cb548b70bf5e454",
+        "output_sha256": "2edd3fccdb00a72f8ecac5c0d1d02d9d091bbafda11b59059fef5ecad98b8821",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "025170313893d34b9df6c888aa9f264cba760d4705c80bd92cb548b70bf5e454",
+        "output_sha256": "1bd86fb2aad9ad1c6b0f0ad20c8dc19037d79f6e58f384558adb2251a3bf7ba1",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/18.30.010",
+    "retained_original": {
+      "byte_count": 38579,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/18.30.010.678410f132ad.html",
+      "retrieved_at": "2026-08-28T04:46:56.156470Z",
+      "sha256": "678410f132ad28a7728dab514f153e254d9705095aba087c302bdd59d99c0e7e"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

@@ -1,0 +1,239 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1709,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "3af0bd104929b2502119951004fd3a75b90dc22716f2ac3dca83b1bf84e4fd02"
+    },
+    "structured": {
+      "block_count": 2,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "f9d78bb3-d0bc-5769-8ba6-616a73f443d1",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:a15-17:section",
+      "sha256": "51d7287bdf5377250d8d104725ff49a85af8ae933388ff22f73b91796c49f1ba",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 4110,
+      "char_count": 4098,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "b7b010b232928624dce6e4940a7a5c0e80684f1235d3f205ad1fe3c5b5087521"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A15-17 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "20de30fb-9cae-57e0-9793-57b2e53a2897",
+          "convention": "utf8_char_offset",
+          "end": 933,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a15-17:block:0",
+          "start": 0
+        },
+        "quote": "(a) Effective November 14, 2015 and continuing through December 31, 2026, a transient guest tax of seven percent shall be levied in the City of Topeka, Kansas, upon the gross rental receipts derived from or paid directly or through an accommodations broker by transient guests for lodging or sleeping accommodations, exclusive of charges for incidental services or facilities, in any hotel, motel, or tourist court. Funds shall be distributed pursuant to resolution and agreement. Effective January 1, 2027, a transient guest tax of eight and one-half (8.5) percent shall be levied in the City of Topeka, Kansas, upon the gross rental receipts derived from or paid directly or through an accommodations broker by transient guests for lodging or sleeping accommodations, exclusive of charges for incidental services or facilities, in any hotel, motel, or tourist court. Funds shall be distributed pursuant to resolution and agreement.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a15-17:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A15-17 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "c73fe8ef-adea-5e3d-a7da-c447c90f0dc2",
+          "convention": "utf8_char_offset",
+          "end": 1708,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a15-17:block:1",
+          "start": 934
+        },
+        "quote": "(b) Notwithstanding anything to the contrary, the total transient guest tax collected at Hotel Topeka in the year 2025 shall constitute the “base year”. Effective January 1, 2026, the transient guest tax rate levied at Hotel Topeka shall be eight percent and effective January 1, 2027, the transient guest tax rate levied at Hotel Topeka shall be eight and one-half (8.5) percent. Any transient guest tax collected at Hotel Topeka in excess of the base year that is not contractually obligated shall be used solely by the City to recoup its investment costs of Hotel Topeka which include the purchase price, capital expenses, and operating losses incurred by the City through the date of sale. This provision shall expire upon complete reimbursement. (C.O. 126 § 1, 5-5-26.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a15-17:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a15-17#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "9136ee1a2e299d46052b5a85d6991cf245d6f1ee913cd765619724afc8e2aab7",
+      "captured_at": "2026-08-28T04:59:55.347140Z",
+      "kind": "rendered_html_capture",
+      "value": "A15-17.9136ee1a2e29.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:a15-17@9136ee1a2e299d46",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:A15-17",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:a15-17",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC A15-17",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/A15-17"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "A15-17",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Sec. A15-17. Levied – Amount."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:59:55.347140Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "9136ee1a2e299d46052b5a85d6991cf245d6f1ee913cd765619724afc8e2aab7",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "9136ee1a2e299d46052b5a85d6991cf245d6f1ee913cd765619724afc8e2aab7",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "9136ee1a2e299d46052b5a85d6991cf245d6f1ee913cd765619724afc8e2aab7",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "b7b010b232928624dce6e4940a7a5c0e80684f1235d3f205ad1fe3c5b5087521",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "b7b010b232928624dce6e4940a7a5c0e80684f1235d3f205ad1fe3c5b5087521",
+        "output_sha256": "3af0bd104929b2502119951004fd3a75b90dc22716f2ac3dca83b1bf84e4fd02",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "b7b010b232928624dce6e4940a7a5c0e80684f1235d3f205ad1fe3c5b5087521",
+        "output_sha256": "51d7287bdf5377250d8d104725ff49a85af8ae933388ff22f73b91796c49f1ba",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/A15-17",
+    "retained_original": {
+      "byte_count": 29834,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/A15-17.9136ee1a2e29.html",
+      "retrieved_at": "2026-08-28T04:59:55.347140Z",
+      "sha256": "9136ee1a2e299d46052b5a85d6991cf245d6f1ee913cd765619724afc8e2aab7"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

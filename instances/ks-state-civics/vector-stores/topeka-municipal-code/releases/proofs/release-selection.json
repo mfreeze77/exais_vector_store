@@ -1,21 +1,23 @@
 {
   "artifact": "topeka_release_selection",
-  "baseline": "released_state_ledger",
+  "baseline": "none",
   "counts": {
     "eligible_changed": 0,
-    "eligible_new": 3063,
-    "held_for_review": 2,
+    "eligible_new": 3088,
+    "held_for_review": 3,
     "pending_extraction": 544,
-    "unchanged": 26
+    "unchanged": 0
   },
   "documents_accounted_for": 3635,
-  "documents_known_released": 26,
+  "documents_known_released": 0,
   "eligible_by_builder": {
-    "retained_ordinance": 362,
-    "tmc_section": 2701
+    "acquired_document": 23,
+    "retained_ordinance": 363,
+    "tmc_section": 2702
   },
   "held_for_review_by_flag": {
-    "identity_ambiguous": 2
+    "identity_ambiguous": 2,
+    "membership_review_needed": 1
   },
   "note": "every document in the destination manifests lands in exactly one bucket. Pending and held documents are not released and are not silently omitted either",
   "offline": true,
@@ -24,9 +26,9 @@
     "ks:city:topeka:resolutions": 532
   },
   "previous_manifest": null,
-  "released_state": "instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/released-state.jsonl",
+  "released_state": "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/releases/released-state.jsonl",
   "schema_version": "1.0",
-  "selected_at": "2026-09-16T00:39:21Z",
+  "selected_at": "2026-09-16T00:43:26Z",
   "selection_capped": false,
-  "selection_written": 3063
+  "selection_written": 3088
 }

@@ -1,0 +1,433 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1490,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "4704bfeadbc235a522d3b0653d22de6e3f7fe74c402a54d12f70ef8d21b6c0a5"
+    },
+    "structured": {
+      "block_count": 12,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 6,
+      "path": "structured.json",
+      "root_component_id": "6d037a5b-d239-559f-97cc-f38e60fbb1ff",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:9.25.020:section",
+      "sha256": "7d6387d7bd41c6c2d71559650c338f9d2ffde86fb88930af31c78a2cabd3afcf",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 4491,
+      "char_count": 4420,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "005c357956a5fa73afd6ff997b4c2f89e2d7d9eee3509598fe146eb34bc208f5"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.25.020 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "26fcf55c-b100-5177-96a1-c6dca04bfb9c",
+          "convention": "utf8_char_offset",
+          "end": 211,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.25.020:block:0",
+          "start": 0
+        },
+        "quote": "“Dwelling unit” means a structure or the part of a structure that is used as a home, residence or sleeping place by one person who maintains a household or by two or more persons who maintain a common household.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.25.020:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.25.020 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "92062a8f-3a59-5224-8612-2de6a4d30298",
+          "convention": "utf8_char_offset",
+          "end": 279,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.25.020:block:1",
+          "start": 212
+        },
+        "quote": "“Good faith” means honesty in fact in the conduct of a transaction.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.25.020:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.25.020 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "f84edae4-5f8c-5a43-acb7-b37e586a0910",
+          "convention": "utf8_char_offset",
+          "end": 458,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.25.020:block:2",
+          "start": 280
+        },
+        "quote": "“Good standing” means that a tenant is not in arrears in the payment of rent and is in compliance with the duties of a tenant enumerated in K.S.A. 58-2555 and amendments thereto.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.25.020:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.25.020 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "95e65fd4-cccb-589b-a59d-cb312a8b5abe",
+          "convention": "utf8_char_offset",
+          "end": 559,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.25.020:block:3",
+          "start": 459
+        },
+        "quote": "“Landlord” means the owner or lessor of a dwelling unit or the building of which the unit is a part.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.25.020:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.25.020 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "7b502ee9-604b-5ffe-882a-6b81420935c4",
+          "convention": "utf8_char_offset",
+          "end": 705,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.25.020:block:4",
+          "start": 560
+        },
+        "quote": "“Rental agreement” means all agreements, written or oral, embodying the terms and conditions concerning the use and occupancy of a dwelling unit.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.25.020:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.25.020 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "373dab88-d54f-53e8-a70c-a1d76b49fbfb",
+          "convention": "utf8_char_offset",
+          "end": 906,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.25.020:block:5",
+          "start": 706
+        },
+        "quote": "“Retaliate” or “retaliatory action” shall include but not be limited to any of the following actions by a landlord when such actions penalize a tenant because of an action identified in TMC 9.25.030 :",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.25.020:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.25.020 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "43a25b75-3cce-533f-ab73-82d9e2abc101",
+          "convention": "utf8_char_offset",
+          "end": 1002,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.25.020:block:6",
+          "start": 907
+        },
+        "quote": "(1) Commencement of any action or proceeding to recover possession of a dwelling from a tenant;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.25.020:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.25.020 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "128635e1-06ba-53bc-bbf5-604523b94f27",
+          "convention": "utf8_char_offset",
+          "end": 1027,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.25.020:block:7",
+          "start": 1003
+        },
+        "quote": "(2) Increasing the rent;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.25.020:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.25.020 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "43064883-7426-5134-8245-9153a8d686e9",
+          "convention": "utf8_char_offset",
+          "end": 1176,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.25.020:block:8",
+          "start": 1028
+        },
+        "quote": "(3) Reduction of services required to be provided by the landlord pursuant to the rental agreement and/or K.S.A. 58-2553 and amendments thereto; and",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.25.020:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.25.020 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "4b62c299-3726-5e9d-87d1-737fa78036d6",
+          "convention": "utf8_char_offset",
+          "end": 1321,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.25.020:block:9",
+          "start": 1177
+        },
+        "quote": "(4) Harassing entry or repeated demands for entry of the tenant’s dwelling unit by the landlord in violation of K.S.A. 58-2557 and/or 58-2571(b)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.25.020:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.25.020 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "3b3b040a-4df9-571b-b667-478b2211ba02",
+          "convention": "utf8_char_offset",
+          "end": 1433,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.25.020:block:10",
+          "start": 1322
+        },
+        "quote": "“Tenant” means a person entitled under a rental agreement to occupy a dwelling unit. (Ord. 20488 § 2, 5-14-24.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.25.020:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.25.020 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "d82f70f2-8e77-52ff-ac4d-70aa10475c62",
+          "convention": "utf8_char_offset",
+          "end": 1489,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.25.020:block:11",
+          "start": 1434
+        },
+        "quote": "Cross References: Definitions generally, TMC 1.10.020 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.25.020:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.25.020#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20488",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1431,
+          "start": 1408
+        },
+        "quote": "Ord. 20488 § 2, 5-14-24",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.25.020#history:20488",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "454e60b4bad47fceef619ff1e0f980c752fcb6c47389be4dce543d6e2bff87c4",
+      "captured_at": "2026-08-28T04:10:34.161099Z",
+      "kind": "rendered_html_capture",
+      "value": "9.25.020.454e60b4bad4.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:9.25.020@454e60b4bad47fce",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:9.25.020",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:9.25.020",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 9.25.020",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/9.25.020"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.25.020#history:20488",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "5-14-24"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "9.25.020",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.25.020#history:20488",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20488"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.25.020#history:20488",
+      "value": "adopted"
+    },
+    "title": "Definitions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:10:34.161099Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "454e60b4bad47fceef619ff1e0f980c752fcb6c47389be4dce543d6e2bff87c4",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "454e60b4bad47fceef619ff1e0f980c752fcb6c47389be4dce543d6e2bff87c4",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "454e60b4bad47fceef619ff1e0f980c752fcb6c47389be4dce543d6e2bff87c4",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "005c357956a5fa73afd6ff997b4c2f89e2d7d9eee3509598fe146eb34bc208f5",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "005c357956a5fa73afd6ff997b4c2f89e2d7d9eee3509598fe146eb34bc208f5",
+        "output_sha256": "4704bfeadbc235a522d3b0653d22de6e3f7fe74c402a54d12f70ef8d21b6c0a5",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "005c357956a5fa73afd6ff997b4c2f89e2d7d9eee3509598fe146eb34bc208f5",
+        "output_sha256": "7d6387d7bd41c6c2d71559650c338f9d2ffde86fb88930af31c78a2cabd3afcf",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/9.25.020",
+    "retained_original": {
+      "byte_count": 29975,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/9.25.020.454e60b4bad4.html",
+      "retrieved_at": "2026-08-28T04:10:34.161099Z",
+      "sha256": "454e60b4bad47fceef619ff1e0f980c752fcb6c47389be4dce543d6e2bff87c4"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

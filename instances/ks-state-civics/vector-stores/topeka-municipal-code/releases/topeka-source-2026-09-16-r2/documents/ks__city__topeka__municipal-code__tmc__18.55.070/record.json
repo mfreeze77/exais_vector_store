@@ -1,0 +1,529 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 3929,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "7ee3f718ec9328613258cbfd0fa88068e29fa44460018fbd83244d81e95733b6"
+    },
+    "structured": {
+      "block_count": 18,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 14,
+      "path": "structured.json",
+      "root_component_id": "58689c61-f910-505d-8beb-7ecf72ba07a1",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:section",
+      "sha256": "287f48d7a6897fe87f5e07a08f00a5e732a6f6c84d82a1fa162ad89542965c0c",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 10118,
+      "char_count": 9951,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "0f1085d9a855f2803b63f23928602c45247c6fdf2d2e201ab471ff7e46a9c0f2"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "16820bd5-3935-56b7-b313-2d66a6e4dfd4",
+          "convention": "utf8_char_offset",
+          "end": 127,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:0",
+          "start": 0
+        },
+        "quote": "“Garage” means a building or structure, or part thereof, used, or intended to be used, for the parking and storage of vehicles.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "5c035712-ac31-5d83-8272-8b1b7b3c5062",
+          "convention": "utf8_char_offset",
+          "end": 384,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:1",
+          "start": 128
+        },
+        "quote": "“Garage, attached” means a private garage which has a roof or wall, or major portion of a roof or wall, in common with a dwelling. Where the garage is attached to a dwelling in this manner, it shall be subject to all yard requirements of the main building.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "eb3dcd4f-c42b-5d00-ab2b-a82615c99e7e",
+          "convention": "utf8_char_offset",
+          "end": 562,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:2",
+          "start": 385
+        },
+        "quote": "“Garage, private” means an accessory building designed or used for the storage of motor vehicles owned and used by the occupants of the building to which it is an accessory use.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "a6e5fbf5-3990-5cd8-b76b-333c618a61dd",
+          "convention": "utf8_char_offset",
+          "end": 790,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:3",
+          "start": 563
+        },
+        "quote": "“Garage, public” means a building, or portion thereof, other than a private customer and employee garage or private residential garage, used primarily for the parking and storage of vehicles and available to the general public.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "239f3e30-f5ed-5806-9e05-296286d8d6a5",
+          "convention": "utf8_char_offset",
+          "end": 1320,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:4",
+          "start": 791
+        },
+        "quote": "“Garden, community” means an area of land managed and maintained by an individual or group of individuals for growing and harvesting, farming, community gardening, or any other use, which contributes to the production of agricultural, floricultural, or horticultural products for beautifica-tion, education, recreation, consumption, community or personal use, sale, or donation. This definition includes community gardens, private gardens, and community supported agriculture (CSA) uses under the blanket term “community garden.”",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "0b0190f8-2983-59b9-a590-80927cf93c2f",
+          "convention": "utf8_char_offset",
+          "end": 1462,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:5",
+          "start": 1321
+        },
+        "quote": "“Garden, community (type I)” means a community garden no greater than two acres of cultivated area which permits sales of a temporary nature.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "ac64560a-2bb4-5c47-9a5c-5cdc67d7b074",
+          "convention": "utf8_char_offset",
+          "end": 1622,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:6",
+          "start": 1463
+        },
+        "quote": "“Garden, community (type II)” means a community garden with permanent produce sales structures or larger accessory structures than permitted in type I gardens.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "c578aa43-50dd-59ff-afb7-91722f64319d",
+          "convention": "utf8_char_offset",
+          "end": 1783,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:7",
+          "start": 1623
+        },
+        "quote": "“Golf course” means a tract of land for playing golf, improved with tees, greens, fairways, hazards, and which may include drives, vehicle parking and shelters.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "d3f6db56-2b7a-5fd0-9598-24a971b58d83",
+          "convention": "utf8_char_offset",
+          "end": 1852,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:8",
+          "start": 1784
+        },
+        "quote": "“Governing Body” means the Mayor and City Council of Topeka, Kansas.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "96c12bfc-43ea-5012-abef-beb02d31147d",
+          "convention": "utf8_char_offset",
+          "end": 1859,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:9",
+          "start": 1853
+        },
+        "quote": "Grade.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "65619cb1-07dd-5120-a4d4-07baa7040ea2",
+          "convention": "utf8_char_offset",
+          "end": 2012,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:10",
+          "start": 1860
+        },
+        "quote": "(1) For buildings having walls adjoining one street, the grade is the elevation of the sidewalk at the center of the building wall adjoining the street.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "751c2009-be2a-5b3b-b712-15967afd6d71",
+          "convention": "utf8_char_offset",
+          "end": 2193,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:11",
+          "start": 2013
+        },
+        "quote": "(2) For buildings having walls adjoining more than one street, the grade is the average of the elevation of the sidewalk at the centers of the building walls adjoining the streets.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "afc12bee-91d9-5930-8ad6-f46c77f3bb8e",
+          "convention": "utf8_char_offset",
+          "end": 2563,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:12",
+          "start": 2194
+        },
+        "quote": "(3) For buildings having no wall adjoining the street, the grade is the average level of the finished surface of the ground adjacent to the exterior building walls. Any wall approximately parallel to and not more than five feet from a street line is to be considered as adjoining the street. Where no sidewalk exists the grade shall be established by the City Engineer.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "4a59c334-e60b-54f5-bae5-238745a250f1",
+          "convention": "utf8_char_offset",
+          "end": 2647,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:13",
+          "start": 2564
+        },
+        "quote": "“Ground floor” means the first floor of a building other than a cellar or basement.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "2b9736c6-a020-5c09-9fa2-95eca95cff41",
+          "convention": "utf8_char_offset",
+          "end": 2898,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:14",
+          "start": 2648
+        },
+        "quote": "“Ground floor area” means the square foot area of a building within the largest outside dimensions, inclusive of the width of the outside walls but exclusive of open porches, breezeways, terraces, garages, exterior stairways, and secondary stairways.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "d678fdbe-21f3-5032-9bfa-42186691dc5e",
+          "convention": "utf8_char_offset",
+          "end": 3345,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:15",
+          "start": 2899
+        },
+        "quote": "“Group home” means a dwelling occupied by not more than 10 persons, including eight or fewer persons with a disability who need not be related by blood or marriage and not to exceed two staff residents who need not be related by blood or marriage to each other or to the residents of the home, which dwelling is licensed by a regulatory agency of this state. “Group home” does not include “group residence, general” or “group residence, limited.”",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "e5f78e8a-b1cd-5a90-bd96-e0ad729741b9",
+          "convention": "utf8_char_offset",
+          "end": 3600,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:16",
+          "start": 3346
+        },
+        "quote": "“Group residence, general” means a residential dwelling that is occupied by nine to 15 persons, including more than eight persons each with a disability, none of whom needs to be related by blood or marriage, that is not a “group home” as defined herein.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.070 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "15e3fe7d-dac1-55a9-bc9f-d636c77e6731",
+          "convention": "utf8_char_offset",
+          "end": 3928,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.070:block:17",
+          "start": 3601
+        },
+        "quote": "“Group residence, limited” means a residential dwelling that is occupied by not more than 10 persons, including a maximum of eight persons each with a disability and a maximum of two staff residents, none of whom needs to be related by blood or marriage, that is not a “group home” as defined herein. (Ord. 19921 § 6, 9-23-14.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19921",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 3926,
+          "start": 3903
+        },
+        "quote": "Ord. 19921 § 6, 9-23-14",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.070#history:19921",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "5dd8b2463e20063573b71117b2a1bbd15b703ed47bda6be0ea668a84be2a6522",
+      "captured_at": "2026-08-28T04:49:13.910937Z",
+      "kind": "rendered_html_capture",
+      "value": "18.55.070.5dd8b2463e20.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:18.55.070@5dd8b2463e200635",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:18.55.070",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:18.55.070",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 18.55.070",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/18.55.070"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.55.070#history:19921",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "9-23-14"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "18.55.070",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.55.070#history:19921",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19921"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.55.070#history:19921",
+      "value": "adopted"
+    },
+    "title": "“G” definitions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:49:13.910937Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "5dd8b2463e20063573b71117b2a1bbd15b703ed47bda6be0ea668a84be2a6522",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "5dd8b2463e20063573b71117b2a1bbd15b703ed47bda6be0ea668a84be2a6522",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "5dd8b2463e20063573b71117b2a1bbd15b703ed47bda6be0ea668a84be2a6522",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "0f1085d9a855f2803b63f23928602c45247c6fdf2d2e201ab471ff7e46a9c0f2",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "0f1085d9a855f2803b63f23928602c45247c6fdf2d2e201ab471ff7e46a9c0f2",
+        "output_sha256": "7ee3f718ec9328613258cbfd0fa88068e29fa44460018fbd83244d81e95733b6",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "0f1085d9a855f2803b63f23928602c45247c6fdf2d2e201ab471ff7e46a9c0f2",
+        "output_sha256": "287f48d7a6897fe87f5e07a08f00a5e732a6f6c84d82a1fa162ad89542965c0c",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/18.55.070",
+    "retained_original": {
+      "byte_count": 33852,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/18.55.070.5dd8b2463e20.html",
+      "retrieved_at": "2026-08-28T04:49:13.910937Z",
+      "sha256": "5dd8b2463e20063573b71117b2a1bbd15b703ed47bda6be0ea668a84be2a6522"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

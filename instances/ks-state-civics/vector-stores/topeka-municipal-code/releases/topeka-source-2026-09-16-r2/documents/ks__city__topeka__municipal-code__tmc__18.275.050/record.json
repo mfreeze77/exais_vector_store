@@ -1,0 +1,1697 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 12096,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "1c7740f85a1cce2993a680ea497be95579db137192de180f919264a2c1fdefad"
+    },
+    "structured": {
+      "block_count": 91,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "8a654de3-03b1-5a24-add5-ba627d26e078",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:section",
+      "sha256": "07c1e02327de319f5f875acf8c5338ef5876ad3c910e8fd2c7475d3fe873e2a5",
+      "table_count": 1
+    },
+    "verbatim": {
+      "byte_count": 34637,
+      "char_count": 34572,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "2394e13e47931ba44f6a111505466631afcd66c86795c7648cf53b0468d66fbb"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "3bcb539e-b135-507b-abf5-cdc1c9433c41",
+          "convention": "utf8_char_offset",
+          "end": 104,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:0",
+          "start": 0
+        },
+        "quote": "(a) The specific design standards in the table below apply to Type A, B, and C nonresidential buildings.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "96093279-fd24-555e-a93a-204e9389abc6",
+          "convention": "utf8_char_offset",
+          "end": 531,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:1",
+          "start": 105
+        },
+        "quote": "(b) When calculating building material and window/door percentages identified in this section, the facade width will be multiplied by the average facade roofline height or a standard height of 12 feet, whichever is less, to determine the total square footage of the facade. The window/door area will be deducted from the square foot calculation of the total facade area before determining the percentage of building materials.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "64b721f9-a194-5f5e-ab81-977e0e8995ff",
+          "convention": "utf8_char_offset",
+          "end": 609,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:2",
+          "start": 532
+        },
+        "quote": "(c) Garage doors will not count towards the required window/door percentages.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "57e80e80-6c41-51fc-8e35-edb045c7be5a",
+          "convention": "utf8_char_offset",
+          "end": 731,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:3",
+          "start": 610
+        },
+        "quote": "(d) The Planning Director may approve alternative building materials or architectural details not listed in this section.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "c3e28e35-8b5d-51db-be3d-72e11bab9d06",
+          "convention": "utf8_char_offset",
+          "end": 6434,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:4",
+          "start": 732
+        },
+        "quote": "Building Design Standards | Building Types\nA | B | C\nType A and Type B Building Materials | Total square footage of all stories of front and/or street-facing facades shall contain the following minimum percentages of the building materials listed below: * Natural stone * Brick * Cast stone * Synthetic stone, such as pre-manufactured fiberglass, cultured stone, or glass fiber reinforced concrete, if it is identical in appearance and of equal or greater durability to natural stone * Traditional stucco or gypsum concrete/plaster materials with smooth finish * Exterior insulating finishing system (E.I.F.S) * Integrally colored or glazed concrete masonry units * High quality pre-stressed concrete systems (Pre-cast w/veneer or textured finish) * Glass curtain wall * Architectural metal panels – must be a higher quality material than standard industrial, ribbed pre-engineered metal panels. * Cement board siding * Solid wood planking and decorative cement fiber panels may be used for accent features The remaining exterior surface area of all stories of front and/or street-facing facades shall be comprised of these materials, or cement fiber panels, or integrally colored split-faced concrete masonry blocks. | 85% | 60% |\nTotal square footage of all stories of nonfront and/or non-street-facing facades may integrate the following maximum percentage of materials into the composition of the materials listed above. * Cement fiber panels * Integrally colored split-faced concrete masonry block | 65% | 75% |\nType C Building Materials | Total square footage of all stories of front and/or street-facing facades shall contain the following minimum percentage of the building materials listed below. * Any of the designated materials for Type A and B * Glass block or curtain wall * Integrally colored split-faced concrete masonry unit * Pre-cast concrete tilt wall with a decorative or textured finish * Industrial, ribbed, pre-engineered metal panels with permanent baked-on enamel finish, or painted to manufacturer’s specs The remaining exterior surface area of all stories of front and/or street-facing facades shall be composed of these materials, or those materials listed for use within nonfront and non-street-facing facades for Type C buildings listed below. | | | 60%\nTotal square footage of all stories of nonfront and/or non-street-facing facades on Type C buildings may integrate the following maximum percentage of additional materials into those listed above. * Cement fiber planking (not panels) * Solid wood planking and decorative cement fiber panels * Metal with permanent baked-on enamel finish, or painted to manufacturer’s specs | | | 85%\nTypes of Architectural Details | For the first 50 linear feet (or less) of front and/or street-facing facades, all building types shall be designed with the following minimum number of architectural details. One additional architectural detail shall be required for each additional 25 feet of building front and/or street frontage. * At least 15% more windows/doors than the required minimum percentage * Display or other ornamental windows * Recessed entries * Horizontal or vertical recesses, projections, or offsets at least 1 foot wide, located an average of every 30 horizontal feet, and with a depth at a minimum of 4\"-6\" * Modulating facade. Individual tenant spaces in multi-tenant buildings must articulate facades of the individual tenant spaces. Articulated facades help break up the mass of the building and create visual interest. * Variation of roof heights * Porches or balconies * Breezeways * Courtyards * Awnings or canopies (permanent) * Alcoves * Arcade, gallery, veranda, or pergola * Arches * Art that is integrated into the facade * Structurally different building materials (i.e., stone and brick) * Decorative tile work, brick patterns, moldings or other materials integrated into the facade * Ornamental cornice * Varied roof forms. Large uninterrupted expanses of rooftop ridgelines must include architectural details that add articulation and visual interest, such as gable-roofed dormers, hip-roof elements, or other design measures to achieve an equivalent result * Premium roofing materials such as tile, or standing-seam metal * Tower cap * Tower or raised parapet | 4 | 3 | 2\nDoors and Windows | * The area of all stories’ front facades of all building types shall contain the following minimum percentage of window or door openings. | 45% | 35% | 20%\n* The area of all stories’ nonfront street-facing facades of all building types shall contain the following minimum percentage of window or door openings. For nonfront facades, faux windows may be applied when the interior function of the building is not conducive to being seen from the exterior. | 25% | 15% | 10%\nNonstreet Facing Walls | Maximum length of nonstreet or nonfront-facing facades without architectural details. | 30' | 50' | 75'\nMechanical Systems | All roof-mounted mechanical units (including evaporative coolers, HVAC units, vents, etc.) for all building types shall be located or screened so as not to be visible from the project’s property lines that are adjacent to public and private streets, as well as adjacent to residential properties (unless height difference makes screening impractical). The screening methods/materials shall be consistent with and incorporated into the design of the building.\nLocation Considerations | Projects located within an industrial context, or not visible from the street, may design to a lesser building type standard than required by zoning; provided, that the project complies with the design requirements of the lesser building type and meets the design considerations in TMC 18.275.040 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "4add30f4-a19b-528e-876e-b48b8c596c71",
+          "convention": "utf8_char_offset",
+          "end": 6460,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:5",
+          "start": 6435
+        },
+        "quote": "Building Design Standards",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "0355d497-5a18-5a86-b866-8ca174ecfde5",
+          "convention": "utf8_char_offset",
+          "end": 6475,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:6",
+          "start": 6461
+        },
+        "quote": "Building Types",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "6574ca18-8e6b-52b9-9499-b6247a9b49cb",
+          "convention": "utf8_char_offset",
+          "end": 6477,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:7",
+          "start": 6476
+        },
+        "quote": "A",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "440695aa-86a6-55a7-9dc9-4424c01ea2f6",
+          "convention": "utf8_char_offset",
+          "end": 6479,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:8",
+          "start": 6478
+        },
+        "quote": "B",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "1cd6e577-7689-5f29-aedb-a9d20ad77991",
+          "convention": "utf8_char_offset",
+          "end": 6481,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:9",
+          "start": 6480
+        },
+        "quote": "C",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "0fb04f9f-6ec3-5815-a900-4e91b71374d2",
+          "convention": "utf8_char_offset",
+          "end": 6518,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:10",
+          "start": 6482
+        },
+        "quote": "Type A and Type B Building Materials",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "8d3a397b-1346-512b-ac6a-8ab7c2a82b32",
+          "convention": "utf8_char_offset",
+          "end": 6680,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:11",
+          "start": 6519
+        },
+        "quote": "Total square footage of all stories of front and/or street-facing facades shall contain the following minimum percentages of the building materials listed below:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "6fd3f2ee-9e59-54fb-8bcd-30bacd08eb24",
+          "convention": "utf8_char_offset",
+          "end": 6696,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:12",
+          "start": 6681
+        },
+        "quote": "* Natural stone",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "29e2d149-9cea-58cd-b063-5c4576ab969d",
+          "convention": "utf8_char_offset",
+          "end": 6704,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:13",
+          "start": 6697
+        },
+        "quote": "* Brick",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "3266050b-dabb-5639-9e7b-511cf1886fc8",
+          "convention": "utf8_char_offset",
+          "end": 6717,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:14",
+          "start": 6705
+        },
+        "quote": "* Cast stone",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "6850bad9-c61f-51b6-b898-0ea4da360924",
+          "convention": "utf8_char_offset",
+          "end": 6910,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:15",
+          "start": 6718
+        },
+        "quote": "* Synthetic stone, such as pre-manufactured fiberglass, cultured stone, or glass fiber reinforced concrete, if it is identical in appearance and of equal or greater durability to natural stone",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "24774aca-21d9-5d6b-b242-b2aa539fb896",
+          "convention": "utf8_char_offset",
+          "end": 6987,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:16",
+          "start": 6911
+        },
+        "quote": "* Traditional stucco or gypsum concrete/plaster materials with smooth finish",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "0c4b3a08-8752-5ca5-a6a7-183baee7d2e3",
+          "convention": "utf8_char_offset",
+          "end": 7036,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:17",
+          "start": 6988
+        },
+        "quote": "* Exterior insulating finishing system (E.I.F.S)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "00dc4ccb-ec35-564d-8b15-07b16b0ce2cf",
+          "convention": "utf8_char_offset",
+          "end": 7090,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:18",
+          "start": 7037
+        },
+        "quote": "* Integrally colored or glazed concrete masonry units",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "e26a3208-6e2f-5827-ab17-c7cb5838785f",
+          "convention": "utf8_char_offset",
+          "end": 7174,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:19",
+          "start": 7091
+        },
+        "quote": "* High quality pre-stressed concrete systems (Pre-cast w/veneer or textured finish)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "c75cf6b2-6a12-5f5b-861a-97d4518fbda2",
+          "convention": "utf8_char_offset",
+          "end": 7195,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:20",
+          "start": 7175
+        },
+        "quote": "* Glass curtain wall",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "7c494adf-5250-54db-a226-09d7f5ea802e",
+          "convention": "utf8_char_offset",
+          "end": 7322,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:21",
+          "start": 7196
+        },
+        "quote": "* Architectural metal panels – must be a higher quality material than standard industrial, ribbed pre-engineered metal panels.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "45265222-4b98-5d43-873c-7735360673fa",
+          "convention": "utf8_char_offset",
+          "end": 7344,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:22",
+          "start": 7323
+        },
+        "quote": "* Cement board siding",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "7ca09e2d-9cda-5c0c-9432-5880225f02c0",
+          "convention": "utf8_char_offset",
+          "end": 7433,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:23",
+          "start": 7345
+        },
+        "quote": "* Solid wood planking and decorative cement fiber panels may be used for accent features",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "6f9ced28-2ce9-5168-b2fe-3f4568fa9002",
+          "convention": "utf8_char_offset",
+          "end": 7644,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:24",
+          "start": 7434
+        },
+        "quote": "The remaining exterior surface area of all stories of front and/or street-facing facades shall be comprised of these materials, or cement fiber panels, or integrally colored split-faced concrete masonry blocks.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "e3f4e1da-e54a-5a27-8a63-ab881f973dad",
+          "convention": "utf8_char_offset",
+          "end": 7648,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:25",
+          "start": 7645
+        },
+        "quote": "85%",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 26",
+        "locator": {
+          "block_index": 26,
+          "component_id": "f8da0d82-7cfe-5457-bfd9-81231e1eb031",
+          "convention": "utf8_char_offset",
+          "end": 7652,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:26",
+          "start": 7649
+        },
+        "quote": "60%",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 27",
+        "locator": {
+          "block_index": 27,
+          "component_id": "f2a362d9-05cd-5cc6-958d-f26c753146d6",
+          "convention": "utf8_char_offset",
+          "end": 7845,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:27",
+          "start": 7653
+        },
+        "quote": "Total square footage of all stories of nonfront and/or non-street-facing facades may integrate the following maximum percentage of materials into the composition of the materials listed above.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 28",
+        "locator": {
+          "block_index": 28,
+          "component_id": "129b1899-0842-5470-b5f8-7abc2b02281e",
+          "convention": "utf8_char_offset",
+          "end": 7867,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:28",
+          "start": 7846
+        },
+        "quote": "* Cement fiber panels",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:28#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 29",
+        "locator": {
+          "block_index": 29,
+          "component_id": "06143fa3-b265-5494-a0b6-c921598a0d1a",
+          "convention": "utf8_char_offset",
+          "end": 7923,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:29",
+          "start": 7868
+        },
+        "quote": "* Integrally colored split-faced concrete masonry block",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:29#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 30",
+        "locator": {
+          "block_index": 30,
+          "component_id": "5a644239-3f4e-503d-a915-fdb324f1cf99",
+          "convention": "utf8_char_offset",
+          "end": 7927,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:30",
+          "start": 7924
+        },
+        "quote": "65%",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:30#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 31",
+        "locator": {
+          "block_index": 31,
+          "component_id": "58f15afa-4bbb-5617-8e6f-3049f5c659db",
+          "convention": "utf8_char_offset",
+          "end": 7931,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:31",
+          "start": 7928
+        },
+        "quote": "75%",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:31#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 32",
+        "locator": {
+          "block_index": 32,
+          "component_id": "f19049fb-ed2b-5109-902d-5bf54199bd0c",
+          "convention": "utf8_char_offset",
+          "end": 7957,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:32",
+          "start": 7932
+        },
+        "quote": "Type C Building Materials",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:32#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 33",
+        "locator": {
+          "block_index": 33,
+          "component_id": "b22f723a-fa13-52f9-8c55-207c3474ea42",
+          "convention": "utf8_char_offset",
+          "end": 8118,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:33",
+          "start": 7958
+        },
+        "quote": "Total square footage of all stories of front and/or street-facing facades shall contain the following minimum percentage of the building materials listed below.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:33#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 34",
+        "locator": {
+          "block_index": 34,
+          "component_id": "978da397-f7c0-53a5-87ab-983279dd6543",
+          "convention": "utf8_char_offset",
+          "end": 8169,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:34",
+          "start": 8119
+        },
+        "quote": "* Any of the designated materials for Type A and B",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:34#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 35",
+        "locator": {
+          "block_index": 35,
+          "component_id": "9ab04c2a-8091-5a43-b1bb-d543170c9e76",
+          "convention": "utf8_char_offset",
+          "end": 8199,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:35",
+          "start": 8170
+        },
+        "quote": "* Glass block or curtain wall",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:35#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 36",
+        "locator": {
+          "block_index": 36,
+          "component_id": "6680d0c2-6a11-50da-87ce-a5ea50246983",
+          "convention": "utf8_char_offset",
+          "end": 8254,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:36",
+          "start": 8200
+        },
+        "quote": "* Integrally colored split-faced concrete masonry unit",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:36#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 37",
+        "locator": {
+          "block_index": 37,
+          "component_id": "80bfe419-dd33-53c0-9c77-6d71725dbce5",
+          "convention": "utf8_char_offset",
+          "end": 8321,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:37",
+          "start": 8255
+        },
+        "quote": "* Pre-cast concrete tilt wall with a decorative or textured finish",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:37#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 38",
+        "locator": {
+          "block_index": 38,
+          "component_id": "814521ef-b975-5fe0-b9d5-e8f642765688",
+          "convention": "utf8_char_offset",
+          "end": 8445,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:38",
+          "start": 8322
+        },
+        "quote": "* Industrial, ribbed, pre-engineered metal panels with permanent baked-on enamel finish, or painted to manufacturer’s specs",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:38#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 39",
+        "locator": {
+          "block_index": 39,
+          "component_id": "b02c9796-e89e-5316-b0e3-e1130273bd07",
+          "convention": "utf8_char_offset",
+          "end": 8687,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:39",
+          "start": 8446
+        },
+        "quote": "The remaining exterior surface area of all stories of front and/or street-facing facades shall be composed of these materials, or those materials listed for use within nonfront and non-street-facing facades for Type C buildings listed below.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:39#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 40",
+        "locator": {
+          "block_index": 40,
+          "component_id": "563f557d-9e5d-514e-8c22-c31e80b8bac7",
+          "convention": "utf8_char_offset",
+          "end": 8691,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:40",
+          "start": 8688
+        },
+        "quote": "60%",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:40#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 41",
+        "locator": {
+          "block_index": 41,
+          "component_id": "5f364dc8-6801-5246-b35a-f4e1f2f7a292",
+          "convention": "utf8_char_offset",
+          "end": 8888,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:41",
+          "start": 8692
+        },
+        "quote": "Total square footage of all stories of nonfront and/or non-street-facing facades on Type C buildings may integrate the following maximum percentage of additional materials into those listed above.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:41#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 42",
+        "locator": {
+          "block_index": 42,
+          "component_id": "67a5caf1-2233-5286-96b2-b044880dd866",
+          "convention": "utf8_char_offset",
+          "end": 8925,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:42",
+          "start": 8889
+        },
+        "quote": "* Cement fiber planking (not panels)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:42#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 43",
+        "locator": {
+          "block_index": 43,
+          "component_id": "4b7e9a68-f4ae-5be9-acca-fddd23235266",
+          "convention": "utf8_char_offset",
+          "end": 8982,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:43",
+          "start": 8926
+        },
+        "quote": "* Solid wood planking and decorative cement fiber panels",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:43#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 44",
+        "locator": {
+          "block_index": 44,
+          "component_id": "e08b924d-a146-57bf-9ef6-77147c164d58",
+          "convention": "utf8_char_offset",
+          "end": 9064,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:44",
+          "start": 8983
+        },
+        "quote": "* Metal with permanent baked-on enamel finish, or painted to manufacturer’s specs",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:44#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 45",
+        "locator": {
+          "block_index": 45,
+          "component_id": "c723017d-8786-5d1f-8db9-bf8c71832fc0",
+          "convention": "utf8_char_offset",
+          "end": 9068,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:45",
+          "start": 9065
+        },
+        "quote": "85%",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:45#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 46",
+        "locator": {
+          "block_index": 46,
+          "component_id": "81712efe-1c6c-5599-bb18-7c3e608be25f",
+          "convention": "utf8_char_offset",
+          "end": 9099,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:46",
+          "start": 9069
+        },
+        "quote": "Types of Architectural Details",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:46#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 47",
+        "locator": {
+          "block_index": 47,
+          "component_id": "d9fd6e1a-abc6-5e24-9d68-15f50f7ef0da",
+          "convention": "utf8_char_offset",
+          "end": 9398,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:47",
+          "start": 9100
+        },
+        "quote": "For the first 50 linear feet (or less) of front and/or street-facing facades, all building types shall be designed with the following minimum number of architectural details. One additional architectural detail shall be required for each additional 25 feet of building front and/or street frontage.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:47#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 48",
+        "locator": {
+          "block_index": 48,
+          "component_id": "0f69f146-38a2-5b0b-a511-138cc1606c5b",
+          "convention": "utf8_char_offset",
+          "end": 9469,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:48",
+          "start": 9399
+        },
+        "quote": "* At least 15% more windows/doors than the required minimum percentage",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:48#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 49",
+        "locator": {
+          "block_index": 49,
+          "component_id": "3e97f78b-40a0-5e3b-9e8a-5af90378cd6e",
+          "convention": "utf8_char_offset",
+          "end": 9507,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:49",
+          "start": 9470
+        },
+        "quote": "* Display or other ornamental windows",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:49#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 50",
+        "locator": {
+          "block_index": 50,
+          "component_id": "25840ad5-dffb-5607-9771-e82b641da0f1",
+          "convention": "utf8_char_offset",
+          "end": 9526,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:50",
+          "start": 9508
+        },
+        "quote": "* Recessed entries",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:50#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 51",
+        "locator": {
+          "block_index": 51,
+          "component_id": "0e4221c1-db9e-53ac-a24a-0191f164bc73",
+          "convention": "utf8_char_offset",
+          "end": 9694,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:51",
+          "start": 9527
+        },
+        "quote": "* Horizontal or vertical recesses, projections, or offsets at least 1 foot wide, located an average of every 30 horizontal feet, and with a depth at a minimum of 4\"-6\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:51#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 52",
+        "locator": {
+          "block_index": 52,
+          "component_id": "5b4d8f3f-8658-5f9a-b9ab-35ac0abdce90",
+          "convention": "utf8_char_offset",
+          "end": 9910,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:52",
+          "start": 9695
+        },
+        "quote": "* Modulating facade. Individual tenant spaces in multi-tenant buildings must articulate facades of the individual tenant spaces. Articulated facades help break up the mass of the building and create visual interest.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:52#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 53",
+        "locator": {
+          "block_index": 53,
+          "component_id": "4380476c-cfc4-5bd7-a46e-5bcf4273c11f",
+          "convention": "utf8_char_offset",
+          "end": 9938,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:53",
+          "start": 9911
+        },
+        "quote": "* Variation of roof heights",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:53#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 54",
+        "locator": {
+          "block_index": 54,
+          "component_id": "dac3fa73-a766-54b1-a6ef-75e37a37568e",
+          "convention": "utf8_char_offset",
+          "end": 9961,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:54",
+          "start": 9939
+        },
+        "quote": "* Porches or balconies",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:54#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 55",
+        "locator": {
+          "block_index": 55,
+          "component_id": "97e79343-a148-5d51-9afb-1c1709afadc5",
+          "convention": "utf8_char_offset",
+          "end": 9974,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:55",
+          "start": 9962
+        },
+        "quote": "* Breezeways",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:55#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 56",
+        "locator": {
+          "block_index": 56,
+          "component_id": "133d68ef-ae60-5e03-82b2-9dbd5239a511",
+          "convention": "utf8_char_offset",
+          "end": 9987,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:56",
+          "start": 9975
+        },
+        "quote": "* Courtyards",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:56#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 57",
+        "locator": {
+          "block_index": 57,
+          "component_id": "ea1bce4f-0d06-53e1-bbb8-451873aeaaa0",
+          "convention": "utf8_char_offset",
+          "end": 10021,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:57",
+          "start": 9988
+        },
+        "quote": "* Awnings or canopies (permanent)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:57#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 58",
+        "locator": {
+          "block_index": 58,
+          "component_id": "6a375a20-7a6b-5b0a-a074-1481f94fa9a4",
+          "convention": "utf8_char_offset",
+          "end": 10031,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:58",
+          "start": 10022
+        },
+        "quote": "* Alcoves",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:58#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 59",
+        "locator": {
+          "block_index": 59,
+          "component_id": "7cecd902-0e8e-51b2-ab78-b9cb8c6e93a8",
+          "convention": "utf8_char_offset",
+          "end": 10070,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:59",
+          "start": 10032
+        },
+        "quote": "* Arcade, gallery, veranda, or pergola",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:59#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 60",
+        "locator": {
+          "block_index": 60,
+          "component_id": "02832c1b-2f06-5514-955d-e3e22b3d6eaa",
+          "convention": "utf8_char_offset",
+          "end": 10079,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:60",
+          "start": 10071
+        },
+        "quote": "* Arches",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:60#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 61",
+        "locator": {
+          "block_index": 61,
+          "component_id": "230adaa2-fcb5-580f-bab0-5f437c8023c1",
+          "convention": "utf8_char_offset",
+          "end": 10120,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:61",
+          "start": 10080
+        },
+        "quote": "* Art that is integrated into the facade",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:61#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 62",
+        "locator": {
+          "block_index": 62,
+          "component_id": "d3149432-4255-5d98-ae44-bc9dfc90aa9d",
+          "convention": "utf8_char_offset",
+          "end": 10188,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:62",
+          "start": 10121
+        },
+        "quote": "* Structurally different building materials (i.e., stone and brick)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:62#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 63",
+        "locator": {
+          "block_index": 63,
+          "component_id": "60eb92df-f539-5930-bc1e-9d47a347557b",
+          "convention": "utf8_char_offset",
+          "end": 10283,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:63",
+          "start": 10189
+        },
+        "quote": "* Decorative tile work, brick patterns, moldings or other materials integrated into the facade",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:63#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 64",
+        "locator": {
+          "block_index": 64,
+          "component_id": "9803a638-a471-5b18-bfa2-fcb32cbd70d6",
+          "convention": "utf8_char_offset",
+          "end": 10304,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:64",
+          "start": 10284
+        },
+        "quote": "* Ornamental cornice",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:64#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 65",
+        "locator": {
+          "block_index": 65,
+          "component_id": "4aceeab2-3b63-59e8-ba46-f2403b5b2d24",
+          "convention": "utf8_char_offset",
+          "end": 10560,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:65",
+          "start": 10305
+        },
+        "quote": "* Varied roof forms. Large uninterrupted expanses of rooftop ridgelines must include architectural details that add articulation and visual interest, such as gable-roofed dormers, hip-roof elements, or other design measures to achieve an equivalent result",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:65#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 66",
+        "locator": {
+          "block_index": 66,
+          "component_id": "8910dd2a-f7ef-5eae-b306-29f7cd4f05a2",
+          "convention": "utf8_char_offset",
+          "end": 10625,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:66",
+          "start": 10561
+        },
+        "quote": "* Premium roofing materials such as tile, or standing-seam metal",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:66#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 67",
+        "locator": {
+          "block_index": 67,
+          "component_id": "e75e4261-9d51-512d-8f56-c7e6c877abd1",
+          "convention": "utf8_char_offset",
+          "end": 10637,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:67",
+          "start": 10626
+        },
+        "quote": "* Tower cap",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:67#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 68",
+        "locator": {
+          "block_index": 68,
+          "component_id": "5285e894-cefa-5865-bbc5-dd5c4c6cf124",
+          "convention": "utf8_char_offset",
+          "end": 10663,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:68",
+          "start": 10638
+        },
+        "quote": "* Tower or raised parapet",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:68#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 69",
+        "locator": {
+          "block_index": 69,
+          "component_id": "ad225d17-165a-5b73-a5b7-8f6a720f7677",
+          "convention": "utf8_char_offset",
+          "end": 10665,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:69",
+          "start": 10664
+        },
+        "quote": "4",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:69#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 70",
+        "locator": {
+          "block_index": 70,
+          "component_id": "5e6abd44-ecbd-5ab7-9f20-48213f5b6122",
+          "convention": "utf8_char_offset",
+          "end": 10667,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:70",
+          "start": 10666
+        },
+        "quote": "3",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:70#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 71",
+        "locator": {
+          "block_index": 71,
+          "component_id": "b2fd2458-9ae1-5ab9-8985-228c8df7fb16",
+          "convention": "utf8_char_offset",
+          "end": 10669,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:71",
+          "start": 10668
+        },
+        "quote": "2",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:71#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 72",
+        "locator": {
+          "block_index": 72,
+          "component_id": "d1db7d23-1640-5996-9bdb-b3b449c7ea88",
+          "convention": "utf8_char_offset",
+          "end": 10687,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:72",
+          "start": 10670
+        },
+        "quote": "Doors and Windows",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:72#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 73",
+        "locator": {
+          "block_index": 73,
+          "component_id": "2c6059ef-350a-5fc1-a883-aa990bcce0c7",
+          "convention": "utf8_char_offset",
+          "end": 10825,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:73",
+          "start": 10688
+        },
+        "quote": "* The area of all stories’ front facades of all building types shall contain the following minimum percentage of window or door openings.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:73#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 74",
+        "locator": {
+          "block_index": 74,
+          "component_id": "b767df91-66d4-52b5-a4a1-9c2a60775a81",
+          "convention": "utf8_char_offset",
+          "end": 10829,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:74",
+          "start": 10826
+        },
+        "quote": "45%",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:74#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 75",
+        "locator": {
+          "block_index": 75,
+          "component_id": "01a35671-368e-5ff0-8b94-218210edb14e",
+          "convention": "utf8_char_offset",
+          "end": 10833,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:75",
+          "start": 10830
+        },
+        "quote": "35%",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:75#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 76",
+        "locator": {
+          "block_index": 76,
+          "component_id": "2c85c709-d7cc-53a2-b6d2-1674d4afdaab",
+          "convention": "utf8_char_offset",
+          "end": 10837,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:76",
+          "start": 10834
+        },
+        "quote": "20%",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:76#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 77",
+        "locator": {
+          "block_index": 77,
+          "component_id": "883184cb-3c40-5567-9850-80b7bde6798c",
+          "convention": "utf8_char_offset",
+          "end": 11135,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:77",
+          "start": 10838
+        },
+        "quote": "* The area of all stories’ nonfront street-facing facades of all building types shall contain the following minimum percentage of window or door openings. For nonfront facades, faux windows may be applied when the interior function of the building is not conducive to being seen from the exterior.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:77#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 78",
+        "locator": {
+          "block_index": 78,
+          "component_id": "1238ed53-594b-5e79-a8b6-9ebc0bbee3f0",
+          "convention": "utf8_char_offset",
+          "end": 11139,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:78",
+          "start": 11136
+        },
+        "quote": "25%",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:78#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 79",
+        "locator": {
+          "block_index": 79,
+          "component_id": "617861bc-c067-5a9b-86cb-8021605ec533",
+          "convention": "utf8_char_offset",
+          "end": 11143,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:79",
+          "start": 11140
+        },
+        "quote": "15%",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:79#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 80",
+        "locator": {
+          "block_index": 80,
+          "component_id": "7b1aaa86-2e2f-5ab5-b26e-75bf8643b7e0",
+          "convention": "utf8_char_offset",
+          "end": 11147,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:80",
+          "start": 11144
+        },
+        "quote": "10%",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:80#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 81",
+        "locator": {
+          "block_index": 81,
+          "component_id": "8a46b7ec-8e41-58ef-bb50-5cd14a6190a3",
+          "convention": "utf8_char_offset",
+          "end": 11170,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:81",
+          "start": 11148
+        },
+        "quote": "Nonstreet Facing Walls",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:81#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 82",
+        "locator": {
+          "block_index": 82,
+          "component_id": "f5a3fce5-f6f3-59cc-b417-870aa1dbb2e0",
+          "convention": "utf8_char_offset",
+          "end": 11256,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:82",
+          "start": 11171
+        },
+        "quote": "Maximum length of nonstreet or nonfront-facing facades without architectural details.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:82#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 83",
+        "locator": {
+          "block_index": 83,
+          "component_id": "e33ec639-44e6-573f-97f5-f97cc13be4b0",
+          "convention": "utf8_char_offset",
+          "end": 11260,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:83",
+          "start": 11257
+        },
+        "quote": "30'",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:83#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 84",
+        "locator": {
+          "block_index": 84,
+          "component_id": "bad245da-e554-5131-9556-3916c48f6b91",
+          "convention": "utf8_char_offset",
+          "end": 11264,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:84",
+          "start": 11261
+        },
+        "quote": "50'",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:84#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 85",
+        "locator": {
+          "block_index": 85,
+          "component_id": "663af2c9-6c04-5b85-91ff-4695b36db239",
+          "convention": "utf8_char_offset",
+          "end": 11268,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:85",
+          "start": 11265
+        },
+        "quote": "75'",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:85#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 86",
+        "locator": {
+          "block_index": 86,
+          "component_id": "2bbc9730-3eb9-537f-8837-1afde5f3ad2f",
+          "convention": "utf8_char_offset",
+          "end": 11287,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:86",
+          "start": 11269
+        },
+        "quote": "Mechanical Systems",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:86#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 87",
+        "locator": {
+          "block_index": 87,
+          "component_id": "c36d678a-0894-5217-add3-2490eb485cb0",
+          "convention": "utf8_char_offset",
+          "end": 11746,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:87",
+          "start": 11288
+        },
+        "quote": "All roof-mounted mechanical units (including evaporative coolers, HVAC units, vents, etc.) for all building types shall be located or screened so as not to be visible from the project’s property lines that are adjacent to public and private streets, as well as adjacent to residential properties (unless height difference makes screening impractical). The screening methods/materials shall be consistent with and incorporated into the design of the building.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:87#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 88",
+        "locator": {
+          "block_index": 88,
+          "component_id": "ee732044-e696-5b75-a694-9f6bc0c6f3c0",
+          "convention": "utf8_char_offset",
+          "end": 11770,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:88",
+          "start": 11747
+        },
+        "quote": "Location Considerations",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:88#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 89",
+        "locator": {
+          "block_index": 89,
+          "component_id": "6be3479d-a151-5d2c-aca1-c34494befb47",
+          "convention": "utf8_char_offset",
+          "end": 12069,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:89",
+          "start": 11771
+        },
+        "quote": "Projects located within an industrial context, or not visible from the street, may design to a lesser building type standard than required by zoning; provided, that the project complies with the design requirements of the lesser building type and meets the design considerations in TMC 18.275.040 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:89#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.275.050 block 90",
+        "locator": {
+          "block_index": 90,
+          "component_id": "6fc64668-8582-5a38-9c23-5407b6d9c043",
+          "convention": "utf8_char_offset",
+          "end": 12095,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.275.050:block:90",
+          "start": 12070
+        },
+        "quote": "(Ord. 20165 § 5, 1-8-19.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050:block:90#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20165",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 12093,
+          "start": 12071
+        },
+        "quote": "Ord. 20165 § 5, 1-8-19",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.275.050#history:20165",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "8e65ace641c2fbdd81bd7dffdcbb347b2328c71bdc85a8387ee550beeb70c3a5",
+      "captured_at": "2026-08-28T04:56:06.877034Z",
+      "kind": "rendered_html_capture",
+      "value": "18.275.050.8e65ace641c2.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:18.275.050@8e65ace641c2fbdd",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:18.275.050",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:18.275.050",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 18.275.050",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/18.275.050"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.275.050#history:20165",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "1-8-19"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "18.275.050",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.275.050#history:20165",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20165"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.275.050#history:20165",
+      "value": "adopted"
+    },
+    "title": "Building design standards – Type A, B, and C nonresidential buildings."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:56:06.877034Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "8e65ace641c2fbdd81bd7dffdcbb347b2328c71bdc85a8387ee550beeb70c3a5",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "8e65ace641c2fbdd81bd7dffdcbb347b2328c71bdc85a8387ee550beeb70c3a5",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "8e65ace641c2fbdd81bd7dffdcbb347b2328c71bdc85a8387ee550beeb70c3a5",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "2394e13e47931ba44f6a111505466631afcd66c86795c7648cf53b0468d66fbb",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "2394e13e47931ba44f6a111505466631afcd66c86795c7648cf53b0468d66fbb",
+        "output_sha256": "1c7740f85a1cce2993a680ea497be95579db137192de180f919264a2c1fdefad",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "2394e13e47931ba44f6a111505466631afcd66c86795c7648cf53b0468d66fbb",
+        "output_sha256": "07c1e02327de319f5f875acf8c5338ef5876ad3c910e8fd2c7475d3fe873e2a5",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/18.275.050",
+    "retained_original": {
+      "byte_count": 38537,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/18.275.050.8e65ace641c2.html",
+      "retrieved_at": "2026-08-28T04:56:06.877034Z",
+      "sha256": "8e65ace641c2fbdd81bd7dffdcbb347b2328c71bdc85a8387ee550beeb70c3a5"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

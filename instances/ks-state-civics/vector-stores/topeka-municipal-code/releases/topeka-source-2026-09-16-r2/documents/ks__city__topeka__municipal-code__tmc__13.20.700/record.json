@@ -1,0 +1,433 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1045,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "721d9ae53d88fb8250dc5bef8a03a564aeb41a7abbe9288cfcb81ecfbbd32490"
+    },
+    "structured": {
+      "block_count": 10,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "12032ae7-7292-5b58-8c8c-63122d42cb59",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.700:section",
+      "sha256": "32ac7d71c026cc7ad0af4a7cf9ab1c72e3913acbb5c03778525a4a2a6fd81e13",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 3291,
+      "char_count": 3283,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "0991e7fdc073e096ccb26f523d03331f97a9a76b585d7fd77b0fb81de761434c"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.700 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "cf06d52a-72e9-5ee8-b204-6b711f9215b3",
+          "convention": "utf8_char_offset",
+          "end": 296,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.700:block:0",
+          "start": 0
+        },
+        "quote": "(a) For the purpose of calculating wastewater service charges, the minimum standard classification charge shall be based upon the average strength of domestic wastewater, and for this purpose the average strength of domestic wastewater is hereby defined as containing not more than the following:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.700:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.700 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "6f1cd730-f686-5b41-8939-a9841cd05854",
+          "convention": "utf8_char_offset",
+          "end": 338,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.700:block:1",
+          "start": 297
+        },
+        "quote": "Three hundred mg/l suspended solids (SS);",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.700:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.700 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "3fbda74f-505f-59e8-8b70-0656e8fe3de7",
+          "convention": "utf8_char_offset",
+          "end": 386,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.700:block:2",
+          "start": 339
+        },
+        "quote": "Four hundred mg/l chemical oxygen demand (COD);",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.700:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.700 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "987c3280-e21e-56c0-a196-9f626160f730",
+          "convention": "utf8_char_offset",
+          "end": 438,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.700:block:3",
+          "start": 387
+        },
+        "quote": "Three hundred mg/l biochemical oxygen demand (BOD);",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.700:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.700 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "e53658d2-4003-5713-bb38-be1d45ffa28c",
+          "convention": "utf8_char_offset",
+          "end": 500,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.700:block:4",
+          "start": 439
+        },
+        "quote": "Fifty mg/l oil and grease (O&G) (animal or vegetable origin);",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.700:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.700 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "20c551df-1cfc-526c-9210-6ed0edc38c5d",
+          "convention": "utf8_char_offset",
+          "end": 525,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.700:block:5",
+          "start": 501
+        },
+        "quote": "Ten mg/l phosphorus (P);",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.700:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.700 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "56b37386-a1bc-5ded-8c9e-82a423eef7e3",
+          "convention": "utf8_char_offset",
+          "end": 556,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.700:block:6",
+          "start": 526
+        },
+        "quote": "Thirty mg/l Kjeldahl nitrogen;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.700:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.700 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "8b11158a-cadb-5b3f-ab45-68b02cf3bbea",
+          "convention": "utf8_char_offset",
+          "end": 594,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.700:block:7",
+          "start": 557
+        },
+        "quote": "Seven hundred mg/l total solids (TS);",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.700:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.700 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "96cf2e63-a478-540b-be65-33f30f180549",
+          "convention": "utf8_char_offset",
+          "end": 681,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.700:block:8",
+          "start": 595
+        },
+        "quote": "Additional elements of wastewater strength as may be deemed necessary by the Director.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.700:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.700 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "b4501cdb-be7b-58f4-b747-cef2ff016e7c",
+          "convention": "utf8_char_offset",
+          "end": 1044,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.700:block:9",
+          "start": 682
+        },
+        "quote": "(b) Any person desiring to discharge wastewater to the City sewage collection system having a concentration greater than 300 mg/l suspended solids or 300 mg/l biochemical oxygen demand shall receive written permission from the Director before allowing such discharge. (Ord. 19496 § 91, 12-21-10; Ord. 18272 § 9, 6-22-04. Code 1995 § 146-343. Formerly 14.80.790.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.700:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.700#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19496",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 976,
+          "start": 951
+        },
+        "quote": "Ord. 19496 § 91, 12-21-10",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.700#history:19496",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 18272",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1001,
+          "start": 978
+        },
+        "quote": "Ord. 18272 § 9, 6-22-04",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.700#history:18272",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "60a6c8d975a32744d719c8b0a56d3c4362cde6a676f5b3684eb4d12c1c478a2c",
+      "captured_at": "2026-08-28T04:30:45.758648Z",
+      "kind": "rendered_html_capture",
+      "value": "13.20.700.60a6c8d975a3.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:13.20.700@60a6c8d975a32744",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:13.20.700",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:13.20.700",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 13.20.700",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/13.20.700"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.700#history:19496",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-21-10"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.700#history:18272",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "6-22-04"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "13.20.700",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.700#history:19496",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19496"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.700#history:18272",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:18272"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.700#history:19496",
+      "value": "adopted"
+    },
+    "title": "Standard classification charges."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:30:45.758648Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "60a6c8d975a32744d719c8b0a56d3c4362cde6a676f5b3684eb4d12c1c478a2c",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "60a6c8d975a32744d719c8b0a56d3c4362cde6a676f5b3684eb4d12c1c478a2c",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "60a6c8d975a32744d719c8b0a56d3c4362cde6a676f5b3684eb4d12c1c478a2c",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "0991e7fdc073e096ccb26f523d03331f97a9a76b585d7fd77b0fb81de761434c",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "0991e7fdc073e096ccb26f523d03331f97a9a76b585d7fd77b0fb81de761434c",
+        "output_sha256": "721d9ae53d88fb8250dc5bef8a03a564aeb41a7abbe9288cfcb81ecfbbd32490",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "0991e7fdc073e096ccb26f523d03331f97a9a76b585d7fd77b0fb81de761434c",
+        "output_sha256": "32ac7d71c026cc7ad0af4a7cf9ab1c72e3913acbb5c03778525a4a2a6fd81e13",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/13.20.700",
+    "retained_original": {
+      "byte_count": 29414,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/13.20.700.60a6c8d975a3.html",
+      "retrieved_at": "2026-08-28T04:30:45.758648Z",
+      "sha256": "60a6c8d975a32744d719c8b0a56d3c4362cde6a676f5b3684eb4d12c1c478a2c"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

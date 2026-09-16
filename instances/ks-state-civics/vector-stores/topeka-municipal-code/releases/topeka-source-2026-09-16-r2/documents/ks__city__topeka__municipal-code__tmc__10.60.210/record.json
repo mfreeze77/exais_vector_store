@@ -1,0 +1,257 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 664,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "ec80259adb47c9f34ee7756f22c877238743b79826dab961c7a98ea36d80b3af"
+    },
+    "structured": {
+      "block_count": 1,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "ee8f51c7-1872-5711-8f0c-1bd039ca8acf",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.210:section",
+      "sha256": "dc21297335d326347a31eed879064a1af200648fb80134d4c70aa8dee6399732",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 2021,
+      "char_count": 2018,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "603c9c5705cbb9fbc5d66edb7c332b39b8d73341359dd8b49e4ed333bcd2db0c"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.210 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "7a01fd8d-9205-5c7a-a51c-9b7e58d24c96",
+          "convention": "utf8_char_offset",
+          "end": 663,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.210:block:0",
+          "start": 0
+        },
+        "quote": "Purpose Generally. The required payment as provided by this article, or fees received in lieu thereof, are hereby ordered to cover the cost of inspection, installation, operation, patrol and use of parking spaces and parking meters and off-street parking facilities described in this article and to regulate the parking of vehicles in the time-restricted parking zones created by this article and to provide for the proper regulation, control and inspection of traffic upon the public streets and municipal off-street parking facilities. All fees thus collected shall be paid into the City Treasury and deposited into the parking fund. (Ord. 20566 § 14, 6-10-25.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.210:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.210#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20566",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 661,
+          "start": 637
+        },
+        "quote": "Ord. 20566 § 14, 6-10-25",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.210#history:20566",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "efc95c6caa7cd25e2a62f23e13e93c5615e40b6912ccc6f20a7cc1833c9a550f",
+      "captured_at": "2026-08-28T04:16:37.158250Z",
+      "kind": "rendered_html_capture",
+      "value": "10.60.210.efc95c6caa7c.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.60.210@efc95c6caa7cd25e",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.60.210",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.60.210",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.60.210",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.60.210"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.60.210#history:20566",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "6-10-25"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.60.210",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.60.210#history:20566",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20566"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.60.210#history:20566",
+      "value": "adopted"
+    },
+    "title": "Rates and fees."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:16:37.158250Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "efc95c6caa7cd25e2a62f23e13e93c5615e40b6912ccc6f20a7cc1833c9a550f",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "efc95c6caa7cd25e2a62f23e13e93c5615e40b6912ccc6f20a7cc1833c9a550f",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "efc95c6caa7cd25e2a62f23e13e93c5615e40b6912ccc6f20a7cc1833c9a550f",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "603c9c5705cbb9fbc5d66edb7c332b39b8d73341359dd8b49e4ed333bcd2db0c",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "603c9c5705cbb9fbc5d66edb7c332b39b8d73341359dd8b49e4ed333bcd2db0c",
+        "output_sha256": "ec80259adb47c9f34ee7756f22c877238743b79826dab961c7a98ea36d80b3af",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "603c9c5705cbb9fbc5d66edb7c332b39b8d73341359dd8b49e4ed333bcd2db0c",
+        "output_sha256": "dc21297335d326347a31eed879064a1af200648fb80134d4c70aa8dee6399732",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.60.210",
+    "retained_original": {
+      "byte_count": 28480,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.60.210.efc95c6caa7c.html",
+      "retrieved_at": "2026-08-28T04:16:37.158250Z",
+      "sha256": "efc95c6caa7cd25e2a62f23e13e93c5615e40b6912ccc6f20a7cc1833c9a550f"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

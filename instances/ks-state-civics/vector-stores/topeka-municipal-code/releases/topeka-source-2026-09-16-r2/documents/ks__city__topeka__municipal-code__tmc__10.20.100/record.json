@@ -1,0 +1,305 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 753,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "507b4b83a1958edf25ea386bc98dabdb5fbb67fa6907a2d116cfd59a52929eb6"
+    },
+    "structured": {
+      "block_count": 4,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "083b7b2f-2ab7-5391-a7fd-792690a8d68a",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.20.100:section",
+      "sha256": "296db71ea6b704d68d4ff3f98404576a972257c4948ae7508772b63a6a84be85",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 2395,
+      "char_count": 2390,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "460b155bba495ca1ac5ec772eab62a9314bc297c16c28dc6c6d6d14fdabed03a"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.20.100 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "38084d24-26f5-5eb8-9e16-d035a980fdb2",
+          "convention": "utf8_char_offset",
+          "end": 210,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.20.100:block:0",
+          "start": 0
+        },
+        "quote": "(a) Inattentive Driving. Every driver shall remain alert and give full attention to the safe operation of his vehicle while it is in motion, and any driver who does not shall be in violation of this subsection.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.100:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.20.100 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "2130991d-661e-5fbb-a47c-7ffb7fdf2987",
+          "convention": "utf8_char_offset",
+          "end": 396,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.20.100:block:1",
+          "start": 211
+        },
+        "quote": "(b) Negligent Driving. No driver, while operating or attempting to operate his vehicle, shall engage in any activity or do any act which interferes with the safe control of his vehicle.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.100:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.20.100 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "13684089-a71c-54d2-bea6-d060f4a14b94",
+          "convention": "utf8_char_offset",
+          "end": 696,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.20.100:block:2",
+          "start": 397
+        },
+        "quote": "(c) Unsafe Driving. No person shall operate or halt any vehicle in such a manner as to indicate a careless or heedless disregard for the rights or safety of others, or in such a manner as to endanger, or be likely to endanger, any person or property. (Ord. 17421 § 2, 10-19-99. Code 1995 § 142-192.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.100:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.20.100 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "ed2f99c7-f5b4-5bdf-937a-7494715048db",
+          "convention": "utf8_char_offset",
+          "end": 752,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.20.100:block:3",
+          "start": 697
+        },
+        "quote": "State Law References: Reckless driving, K.S.A. 8-1566 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.100:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.100#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 17421",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 673,
+          "start": 649
+        },
+        "quote": "Ord. 17421 § 2, 10-19-99",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.100#history:17421",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "200c6f0e32a64cb6031ad6086518aead5b682d358904409c346164956864e2c8",
+      "captured_at": "2026-08-28T04:13:58.521350Z",
+      "kind": "rendered_html_capture",
+      "value": "10.20.100.200c6f0e32a6.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.20.100@200c6f0e32a64cb6",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.20.100",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.20.100",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.20.100",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.20.100"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.20.100#history:17421",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "10-19-99"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.20.100",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.20.100#history:17421",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:17421"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.20.100#history:17421",
+      "value": "adopted"
+    },
+    "title": "Inattentive, negligent or unsafe driving."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:13:58.521350Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "200c6f0e32a64cb6031ad6086518aead5b682d358904409c346164956864e2c8",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "200c6f0e32a64cb6031ad6086518aead5b682d358904409c346164956864e2c8",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "200c6f0e32a64cb6031ad6086518aead5b682d358904409c346164956864e2c8",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "460b155bba495ca1ac5ec772eab62a9314bc297c16c28dc6c6d6d14fdabed03a",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "460b155bba495ca1ac5ec772eab62a9314bc297c16c28dc6c6d6d14fdabed03a",
+        "output_sha256": "507b4b83a1958edf25ea386bc98dabdb5fbb67fa6907a2d116cfd59a52929eb6",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "460b155bba495ca1ac5ec772eab62a9314bc297c16c28dc6c6d6d14fdabed03a",
+        "output_sha256": "296db71ea6b704d68d4ff3f98404576a972257c4948ae7508772b63a6a84be85",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.20.100",
+    "retained_original": {
+      "byte_count": 29256,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.20.100.200c6f0e32a6.html",
+      "retrieved_at": "2026-08-28T04:13:58.521350Z",
+      "sha256": "200c6f0e32a64cb6031ad6086518aead5b682d358904409c346164956864e2c8"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

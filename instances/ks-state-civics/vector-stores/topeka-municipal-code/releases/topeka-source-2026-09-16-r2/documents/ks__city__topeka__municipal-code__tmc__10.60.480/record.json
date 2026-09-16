@@ -1,0 +1,287 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 799,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "fb0dd90e118007cf6e223d4f3736fb728d3370125b5be53379f600d569fffc7f"
+    },
+    "structured": {
+      "block_count": 5,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "b82d7136-4161-51b6-85d4-7e59e7aa988d",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.480:section",
+      "sha256": "244877e8e63a76b4d1d58e92042ad36c66477580b2d4e9e4257f189b29168f82",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 2479,
+      "char_count": 2471,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "7f1e585047dce729153287ce4955b41ec71535124043f0252b85bfc8993e738d"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.480 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "bf2e080c-2bfb-59cf-b32b-89bf28572721",
+          "convention": "utf8_char_offset",
+          "end": 212,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.480:block:0",
+          "start": 0
+        },
+        "quote": "(a) The owner of any taxicab shall first obtain and file with the City Clerk the written consent of the owner or of the one in control of the property abutting which the stand is to be established and maintained.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.480:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.480 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "95986ce6-33b5-5f67-b545-cc7aa5d96c2a",
+          "convention": "utf8_char_offset",
+          "end": 430,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.480:block:1",
+          "start": 213
+        },
+        "quote": "(b) The one granting the consent or permit under this section may revoke the consent or permit by giving at least 10 days’ notice in writing to the operator and filing with the City Clerk proof of the service thereof.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.480:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.480 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "42ba460c-7f91-5fb4-a080-f67733af27a1",
+          "convention": "utf8_char_offset",
+          "end": 578,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.480:block:2",
+          "start": 431
+        },
+        "quote": "(c) The Traffic Engineer may revoke any license or permit under this section whenever it appears to be to the best interest of the public so to do.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.480:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.480 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "6dd9ccc2-70d6-5964-9770-d23875827f96",
+          "convention": "utf8_char_offset",
+          "end": 719,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.480:block:3",
+          "start": 579
+        },
+        "quote": "(d) No taxicab stands shall be maintained on Kansas Avenue between Fourth Street and 11th Street. (Code 1981 § 43-496. Code 1995 § 142-502.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.480:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.480 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "3adf343e-e039-572b-9f0b-20e328a49d96",
+          "convention": "utf8_char_offset",
+          "end": 798,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.480:block:4",
+          "start": 720
+        },
+        "quote": "Cross References: City Clerk, TMC 2.20.010 ; Traffic Engineer, TMC 10.10.010 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.480:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.480#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "e0918d47cef20cfff1de4c1ce874484a6d4050ec74b1e0fdf11d647a7e90db9a",
+      "captured_at": "2026-08-28T04:17:55.533262Z",
+      "kind": "rendered_html_capture",
+      "value": "10.60.480.e0918d47cef2.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.60.480@e0918d47cef20cff",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.60.480",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.60.480",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.60.480",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.60.480"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.60.480",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Application for and conditions of permit for taxicab stands."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:17:55.533262Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "e0918d47cef20cfff1de4c1ce874484a6d4050ec74b1e0fdf11d647a7e90db9a",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "e0918d47cef20cfff1de4c1ce874484a6d4050ec74b1e0fdf11d647a7e90db9a",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "e0918d47cef20cfff1de4c1ce874484a6d4050ec74b1e0fdf11d647a7e90db9a",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "7f1e585047dce729153287ce4955b41ec71535124043f0252b85bfc8993e738d",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "7f1e585047dce729153287ce4955b41ec71535124043f0252b85bfc8993e738d",
+        "output_sha256": "fb0dd90e118007cf6e223d4f3736fb728d3370125b5be53379f600d569fffc7f",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "7f1e585047dce729153287ce4955b41ec71535124043f0252b85bfc8993e738d",
+        "output_sha256": "244877e8e63a76b4d1d58e92042ad36c66477580b2d4e9e4257f189b29168f82",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.60.480",
+    "retained_original": {
+      "byte_count": 29841,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.60.480.e0918d47cef2.html",
+      "retrieved_at": "2026-08-28T04:17:55.533262Z",
+      "sha256": "e0918d47cef20cfff1de4c1ce874484a6d4050ec74b1e0fdf11d647a7e90db9a"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

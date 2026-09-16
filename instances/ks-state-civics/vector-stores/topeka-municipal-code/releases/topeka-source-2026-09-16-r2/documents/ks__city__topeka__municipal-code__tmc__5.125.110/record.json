@@ -1,0 +1,239 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 785,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "ba4f127635bb608b5bba6a10f2c670aaa85172d808cbd1803ad8f562f9dd91be"
+    },
+    "structured": {
+      "block_count": 2,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "3374bf50-ee01-5dbc-8496-713e2d64e6cf",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.110:section",
+      "sha256": "d29dfae26ca160ebd89fa22e1b724dcae4bb31c2d9d9fe823dc79bc0fad49a50",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 2264,
+      "char_count": 2256,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "19519a1569268ebe2a8b3b2682d92e02620fcbf275d440782c6b9cbba834a3e0"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.125.110 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "e65616b0-2d7d-5fb9-a31b-2f9db2aa9053",
+          "convention": "utf8_char_offset",
+          "end": 726,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.110:block:0",
+          "start": 0
+        },
+        "quote": "The document or other instrument evidencing the license of a precious metal dealer shall state the address at which the business is to be conducted and shall state fully the name of the licensee. If the licensee is a partnership, the license shall state the names of the members thereof and, if a corporation, the date and place of its incorporation and the names of all shareholders thereof. Such license shall be kept conspicuously posted in the place of business of the licensee and shall not be transferable or assignable. Not more than one license may be issued to the same licensee upon compliance with all provisions of this chapter governing the issuance of an initial license. (Code 1981 § 37-64. Code 1995 § 30-209.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.110:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.125.110 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "942e5ab8-5db0-5a6c-bb8f-b1f99de9d889",
+          "convention": "utf8_char_offset",
+          "end": 784,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.125.110:block:1",
+          "start": 727
+        },
+        "quote": "State Law References: Similar provisions, K.S.A. 16-710 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.110:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.125.110#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "647d04e5f109128a32d15ec4e02d14c59353b913ce539fbc0a2ac481ba0ce9df",
+      "captured_at": "2026-08-28T03:59:44.997744Z",
+      "kind": "rendered_html_capture",
+      "value": "5.125.110.647d04e5f109.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:5.125.110@647d04e5f109128a",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:5.125.110",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:5.125.110",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 5.125.110",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/5.125.110"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "5.125.110",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Contents – Display – License for each place of business."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T03:59:44.997744Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "647d04e5f109128a32d15ec4e02d14c59353b913ce539fbc0a2ac481ba0ce9df",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "647d04e5f109128a32d15ec4e02d14c59353b913ce539fbc0a2ac481ba0ce9df",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "647d04e5f109128a32d15ec4e02d14c59353b913ce539fbc0a2ac481ba0ce9df",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "19519a1569268ebe2a8b3b2682d92e02620fcbf275d440782c6b9cbba834a3e0",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "19519a1569268ebe2a8b3b2682d92e02620fcbf275d440782c6b9cbba834a3e0",
+        "output_sha256": "ba4f127635bb608b5bba6a10f2c670aaa85172d808cbd1803ad8f562f9dd91be",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "19519a1569268ebe2a8b3b2682d92e02620fcbf275d440782c6b9cbba834a3e0",
+        "output_sha256": "d29dfae26ca160ebd89fa22e1b724dcae4bb31c2d9d9fe823dc79bc0fad49a50",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/5.125.110",
+    "retained_original": {
+      "byte_count": 28593,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/5.125.110.647d04e5f109.html",
+      "retrieved_at": "2026-08-28T03:59:44.997744Z",
+      "sha256": "647d04e5f109128a32d15ec4e02d14c59353b913ce539fbc0a2ac481ba0ce9df"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

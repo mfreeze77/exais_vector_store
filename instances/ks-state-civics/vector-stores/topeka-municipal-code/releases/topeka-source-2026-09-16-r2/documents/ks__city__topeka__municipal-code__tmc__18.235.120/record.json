@@ -1,0 +1,401 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1300,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "93550430b17a972fea6032b5cf85e7dc268364df9e601089ade99ba6fb996cec"
+    },
+    "structured": {
+      "block_count": 8,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "2f76fc92-bcac-5fe1-a6aa-f04210446a06",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.120:section",
+      "sha256": "763ece3d6c4cf37fccb089146c24115621790ef00aa2ec0e7fc80b5ace46612b",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 3791,
+      "char_count": 3783,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "bf88084595431e6c97107a222784a759593a05b03a38e91b0ef7a1e8feb92351"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.120 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "f49601ba-685e-5cea-ba50-f7d74aad0334",
+          "convention": "utf8_char_offset",
+          "end": 534,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.120:block:0",
+          "start": 0
+        },
+        "quote": "(a) Any large tree planted to meet minimum requirements of this chapter shall have at least a two-inch to two-and-one-half-inch diameter caliper. Any medium tree, understory tree, or coniferous tree planted to meet minimum requirements of this chapter shall have a diameter caliper of one and one-quarter inches to one and one-half inches, except that multistemmed understory trees shall be between six and eight feet in height. Deviations from the recommended tree list may be approved through a written request to the City Forester.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.120:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.120 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "db91c85b-1399-54b0-ac70-a4d2bec12adf",
+          "convention": "utf8_char_offset",
+          "end": 662,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.120:block:1",
+          "start": 535
+        },
+        "quote": "(b) All trees planted to meet the minimum requirements of this chapter shall be in a healthy condition at the time of planting.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.120:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.120 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "1f9106cd-ea07-5bba-9b15-114aa1c8c70e",
+          "convention": "utf8_char_offset",
+          "end": 789,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.120:block:2",
+          "start": 663
+        },
+        "quote": "(c) Shrubs planted to meet the minimum requirements of this chapter shall be a minimum of an established two-gallon container.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.120:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.120 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "4c918b62-79af-5aeb-80c6-3c7a17165415",
+          "convention": "utf8_char_offset",
+          "end": 904,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.120:block:3",
+          "start": 790
+        },
+        "quote": "(d) Grass shall be planted in such a manner as to completely cover all exposed soil after one full growing season.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.120:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.120 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "d0c8183f-43b0-5545-9bbb-30bda921e700",
+          "convention": "utf8_char_offset",
+          "end": 1045,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.120:block:4",
+          "start": 905
+        },
+        "quote": "(e) No bare ground shall be left exposed. Grass or other groundcover or mulch, such as pine straw or tree bark, shall cover all bare ground.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.120:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.120 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "08b644f0-d709-509d-8161-13e941f6055f",
+          "convention": "utf8_char_offset",
+          "end": 1096,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.120:block:5",
+          "start": 1046
+        },
+        "quote": "(f) Irrigation is not required but is recommended.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.120:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.120 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "9ae981fb-d078-50be-831f-8803c01f85b4",
+          "convention": "utf8_char_offset",
+          "end": 1247,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.120:block:6",
+          "start": 1097
+        },
+        "quote": "(g) Any planting that dies shall be replaced within one full growing season. (Ord. 18255 § 9, 6-1-04; Ord. 17846 § 12, 6-11-02. Code 1995 § 48-38.11.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.120:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.120 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "f59be8d4-913e-5002-8dbe-b251fc157151",
+          "convention": "utf8_char_offset",
+          "end": 1299,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.120:block:7",
+          "start": 1248
+        },
+        "quote": "Cross References: City Forester, Chapter 12.65 TMC.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.120:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.120#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 18255",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1197,
+          "start": 1175
+        },
+        "quote": "Ord. 18255 § 9, 6-1-04",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.120#history:18255",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 17846",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1223,
+          "start": 1199
+        },
+        "quote": "Ord. 17846 § 12, 6-11-02",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.120#history:17846",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "1ce8e23f790fe80d24689902ce8d1f5189fbc6063adfca2bf310f25c6ebc9065",
+      "captured_at": "2026-08-28T04:54:40.909078Z",
+      "kind": "rendered_html_capture",
+      "value": "18.235.120.1ce8e23f790f.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:18.235.120@1ce8e23f790fe80d",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:18.235.120",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:18.235.120",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 18.235.120",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/18.235.120"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.235.120#history:18255",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "6-1-04"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.235.120#history:17846",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "6-11-02"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "18.235.120",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.235.120#history:18255",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:18255"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.235.120#history:17846",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:17846"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.235.120#history:18255",
+      "value": "adopted"
+    },
+    "title": "Size and quality requirements."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:54:40.909078Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "1ce8e23f790fe80d24689902ce8d1f5189fbc6063adfca2bf310f25c6ebc9065",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "1ce8e23f790fe80d24689902ce8d1f5189fbc6063adfca2bf310f25c6ebc9065",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "1ce8e23f790fe80d24689902ce8d1f5189fbc6063adfca2bf310f25c6ebc9065",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "bf88084595431e6c97107a222784a759593a05b03a38e91b0ef7a1e8feb92351",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "bf88084595431e6c97107a222784a759593a05b03a38e91b0ef7a1e8feb92351",
+        "output_sha256": "93550430b17a972fea6032b5cf85e7dc268364df9e601089ade99ba6fb996cec",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "bf88084595431e6c97107a222784a759593a05b03a38e91b0ef7a1e8feb92351",
+        "output_sha256": "763ece3d6c4cf37fccb089146c24115621790ef00aa2ec0e7fc80b5ace46612b",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/18.235.120",
+    "retained_original": {
+      "byte_count": 30495,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/18.235.120.1ce8e23f790f.html",
+      "retrieved_at": "2026-08-28T04:54:40.909078Z",
+      "sha256": "1ce8e23f790fe80d24689902ce8d1f5189fbc6063adfca2bf310f25c6ebc9065"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

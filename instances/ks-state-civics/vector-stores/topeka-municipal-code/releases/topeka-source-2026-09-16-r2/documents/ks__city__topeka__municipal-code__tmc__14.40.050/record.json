@@ -1,0 +1,337 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1001,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "8a59f5e428deb17f9623202c3961ae386720261996d2acf80379d165001fabc0"
+    },
+    "structured": {
+      "block_count": 6,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "bff9269d-56b9-5ab6-8a38-edb5b1f7f0b8",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:14.40.050:section",
+      "sha256": "065d383b50e51f7cc233c97bd7029a83d4f862feaea381089767d59b1044dc61",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 2953,
+      "char_count": 2950,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "57206da0dead05a44e6bb82f6ecb145d626f69f618d19419d1c787a045ef090d"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.40.050 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "8e96dac1-e15e-5aee-b479-df96d1c98a65",
+          "convention": "utf8_char_offset",
+          "end": 136,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.40.050:block:0",
+          "start": 0
+        },
+        "quote": "Chapter 1, Section 105.5.34, Open burning, is hereby deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.40.050:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.40.050 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "345574de-14a1-5fac-8e2b-fe34a31e0772",
+          "convention": "utf8_char_offset",
+          "end": 363,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.40.050:block:1",
+          "start": 137
+        },
+        "quote": "An operational permit is required for the kindling or maintaining of an open fire or a fire on any public street, alley, road, or other public or private ground. Instructions and stipulations of the permit shall be adhered to.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.40.050:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.40.050 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "dfb3b735-ab87-56d9-9684-bfb0f0f7af8e",
+          "convention": "utf8_char_offset",
+          "end": 429,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.40.050:block:2",
+          "start": 364
+        },
+        "quote": "Exception: Recreational Fires defined at subsections (a) and (b):",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.40.050:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.40.050 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "07c1e533-a613-517e-82b1-9fed77eb768d",
+          "convention": "utf8_char_offset",
+          "end": 686,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.40.050:block:3",
+          "start": 430
+        },
+        "quote": "(a) An outdoor fire burning approved material, at ground level, other than rubbish with a total fuel area of 3 feet (914 mm) or less in diameter and 2 feet (610 mm) or less in height for pleasure, religious, ceremonial, cooking, warmth or similar purposes.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.40.050:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.40.050 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "fb1cdc43-de60-5056-8a12-b2e46b68e776",
+          "convention": "utf8_char_offset",
+          "end": 974,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.40.050:block:4",
+          "start": 687
+        },
+        "quote": "(b) An outdoor fire burning approved material other than rubbish in a commercially produced fire pit or fireplace with a total fuel area of 3 feet (914 mm) or less in diameter and 2 feet (610 mm) or less in height for pleasure, religious, ceremonial, cooking, warmth or similar purposes.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.40.050:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.40.050 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "c7c80674-8d64-5fd0-b4ee-b254c58e43a1",
+          "convention": "utf8_char_offset",
+          "end": 1000,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.40.050:block:5",
+          "start": 975
+        },
+        "quote": "(Ord. 20407 § 5, 2-7-23.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.40.050:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.40.050#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20407",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 998,
+          "start": 976
+        },
+        "quote": "Ord. 20407 § 5, 2-7-23",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.40.050#history:20407",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "3210c0d8f08757614473b390010eaaed7ff4bb991ba4714aea9b91a11f29cc03",
+      "captured_at": "2026-08-28T04:37:15.619255Z",
+      "kind": "rendered_html_capture",
+      "value": "14.40.050.3210c0d8f087.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:14.40.050@3210c0d8f0875761",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:14.40.050",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:14.40.050",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 14.40.050",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/14.40.050"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.40.050#history:20407",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "2-7-23"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "14.40.050",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.40.050#history:20407",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20407"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.40.050#history:20407",
+      "value": "adopted"
+    },
+    "title": "Chapter 1, Section 105.5.34, Open burning."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:37:15.619255Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "3210c0d8f08757614473b390010eaaed7ff4bb991ba4714aea9b91a11f29cc03",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "3210c0d8f08757614473b390010eaaed7ff4bb991ba4714aea9b91a11f29cc03",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "3210c0d8f08757614473b390010eaaed7ff4bb991ba4714aea9b91a11f29cc03",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "57206da0dead05a44e6bb82f6ecb145d626f69f618d19419d1c787a045ef090d",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "57206da0dead05a44e6bb82f6ecb145d626f69f618d19419d1c787a045ef090d",
+        "output_sha256": "8a59f5e428deb17f9623202c3961ae386720261996d2acf80379d165001fabc0",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "57206da0dead05a44e6bb82f6ecb145d626f69f618d19419d1c787a045ef090d",
+        "output_sha256": "065d383b50e51f7cc233c97bd7029a83d4f862feaea381089767d59b1044dc61",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/14.40.050",
+    "retained_original": {
+      "byte_count": 28669,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/14.40.050.3210c0d8f087.html",
+      "retrieved_at": "2026-08-28T04:37:15.619255Z",
+      "sha256": "3210c0d8f08757614473b390010eaaed7ff4bb991ba4714aea9b91a11f29cc03"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

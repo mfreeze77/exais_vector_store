@@ -1,0 +1,305 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1816,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "c5819a799dc6dc96c473d097f868b14a573875babcc3bdd5278684eea169023e"
+    },
+    "structured": {
+      "block_count": 4,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "ab4dfa59-343c-57fd-935a-11972d35c133",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:14.10.020:section",
+      "sha256": "c3aae057fc8c684f7cf99f845747a36da99e552d069cfa414bb4f0a55610eb0c",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 4534,
+      "char_count": 4525,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "f7487959406a356ad4e617f99171a676364a41fa4f78bd227469ef521b317bd8"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.10.020 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "95b43979-6ff3-50c7-abc2-72bef1e6bd46",
+          "convention": "utf8_char_offset",
+          "end": 741,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.10.020:block:0",
+          "start": 0
+        },
+        "quote": "(a) Existing Single-Family Residential Dwelling. Any permit required by this chapter may be issued to an unlicensed individual who owns and occupies a single-family dwelling, provided the work is done only by the unlicensed owner in an existing single-family dwelling, including accessory building, used exclusively for living purposes. The individual shall be responsible for all materials and labor and shall submit plans that have to be approved prior to the issuance of a permit. All work must be done by the owner or by licensed contractors. All work is subject to and must pass all applicable inspections, and the unlicensed homeowner is specifically responsible for all costs of correcting deficient work, including reinspection fees.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.10.020:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.10.020 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "027cbec7-c333-56b5-9484-02e37ddf3275",
+          "convention": "utf8_char_offset",
+          "end": 801,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.10.020:block:1",
+          "start": 742
+        },
+        "quote": "(b) New Construction of Single-Family Residential Dwelling.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.10.020:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.10.020 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "7aa0c9af-c64c-5552-ab70-9523db701507",
+          "convention": "utf8_char_offset",
+          "end": 1613,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.10.020:block:2",
+          "start": 802
+        },
+        "quote": "(1) A permit for the construction of a new single-family dwelling may be issued to an unlicensed individual subject to the restrictions and requirements in this subsection. The individual shall be responsible for all materials and labor and shall submit plans that have to be approved prior to the issuance of a permit. All work must be done by the owner or by licensed contractors. All work is subject to and must pass all applicable inspections, and the unlicensed homeowner is specifically responsible for all costs of correcting deficient work, including reinspection fees. Provided, however, an unlicensed individual may not perform any work during the construction of the single-family dwelling which is required under this title to be done by a licensed individual in the employ of a licensed contractor.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.10.020:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.10.020 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "9c0bfec2-f3b7-568e-9ce6-a365944a1b2d",
+          "convention": "utf8_char_offset",
+          "end": 1815,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.10.020:block:3",
+          "start": 1614
+        },
+        "quote": "(2) An unlicensed individual shall only be issued one permit for the construction of a single-family dwelling in any five-year period. (Ord. 18685 § 1, 7-25-06. Code 1981 § 10-40.3. Code 1995 § 26-52.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.10.020:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.10.020#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 18685",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1773,
+          "start": 1750
+        },
+        "quote": "Ord. 18685 § 1, 7-25-06",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.10.020#history:18685",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "ba6d1af3cb4a2056bfd452cb2c84422306be2dd47b7253c113421c327821c08c",
+      "captured_at": "2026-08-28T04:33:32.814294Z",
+      "kind": "rendered_html_capture",
+      "value": "14.10.020.ba6d1af3cb4a.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:14.10.020@ba6d1af3cb4a2056",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:14.10.020",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:14.10.020",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 14.10.020",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/14.10.020"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.10.020#history:18685",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "7-25-06"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "14.10.020",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.10.020#history:18685",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:18685"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.10.020#history:18685",
+      "value": "adopted"
+    },
+    "title": "Issuance – To unlicensed individuals."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:33:32.814294Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "ba6d1af3cb4a2056bfd452cb2c84422306be2dd47b7253c113421c327821c08c",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "ba6d1af3cb4a2056bfd452cb2c84422306be2dd47b7253c113421c327821c08c",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "ba6d1af3cb4a2056bfd452cb2c84422306be2dd47b7253c113421c327821c08c",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "f7487959406a356ad4e617f99171a676364a41fa4f78bd227469ef521b317bd8",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "f7487959406a356ad4e617f99171a676364a41fa4f78bd227469ef521b317bd8",
+        "output_sha256": "c5819a799dc6dc96c473d097f868b14a573875babcc3bdd5278684eea169023e",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "f7487959406a356ad4e617f99171a676364a41fa4f78bd227469ef521b317bd8",
+        "output_sha256": "c3aae057fc8c684f7cf99f845747a36da99e552d069cfa414bb4f0a55610eb0c",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/14.10.020",
+    "retained_original": {
+      "byte_count": 29158,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/14.10.020.ba6d1af3cb4a.html",
+      "retrieved_at": "2026-08-28T04:33:32.814294Z",
+      "sha256": "ba6d1af3cb4a2056bfd452cb2c84422306be2dd47b7253c113421c327821c08c"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

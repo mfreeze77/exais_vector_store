@@ -1,0 +1,689 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 6864,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "fb95e136130203502fd4bc80d63c2b00948a5943ce9cea6fd9274e323a067bde"
+    },
+    "structured": {
+      "block_count": 28,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "0d5cfc47-1bfc-57a3-a215-1b20a9cb8177",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:section",
+      "sha256": "96279cc0018027e05a6d279e888f587a467645416a68f821b093fffa603d7085",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 16003,
+      "char_count": 15968,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "c24de1246c2d976adfa60b5cca4d24d6e731f251d60d846eff30e45ad3c37dd7"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "c12e87e9-1dc9-565e-a1ef-bde1d3ce1b2a",
+          "convention": "utf8_char_offset",
+          "end": 383,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:0",
+          "start": 0
+        },
+        "quote": "(a) Permitted. Payment is not required for any parking space when the conditions set forth in this section have been satisfied and a permit issued for the reserving of such parking space. “Permit” or “hood” or “hooded meters” refers to any parking space designated as reserved, that has been marked with a hood covering the meter or other signage communicating the space as reserved.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "a7737559-bd37-5646-aed1-7d430de11d80",
+          "convention": "utf8_char_offset",
+          "end": 589,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:1",
+          "start": 384
+        },
+        "quote": "(b) Eligible Applicants. Criteria for issuing a permit for the reserving of time-restricted parking spaces, when so required for actual execution of the work or activity, are hereby established as follows:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "b04f4ba9-4266-50d3-964f-711b74ad7d4e",
+          "convention": "utf8_char_offset",
+          "end": 744,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:2",
+          "start": 590
+        },
+        "quote": "(1) Persons having a permit from the Development Services Division to encumber any street or sidewalk in connection with any building or wrecking project.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "22e77762-fb57-5734-b6b1-3e8f968d2a0b",
+          "convention": "utf8_char_offset",
+          "end": 973,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:3",
+          "start": 745
+        },
+        "quote": "(2) Persons having a permit from the Development Services Division to perform any plumbing, electrical, heating, sign hanging or other project in any public way or on premises which directly adjoin any street, alley or sidewalk.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "aeb02cd1-b523-5bc0-834c-6b86d1f31d77",
+          "convention": "utf8_char_offset",
+          "end": 1121,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:4",
+          "start": 974
+        },
+        "quote": "(3) Persons engaged in any public improvement under contract with the City or engaged in any work under supervision of the Public Works Department.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "186716ff-c840-5c00-a093-990fa019ec7d",
+          "convention": "utf8_char_offset",
+          "end": 1260,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:5",
+          "start": 1122
+        },
+        "quote": "(4) Service crews of public utilities (private or municipal) engaging in construction and maintenance work in or adjoining any public way.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "c51a3fb5-10cc-5a22-98ba-14ce8572886e",
+          "convention": "utf8_char_offset",
+          "end": 1410,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:6",
+          "start": 1261
+        },
+        "quote": "(5) Persons engaged in the business of moving personal property and effects from and to residential or commercial buildings adjoining any public way.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "087fa6b1-bf7d-516a-a363-0d8540e3f4fd",
+          "convention": "utf8_char_offset",
+          "end": 1504,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:7",
+          "start": 1411
+        },
+        "quote": "(6) Persons licensed as funeral directors and holding services in any funeral home or church.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "f4c28b38-9023-5fd2-b35b-d61629672694",
+          "convention": "utf8_char_offset",
+          "end": 1609,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:8",
+          "start": 1505
+        },
+        "quote": "(7) Persons engaged in the repair and maintenance of building service installations or office equipment.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "c4011b7e-c6bc-5305-b4b5-2454cb180d11",
+          "convention": "utf8_char_offset",
+          "end": 1802,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:9",
+          "start": 1610
+        },
+        "quote": "(8) Persons requiring temporary parking space immediately adjacent to commercial and industrial establishments for loading or unloading of building and office equipment of immediate necessity.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "b58a0132-eddc-5f88-862b-f5ffa417df6a",
+          "convention": "utf8_char_offset",
+          "end": 1940,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:10",
+          "start": 1803
+        },
+        "quote": "(9) Persons acting under the authority or requirements of the Police and Fire Departments to provide temporary special use parking zones.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "b835c934-0201-57a8-ba05-b9fce75ff621",
+          "convention": "utf8_char_offset",
+          "end": 2094,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:11",
+          "start": 1941
+        },
+        "quote": "(10) Governmental agencies sponsoring an agency event or meeting where additional parking stalls are required to meet the parking needs of the attendees.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "ab19539c-abfa-596a-9226-79305c37ff90",
+          "convention": "utf8_char_offset",
+          "end": 2395,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:12",
+          "start": 2095
+        },
+        "quote": "(11) Persons with a severe mobility impairment which necessitates the continued use of a wheelchair or canes and where the hooded parking stall is in close proximity to the person’s place of employment. Provided, the fee for such a hooded parking meter shall be at the market rate for garage parking.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "be3d50d4-4ded-50c7-82b7-e37ffadaf5bf",
+          "convention": "utf8_char_offset",
+          "end": 2761,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:13",
+          "start": 2396
+        },
+        "quote": "(12) Persons/agencies or businesses with a physical address in the downtown business district are permitted to reserve space contiguous to their business for the purpose of sales/vending consistent with their business needs. The space may not be continuously occupied for more than 10 consecutive hours. Sale or lease to a third party within City ROW is prohibited.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "68640fab-3669-52fe-bb0f-55629967bd98",
+          "convention": "utf8_char_offset",
+          "end": 3116,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:14",
+          "start": 2762
+        },
+        "quote": "(c) Approval of Application. The Transportation Operations Superintendent shall determine compliance with the above criteria for the reservation of any parking space, and upon approval of the application therefor and payment of the appropriate fee, shall authorize the required parking space to be reserved in accordance with the application as approved.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "2069c0d7-4942-5185-a134-6f9daa7b9fac",
+          "convention": "utf8_char_offset",
+          "end": 3577,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:15",
+          "start": 3117
+        },
+        "quote": "(d) Exceptional Cases. Exceptions to the rules and regulations and payment of required fees may be made in appropriate cases involving special circumstances not covered by this section upon an application and a showing that the hooding or removal of any parking meter serves the public convenience and safety, and is in harmony with the other provisions of this code; provided, that such exceptions shall be approved in advance by the Director of Public Works.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "a8106b58-8a4c-5546-9750-a91317b50e5a",
+          "convention": "utf8_char_offset",
+          "end": 3910,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:16",
+          "start": 3578
+        },
+        "quote": "(e) Time of Filing Application. The application for a permit shall be made in writing and filed at least 12 hours in advance of the time any parking meter is to be hooded or removed; provided, that this requirement may be waived by the Transportation Operations Superintendent in emergency situations where public safety is at risk.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "2abb10e7-e3f1-550d-b28b-eff7da81e33c",
+          "convention": "utf8_char_offset",
+          "end": 4269,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:17",
+          "start": 3911
+        },
+        "quote": "(f) Form of Application. The application for a permit under this section shall be on a form prepared by the Transportation Operations Superintendent. The failure or refusal of any applicant to furnish information requested in such application shall be sufficient grounds for denial by the Transportation Operations Superintendent. The application shall show:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "25e2b422-3cf5-5642-a076-3d0e0e3772e4",
+          "convention": "utf8_char_offset",
+          "end": 4313,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:18",
+          "start": 4270
+        },
+        "quote": "(1) The name and business of the applicant;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "90d6a97d-bb13-5049-9591-cf8f0de07c84",
+          "convention": "utf8_char_offset",
+          "end": 4370,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:19",
+          "start": 4314
+        },
+        "quote": "(2) The reason for the reservation of the parking space;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "7e753f41-8b38-52c8-901b-5af41c23031b",
+          "convention": "utf8_char_offset",
+          "end": 4499,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:20",
+          "start": 4371
+        },
+        "quote": "(3) Evidence that a permit for the encumbering of any street has been issued by the Building Inspection Division, if applicable;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "ee786508-4a31-5105-afa4-91a292910002",
+          "convention": "utf8_char_offset",
+          "end": 4639,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:21",
+          "start": 4500
+        },
+        "quote": "(4) The location and number of parking spaces desired to be reserved and the day or dates and the hours such spaces are to be reserved; and",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "63567c43-6847-5960-a151-ba34ea3bcab0",
+          "convention": "utf8_char_offset",
+          "end": 4962,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:22",
+          "start": 4640
+        },
+        "quote": "(5) Such other information as may be required in such application form. If the Transportation Operations Superintendent finds from the application that the proposed use of a reserved space will be consistent on a yearly basis, then the Transportation Operations Superintendent may grant a permit on a month-to-month basis.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "7ad09ba8-18b5-5e6e-b340-2d53205fea7b",
+          "convention": "utf8_char_offset",
+          "end": 5220,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:23",
+          "start": 4963
+        },
+        "quote": "(g) Exhibit of Permit. In all cases, any permit issued under this section shall be kept by the permittee or his agent at the location of the parking spaces authorized to be reserved, and shall be exhibited to any officer or employee of the City upon demand.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "64aad7e6-29a0-51d3-b4c9-f359623fbca7",
+          "convention": "utf8_char_offset",
+          "end": 5770,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:24",
+          "start": 5221
+        },
+        "quote": "(h) Issuance – Duties of City Officer. When an application for a permit has been approved, authorized employees of the City Transportation Operations Division shall cause the designated parking spaces to be reserved with appropriate signage in accordance with the permits; and such employees shall remove the signage at the expiration of the time limit as noted on the permit. If a meter is removed, it shall be removed by or under the direction of the Transportation Operations Superintendent so that the maximum amount of material may be salvaged.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "05b6e631-f9ca-5322-8159-847e16d98531",
+          "convention": "utf8_char_offset",
+          "end": 6409,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:25",
+          "start": 5771
+        },
+        "quote": "(i) Fees. The Transportation Operations Superintendent may establish daily reserved space permit rates within the minimum and maximum ranges of $6.00 and $30.00. There shall be no permit fee imposed for Sundays or Saturdays. Each applicant shall pay the required fee per parking space when any portion of the parking space is used by the applicant or reserved under a permit granted as provided for in this section. Under no circumstances will the permit fee or any portion thereof be refunded to any applicant. All fees received under this section shall be deposited with the City Treasurer to the credit of the parking fund of the City.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 26",
+        "locator": {
+          "block_index": 26,
+          "component_id": "708100c4-9227-51f9-841c-afa235b8c911",
+          "convention": "utf8_char_offset",
+          "end": 6656,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:26",
+          "start": 6410
+        },
+        "quote": "(j) Termination of Permit. Notwithstanding anything in this section to the contrary, the Transportation Operations Superintendent shall have the right to unilaterally terminate a permit granted pursuant to this section. (Ord. 20566 § 8, 6-10-25.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.220 block 27",
+        "locator": {
+          "block_index": 27,
+          "component_id": "69c4cee6-1272-55be-b84b-ea8379ec64bc",
+          "convention": "utf8_char_offset",
+          "end": 6863,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.220:block:27",
+          "start": 6657
+        },
+        "quote": "Cross References: City Treasurer, TMC 2.20.020 ; Fire Department, TMC 2.20.030 ; Police Department, TMC 2.20.090 ; Public Works Department, TMC 2.20.100 ; Transportation Operations Division, TMC 10.10.060 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220:block:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20566",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 6654,
+          "start": 6631
+        },
+        "quote": "Ord. 20566 § 8, 6-10-25",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.220#history:20566",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "e71a7a2bdb2a0176d569b413e459001d75efaad3501d951a0da619a87f2b21b6",
+      "captured_at": "2026-08-28T04:16:38.808826Z",
+      "kind": "rendered_html_capture",
+      "value": "10.60.220.e71a7a2bdb2a.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.60.220@e71a7a2bdb2a0176",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.60.220",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.60.220",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.60.220",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.60.220"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.60.220#history:20566",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "6-10-25"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.60.220",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.60.220#history:20566",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20566"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.60.220#history:20566",
+      "value": "adopted"
+    },
+    "title": "Permit for reserved parking space."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:16:38.808826Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "e71a7a2bdb2a0176d569b413e459001d75efaad3501d951a0da619a87f2b21b6",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "e71a7a2bdb2a0176d569b413e459001d75efaad3501d951a0da619a87f2b21b6",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "e71a7a2bdb2a0176d569b413e459001d75efaad3501d951a0da619a87f2b21b6",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "c24de1246c2d976adfa60b5cca4d24d6e731f251d60d846eff30e45ad3c37dd7",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "c24de1246c2d976adfa60b5cca4d24d6e731f251d60d846eff30e45ad3c37dd7",
+        "output_sha256": "fb95e136130203502fd4bc80d63c2b00948a5943ce9cea6fd9274e323a067bde",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "c24de1246c2d976adfa60b5cca4d24d6e731f251d60d846eff30e45ad3c37dd7",
+        "output_sha256": "96279cc0018027e05a6d279e888f587a467645416a68f821b093fffa603d7085",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.60.220",
+    "retained_original": {
+      "byte_count": 41689,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.60.220.e71a7a2bdb2a.html",
+      "retrieved_at": "2026-08-28T04:16:38.808826Z",
+      "sha256": "e71a7a2bdb2a0176d569b413e459001d75efaad3501d951a0da619a87f2b21b6"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

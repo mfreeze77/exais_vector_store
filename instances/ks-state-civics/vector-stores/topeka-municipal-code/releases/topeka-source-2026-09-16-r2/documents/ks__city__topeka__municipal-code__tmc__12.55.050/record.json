@@ -1,0 +1,433 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 2846,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "d0345ac7f21c8c7bb6fe0ab7c28c162f1faedac5478e57e7c30edef33357bdbd"
+    },
+    "structured": {
+      "block_count": 12,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 10,
+      "path": "structured.json",
+      "root_component_id": "54d0f6c0-176b-5f73-bf36-a65a03f1e645",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.050:section",
+      "sha256": "2c90c3b2dfd1ecb2ef3f65951330d644f28d91e98c5436dedcaa3ffbddbdedc3",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 7450,
+      "char_count": 7349,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "f1b54027c5b2771a4e57a982a88bbdf586b896c661becea4f3f6ccaa9b9e6895"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.050 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "65ef6e5d-ec22-5d1f-ae4e-7ad682ec2191",
+          "convention": "utf8_char_offset",
+          "end": 24,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.050:block:0",
+          "start": 0
+        },
+        "quote": "As used in this chapter:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.050:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.050 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "8b29d2d0-2ee7-5b67-abac-7faddd961711",
+          "convention": "utf8_char_offset",
+          "end": 324,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.050:block:1",
+          "start": 25
+        },
+        "quote": "“Capital improvements plan” means the five-year plan for capital improvements, adopted annually by the City Council, describing the approximate location, size, time of availability and estimated cost of capital improvement projects and identifies sources of funding for capital improvement projects.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.050:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.050 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "c41c26a8-ae78-51bd-aab9-fdd62c1c70a7",
+          "convention": "utf8_char_offset",
+          "end": 423,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.050:block:2",
+          "start": 325
+        },
+        "quote": "“Collection” means the point at which the trafficway impact fee is actually paid over to the City.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.050:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.050 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "a1c7f5d4-9fce-5bc5-bc31-34ac014e3e20",
+          "convention": "utf8_char_offset",
+          "end": 568,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.050:block:3",
+          "start": 424
+        },
+        "quote": "“Commitment” means earmarking trafficway impact fees to fund or partially fund trafficway capital improvements serving new development projects.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.050:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.050 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "36adcfc2-03b3-53db-a6b2-e3dc3fc72b15",
+          "convention": "utf8_char_offset",
+          "end": 847,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.050:block:4",
+          "start": 569
+        },
+        "quote": "“Dwelling unit” means one or more rooms in a building or a portion of a room, designed, intended to be used, or actually used for occupancy by one family for living and sleeping quarters, and containing one kitchen only, and includes a mobile home, but not hotel or motel units.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.050:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.050 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "5db047ae-f3d7-584e-b483-e8239e92815f",
+          "convention": "utf8_char_offset",
+          "end": 1008,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.050:block:5",
+          "start": 848
+        },
+        "quote": "“Impose” means to determine that a particular development project is subject to the collection of trafficway impact fees as a condition of development approval.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.050:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.050 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "fbae9388-8fe5-5015-9568-66f35754ad93",
+          "convention": "utf8_char_offset",
+          "end": 1451,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.050:block:6",
+          "start": 1009
+        },
+        "quote": "“New development” or “development project” means and includes any project undertaken for the purpose of development, including without limitation a project involving the issuance of a permit for construction, reconstruction, or change of use, but not a project involving the issuance of a permit to operate or to remodel, rehabilitate, or improve an existing structure, nor the rebuilding of a structure destroyed or damaged by an act of God.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.050:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.050 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "dbf5af76-ca7c-5925-a59e-2ec951befb92",
+          "convention": "utf8_char_offset",
+          "end": 1555,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.050:block:7",
+          "start": 1452
+        },
+        "quote": "“Nonresidential development project” means all development other than residential development projects.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.050:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.050 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "a1e03bdc-b61a-5d2f-8836-34eb1563912a",
+          "convention": "utf8_char_offset",
+          "end": 1662,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.050:block:8",
+          "start": 1556
+        },
+        "quote": "“Residential development project” means any development undertaken to create a new dwelling unit or units.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.050:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.050 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "a2b8bd33-4209-5a96-baf3-b42891e5c382",
+          "convention": "utf8_char_offset",
+          "end": 2277,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.050:block:9",
+          "start": 1663
+        },
+        "quote": "“Trafficway capital improvement” means land or facilities for the purposes of transportation and transit, including without limitation streets, street lighting and traffic-control devices and supporting improvements, roads, overpasses, bridges, and related facilities. Trafficway capital improvement also includes design, engineering, inspection, testing, planning, legal land acquisition and all other costs associated with construction of a public trafficway. Provided, however, trafficway capital improvement shall not include residential two-lane streets or roads which primarily serve residential development.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.050:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.050 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "8a5db544-95b1-5397-b6f9-0970ca8f61e7",
+          "convention": "utf8_char_offset",
+          "end": 2604,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.050:block:10",
+          "start": 2278
+        },
+        "quote": "“Trafficway impact fee” means any monetary exaction imposed by the City as a condition of or in connection with approval of a development project for the purpose of defraying all or some of the cost of or repayment of costs previously expended from other City funds for trafficway capital improvements relating to the project.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.050:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.050 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "47c282ec-d1e7-5a30-8459-385afd6aff95",
+          "convention": "utf8_char_offset",
+          "end": 2845,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.050:block:11",
+          "start": 2605
+        },
+        "quote": "“Trafficway impact fee district” means the geographic area within which trafficway impact fees are collected and expended for a public trafficway serving development projects within such area. (Ord. 18273 § 6, 6-22-04. Code 1995 § 130-765.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.050:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.050#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 18273",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2822,
+          "start": 2799
+        },
+        "quote": "Ord. 18273 § 6, 6-22-04",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.050#history:18273",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "79beb0374a938b0183e41515142efee8ed3a1582ebe184299af0cc2f3565e2cc",
+      "captured_at": "2026-08-28T04:23:50.699418Z",
+      "kind": "rendered_html_capture",
+      "value": "12.55.050.79beb0374a93.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:12.55.050@79beb0374a938b01",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:12.55.050",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:12.55.050",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 12.55.050",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/12.55.050"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.55.050#history:18273",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "6-22-04"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "12.55.050",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.55.050#history:18273",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:18273"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.55.050#history:18273",
+      "value": "adopted"
+    },
+    "title": "Definitions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:23:50.699418Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "79beb0374a938b0183e41515142efee8ed3a1582ebe184299af0cc2f3565e2cc",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "79beb0374a938b0183e41515142efee8ed3a1582ebe184299af0cc2f3565e2cc",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "79beb0374a938b0183e41515142efee8ed3a1582ebe184299af0cc2f3565e2cc",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "f1b54027c5b2771a4e57a982a88bbdf586b896c661becea4f3f6ccaa9b9e6895",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "f1b54027c5b2771a4e57a982a88bbdf586b896c661becea4f3f6ccaa9b9e6895",
+        "output_sha256": "d0345ac7f21c8c7bb6fe0ab7c28c162f1faedac5478e57e7c30edef33357bdbd",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "f1b54027c5b2771a4e57a982a88bbdf586b896c661becea4f3f6ccaa9b9e6895",
+        "output_sha256": "2c90c3b2dfd1ecb2ef3f65951330d644f28d91e98c5436dedcaa3ffbddbdedc3",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/12.55.050",
+    "retained_original": {
+      "byte_count": 30946,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/12.55.050.79beb0374a93.html",
+      "retrieved_at": "2026-08-28T04:23:50.699418Z",
+      "sha256": "79beb0374a938b0183e41515142efee8ed3a1582ebe184299af0cc2f3565e2cc"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

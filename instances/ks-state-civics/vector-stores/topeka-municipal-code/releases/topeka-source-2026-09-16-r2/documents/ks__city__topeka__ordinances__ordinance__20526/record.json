@@ -1,0 +1,1528 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 76728,
+      "normalizations": [
+        {
+          "description": "Removed the ExAIS-added title and Source collection/Ordinance number/Official PDF lines prepended to the retained extraction; the same facts are carried in source.*.",
+          "name": "strip_exais_provenance_preamble"
+        },
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.md",
+      "sha256": "6e22bc3aa31f8043952b159a4dc39fca01cb7249f624567595fd965002f79cf6"
+    },
+    "structured": {
+      "block_count": 86,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "4c85cc1e-e4e3-5ed8-98d3-c45752aee479",
+      "root_source_component_key": "ks:city:topeka:ordinances:ordinance:20526:document",
+      "sha256": "e3550f3fab29e7882ede6bab3d6fc2ab064228cd5e03d144cdd4710d7a1a9118",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 76955,
+      "char_count": 76887,
+      "form": "retained_extraction_markdown",
+      "path": "verbatim.md",
+      "sha256": "0ea1eb7f9a9069d81fec0847310e6a27f8c111455323f889e78a4ecc1972469e"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.md",
+        "unit": "unicode codepoint"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Attachment A",
+        "locator": {
+          "component_id": "9a00975f-6ea4-500b-8e6f-d48b8ce24258",
+          "convention": "utf8_char_offset",
+          "end": 5443,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:0",
+          "start": 5431
+        },
+        "quote": "Attachment A",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2025-2027",
+        "locator": {
+          "component_id": "cc2ad44e-df43-5c35-8c41-1cc3819e7e86",
+          "convention": "utf8_char_offset",
+          "end": 5473,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:1",
+          "start": 5464
+        },
+        "quote": "2025-2027",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "City of Topeka, Kansas",
+        "locator": {
+          "component_id": "fa9fd469-04a3-5885-9a2f-cf037fa14544",
+          "convention": "utf8_char_offset",
+          "end": 5650,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:2",
+          "start": 5628
+        },
+        "quote": "City of Topeka, Kansas",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "10/15/2024",
+        "locator": {
+          "component_id": "a71db78e-9a83-5923-ba0d-2f25c3a099d3",
+          "convention": "utf8_char_offset",
+          "end": 5738,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:3",
+          "start": 5728
+        },
+        "quote": "10/15/2024",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Introduction",
+        "locator": {
+          "component_id": "1328d2b1-f1df-5e5a-ab19-7e58ee52893c",
+          "convention": "utf8_char_offset",
+          "end": 6084,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:4",
+          "start": 6072
+        },
+        "quote": "Introduction",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PART 1",
+        "locator": {
+          "component_id": "f2a2dd2c-5390-5b22-8d32-28c4eae00493",
+          "convention": "utf8_char_offset",
+          "end": 16690,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:5",
+          "start": 16684
+        },
+        "quote": "PART 1",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "DESCRIPTION OF NEIGHBORHOOD REVITALIZATION AREA",
+        "locator": {
+          "component_id": "4c170ebc-1af7-501d-9874-6c014f2304e7",
+          "convention": "utf8_char_offset",
+          "end": 16742,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:6",
+          "start": 16695
+        },
+        "quote": "DESCRIPTION OF NEIGHBORHOOD REVITALIZATION AREA",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Single Family Housing Tenure (July 2023 Shawnee County Appraisers Office)",
+        "locator": {
+          "component_id": "d5210362-f982-524e-9840-b7a4d7ccfad1",
+          "convention": "utf8_char_offset",
+          "end": 19495,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:7",
+          "start": 19422
+        },
+        "quote": "Single Family Housing Tenure (July 2023 Shawnee County Appraisers Office)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Vital Sign Ranges (2023)",
+        "locator": {
+          "component_id": "9816f4aa-c544-5bbd-92e1-ed6990fca64f",
+          "convention": "utf8_char_offset",
+          "end": 20091,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:8",
+          "start": 20067
+        },
+        "quote": "Vital Sign Ranges (2023)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Area Profile",
+        "locator": {
+          "component_id": "ade712e5-900b-5793-aaba-a7755e4f4010",
+          "convention": "utf8_char_offset",
+          "end": 22477,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:9",
+          "start": 22465
+        },
+        "quote": "Area Profile",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Summary",
+        "locator": {
+          "component_id": "a808ba7c-8010-51f7-b4e8-06994fb742b4",
+          "convention": "utf8_char_offset",
+          "end": 31541,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:10",
+          "start": 31534
+        },
+        "quote": "Summary",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PRIMARY AREA",
+        "locator": {
+          "component_id": "7dd8c0aa-283c-5a6c-a8f0-1d48256289e6",
+          "convention": "utf8_char_offset",
+          "end": 32282,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:11",
+          "start": 32270
+        },
+        "quote": "PRIMARY AREA",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "LEGAL DESCRIPTION OF Neighborhood Revitalization Area MAY 2024",
+        "locator": {
+          "component_id": "4812cac1-3c69-541f-8fcc-c7cb01c3c64b",
+          "convention": "utf8_char_offset",
+          "end": 36319,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:12",
+          "start": 36257
+        },
+        "quote": "LEGAL DESCRIPTION OF Neighborhood Revitalization Area MAY 2024",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(AND IN ADDITION)",
+        "locator": {
+          "component_id": "88702773-9909-5d87-9818-47aa335d3e8d",
+          "convention": "utf8_char_offset",
+          "end": 38819,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:13",
+          "start": 38802
+        },
+        "quote": "(AND IN ADDITION)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "KANZA BUSINESS AND TECHNOLOGY PARK (OVERALL PUD BOUNDARY)",
+        "locator": {
+          "component_id": "1925aa70-0a56-5f34-b1db-0c7335a0e1f8",
+          "convention": "utf8_char_offset",
+          "end": 38881,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:14",
+          "start": 38824
+        },
+        "quote": "KANZA BUSINESS AND TECHNOLOGY PARK (OVERALL PUD BOUNDARY)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(AND IN ADDITION)",
+        "locator": {
+          "component_id": "a991d730-7b29-59f4-a94e-2495d218bc0b",
+          "convention": "utf8_char_offset",
+          "end": 45641,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:15",
+          "start": 45624
+        },
+        "quote": "(AND IN ADDITION)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "KANZA BUSINESS AND TECHNOLOGY PARK SUBDIVISION. CONTAINS APPROXIMATELY 10.39ACRES, MORE OR LESS.",
+        "locator": {
+          "component_id": "b49a7b24-15c0-5afb-a82d-783aed2843b2",
+          "convention": "utf8_char_offset",
+          "end": 45742,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:16",
+          "start": 45646
+        },
+        "quote": "KANZA BUSINESS AND TECHNOLOGY PARK SUBDIVISION. CONTAINS APPROXIMATELY 10.39ACRES, MORE OR LESS.",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "EXCEPT",
+        "locator": {
+          "component_id": "aadfd0dc-abe5-5ceb-bd6e-24b739a232b7",
+          "convention": "utf8_char_offset",
+          "end": 45753,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:17",
+          "start": 45747
+        },
+        "quote": "EXCEPT",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(AND IN ADDITION)",
+        "locator": {
+          "component_id": "609e637b-a5e3-52f3-8a00-a03fd7974fe5",
+          "convention": "utf8_char_offset",
+          "end": 47225,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:18",
+          "start": 47208
+        },
+        "quote": "(AND IN ADDITION)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(AND IN ADDITION)",
+        "locator": {
+          "component_id": "fc0bba70-97f2-55d5-8155-4b6a88c06539",
+          "convention": "utf8_char_offset",
+          "end": 47314,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:19",
+          "start": 47297
+        },
+        "quote": "(AND IN ADDITION)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(AND IN ADDITION)",
+        "locator": {
+          "component_id": "6fa46bdc-c418-5062-a375-ff0b43dca9e9",
+          "convention": "utf8_char_offset",
+          "end": 47514,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:20",
+          "start": 47497
+        },
+        "quote": "(AND IN ADDITION)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(AND IN ADDITION)",
+        "locator": {
+          "component_id": "24831c6b-c677-525d-8c76-1d1471204678",
+          "convention": "utf8_char_offset",
+          "end": 47602,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:21",
+          "start": 47585
+        },
+        "quote": "(AND IN ADDITION)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(AND IN ADDITION)",
+        "locator": {
+          "component_id": "0b942a9d-9f52-5beb-8da5-a7d95829e825",
+          "convention": "utf8_char_offset",
+          "end": 47686,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:22",
+          "start": 47669
+        },
+        "quote": "(AND IN ADDITION)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(AND IN ADDITION)",
+        "locator": {
+          "component_id": "4564f60c-174d-5e00-9aa4-7009d5cad6a8",
+          "convention": "utf8_char_offset",
+          "end": 47785,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:23",
+          "start": 47768
+        },
+        "quote": "(AND IN ADDITION)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(AND IN ADDITION)",
+        "locator": {
+          "component_id": "b619e3f0-58d3-53bd-9acc-81c6f45ad81e",
+          "convention": "utf8_char_offset",
+          "end": 47931,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:24",
+          "start": 47914
+        },
+        "quote": "(AND IN ADDITION)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(AND IN ADDITION)",
+        "locator": {
+          "component_id": "31a343fb-5dd5-53fc-bd8c-86731fb5a8cb",
+          "convention": "utf8_char_offset",
+          "end": 48005,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:25",
+          "start": 47988
+        },
+        "quote": "(AND IN ADDITION)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "OUTSIDE REVITALIZATION AREA; 'DILAPIDATED STRUCTURE':",
+        "locator": {
+          "component_id": "fc2b9582-f2b7-5ab8-919b-6b392a277818",
+          "convention": "utf8_char_offset",
+          "end": 48194,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:26",
+          "start": 48141
+        },
+        "quote": "OUTSIDE REVITALIZATION AREA; 'DILAPIDATED STRUCTURE':",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(Menninger Clock Tower Building)",
+        "locator": {
+          "component_id": "25d04cb4-8aa0-5ab5-98ee-b3e7edeaa786",
+          "convention": "utf8_char_offset",
+          "end": 48231,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:27",
+          "start": 48199
+        },
+        "quote": "(Menninger Clock Tower Building)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PART 2 APPRAISED VALUATION OF REAL PROPERTY",
+        "locator": {
+          "component_id": "80027dc8-9360-538b-ac49-209759b7d341",
+          "convention": "utf8_char_offset",
+          "end": 49882,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:28",
+          "start": 49839
+        },
+        "quote": "PART 2 APPRAISED VALUATION OF REAL PROPERTY",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:28#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PART 3 LISTING OF OWNERS OF RECORD IN AREA",
+        "locator": {
+          "component_id": "5537ca93-a62d-511c-8280-4f30abfdf957",
+          "convention": "utf8_char_offset",
+          "end": 50521,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:29",
+          "start": 50479
+        },
+        "quote": "PART 3 LISTING OF OWNERS OF RECORD IN AREA",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:29#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PART 4",
+        "locator": {
+          "component_id": "cddd25ed-7745-558c-ae42-d4600069e31c",
+          "convention": "utf8_char_offset",
+          "end": 50737,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:30",
+          "start": 50731
+        },
+        "quote": "PART 4",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:30#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "EXISTING ZONING BOUNDARIES &amp; EXISTING/PROPOSED LAND USES",
+        "locator": {
+          "component_id": "0efc3c28-1f07-530e-baac-9a3d2eeb7226",
+          "convention": "utf8_char_offset",
+          "end": 50802,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:31",
+          "start": 50742
+        },
+        "quote": "EXISTING ZONING BOUNDARIES &amp; EXISTING/PROPOSED LAND USES",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:31#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PART 5 MAJOR IMPROVEMENTS PROPOSED FOR NEIGHBORHOOD REVITALIZATION AREA",
+        "locator": {
+          "component_id": "9daf5861-8034-56bf-8aeb-72bdc377c76f",
+          "convention": "utf8_char_offset",
+          "end": 51109,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:32",
+          "start": 51038
+        },
+        "quote": "PART 5 MAJOR IMPROVEMENTS PROPOSED FOR NEIGHBORHOOD REVITALIZATION AREA",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:32#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PART 6 STATEMENT SPECIFYING THE ELIGIBILITY REQUIREMENTS FOR A TAX REBATE",
+        "locator": {
+          "component_id": "f6b5cfca-d6ce-5155-aa7a-8c9d09a7ce96",
+          "convention": "utf8_char_offset",
+          "end": 52695,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:33",
+          "start": 52622
+        },
+        "quote": "PART 6 STATEMENT SPECIFYING THE ELIGIBILITY REQUIREMENTS FOR A TAX REBATE",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:33#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Residential New Construction/Rehabilitation",
+        "locator": {
+          "component_id": "69c053c5-28cf-53c5-afcb-c1e22b62b5ff",
+          "convention": "utf8_char_offset",
+          "end": 52743,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:34",
+          "start": 52700
+        },
+        "quote": "Residential New Construction/Rehabilitation",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:34#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Commercial New Construction/Rehabilitation",
+        "locator": {
+          "component_id": "a00b1989-a72c-5028-acf1-0e81a74e89a8",
+          "convention": "utf8_char_offset",
+          "end": 53139,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:35",
+          "start": 53097
+        },
+        "quote": "Commercial New Construction/Rehabilitation",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:35#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PART 7",
+        "locator": {
+          "component_id": "de48081b-4cb9-5212-be3a-a4c58480cbbf",
+          "convention": "utf8_char_offset",
+          "end": 53541,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:36",
+          "start": 53535
+        },
+        "quote": "PART 7",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:36#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "CRITERIA FOR DETERMINATION OF ELIGIBILITY",
+        "locator": {
+          "component_id": "93542c03-a531-5d53-8532-261813a8042b",
+          "convention": "utf8_char_offset",
+          "end": 53587,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:37",
+          "start": 53546
+        },
+        "quote": "CRITERIA FOR DETERMINATION OF ELIGIBILITY",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:37#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PART 8",
+        "locator": {
+          "component_id": "47ce341e-0604-591b-b61c-0c853868a52f",
+          "convention": "utf8_char_offset",
+          "end": 56816,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:38",
+          "start": 56810
+        },
+        "quote": "PART 8",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:38#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "CONTENTS OF APPLICATION FOR TAX REBATE",
+        "locator": {
+          "component_id": "b4493567-7a82-57c9-af79-3b459c7d2d5a",
+          "convention": "utf8_char_offset",
+          "end": 56859,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:39",
+          "start": 56821
+        },
+        "quote": "CONTENTS OF APPLICATION FOR TAX REBATE",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:39#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Part 1 - General Information (Completed by applicant)",
+        "locator": {
+          "component_id": "31ee0504-c22a-5650-a37c-f732aa7d1539",
+          "convention": "utf8_char_offset",
+          "end": 56917,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:40",
+          "start": 56864
+        },
+        "quote": "Part 1 - General Information (Completed by applicant)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:40#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Part 2 - Status of Construction/Completion",
+        "locator": {
+          "component_id": "86e1ed52-fe06-503f-9c56-245fe1ef9f26",
+          "convention": "utf8_char_offset",
+          "end": 57574,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:41",
+          "start": 57532
+        },
+        "quote": "Part 2 - Status of Construction/Completion",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:41#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "APPLICATION PROCEDURE",
+        "locator": {
+          "component_id": "65836c83-5f0b-5f33-aba9-0e366b4ef86a",
+          "convention": "utf8_char_offset",
+          "end": 57772,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:42",
+          "start": 57751
+        },
+        "quote": "APPLICATION PROCEDURE",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:42#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PART 10",
+        "locator": {
+          "component_id": "47d23e92-6090-5d87-8dda-0e907e775f3e",
+          "convention": "utf8_char_offset",
+          "end": 60293,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:43",
+          "start": 60286
+        },
+        "quote": "PART 10",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:43#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "STANDARDS AND CRITERIA FOR APPROVAL",
+        "locator": {
+          "component_id": "9889b10c-fb24-514f-a813-3e14fdaca757",
+          "convention": "utf8_char_offset",
+          "end": 60333,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:44",
+          "start": 60298
+        },
+        "quote": "STANDARDS AND CRITERIA FOR APPROVAL",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:44#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Program Period:",
+        "locator": {
+          "component_id": "3e5cf350-d424-5507-afbc-d1d3e29aec32",
+          "convention": "utf8_char_offset",
+          "end": 61378,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:45",
+          "start": 61363
+        },
+        "quote": "Program Period:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:45#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Rebate Period:",
+        "locator": {
+          "component_id": "66247651-f73a-52b5-9d2e-3391e148a1c6",
+          "convention": "utf8_char_offset",
+          "end": 61503,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:46",
+          "start": 61489
+        },
+        "quote": "Rebate Period:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:46#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PART 11",
+        "locator": {
+          "component_id": "ccb157aa-b2ee-5bcc-87e3-d09605e6de1b",
+          "convention": "utf8_char_offset",
+          "end": 63620,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:47",
+          "start": 63613
+        },
+        "quote": "PART 11",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:47#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "STATEMENT SPECIFYING REBATE FORMULA",
+        "locator": {
+          "component_id": "c5989379-b9ec-52c1-a873-b3b27480b852",
+          "convention": "utf8_char_offset",
+          "end": 63660,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:48",
+          "start": 63625
+        },
+        "quote": "STATEMENT SPECIFYING REBATE FORMULA",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:48#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Part 12",
+        "locator": {
+          "component_id": "2b5f01c2-65dd-50cc-ac82-c5fc95439ecd",
+          "convention": "utf8_char_offset",
+          "end": 63672,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:49",
+          "start": 63665
+        },
+        "quote": "Part 12",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:49#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "OTHER MATTERS",
+        "locator": {
+          "component_id": "209cf836-a255-54d8-8f5e-da91c19f0fb2",
+          "convention": "utf8_char_offset",
+          "end": 63690,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:50",
+          "start": 63677
+        },
+        "quote": "OTHER MATTERS",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:50#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "SHAWNEE COUNTY TAX LEVY SCHEDULE 2023",
+        "locator": {
+          "component_id": "03f9ed6e-0ad0-5c73-a5bf-2040c0c37c01",
+          "convention": "utf8_char_offset",
+          "end": 66048,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:51",
+          "start": 66011
+        },
+        "quote": "SHAWNEE COUNTY TAX LEVY SCHEDULE 2023",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:51#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Tax Levies per $1,000 Assessed Valuation",
+        "locator": {
+          "component_id": "b969f92c-b582-54d9-9f7e-e33b27851788",
+          "convention": "utf8_char_offset",
+          "end": 66093,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:52",
+          "start": 66053
+        },
+        "quote": "Tax Levies per $1,000 Assessed Valuation",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:52#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "CITY OF TOPEKA CONTRACT NO.",
+        "locator": {
+          "component_id": "d971a8d6-6612-5b1b-81b7-00f7e3e67937",
+          "convention": "utf8_char_offset",
+          "end": 68707,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:53",
+          "start": 68680
+        },
+        "quote": "CITY OF TOPEKA CONTRACT NO.",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:53#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "INTERLOCAL AGREEMENT/NEIGHBORHOOD REVITALIZATION 2025-2027",
+        "locator": {
+          "component_id": "b00869ee-4609-53ec-914f-07927277a234",
+          "convention": "utf8_char_offset",
+          "end": 68770,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:54",
+          "start": 68712
+        },
+        "quote": "INTERLOCAL AGREEMENT/NEIGHBORHOOD REVITALIZATION 2025-2027",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:54#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "SIGNATURE PAGE",
+        "locator": {
+          "component_id": "bdf80e9f-77b4-5c08-bcd6-7ad2f20a77a3",
+          "convention": "utf8_char_offset",
+          "end": 74130,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:55",
+          "start": 74116
+        },
+        "quote": "SIGNATURE PAGE",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:55#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "locator": {
+          "component_id": "22c1db41-4bbe-5e7c-9e57-aecb31ec27ce",
+          "convention": "utf8_char_offset",
+          "end": 74209,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:56",
+          "start": 74135
+        },
+        "quote": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:56#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "UNIFIED SCHOOL DISTRICT 345 (Seaman)",
+        "locator": {
+          "component_id": "bf517348-8227-516f-b094-ad1138f0cf22",
+          "convention": "utf8_char_offset",
+          "end": 74250,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:57",
+          "start": 74214
+        },
+        "quote": "UNIFIED SCHOOL DISTRICT 345 (Seaman)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:57#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "SIGNATURE PAGE",
+        "locator": {
+          "component_id": "daf13f12-7532-5d97-b141-6f2c33f459d6",
+          "convention": "utf8_char_offset",
+          "end": 74352,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:58",
+          "start": 74338
+        },
+        "quote": "SIGNATURE PAGE",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:58#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "locator": {
+          "component_id": "ba47f969-b936-5a19-8136-dde1c25ef8d8",
+          "convention": "utf8_char_offset",
+          "end": 74431,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:59",
+          "start": 74357
+        },
+        "quote": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:59#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "UNIFIED SCHOOL DISTRICT 437 (Auburn/Washburn)",
+        "locator": {
+          "component_id": "132334af-b60a-56d1-8261-cf06218b1f94",
+          "convention": "utf8_char_offset",
+          "end": 74481,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:60",
+          "start": 74436
+        },
+        "quote": "UNIFIED SCHOOL DISTRICT 437 (Auburn/Washburn)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:60#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "SIGNATURE PAGE",
+        "locator": {
+          "component_id": "73b657db-bc45-5671-a8a7-1f2ba6582608",
+          "convention": "utf8_char_offset",
+          "end": 74583,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:61",
+          "start": 74569
+        },
+        "quote": "SIGNATURE PAGE",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:61#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "locator": {
+          "component_id": "7cb7e2c9-279e-5467-9436-7b64b3f1ed12",
+          "convention": "utf8_char_offset",
+          "end": 74662,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:62",
+          "start": 74588
+        },
+        "quote": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:62#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "UNIFIED SCHOOL DISTRICT 450 (Shawnee Heights)",
+        "locator": {
+          "component_id": "7a9793ad-3161-51ec-becf-75011084992f",
+          "convention": "utf8_char_offset",
+          "end": 74712,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:63",
+          "start": 74667
+        },
+        "quote": "UNIFIED SCHOOL DISTRICT 450 (Shawnee Heights)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:63#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "SIGNATURE PAGE",
+        "locator": {
+          "component_id": "6a30f2af-5ebe-5958-8998-e6845c268ac4",
+          "convention": "utf8_char_offset",
+          "end": 74814,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:64",
+          "start": 74800
+        },
+        "quote": "SIGNATURE PAGE",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:64#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "locator": {
+          "component_id": "ca6cd19f-489b-5b9e-bfe9-5fdd2e928136",
+          "convention": "utf8_char_offset",
+          "end": 74893,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:65",
+          "start": 74819
+        },
+        "quote": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:65#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "UNIFIED SCHOOL DISTRICT 501 (Topeka)",
+        "locator": {
+          "component_id": "49731f1a-5818-5977-9c8b-07374fbf5523",
+          "convention": "utf8_char_offset",
+          "end": 74934,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:66",
+          "start": 74898
+        },
+        "quote": "UNIFIED SCHOOL DISTRICT 501 (Topeka)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:66#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "SIGNATURE PAGE",
+        "locator": {
+          "component_id": "e361e98d-dba6-5de1-94bb-9fdaf1c18ab4",
+          "convention": "utf8_char_offset",
+          "end": 75036,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:67",
+          "start": 75022
+        },
+        "quote": "SIGNATURE PAGE",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:67#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "locator": {
+          "component_id": "8fa83065-e7eb-5bca-a9e9-8c2d5ec38f7f",
+          "convention": "utf8_char_offset",
+          "end": 75115,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:68",
+          "start": 75041
+        },
+        "quote": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:68#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Board of County Commissioners of Shawnee County",
+        "locator": {
+          "component_id": "0e83bf85-7601-5cf9-bf3f-f746b38ad9fd",
+          "convention": "utf8_char_offset",
+          "end": 75167,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:69",
+          "start": 75120
+        },
+        "quote": "Board of County Commissioners of Shawnee County",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:69#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "SIGNATURE PAGE",
+        "locator": {
+          "component_id": "1a71da8b-72ec-5bf4-8509-b1b77cb148a7",
+          "convention": "utf8_char_offset",
+          "end": 75280,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:70",
+          "start": 75266
+        },
+        "quote": "SIGNATURE PAGE",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:70#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "locator": {
+          "component_id": "9d102909-785f-5070-a54c-8b5369a24b7c",
+          "convention": "utf8_char_offset",
+          "end": 75359,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:71",
+          "start": 75285
+        },
+        "quote": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:71#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Topeka Transit Metro Authority",
+        "locator": {
+          "component_id": "43de6590-0d5f-56f0-a539-4737ec724de4",
+          "convention": "utf8_char_offset",
+          "end": 75394,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:72",
+          "start": 75364
+        },
+        "quote": "Topeka Transit Metro Authority",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:72#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "SIGNATURE PAGE",
+        "locator": {
+          "component_id": "0c7efdfd-304d-5656-89ac-203c51a69659",
+          "convention": "utf8_char_offset",
+          "end": 75499,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:73",
+          "start": 75485
+        },
+        "quote": "SIGNATURE PAGE",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:73#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "locator": {
+          "component_id": "da25827b-f910-5f9f-a46a-1dbdbcdea8ca",
+          "convention": "utf8_char_offset",
+          "end": 75578,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:74",
+          "start": 75504
+        },
+        "quote": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:74#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Metropolitan Topeka Airport Authority",
+        "locator": {
+          "component_id": "59291155-7fe4-5df3-b1e0-fc893803a753",
+          "convention": "utf8_char_offset",
+          "end": 75620,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:75",
+          "start": 75583
+        },
+        "quote": "Metropolitan Topeka Airport Authority",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:75#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "SIGNATURE PAGE",
+        "locator": {
+          "component_id": "a78012ce-e44e-5797-9f9d-be02f860235b",
+          "convention": "utf8_char_offset",
+          "end": 75719,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:76",
+          "start": 75705
+        },
+        "quote": "SIGNATURE PAGE",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:76#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "locator": {
+          "component_id": "e2729dc9-4642-537a-9353-0ea7f78cde46",
+          "convention": "utf8_char_offset",
+          "end": 75798,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:77",
+          "start": 75724
+        },
+        "quote": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:77#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Topeka and Shawnee County Public Library",
+        "locator": {
+          "component_id": "fc164a8a-84d8-5dc0-a732-680bc4c90bf9",
+          "convention": "utf8_char_offset",
+          "end": 75843,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:78",
+          "start": 75803
+        },
+        "quote": "Topeka and Shawnee County Public Library",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:78#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "SIGNATURE PAGE",
+        "locator": {
+          "component_id": "9c9f2e25-4927-55b7-b398-43a72f5be143",
+          "convention": "utf8_char_offset",
+          "end": 75954,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:79",
+          "start": 75940
+        },
+        "quote": "SIGNATURE PAGE",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:79#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "locator": {
+          "component_id": "1d92cad6-9481-5abb-ba66-a98e79d82ca5",
+          "convention": "utf8_char_offset",
+          "end": 76033,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:80",
+          "start": 75959
+        },
+        "quote": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:80#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Washburn University",
+        "locator": {
+          "component_id": "db6ee879-884e-52fb-8454-1bfaf618234d",
+          "convention": "utf8_char_offset",
+          "end": 76057,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:81",
+          "start": 76038
+        },
+        "quote": "Washburn University",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:81#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "SIGNATURE PAGE (INTERLOCAL COOPERATION AGREEMENT)",
+        "locator": {
+          "component_id": "ba54ae99-7717-5fab-ac15-71e34704abff",
+          "convention": "utf8_char_offset",
+          "end": 76189,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:82",
+          "start": 76140
+        },
+        "quote": "SIGNATURE PAGE (INTERLOCAL COOPERATION AGREEMENT)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:82#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "CITY OF TOPEKA, KANSAS",
+        "locator": {
+          "component_id": "7e46a53a-1f54-555d-8034-ee801984bce2",
+          "convention": "utf8_char_offset",
+          "end": 76216,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:83",
+          "start": 76194
+        },
+        "quote": "CITY OF TOPEKA, KANSAS",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:83#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "locator": {
+          "component_id": "5d541d38-4fc7-5b18-9594-6b315be2340e",
+          "convention": "utf8_char_offset",
+          "end": 76442,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:84",
+          "start": 76368
+        },
+        "quote": "(INTERLOCAL COOPERATION AGREEMENT) (NEIGHBORHOOD REVITALIZATION 2025-2027)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:84#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "ATTORNEY GENERAL APPROVAL",
+        "locator": {
+          "component_id": "886167ad-d5b8-5ac0-8330-7cfdfb03744d",
+          "convention": "utf8_char_offset",
+          "end": 76472,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20526:heading:85",
+          "start": 76447
+        },
+        "quote": "ATTORNEY GENERAL APPROVAL",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526:heading:85#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "PDF page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526#page",
+        "unavailable_reason": "the retained extraction carries no page boundary markers, so no PDF page number is known for any span; markdown line numbers are not page numbers and are never converted into one"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publication line",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 66,
+          "start": 14
+        },
+        "quote": "(Published in the Topeka Metro News October 21, 2024",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20526#published",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "48041b1cb363f8dd2b968998b22a515952f8b1bba69554cd7eae8856d3fd1a26",
+      "captured_at": "2026-08-27T21:48:44+00:00",
+      "kind": "retained_publisher_pdf",
+      "value": "20526.pdf"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:ordinances",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:ordinances:ordinance:20526@48041b1cb363f8dd",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "topeka-ordinance:4ff9b4d5dd66c5f3fad0a081",
+        "note": "id in manifests/ordinances.jsonl",
+        "system": "topeka_ordinance_seed_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:ordinances:ordinance:20526",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "20526",
+        "scope": "document",
+        "url": "https://files.topeka.gov/community/ordinances/2024/Ordinance20526.pdf"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:ordinances:ordinance:20526#published",
+        "kind": "published",
+        "note": "publication line printed on the instrument; not a certification of effective date",
+        "precision": "day",
+        "value": "October 21, 2024"
+      }
+    ],
+    "document_subtype": "ordinance",
+    "document_type": "ordinance",
+    "extraction_quality": {
+      "grade": "degraded",
+      "limitations": [
+        {
+          "affects": "evidence",
+          "code": "no_page_coordinates",
+          "description": "The retained Markdown has no page boundaries, so page-level citation into the original PDF is unavailable for this document."
+        },
+        {
+          "affects": "readable_text",
+          "code": "margin_line_numbers_in_text",
+          "description": "39 standalone numeric lines are present; these are the PDF's margin line numbering rendered as body text. They are retained rather than stripped, because removing them risks deleting real numbers from the instrument."
+        }
+      ],
+      "usable_text": true
+    },
+    "publisher_number": "20526",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "no_page_coordinates",
+        "margin_line_numbers_in_text"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "review_needed"
+    },
+    "status": {
+      "basis": "the publisher lists this instrument in its official adopted Topeka Ordinances library and the document carries an enacting clause",
+      "evidence_ref": "ks:city:topeka:ordinances:ordinance:20526#published",
+      "value": "adopted"
+    },
+    "title": "20526"
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "publisher PDF retained and hash-verified against the manifest",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "retained Markdown present and non-empty",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "flattened redline markup needs a human read against the PDF",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-27T21:48:44+00:00",
+      "connector_entrypoint": "scripts/release/topeka-ordinances-collect.py",
+      "connector_revision": "observed-2026-08-27",
+      "method": "official_city_document_center_download"
+    },
+    "extractor": {
+      "mode": "remote_pdf_to_markdown",
+      "name": "marker",
+      "version": "runpod-hosted-2026-08"
+    },
+    "lineage": [
+      {
+        "input_sha256": "48041b1cb363f8dd2b968998b22a515952f8b1bba69554cd7eae8856d3fd1a26",
+        "note": "publisher PDF retained unmodified; input and output are the same bytes",
+        "output_sha256": "48041b1cb363f8dd2b968998b22a515952f8b1bba69554cd7eae8856d3fd1a26",
+        "step": "download",
+        "tool": "scripts/release/topeka-ordinances-collect.py",
+        "tool_version": "observed-2026-08-27"
+      },
+      {
+        "input_sha256": "48041b1cb363f8dd2b968998b22a515952f8b1bba69554cd7eae8856d3fd1a26",
+        "note": "Markdown produced by the bounded remote extraction path",
+        "output_sha256": "0ea1eb7f9a9069d81fec0847310e6a27f8c111455323f889e78a4ecc1972469e",
+        "step": "extract",
+        "tool": "marker",
+        "tool_version": "runpod-hosted-2026-08"
+      },
+      {
+        "input_sha256": "0ea1eb7f9a9069d81fec0847310e6a27f8c111455323f889e78a4ecc1972469e",
+        "output_sha256": "6e22bc3aa31f8043952b159a4dc39fca01cb7249f624567595fd965002f79cf6",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "0ea1eb7f9a9069d81fec0847310e6a27f8c111455323f889e78a4ecc1972469e",
+        "output_sha256": "e3550f3fab29e7882ede6bab3d6fc2ab064228cd5e03d144cdd4710d7a1a9118",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.gov/community/ordinances/index.php",
+    "official_url": "https://files.topeka.gov/community/ordinances/2024/Ordinance20526.pdf",
+    "retained_original": {
+      "byte_count": 995398,
+      "local_path": null,
+      "media_type": "application/pdf",
+      "reference_uri": "seed://topeka-ordinances/raw/pdfs/20526.pdf",
+      "retrieved_at": "2026-08-27T21:48:44+00:00",
+      "sha256": "48041b1cb363f8dd2b968998b22a515952f8b1bba69554cd7eae8856d3fd1a26"
+    },
+    "source_schema_version": "topeka_ordinance_seed_v1"
+  }
+}

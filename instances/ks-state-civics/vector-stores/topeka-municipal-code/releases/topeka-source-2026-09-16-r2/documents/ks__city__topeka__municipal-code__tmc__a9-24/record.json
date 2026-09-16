@@ -1,0 +1,239 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1420,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "a2c42ea322016dc2546eb220899d4d434334c914fbe1fc6e04ea4535e4d6aea1"
+    },
+    "structured": {
+      "block_count": 2,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "9d04533d-fcb4-558e-99fb-eba51b66dcf4",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:a9-24:section",
+      "sha256": "1eb9e0653047d43fd4188cc2c9e992760b5c815fb55d3dba79260781f8d406fd",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 3546,
+      "char_count": 3540,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "a0cb13443647a46a08113c77aa8275972f0bee1a8626cc495b5c56db77aaea53"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A9-24 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "eb18b0d2-2526-52f7-88ab-efad125a6720",
+          "convention": "utf8_char_offset",
+          "end": 1380,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a9-24:block:0",
+          "start": 0
+        },
+        "quote": "It shall be the duty of the board, as promptly as possible, to rehabilitate, reconstruct and modernize all portions of any transportation system acquired by the authority and to maintain at all times an adequate and modern transportation system suitable and adapted to the needs of the municipality served by the authority, and for safe, comfortable and convenient service. To that end, the board may disburse moneys from the operating expense account or from any other account designated for such use by the urban mass transportation authority regulations, for the purpose of making replacements of property damaged or destroyed. In addition, the board may establish a capital reserve fund out of which moneys for the purpose of acquiring or constructing extensions and improvements and betterment of the system shall be disbursed. The board may make temporary loans from the capital reserve fund for either use [as] initial working capital, or, in necessary cases where the depreciation fund is insufficient, to purchase and cancel its revenue bonds and certificates prior to their maturity at the price of not to exceed their par value, and to redeem and cancel its revenue bonds and certificates prior to their maturity at the price of not to exceed their par value, and to redeem and cancel its revenue bonds and certificates according to their terms. (Ord. 52 § 4, 2-21-81.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a9-24:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A9-24 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "8d6f4059-ac17-539a-88d4-106c77391bb9",
+          "convention": "utf8_char_offset",
+          "end": 1419,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a9-24:block:1",
+          "start": 1381
+        },
+        "quote": "State Law References: K.S.A. 12-2832 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a9-24:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a9-24#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "d4c51bde5a267b45ab2e9c8aaf24b6cf8746d3bdc69bb03c624a51050d1f8ca1",
+      "captured_at": "2026-08-28T04:58:30.356432Z",
+      "kind": "rendered_html_capture",
+      "value": "A9-24.d4c51bde5a26.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:a9-24@d4c51bde5a267b45",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:A9-24",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:a9-24",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC A9-24",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/A9-24"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "A9-24",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Sec. A9-24. Same – Duty to rehabilitate, etc., system – Concomitant fiscal powers."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:58:30.356432Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "d4c51bde5a267b45ab2e9c8aaf24b6cf8746d3bdc69bb03c624a51050d1f8ca1",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "d4c51bde5a267b45ab2e9c8aaf24b6cf8746d3bdc69bb03c624a51050d1f8ca1",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "d4c51bde5a267b45ab2e9c8aaf24b6cf8746d3bdc69bb03c624a51050d1f8ca1",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "a0cb13443647a46a08113c77aa8275972f0bee1a8626cc495b5c56db77aaea53",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "a0cb13443647a46a08113c77aa8275972f0bee1a8626cc495b5c56db77aaea53",
+        "output_sha256": "a2c42ea322016dc2546eb220899d4d434334c914fbe1fc6e04ea4535e4d6aea1",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "a0cb13443647a46a08113c77aa8275972f0bee1a8626cc495b5c56db77aaea53",
+        "output_sha256": "1eb9e0653047d43fd4188cc2c9e992760b5c815fb55d3dba79260781f8d406fd",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/A9-24",
+    "retained_original": {
+      "byte_count": 29596,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/A9-24.d4c51bde5a26.html",
+      "retrieved_at": "2026-08-28T04:58:30.356432Z",
+      "sha256": "d4c51bde5a267b45ab2e9c8aaf24b6cf8746d3bdc69bb03c624a51050d1f8ca1"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

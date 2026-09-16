@@ -1,0 +1,305 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 816,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "b6afdbbe172136f92fcbb9f93b5cbdc52173b435cb3b22cb4d9b5a8cecbb9a20"
+    },
+    "structured": {
+      "block_count": 4,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "a67e166b-ce8a-58c0-919f-db3cd49ddda4",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.080:section",
+      "sha256": "295b53a6d2aea2d9a48ca33cbaebb3142025e2de5a0a71ac87f44a19521fede3",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 2498,
+      "char_count": 2493,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "11eb1a61cd5d988e7c4e85bab4adb50b41b22319a3e768753c4fbf2bdee0abe2"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.080 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "87e62dbc-8632-53e8-b013-eee2ac794f9b",
+          "convention": "utf8_char_offset",
+          "end": 412,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.080:block:0",
+          "start": 0
+        },
+        "quote": "(a) The City shall establish a trafficway impact fee account for each benefit area, as designated by the City Engineer, for each trafficway capital improvement for which a trafficway impact fee is imposed, and trafficway impact fees collected shall be deposited in each such account according to type of improvement and benefit area. The funds of the account shall not be commingled with other funds of the City.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.080:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.080 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "20c9becd-381e-5381-92db-6d1302f765eb",
+          "convention": "utf8_char_offset",
+          "end": 542,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.080:block:1",
+          "start": 413
+        },
+        "quote": "(b) Each trafficway impact fee account shall be interest bearing and the accumulated interest shall become a part of the account.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.080:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.080 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "52c6220f-fef8-500c-aa77-de0e8db5b8a8",
+          "convention": "utf8_char_offset",
+          "end": 767,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.080:block:2",
+          "start": 543
+        },
+        "quote": "(c) The funds of each account shall be expended within the benefit area exclusively for the trafficway capital improvements for which the trafficway impact fees were collected. (Ord. 18273 § 9, 6-22-04. Code 1995 § 130-768.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.080:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.55.080 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "46cad057-251d-5480-b8ce-06664706e359",
+          "convention": "utf8_char_offset",
+          "end": 815,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.55.080:block:3",
+          "start": 768
+        },
+        "quote": "Cross References: City Engineer, TMC 2.20.100 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.080:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.080#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 18273",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 744,
+          "start": 721
+        },
+        "quote": "Ord. 18273 § 9, 6-22-04",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.55.080#history:18273",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "3f35d7ef4d8defdca88b9f89ce1e83654de13be5ee2551f8b12045ecc157ffba",
+      "captured_at": "2026-08-28T04:23:59.776718Z",
+      "kind": "rendered_html_capture",
+      "value": "12.55.080.3f35d7ef4d8d.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:12.55.080@3f35d7ef4d8defdc",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:12.55.080",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:12.55.080",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 12.55.080",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/12.55.080"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.55.080#history:18273",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "6-22-04"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "12.55.080",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.55.080#history:18273",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:18273"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.55.080#history:18273",
+      "value": "adopted"
+    },
+    "title": "Impact fee accounts."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:23:59.776718Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "3f35d7ef4d8defdca88b9f89ce1e83654de13be5ee2551f8b12045ecc157ffba",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "3f35d7ef4d8defdca88b9f89ce1e83654de13be5ee2551f8b12045ecc157ffba",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "3f35d7ef4d8defdca88b9f89ce1e83654de13be5ee2551f8b12045ecc157ffba",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "11eb1a61cd5d988e7c4e85bab4adb50b41b22319a3e768753c4fbf2bdee0abe2",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "11eb1a61cd5d988e7c4e85bab4adb50b41b22319a3e768753c4fbf2bdee0abe2",
+        "output_sha256": "b6afdbbe172136f92fcbb9f93b5cbdc52173b435cb3b22cb4d9b5a8cecbb9a20",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "11eb1a61cd5d988e7c4e85bab4adb50b41b22319a3e768753c4fbf2bdee0abe2",
+        "output_sha256": "295b53a6d2aea2d9a48ca33cbaebb3142025e2de5a0a71ac87f44a19521fede3",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/12.55.080",
+    "retained_original": {
+      "byte_count": 28154,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/12.55.080.3f35d7ef4d8d.html",
+      "retrieved_at": "2026-08-28T04:23:59.776718Z",
+      "sha256": "3f35d7ef4d8defdca88b9f89ce1e83654de13be5ee2551f8b12045ecc157ffba"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

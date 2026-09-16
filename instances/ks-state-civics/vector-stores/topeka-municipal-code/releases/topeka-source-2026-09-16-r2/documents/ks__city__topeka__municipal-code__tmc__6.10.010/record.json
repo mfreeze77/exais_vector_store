@@ -1,0 +1,305 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 197,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "150bfb8eaf6705beba889720136cbb5ddfff3f7a34c7ffe67671bf410cdd2040"
+    },
+    "structured": {
+      "block_count": 4,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "025627d8-fd0c-52fa-8b79-09efe9b88720",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:6.10.010:section",
+      "sha256": "618bf88c09d3e3586b7eb307307732d3d8fc5b861a69318f73153dcad2e0d2ba",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 1265,
+      "char_count": 1262,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "5f4ff226c163f3c213daa7c46f9e54b0861fbcd7b94631dd5118eb4be3e781c5"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 6.10.010 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "cfb17634-8b1b-57da-a404-7e5e835139cc",
+          "convention": "utf8_char_offset",
+          "end": 64,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:6.10.010:block:0",
+          "start": 0
+        },
+        "quote": "Every person shall promptly report to the Animal Control office:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:6.10.010:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 6.10.010 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "07c02f1a-97d6-576a-8634-a0b57b3d5c2d",
+          "convention": "utf8_char_offset",
+          "end": 101,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:6.10.010:block:1",
+          "start": 65
+        },
+        "quote": "(a) Any animal which bites a person;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:6.10.010:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 6.10.010 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "9fcf189a-7a7b-54bf-9a7b-1cd7aef8f13b",
+          "convention": "utf8_char_offset",
+          "end": 126,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:6.10.010:block:2",
+          "start": 102
+        },
+        "quote": "(b) Any rabid animal; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:6.10.010:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 6.10.010 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "53f7bbcc-a8ed-5cc3-8988-841153c74065",
+          "convention": "utf8_char_offset",
+          "end": 196,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:6.10.010:block:3",
+          "start": 127
+        },
+        "quote": "(c) Any animal suspected of being rabid. (Ord. 20106 § 14, 12-19-17.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:6.10.010:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:6.10.010#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20106",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 194,
+          "start": 169
+        },
+        "quote": "Ord. 20106 § 14, 12-19-17",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:6.10.010#history:20106",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "7ecc55cb56e58d591d58a46912351c33c61a40d14ee56f424bb9a6627142027c",
+      "captured_at": "2026-08-28T04:01:53.751119Z",
+      "kind": "rendered_html_capture",
+      "value": "6.10.010.7ecc55cb56e5.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:6.10.010@7ecc55cb56e58d59",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:6.10.010",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:6.10.010",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 6.10.010",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/6.10.010"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:6.10.010#history:20106",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-19-17"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "6.10.010",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:6.10.010#history:20106",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20106"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:6.10.010#history:20106",
+      "value": "adopted"
+    },
+    "title": "Report of certain animals."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:01:53.751119Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "7ecc55cb56e58d591d58a46912351c33c61a40d14ee56f424bb9a6627142027c",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "7ecc55cb56e58d591d58a46912351c33c61a40d14ee56f424bb9a6627142027c",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "7ecc55cb56e58d591d58a46912351c33c61a40d14ee56f424bb9a6627142027c",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "5f4ff226c163f3c213daa7c46f9e54b0861fbcd7b94631dd5118eb4be3e781c5",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "5f4ff226c163f3c213daa7c46f9e54b0861fbcd7b94631dd5118eb4be3e781c5",
+        "output_sha256": "150bfb8eaf6705beba889720136cbb5ddfff3f7a34c7ffe67671bf410cdd2040",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "5f4ff226c163f3c213daa7c46f9e54b0861fbcd7b94631dd5118eb4be3e781c5",
+        "output_sha256": "618bf88c09d3e3586b7eb307307732d3d8fc5b861a69318f73153dcad2e0d2ba",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/6.10.010",
+    "retained_original": {
+      "byte_count": 26957,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/6.10.010.7ecc55cb56e5.html",
+      "retrieved_at": "2026-08-28T04:01:53.751119Z",
+      "sha256": "7ecc55cb56e58d591d58a46912351c33c61a40d14ee56f424bb9a6627142027c"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

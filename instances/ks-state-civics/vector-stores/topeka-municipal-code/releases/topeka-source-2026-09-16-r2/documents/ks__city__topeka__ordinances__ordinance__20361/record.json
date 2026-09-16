@@ -1,0 +1,281 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 11926,
+      "normalizations": [
+        {
+          "description": "Removed the ExAIS-added title and Source collection/Ordinance number/Official PDF lines prepended to the retained extraction; the same facts are carried in source.*.",
+          "name": "strip_exais_provenance_preamble"
+        },
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.md",
+      "sha256": "185aa56d7e74862b43010697afd7c9ad75cc82f149ce135e859a289add17309d"
+    },
+    "structured": {
+      "block_count": 3,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "1bb3fd35-10de-52da-a7ab-6b4f26c14eac",
+      "root_source_component_key": "ks:city:topeka:ordinances:ordinance:20361:document",
+      "sha256": "e5102e07f410f5b95dfe4521dd720faa9b0aa1e27c412fb590bad0ca8ee25363",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 12085,
+      "char_count": 12085,
+      "form": "retained_extraction_markdown",
+      "path": "verbatim.md",
+      "sha256": "4542a0a9d3639816fd9a964a06ff3e7f6bdaad2bfcbbe3435194cc5da4246f5c"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.md",
+        "unit": "unicode codepoint"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "ORDINANCE NO. 20361",
+        "locator": {
+          "component_id": "829301cc-998d-533e-9bfb-310bec859439",
+          "convention": "utf8_char_offset",
+          "end": 22,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20361:heading:0",
+          "start": 3
+        },
+        "quote": "ORDINANCE NO. 20361",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20361:heading:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "BE IT ORDAINED BY THE COUNCIL OF THE CITY OF TOPEKA, KANSAS:",
+        "locator": {
+          "component_id": "d2c11aa6-8478-56dd-b2ba-86d9914db188",
+          "convention": "utf8_char_offset",
+          "end": 664,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20361:heading:1",
+          "start": 604
+        },
+        "quote": "BE IT ORDAINED BY THE COUNCIL OF THE CITY OF TOPEKA, KANSAS:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20361:heading:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Exhibit A: Downtown D-3 Rezone Parcels, May 2022",
+        "locator": {
+          "component_id": "738849de-433b-5544-bdad-fee559b37c91",
+          "convention": "utf8_char_offset",
+          "end": 1904,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20361:heading:2",
+          "start": 1856
+        },
+        "quote": "Exhibit A: Downtown D-3 Rezone Parcels, May 2022",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20361:heading:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "PDF page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20361#page",
+        "unavailable_reason": "the retained extraction carries no page boundary markers, so no PDF page number is known for any span; markdown line numbers are not page numbers and are never converted into one"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.50.050 citation",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 193,
+          "start": 184
+        },
+        "quote": "18.50.050",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20361#cites:18.50.050",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "21ebb107f7455d50011afd32e65b9d3b10ffe21b250c38af94aa939f973a5ae7",
+      "captured_at": "2026-08-27T21:48:44+00:00",
+      "kind": "retained_publisher_pdf",
+      "value": "20361.pdf"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:ordinances",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:ordinances:ordinance:20361@21ebb107f7455d50",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "topeka-ordinance:1effb3589273032d676aaafa",
+        "note": "id in manifests/ordinances.jsonl",
+        "system": "topeka_ordinance_seed_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:ordinances:ordinance:20361",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "20361",
+        "scope": "document",
+        "url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20361.pdf"
+      }
+    ],
+    "dates": [],
+    "document_subtype": "ordinance",
+    "document_type": "ordinance",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [
+        {
+          "affects": "evidence",
+          "code": "no_page_coordinates",
+          "description": "The retained Markdown has no page boundaries, so page-level citation into the original PDF is unavailable for this document."
+        }
+      ],
+      "usable_text": true
+    },
+    "publisher_number": "20361",
+    "relationships": [
+      {
+        "basis": "TMC-shaped citation matched in the extracted text of this instrument",
+        "evidence_ref": "ks:city:topeka:ordinances:ordinance:20361#cites:18.50.050",
+        "note": "textual citation only. It is not evidence that this instrument amended that section; the publisher's own ordinance-history row on the code side carries that claim",
+        "predicate": "cites_code_section",
+        "resolved": false,
+        "target": {
+          "collection_id": "ks:city:topeka:municipal-code",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:municipal-code:tmc:18.50.050"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "no_page_coordinates"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher lists this instrument in its official adopted Topeka Ordinances library and the document carries an enacting clause",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "20361"
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "publisher PDF retained and hash-verified against the manifest",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "retained Markdown present and non-empty",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "state": "not_applicable"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-27T21:48:44+00:00",
+      "connector_entrypoint": "scripts/release/topeka-ordinances-collect.py",
+      "connector_revision": "observed-2026-08-27",
+      "method": "official_city_document_center_download"
+    },
+    "extractor": {
+      "mode": "remote_pdf_to_markdown",
+      "name": "marker",
+      "version": "runpod-hosted-2026-08"
+    },
+    "lineage": [
+      {
+        "input_sha256": "21ebb107f7455d50011afd32e65b9d3b10ffe21b250c38af94aa939f973a5ae7",
+        "note": "publisher PDF retained unmodified; input and output are the same bytes",
+        "output_sha256": "21ebb107f7455d50011afd32e65b9d3b10ffe21b250c38af94aa939f973a5ae7",
+        "step": "download",
+        "tool": "scripts/release/topeka-ordinances-collect.py",
+        "tool_version": "observed-2026-08-27"
+      },
+      {
+        "input_sha256": "21ebb107f7455d50011afd32e65b9d3b10ffe21b250c38af94aa939f973a5ae7",
+        "note": "Markdown produced by the bounded remote extraction path",
+        "output_sha256": "4542a0a9d3639816fd9a964a06ff3e7f6bdaad2bfcbbe3435194cc5da4246f5c",
+        "step": "extract",
+        "tool": "marker",
+        "tool_version": "runpod-hosted-2026-08"
+      },
+      {
+        "input_sha256": "4542a0a9d3639816fd9a964a06ff3e7f6bdaad2bfcbbe3435194cc5da4246f5c",
+        "output_sha256": "185aa56d7e74862b43010697afd7c9ad75cc82f149ce135e859a289add17309d",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "4542a0a9d3639816fd9a964a06ff3e7f6bdaad2bfcbbe3435194cc5da4246f5c",
+        "output_sha256": "e5102e07f410f5b95dfe4521dd720faa9b0aa1e27c412fb590bad0ca8ee25363",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.gov/community/ordinances/index.php",
+    "official_url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20361.pdf",
+    "retained_original": {
+      "byte_count": 1119879,
+      "local_path": null,
+      "media_type": "application/pdf",
+      "reference_uri": "seed://topeka-ordinances/raw/pdfs/20361.pdf",
+      "retrieved_at": "2026-08-27T21:48:44+00:00",
+      "sha256": "21ebb107f7455d50011afd32e65b9d3b10ffe21b250c38af94aa939f973a5ae7"
+    },
+    "source_schema_version": "topeka_ordinance_seed_v1"
+  }
+}

@@ -1,0 +1,625 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 6769,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "9d87be932400eea4f7fd270e5f92f6a9e062263c169b5599db9170cded369a31"
+    },
+    "structured": {
+      "block_count": 24,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "ae7372ef-7157-5c14-be33-1f43a2bb3992",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:section",
+      "sha256": "047ff29813e12a75ac3e08f05b2686b8c86e4d2212c11023110a29820028a6a5",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 15588,
+      "char_count": 15581,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "77d34eace86c41d5a8292388ec81c9644fa0698c6179d7b7d4563d57ffc6e00d"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "be104671-d550-5e80-aff2-a48521264a1b",
+          "convention": "utf8_char_offset",
+          "end": 686,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:0",
+          "start": 0
+        },
+        "quote": "(a) The maintenance and repair of a building service line and its connection with the City sewer main is the responsibility of the owner of the property it serves. It is therefore the responsibility of the property owner to make repairs if there is a failure in the building service line or the wye connection to the City sewer main and the responsibility of the City if there is a failure in the City sewer main. The first indication of sewer failure or potential failure may vary. It is the intention of the Water Pollution Control Division to cooperate with the individual property owners and the plumbers in the resolution of these sanitary failures within the following guidelines.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "def437e2-a398-50da-84c6-571e9675b068",
+          "convention": "utf8_char_offset",
+          "end": 718,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:1",
+          "start": 687
+        },
+        "quote": "(b) Sewer Failure – Excavation.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "3f12a071-f2da-5571-a941-0250e3b172c6",
+          "convention": "utf8_char_offset",
+          "end": 1601,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:2",
+          "start": 719
+        },
+        "quote": "(1) Settlement of Ground Surface. In some cases failure of a sewer line is first indicated by settlement of the ground surface near a failure. This can happen before there is any apparent malfunction in either the building service line or the City sewer main. When this occurs over or near the connection of the building service line to the City sewer main, it is not always possible to determine before excavation whether the failure is in the building service line, the City sewer main, or both. If there is no indication at this time that the building service line has failed, the Water Pollution Control Division will make an attempt to determine the problem by inspection of the City sewer main. If the problem is with the City sewer main, or if the City is unable to inspect the City sewer, the Division will make the initial excavation to determine the source of the problem.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "632312cd-f576-58d3-8bb3-435e1bfb5915",
+          "convention": "utf8_char_offset",
+          "end": 1814,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:3",
+          "start": 1602
+        },
+        "quote": "(2) Sewer Stoppage/Backup. If the backup of sewage is the first indication of failure, the Water Pollution Control Division will assist by investigating to determine if there is a stoppage in the City sewer main.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "0e470b7b-ccb5-568b-9404-05466a7b242b",
+          "convention": "utf8_char_offset",
+          "end": 2129,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:4",
+          "start": 1815
+        },
+        "quote": "(i) If the City sewer main has deteriorated to the point where it appears to be the source of the problem or if the City sewer main contains a stoppage that cannot be removed by conventional methods, then the Water Pollution Control Division will make the initial excavation to determine the extent of the failure.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "2014e9c0-2d63-5e38-8f12-e668cb248e2a",
+          "convention": "utf8_char_offset",
+          "end": 2435,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:5",
+          "start": 2130
+        },
+        "quote": "(ii) If the City sewer main is not obstructed, but is open and flowing, and the private sewer line has failed, it then becomes the responsibility of the property owner to make the necessary repairs within seven days. In this case, the Water Pollution Control Division will not make the initial excavation.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "acb9e6bf-dcba-501d-967e-513f773620bd",
+          "convention": "utf8_char_offset",
+          "end": 2693,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:6",
+          "start": 2436
+        },
+        "quote": "(3) Excavation Requirement. It shall be the total responsibility of the party making the excavation to make it of adequate size for Water Pollution Control Division personnel to work safely for inspection of the sewer and/or repairing of the wye connection.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "07c1df15-8328-5d8f-b842-9f8e56910e68",
+          "convention": "utf8_char_offset",
+          "end": 2712,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:7",
+          "start": 2694
+        },
+        "quote": "(c) Sewer Repairs.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "547427ee-38d4-50d1-9057-14e6220ee3b1",
+          "convention": "utf8_char_offset",
+          "end": 3003,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:8",
+          "start": 2713
+        },
+        "quote": "(1) City Sewer Is Broken. If the City sewer main is broken or in such poor condition that it is impractical to make a new wye connection (except where the City sewer main was broken during excavation by others), then the Water Pollution Control Division will provide the following services:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "86542e9e-8889-57c5-9375-538d99466e86",
+          "convention": "utf8_char_offset",
+          "end": 3117,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:9",
+          "start": 3004
+        },
+        "quote": "(i) Make the additional excavation required to remove the damaged pipe and replace the broken section(s) of pipe.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "9ec590fd-cb96-5ac8-b6ed-6dea28e70dca",
+          "convention": "utf8_char_offset",
+          "end": 3234,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:10",
+          "start": 3118
+        },
+        "quote": "(ii) Install a new wye connection thereto and pour a concrete base under the City sewer or provide adequate support.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "33157748-2fec-52dc-aa09-dd9b6b81386f",
+          "convention": "utf8_char_offset",
+          "end": 3384,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:11",
+          "start": 3235
+        },
+        "quote": "(iii) If the material removed from the hole is unacceptable for backfilling, the Water Pollution Control Division will furnish new backfill material.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "800f86f8-556a-5a12-a628-7582c150500f",
+          "convention": "utf8_char_offset",
+          "end": 3459,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:12",
+          "start": 3385
+        },
+        "quote": "(iv) Haul off any excess dirt or other material unacceptable for backfill.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "96637888-a899-541c-8b0a-34e2ae7ac594",
+          "convention": "utf8_char_offset",
+          "end": 3504,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:13",
+          "start": 3460
+        },
+        "quote": "(v) Remove any debris left on City property.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "6584c904-0d0c-55f0-8d4a-3a05f6110b33",
+          "convention": "utf8_char_offset",
+          "end": 3532,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:14",
+          "start": 3505
+        },
+        "quote": "(vi) Replace the surfacing.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "6b1ea9b9-57d4-5c6a-86a4-b5cb810b0427",
+          "convention": "utf8_char_offset",
+          "end": 3713,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:15",
+          "start": 3533
+        },
+        "quote": "(vii) If the initial excavation was made by the property owner(s), the Water Pollution Control Division may share in the cost, depending upon the reason for the initial excavation.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "7634e7b6-378b-5a62-ae72-8baf531efe47",
+          "convention": "utf8_char_offset",
+          "end": 4391,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:16",
+          "start": 3714
+        },
+        "quote": "(2) Broken Wye. If the wye connection itself is broken at the City sewer main, the private sewer line has also failed and the City sewer is in good condition, the Water Pollution Control Division will also haul off any excess dirt or other material unacceptable for backfill and remove any debris left on City property. The Water Pollution Control Division may participate in the cost of additional items of work where the cost is excessive due to surfacing or deep sewers. It is the responsibility of the property owner(s) to hire a plumber to install the private sewer line(s), replace the backfill material and compact it in accordance with Engineering Department standards.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "734d02e0-4494-5f3e-ba2e-8d272a20530f",
+          "convention": "utf8_char_offset",
+          "end": 4414,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:17",
+          "start": 4392
+        },
+        "quote": "(3) City Sewer Intact.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "68c470b5-d5f1-5a5f-aa43-278c8ff936c3",
+          "convention": "utf8_char_offset",
+          "end": 4839,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:18",
+          "start": 4415
+        },
+        "quote": "(i) If the City sewer main and the wye connection itself are intact and only the private sewer line(s) is damaged, the Water Pollution Control Division has no responsibility and therefore will not assist in or pay for any portion of the repair work. In such cases, the Utilities Director or designee shall direct the property owner, from which the building service line extends, to repair the service line within seven days.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "62be566e-489e-5da9-adad-566591327904",
+          "convention": "utf8_char_offset",
+          "end": 5084,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:19",
+          "start": 4840
+        },
+        "quote": "(ii) The property owner may, through written request, authorize the Water Pollution Control Division to cause the private sewer line to be repaired and reimburse the Water Pollution Control Division for any cost and expenses incurred therewith.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "3c30624b-0fc4-54e9-9da5-3b70887e12ba",
+          "convention": "utf8_char_offset",
+          "end": 5798,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:20",
+          "start": 5085
+        },
+        "quote": "(iii) The Water Pollution Control Division shall exercise diligence, including sending a certified letter, return receipt requested, in attempting to locate and direct the property owner to repair the service line. However, if said property owner cannot be located or if said property owner fails to secure the service of a contractor to repair the private sewer service line within 72 hours of having received notice from the Utilities Director, then the Water Pollution Control Division may cause the private sewer line, situated in the public right-of-way, to be repaired and excavation backfilled. The said property owner shall be responsible for any cost and expenses incurred in connection with said repair.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "c3183011-f41f-5d48-a537-89bd2cc90c30",
+          "convention": "utf8_char_offset",
+          "end": 6511,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:21",
+          "start": 5799
+        },
+        "quote": "(iv) The Water Pollution Control Division shall submit a bill to the owner of any property for which it caused a private sewer line to be repaired. In the event the owner of any property for which the Water Pollution Control Division has caused replacement or repair of a private sewer service line shall neglect, fail or refuse to pay the cost or expenses incurred by the Water Pollution Control Division, such charges shall constitute a lien upon the real estate from which the private sewer line extends, and shall be certified by the City Clerk to the County Clerk, to be placed on the tax roll for collection, subject to the same penalties and collected in like manner as other taxes are by law collectable.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "dafb88de-7627-5019-a4c9-e556a1bd310f",
+          "convention": "utf8_char_offset",
+          "end": 6723,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:22",
+          "start": 6512
+        },
+        "quote": "(v) The officials of the Utilities Department shall be authorized to inspect any sewer repair work done in public right-of-way or easement pursuant to the provisions of this section. (Ord. 20089 § 45, 10-17-17.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.150 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "93fe34a4-0c67-5a5b-ac3b-e97242cf463e",
+          "convention": "utf8_char_offset",
+          "end": 6768,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.150:block:23",
+          "start": 6724
+        },
+        "quote": "Cross References: City Clerk, TMC 2.20.010 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20089",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 6721,
+          "start": 6696
+        },
+        "quote": "Ord. 20089 § 45, 10-17-17",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.150#history:20089",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "9c20b44a7431fd84847f28ab4ae2cb898be9beb53117eafc9b44a5d4c2b65734",
+      "captured_at": "2026-08-28T04:28:21.880494Z",
+      "kind": "rendered_html_capture",
+      "value": "13.20.150.9c20b44a7431.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:13.20.150@9c20b44a7431fd84",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:13.20.150",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:13.20.150",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 13.20.150",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/13.20.150"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.150#history:20089",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "10-17-17"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "13.20.150",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.150#history:20089",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20089"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.150#history:20089",
+      "value": "adopted"
+    },
+    "title": "Sanitary sewer failures and repair responsibilities."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:28:21.880494Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "9c20b44a7431fd84847f28ab4ae2cb898be9beb53117eafc9b44a5d4c2b65734",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "9c20b44a7431fd84847f28ab4ae2cb898be9beb53117eafc9b44a5d4c2b65734",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "9c20b44a7431fd84847f28ab4ae2cb898be9beb53117eafc9b44a5d4c2b65734",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "77d34eace86c41d5a8292388ec81c9644fa0698c6179d7b7d4563d57ffc6e00d",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "77d34eace86c41d5a8292388ec81c9644fa0698c6179d7b7d4563d57ffc6e00d",
+        "output_sha256": "9d87be932400eea4f7fd270e5f92f6a9e062263c169b5599db9170cded369a31",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "77d34eace86c41d5a8292388ec81c9644fa0698c6179d7b7d4563d57ffc6e00d",
+        "output_sha256": "047ff29813e12a75ac3e08f05b2686b8c86e4d2212c11023110a29820028a6a5",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/13.20.150",
+    "retained_original": {
+      "byte_count": 40414,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/13.20.150.9c20b44a7431.html",
+      "retrieved_at": "2026-08-28T04:28:21.880494Z",
+      "sha256": "9c20b44a7431fd84847f28ab4ae2cb898be9beb53117eafc9b44a5d4c2b65734"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

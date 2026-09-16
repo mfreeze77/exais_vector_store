@@ -1,0 +1,513 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 2446,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "c99aaa22e9dfbd150926b5fcc2605fcb04ddfdefed49939324e80a23f30298f0"
+    },
+    "structured": {
+      "block_count": 15,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 4,
+      "path": "structured.json",
+      "root_component_id": "a0c62873-7e1c-59eb-9e06-6dd1ec3c2ecf",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:section",
+      "sha256": "18f25e01f0385fe934473b457ff575566a4a7e1b92b631618fda9e9be647ea32",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 6700,
+      "char_count": 6620,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "b3f216b33f54e51daeeaa1f921e90d288d2d4ea80f928b77880a262e9ef3d3b8"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "39a86b0e-ed41-584c-a51c-692387ca8755",
+          "convention": "utf8_char_offset",
+          "end": 131,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:0",
+          "start": 0
+        },
+        "quote": "(a) Definitions. The following words and phrases, when used in this section, shall have the meanings respectively ascribed to them:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "f03cf4a2-44e8-5d1e-9548-28fb8416e69f",
+          "convention": "utf8_char_offset",
+          "end": 485,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:1",
+          "start": 132
+        },
+        "quote": "“Announced religious event” means a religious event regarding which the public has been provided notice of the beginning time and of the duration or ending time of such event by the conspicuous posting of a sign on the property where the event is to be held or by announcement in a newspaper regularly printed on at least a weekly basis within the City.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "67749681-5460-574d-84c0-52e502bd3a2b",
+          "convention": "utf8_char_offset",
+          "end": 664,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:2",
+          "start": 486
+        },
+        "quote": "“Focused picketing” means standing or sitting or walking in a repeated manner past or around a house of worship, by one or more persons while carrying a banner, placard, or sign.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "d420be25-8468-51c0-9261-ced2e5e34530",
+          "convention": "utf8_char_offset",
+          "end": 801,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:3",
+          "start": 665
+        },
+        "quote": "“House of worship” means any church, synagogue, mosque, or other structure that is regularly used for the exercise of religious beliefs.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "2e715398-1c05-53f9-a2fb-e6f2e20bddd6",
+          "convention": "utf8_char_offset",
+          "end": 1084,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:4",
+          "start": 802
+        },
+        "quote": "“Religious event” means any scheduled worship service, wedding, funeral rite, memorial service for the dead, or other observance of a religious sacrament, ritual, ceremony or celebration that takes place at a house of worship or on the property where a house of worship is situated.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "b99d791e-c696-5d5a-9543-f04d7f74d791",
+          "convention": "utf8_char_offset",
+          "end": 1377,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:5",
+          "start": 1085
+        },
+        "quote": "(b) Unlawful Acts. It is unlawful for any person to engage in focused picketing, during the time period from one-half hour prior to the beginning time of an announced religious event until one-half hour after the ending time of the event, on public property at any of the following locations:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "7d32b299-d932-543d-b874-dacacae81b07",
+          "convention": "utf8_char_offset",
+          "end": 1464,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:6",
+          "start": 1378
+        },
+        "quote": "(1) On the sidewalk adjoining the property on which a house of worship is situated; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "9e922306-19b0-57af-b54b-60c417618681",
+          "convention": "utf8_char_offset",
+          "end": 1575,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:7",
+          "start": 1465
+        },
+        "quote": "(2) In the street or roadway adjoining or adjacent to the property on which a house of worship is situated; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "9b69bc82-df1d-5b1d-bcda-1c634e81c371",
+          "convention": "utf8_char_offset",
+          "end": 1843,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:8",
+          "start": 1576
+        },
+        "quote": "(3) On the public area between the house of worship and an adjoining or adjacent street or roadway, including but not limited to the curb, drainage, or area between the street and sidewalk (if a sidewalk exists) commonly referred to as the “parking” or “easement”; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "579a646a-7b5f-50a6-931d-271fd036043c",
+          "convention": "utf8_char_offset",
+          "end": 2028,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:9",
+          "start": 1844
+        },
+        "quote": "(4) On any public property within 50 feet of the property line on which a house of worship is situated, if any entrance to the house of worship is located on that side of the property.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "d592bae0-1abe-5df8-9afe-6c92051af9fd",
+          "convention": "utf8_char_offset",
+          "end": 2095,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:10",
+          "start": 2029
+        },
+        "quote": "(c) Penalty. Any person violating this section may be punished by:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "5fd77185-623a-572f-8214-b2b94f37de67",
+          "convention": "utf8_char_offset",
+          "end": 2132,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:11",
+          "start": 2096
+        },
+        "quote": "(1) A fine of not more than $499.00;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "d97a2752-f93c-5e3d-b8c6-ad391bcf722b",
+          "convention": "utf8_char_offset",
+          "end": 2188,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:12",
+          "start": 2133
+        },
+        "quote": "(2) Imprisonment in jail for not more than 179 days; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "81058432-1ce1-591f-a86b-a01378267128",
+          "convention": "utf8_char_offset",
+          "end": 2389,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:13",
+          "start": 2189
+        },
+        "quote": "(3) Both such fine and imprisonment not to exceed the limits set out in subsections (c)(1) and (c)(2) of this section. (Ord. 17068 §§ 1 – 3, 1-28-97; Ord. 16843 §§ 1 – 3, 7-11-95. Code 1995 § 54-135.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.140 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "f5bcd057-08e0-51d4-919c-f0a584637f6c",
+          "convention": "utf8_char_offset",
+          "end": 2445,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.140:block:14",
+          "start": 2390
+        },
+        "quote": "Cross References: Definitions generally, TMC 1.10.020 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 17068",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2337,
+          "start": 2309
+        },
+        "quote": "Ord. 17068 §§ 1 – 3, 1-28-97",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140#history:17068",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 16843",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2367,
+          "start": 2339
+        },
+        "quote": "Ord. 16843 §§ 1 – 3, 7-11-95",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.140#history:16843",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "8be0a49cb648b9939ee49394d961c5035f629eeca8aa2fa3dd56445cba2139e0",
+      "captured_at": "2026-08-28T04:11:36.337283Z",
+      "kind": "rendered_html_capture",
+      "value": "9.45.140.8be0a49cb648.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:9.45.140@8be0a49cb648b993",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:9.45.140",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:9.45.140",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 9.45.140",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/9.45.140"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.45.140#history:17068",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "1-28-97"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.45.140#history:16843",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "7-11-95"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "9.45.140",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.45.140#history:17068",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:17068"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.45.140#history:16843",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:16843"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.45.140#history:17068",
+      "value": "adopted"
+    },
+    "title": "Picketing of religious events."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:11:36.337283Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "8be0a49cb648b9939ee49394d961c5035f629eeca8aa2fa3dd56445cba2139e0",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "8be0a49cb648b9939ee49394d961c5035f629eeca8aa2fa3dd56445cba2139e0",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "8be0a49cb648b9939ee49394d961c5035f629eeca8aa2fa3dd56445cba2139e0",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "b3f216b33f54e51daeeaa1f921e90d288d2d4ea80f928b77880a262e9ef3d3b8",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "b3f216b33f54e51daeeaa1f921e90d288d2d4ea80f928b77880a262e9ef3d3b8",
+        "output_sha256": "c99aaa22e9dfbd150926b5fcc2605fcb04ddfdefed49939324e80a23f30298f0",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "b3f216b33f54e51daeeaa1f921e90d288d2d4ea80f928b77880a262e9ef3d3b8",
+        "output_sha256": "18f25e01f0385fe934473b457ff575566a4a7e1b92b631618fda9e9be647ea32",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/9.45.140",
+    "retained_original": {
+      "byte_count": 33146,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/9.45.140.8be0a49cb648.html",
+      "retrieved_at": "2026-08-28T04:11:36.337283Z",
+      "sha256": "8be0a49cb648b9939ee49394d961c5035f629eeca8aa2fa3dd56445cba2139e0"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

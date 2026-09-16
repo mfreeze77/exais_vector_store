@@ -1,0 +1,568 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 9573,
+      "normalizations": [
+        {
+          "description": "Removed the ExAIS-added title and Source collection/Ordinance number/Official PDF lines prepended to the retained extraction; the same facts are carried in source.*.",
+          "name": "strip_exais_provenance_preamble"
+        },
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.md",
+      "sha256": "00d6fcf4a6b37a2c4b9514f01dfc8f7d9a86cb7bc92e568dbfbb5afda1e18bea"
+    },
+    "structured": {
+      "block_count": 22,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "b039bcb7-645f-5ed6-8310-e8fa025976e9",
+      "root_source_component_key": "ks:city:topeka:ordinances:ordinance:20336:document",
+      "sha256": "d3abe23945bd9b6c3d870709a3ad28ad5175fdb3e8a85ccc65e3c13edf132860",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 9732,
+      "char_count": 9732,
+      "form": "retained_extraction_markdown",
+      "path": "verbatim.md",
+      "sha256": "56e80eae40782d8becde6c993b0d89b2201e8715894c6b7e974468914cc09247"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.md",
+        "unit": "unicode codepoint"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(Published in the Topeka Metro News January 10, 2022)",
+        "locator": {
+          "component_id": "4cfa91eb-3f46-58c5-8880-5090daa0be11",
+          "convention": "utf8_char_offset",
+          "end": 56,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:0",
+          "start": 3
+        },
+        "quote": "(Published in the Topeka Metro News January 10, 2022)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "ORDINANCE NO. 20336",
+        "locator": {
+          "component_id": "f3bdffa1-247b-57e3-89ba-f7aa16fe60f3",
+          "convention": "utf8_char_offset",
+          "end": 80,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:1",
+          "start": 61
+        },
+        "quote": "ORDINANCE NO. 20336",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Parcel 1 (3826 SW 12 th Street)",
+        "locator": {
+          "component_id": "db6e2bf5-db8c-5622-a033-9f46daab4adc",
+          "convention": "utf8_char_offset",
+          "end": 662,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:2",
+          "start": 631
+        },
+        "quote": "Parcel 1 (3826 SW 12 th Street)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Temporary Easement:",
+        "locator": {
+          "component_id": "1759a523-0fff-5f21-9200-4d9b3500ea61",
+          "convention": "utf8_char_offset",
+          "end": 1311,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:3",
+          "start": 1292
+        },
+        "quote": "Temporary Easement:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Parcel 6 (3722 SW 12 th Street)",
+        "locator": {
+          "component_id": "19d50e7d-5b31-5af7-829f-8c36095ced44",
+          "convention": "utf8_char_offset",
+          "end": 2004,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:4",
+          "start": 1973
+        },
+        "quote": "Parcel 6 (3722 SW 12 th Street)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PROPERTY TO BE ACQUIRED:",
+        "locator": {
+          "component_id": "08601b81-d9b5-5cfa-9d8a-50911e231190",
+          "convention": "utf8_char_offset",
+          "end": 2284,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:5",
+          "start": 2260
+        },
+        "quote": "PROPERTY TO BE ACQUIRED:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Temporary Easement:",
+        "locator": {
+          "component_id": "fb05c74b-2415-5d84-a55b-fd7695e30f6a",
+          "convention": "utf8_char_offset",
+          "end": 2308,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:6",
+          "start": 2289
+        },
+        "quote": "Temporary Easement:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Parcel 12 (1200 SW Orleans Street)",
+        "locator": {
+          "component_id": "e9458278-91d0-5d97-8374-db0dfeb34937",
+          "convention": "utf8_char_offset",
+          "end": 2735,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:7",
+          "start": 2701
+        },
+        "quote": "Parcel 12 (1200 SW Orleans Street)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PROPERTY TO BE ACQUIRED:",
+        "locator": {
+          "component_id": "4d3b5171-ec41-5f07-9995-20c8eac8487e",
+          "convention": "utf8_char_offset",
+          "end": 3280,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:8",
+          "start": 3256
+        },
+        "quote": "PROPERTY TO BE ACQUIRED:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Temporary Easement:",
+        "locator": {
+          "component_id": "d6c5430f-b5d9-5edc-a225-cc250bf4f9b5",
+          "convention": "utf8_char_offset",
+          "end": 3304,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:9",
+          "start": 3285
+        },
+        "quote": "Temporary Easement:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Parcel 26 (3126 SW 12 th Street)",
+        "locator": {
+          "component_id": "3f4680e9-bd26-5453-a43d-8d4e3c4a013b",
+          "convention": "utf8_char_offset",
+          "end": 3739,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:10",
+          "start": 3707
+        },
+        "quote": "Parcel 26 (3126 SW 12 th Street)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PROPERTY TO BE ACQUIRED:",
+        "locator": {
+          "component_id": "be8cd6d1-65bb-5ac3-ada2-e0b114a966f5",
+          "convention": "utf8_char_offset",
+          "end": 4567,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:11",
+          "start": 4543
+        },
+        "quote": "PROPERTY TO BE ACQUIRED:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Temporary Easement:",
+        "locator": {
+          "component_id": "db319ab1-cd4e-5aa9-a270-8431894f0661",
+          "convention": "utf8_char_offset",
+          "end": 4591,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:12",
+          "start": 4572
+        },
+        "quote": "Temporary Easement:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Parcel 28 (3118 SW 12 th Street)",
+        "locator": {
+          "component_id": "3ce15c45-bf0f-596e-9494-1cd2e3828001",
+          "convention": "utf8_char_offset",
+          "end": 5259,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:13",
+          "start": 5227
+        },
+        "quote": "Parcel 28 (3118 SW 12 th Street)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PROPERTY TO BE ACQUIRED:",
+        "locator": {
+          "component_id": "d1d981d0-2448-56fb-9772-688638aa7305",
+          "convention": "utf8_char_offset",
+          "end": 5477,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:14",
+          "start": 5453
+        },
+        "quote": "PROPERTY TO BE ACQUIRED:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Temporary Easement:",
+        "locator": {
+          "component_id": "b467ffde-9d6d-5b88-8b8e-b9ea1e4279e9",
+          "convention": "utf8_char_offset",
+          "end": 5501,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:15",
+          "start": 5482
+        },
+        "quote": "Temporary Easement:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Parcel 29 (1197 SW Oakley Street)",
+        "locator": {
+          "component_id": "f37684e5-b9cd-5485-97f7-fd1a2dfb5353",
+          "convention": "utf8_char_offset",
+          "end": 5965,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:16",
+          "start": 5932
+        },
+        "quote": "Parcel 29 (1197 SW Oakley Street)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PROPERTY TO BE ACQUIRED:",
+        "locator": {
+          "component_id": "7c1441fa-4fa4-5c1b-9016-f969f9c84e33",
+          "convention": "utf8_char_offset",
+          "end": 6440,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:17",
+          "start": 6416
+        },
+        "quote": "PROPERTY TO BE ACQUIRED:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Temporary Easement:",
+        "locator": {
+          "component_id": "9a552cd7-28c2-5354-9851-e1e161234b9c",
+          "convention": "utf8_char_offset",
+          "end": 6464,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:18",
+          "start": 6445
+        },
+        "quote": "Temporary Easement:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Parcel 31 (1201 SW Randolph Ave)",
+        "locator": {
+          "component_id": "048526a2-83bb-58f4-919f-4a74ef584215",
+          "convention": "utf8_char_offset",
+          "end": 6883,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:19",
+          "start": 6851
+        },
+        "quote": "Parcel 31 (1201 SW Randolph Ave)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "PROPERTY TO BE ACQUIRED:",
+        "locator": {
+          "component_id": "2ea4662f-13ac-5b87-85fc-e09ff8d312dd",
+          "convention": "utf8_char_offset",
+          "end": 7151,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:20",
+          "start": 7127
+        },
+        "quote": "PROPERTY TO BE ACQUIRED:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Temporary Easement:",
+        "locator": {
+          "component_id": "24861d58-ea27-509a-89f8-1280b7e5fdc1",
+          "convention": "utf8_char_offset",
+          "end": 7175,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20336:heading:21",
+          "start": 7156
+        },
+        "quote": "Temporary Easement:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336:heading:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "PDF page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336#page",
+        "unavailable_reason": "the retained extraction carries no page boundary markers, so no PDF page number is known for any span; markdown line numbers are not page numbers and are never converted into one"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publication line",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 55,
+          "start": 3
+        },
+        "quote": "(Published in the Topeka Metro News January 10, 2022",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20336#published",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "ad9fb151f9aa4b7bdd627bef4e93fb23c000051233fcd5d90f07d10054a44a97",
+      "captured_at": "2026-08-27T21:48:44+00:00",
+      "kind": "retained_publisher_pdf",
+      "value": "20336.pdf"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:ordinances",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:ordinances:ordinance:20336@ad9fb151f9aa4b7b",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "topeka-ordinance:956ddeef76b67b90ccce3210",
+        "note": "id in manifests/ordinances.jsonl",
+        "system": "topeka_ordinance_seed_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:ordinances:ordinance:20336",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "20336",
+        "scope": "document",
+        "url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20336.pdf"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:ordinances:ordinance:20336#published",
+        "kind": "published",
+        "note": "publication line printed on the instrument; not a certification of effective date",
+        "precision": "day",
+        "value": "January 10, 2022"
+      }
+    ],
+    "document_subtype": "ordinance",
+    "document_type": "ordinance",
+    "extraction_quality": {
+      "grade": "degraded",
+      "limitations": [
+        {
+          "affects": "evidence",
+          "code": "no_page_coordinates",
+          "description": "The retained Markdown has no page boundaries, so page-level citation into the original PDF is unavailable for this document."
+        },
+        {
+          "affects": "readable_text",
+          "code": "margin_line_numbers_in_text",
+          "description": "30 standalone numeric lines are present; these are the PDF's margin line numbering rendered as body text. They are retained rather than stripped, because removing them risks deleting real numbers from the instrument."
+        }
+      ],
+      "usable_text": true
+    },
+    "publisher_number": "20336",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "no_page_coordinates",
+        "margin_line_numbers_in_text"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "review_needed"
+    },
+    "status": {
+      "basis": "the publisher lists this instrument in its official adopted Topeka Ordinances library and the document carries an enacting clause",
+      "evidence_ref": "ks:city:topeka:ordinances:ordinance:20336#published",
+      "value": "adopted"
+    },
+    "title": "20336"
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "publisher PDF retained and hash-verified against the manifest",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "retained Markdown present and non-empty",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "flattened redline markup needs a human read against the PDF",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-27T21:48:44+00:00",
+      "connector_entrypoint": "scripts/release/topeka-ordinances-collect.py",
+      "connector_revision": "observed-2026-08-27",
+      "method": "official_city_document_center_download"
+    },
+    "extractor": {
+      "mode": "remote_pdf_to_markdown",
+      "name": "marker",
+      "version": "runpod-hosted-2026-08"
+    },
+    "lineage": [
+      {
+        "input_sha256": "ad9fb151f9aa4b7bdd627bef4e93fb23c000051233fcd5d90f07d10054a44a97",
+        "note": "publisher PDF retained unmodified; input and output are the same bytes",
+        "output_sha256": "ad9fb151f9aa4b7bdd627bef4e93fb23c000051233fcd5d90f07d10054a44a97",
+        "step": "download",
+        "tool": "scripts/release/topeka-ordinances-collect.py",
+        "tool_version": "observed-2026-08-27"
+      },
+      {
+        "input_sha256": "ad9fb151f9aa4b7bdd627bef4e93fb23c000051233fcd5d90f07d10054a44a97",
+        "note": "Markdown produced by the bounded remote extraction path",
+        "output_sha256": "56e80eae40782d8becde6c993b0d89b2201e8715894c6b7e974468914cc09247",
+        "step": "extract",
+        "tool": "marker",
+        "tool_version": "runpod-hosted-2026-08"
+      },
+      {
+        "input_sha256": "56e80eae40782d8becde6c993b0d89b2201e8715894c6b7e974468914cc09247",
+        "output_sha256": "00d6fcf4a6b37a2c4b9514f01dfc8f7d9a86cb7bc92e568dbfbb5afda1e18bea",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "56e80eae40782d8becde6c993b0d89b2201e8715894c6b7e974468914cc09247",
+        "output_sha256": "d3abe23945bd9b6c3d870709a3ad28ad5175fdb3e8a85ccc65e3c13edf132860",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.gov/community/ordinances/index.php",
+    "official_url": "https://files.topeka.gov/community/ordinances/2022/Ordinance20336.pdf",
+    "retained_original": {
+      "byte_count": 107698,
+      "local_path": null,
+      "media_type": "application/pdf",
+      "reference_uri": "seed://topeka-ordinances/raw/pdfs/20336.pdf",
+      "retrieved_at": "2026-08-27T21:48:44+00:00",
+      "sha256": "ad9fb151f9aa4b7bdd627bef4e93fb23c000051233fcd5d90f07d10054a44a97"
+    },
+    "source_schema_version": "topeka_ordinance_seed_v1"
+  }
+}

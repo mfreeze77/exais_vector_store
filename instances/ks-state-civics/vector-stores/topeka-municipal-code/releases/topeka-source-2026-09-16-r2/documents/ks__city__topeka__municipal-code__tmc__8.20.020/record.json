@@ -1,0 +1,545 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 5918,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "4b8942e6aee5b5356b319c162a91e5dd1b75bc1d201fddf5f7296f22643a3914"
+    },
+    "structured": {
+      "block_count": 19,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "685c1cee-f154-5c45-82cd-370ba3f55371",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:section",
+      "sha256": "38fab65122df8d56738543e178bd342cad53b66aa42423c18abd4171ea0a79cb",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 13660,
+      "char_count": 13505,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "9b50139c8f8e8b91f048fe2d65b17d73b6b5d261cdd309e24e23740d9c04f61f"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "0a2c3c38-2716-5275-b91d-bfa6e6fb79a9",
+          "convention": "utf8_char_offset",
+          "end": 110,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:0",
+          "start": 0
+        },
+        "quote": "The following words and phrases, whenever used in this chapter, shall be construed as defined in this section:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "84bc4f75-d24b-5b01-9b2a-92fed3ec6aee",
+          "convention": "utf8_char_offset",
+          "end": 499,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:1",
+          "start": 111
+        },
+        "quote": "(a) “Business” means any sole proprietorship, partnership, joint venture, corporation or other business entity formed for profit or not-for-profit purposes, including places where goods or services are sold at retail or wholesale as well as professional corporations and other entities where legal, medical, dental, engineering, architectural or other professional services are delivered.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "fafb7a11-f1ae-5efe-8ef4-aab733222122",
+          "convention": "utf8_char_offset",
+          "end": 952,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:2",
+          "start": 500
+        },
+        "quote": "(b) “Electronic cigarette” (e-cigarette) means an electronic and/or battery operated device that may resemble a cigarette, but uses an atomizer or similar device that allows users to inhale nicotine vapor or other flavored vapor without fire, smoke or ash. An electronic cigarette includes but is not limited to an electronic smoking device, electronic vaping device, personal vaporizer, electronic pipe (e-pipe), electronic hookah, e-pen or vapor pen.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "58275eb0-aae7-54e3-98f8-56d6601cbeb3",
+          "convention": "utf8_char_offset",
+          "end": 1155,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:3",
+          "start": 953
+        },
+        "quote": "(c) “Employee” means any person who is employed by an employer in consideration for direct or indirect monetary wages or profit, and any person who volunteers his or her services for a nonprofit entity.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "b0d6f589-6c0a-59e3-824b-d4a26ad3073f",
+          "convention": "utf8_char_offset",
+          "end": 1397,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:4",
+          "start": 1156
+        },
+        "quote": "(d) “Employer” means any person, partnership, corporation, including a municipal corporation, or nonprofit entity, which employs in consideration for direct or indirect monetary wages or profit the services of one or more individual persons.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "d3c6181f-1d17-5dae-9164-c966e53b1779",
+          "convention": "utf8_char_offset",
+          "end": 1746,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:5",
+          "start": 1398
+        },
+        "quote": "(e) “Enclosed area” means all space between a floor and ceiling which is enclosed on all sides by solid walls or windows (exclusive of door or passage ways) which extend from the floor to the ceiling, including all space therein screened by partitions which do not extend to the ceiling or are not solid, “office landscaping” or similar structures.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "d993bdec-741e-5c7a-9c52-24a8b1422c51",
+          "convention": "utf8_char_offset",
+          "end": 1836,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:6",
+          "start": 1747
+        },
+        "quote": "For the purposes of this chapter, the following shall not be considered an enclosed area:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "02f86ec6-b228-5109-bcad-ec65dc5c7dd9",
+          "convention": "utf8_char_offset",
+          "end": 1992,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:7",
+          "start": 1837
+        },
+        "quote": "(1) Rooms or areas enclosed by walls or windows having neither a ceiling nor a roof and which are completely open to the elements and weather at all times.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "69deca50-6027-52d2-bc3c-28ca43760b40",
+          "convention": "utf8_char_offset",
+          "end": 2196,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:8",
+          "start": 1993
+        },
+        "quote": "(2) Rooms or areas, enclosed by walls or windows and a roof or ceiling, having an opening at least 80 percent of the total perimeter wall area completely and permanently open to the elements and weather.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "cecc09cd-bdca-5894-9944-988f89e44a86",
+          "convention": "utf8_char_offset",
+          "end": 2767,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:9",
+          "start": 2197
+        },
+        "quote": "(f) “Food service establishment” shall mean any place in which food or alcoholic liquor or cereal malt beverages, or both, is served or is prepared for sale or service on the premises or elsewhere. Such term shall include, but not be limited to, fixed or mobile restaurant, coffee shop, cafeteria, short-order cafe, luncheonette, grill, tea room, sandwich shop, soda fountain, tavern, private club, roadside kitchen, commissary and any other private, public or nonprofit organization or institution that routinely serves or prepares food or drink with or without charge.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "12fe92fe-2277-5727-a680-acfbf65da430",
+          "convention": "utf8_char_offset",
+          "end": 3285,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:10",
+          "start": 2768
+        },
+        "quote": "(g) “Licensed premises” shall mean any premises where alcoholic liquor or cereal malt beverages, or both, by the individual drink as defined by K.S.A. Chapter 41 , and amendments thereto, is served or provided for consumption or use on the premises with or without charge. Such term shall include drinking establishments, Class A private clubs, Class B private clubs, and cereal malt beverage or alcoholic liquor retailer establishments, all as defined by K.S.A. Chapter 41 , and amendments thereto, and this chapter.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "293522e0-e184-5132-a8b5-2b6cb2f55ede",
+          "convention": "utf8_char_offset",
+          "end": 3713,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:11",
+          "start": 3286
+        },
+        "quote": "(h) “Place of employment” means any enclosed area under the control of a public or private employer which employees normally frequent during the course of employment, including, but not limited to, work areas, employee lounges and restrooms, conference and classrooms, employee cafeterias and hallways. A private residence is not a “place of employment” unless it is used as a childcare, adult day care or health care facility.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "5e712f56-33b0-54c5-b0fc-1c5a0920d531",
+          "convention": "utf8_char_offset",
+          "end": 3986,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:12",
+          "start": 3714
+        },
+        "quote": "(i) “Private place” means any enclosed area to which the public is not invited or in which the public is not permitted, including, but not limited to, personal residences or personal motor vehicles. A privately owned business, open to the public, is not a “private place.”",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "1fb73676-b215-5f50-9f67-2b5cc031fda8",
+          "convention": "utf8_char_offset",
+          "end": 4427,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:13",
+          "start": 3987
+        },
+        "quote": "(j) “Public place” means any enclosed area to which the public is invited or in which the public is permitted, including, but not limited to, banks, educational facilities, health facilities, health care facilities, laundromats, public transportation facilities, reception areas, production and marketing establishments, retail service establishments, retail stores, theaters, and waiting rooms. A private residence is not a “public place.”",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "9aa30cc5-b20f-58f5-aa74-734bffba2c31",
+          "convention": "utf8_char_offset",
+          "end": 5099,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:14",
+          "start": 4428
+        },
+        "quote": "(k) “Smoking” means any of the following: (1) the use of an electronic cigarette; (2) possession of a cigarette, cigar, or pipe partially or wholly consisting of or containing burning vegetation that is used for the introduction of smoke from the burning vegetation into the human body; or (3) possession of any other device containing burning vegetation that is used for the introduction of smoke from the burning vegetation into the human body. For the purposes of this definition, the term “vegetation” includes, but is not limited to, tobacco, but does not include any controlled substance listed in K.S.A. 65-4105 through 65-4113 , inclusive, and amendments thereto.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "bd7e3c66-c2f0-5940-8244-a49d4b77c880",
+          "convention": "utf8_char_offset",
+          "end": 5407,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:15",
+          "start": 5100
+        },
+        "quote": "(l) “Sports arena” means sports pavilions, gymnasiums, health spas, boxing arenas, swimming pools, roller and ice rinks, bowling alleys and other similar places where members of the general public assemble either to engage in physical exercise, participate in athletic competition, or witness sports events.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "6d234bee-60dc-58d5-8e01-080b6db9728d",
+          "convention": "utf8_char_offset",
+          "end": 5667,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:16",
+          "start": 5408
+        },
+        "quote": "(m) “Smoke shop” means any indoor area operated primarily for the retail sale of electronic cigarettes, tobacco, tobacco products or smoking devices or accessories, and which derives not less than 65 percent of its gross receipts from the sale of these items.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "15bc23ee-08c7-5cfe-91e6-74e5a7af579c",
+          "convention": "utf8_char_offset",
+          "end": 5861,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:17",
+          "start": 5668
+        },
+        "quote": "(n) “Wall” means a side of a room, building or structure connecting the floor and ceiling or foundation and roof, including temporary, movable, and retractable sides. (Ord. 19964 § 1, 8-18-15.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.20.020 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "7c6802e3-0abd-5e04-9a81-44dd3962c21c",
+          "convention": "utf8_char_offset",
+          "end": 5917,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.20.020:block:18",
+          "start": 5862
+        },
+        "quote": "Cross References: Definitions generally, TMC 1.10.020 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19964",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 5859,
+          "start": 5836
+        },
+        "quote": "Ord. 19964 § 1, 8-18-15",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.20.020#history:19964",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "df835d2fbb52cb3d1b34ad1c92108ff9656ad8a49b1aad2888264c088ffb1a6c",
+      "captured_at": "2026-08-28T04:03:12.380275Z",
+      "kind": "rendered_html_capture",
+      "value": "8.20.020.df835d2fbb52.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:8.20.020@df835d2fbb52cb3d",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:8.20.020",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:8.20.020",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 8.20.020",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/8.20.020"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:8.20.020#history:19964",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "8-18-15"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "8.20.020",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:8.20.020#history:19964",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19964"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:8.20.020#history:19964",
+      "value": "adopted"
+    },
+    "title": "Definitions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:03:12.380275Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "df835d2fbb52cb3d1b34ad1c92108ff9656ad8a49b1aad2888264c088ffb1a6c",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "df835d2fbb52cb3d1b34ad1c92108ff9656ad8a49b1aad2888264c088ffb1a6c",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "df835d2fbb52cb3d1b34ad1c92108ff9656ad8a49b1aad2888264c088ffb1a6c",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "9b50139c8f8e8b91f048fe2d65b17d73b6b5d261cdd309e24e23740d9c04f61f",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "9b50139c8f8e8b91f048fe2d65b17d73b6b5d261cdd309e24e23740d9c04f61f",
+        "output_sha256": "4b8942e6aee5b5356b319c162a91e5dd1b75bc1d201fddf5f7296f22643a3914",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "9b50139c8f8e8b91f048fe2d65b17d73b6b5d261cdd309e24e23740d9c04f61f",
+        "output_sha256": "38fab65122df8d56738543e178bd342cad53b66aa42423c18abd4171ea0a79cb",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/8.20.020",
+    "retained_original": {
+      "byte_count": 38835,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/8.20.020.df835d2fbb52.html",
+      "retrieved_at": "2026-08-28T04:03:12.380275Z",
+      "sha256": "df835d2fbb52cb3d1b34ad1c92108ff9656ad8a49b1aad2888264c088ffb1a6c"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

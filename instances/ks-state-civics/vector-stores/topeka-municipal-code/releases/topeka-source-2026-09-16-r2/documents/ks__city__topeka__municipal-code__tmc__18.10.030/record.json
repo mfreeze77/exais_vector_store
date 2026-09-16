@@ -1,0 +1,593 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 2865,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "87363c2ce323b03d2c85ca1b82aceea9a0b674612b17be02204317b3d2e30cbc"
+    },
+    "structured": {
+      "block_count": 22,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "d9123730-7ea0-58e6-95d8-8dc849618cd4",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:section",
+      "sha256": "7a0ba2f37722d25addf1cb8e6fe97d49818b494e71ed96b3397817c73343a9b6",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 7779,
+      "char_count": 7760,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "9a01c1ad5c21841e64d4b2f8f444a283897e74f4914783aef8d427d05e99933e"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "6d54959a-33ee-535f-94dd-143aba2043b7",
+          "convention": "utf8_char_offset",
+          "end": 14,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:0",
+          "start": 0
+        },
+        "quote": "(a) Generally.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "f57800a8-8438-5a07-9eef-0bd612b9cb32",
+          "convention": "utf8_char_offset",
+          "end": 92,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:1",
+          "start": 15
+        },
+        "quote": "(1) This chapter applies to any sign within the corporate limits of the City.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "13710fd6-42b2-5ba5-9905-4c4b426e8068",
+          "convention": "utf8_char_offset",
+          "end": 207,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:2",
+          "start": 93
+        },
+        "quote": "(2) It is unlawful for any person to erect, operate, or otherwise use any sign that is prohibited by this chapter.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "71decc43-d030-5d95-bad8-1109a998c84b",
+          "convention": "utf8_char_offset",
+          "end": 350,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:3",
+          "start": 208
+        },
+        "quote": "(3) It is unlawful for any person to erect, operate, or otherwise use any sign at a time, place, or manner that is prohibited by this chapter.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "99701648-693b-5133-99e3-f486edfca01c",
+          "convention": "utf8_char_offset",
+          "end": 678,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:4",
+          "start": 351
+        },
+        "quote": "(4) The Planning and Development Director is authorized to interpret and execute the regulations of this chapter. Any person aggrieved by a decision of the Planning and Development Director regarding the administration of this chapter may appeal such decision to the Board of Zoning Appeals in accordance with Chapter 2.45 TMC.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "6ee5efce-19c3-5c35-8ec5-d57c221f4d2e",
+          "convention": "utf8_char_offset",
+          "end": 830,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:5",
+          "start": 679
+        },
+        "quote": "(5) This chapter does not prohibit signs, sign locations, or sign characteristics that are permitted by an express requirement of State or Federal law.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "e74b8c2b-ce06-5d7c-aaf5-f4f82a18411f",
+          "convention": "utf8_char_offset",
+          "end": 909,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:6",
+          "start": 831
+        },
+        "quote": "(b) Exemptions. The regulations of this chapter do not apply to the following:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "b4feb8df-8dd0-5238-96c3-f3036c8b8c9a",
+          "convention": "utf8_char_offset",
+          "end": 1504,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:7",
+          "start": 910
+        },
+        "quote": "(1) Signs that are not visible from a public street, highway, road, sidewalk, bicycle, pedestrian path, or similar public way unless the sign is visible from the property line of an adjoining lot or parcel. A sign is considered not visible where it is fully obstructed by natural changes in grade, buildings, or landscaping that provides a complete year-round visual barrier. “Fully obstructed” means that the signs are not visible at ground level from the edge of the public right-of-way or residential property line, or from the upper level of a residential building on an adjoining property.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "6dd42f99-2755-520f-9a36-b82bdeb1aa8f",
+          "convention": "utf8_char_offset",
+          "end": 1634,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:8",
+          "start": 1505
+        },
+        "quote": "(2) Signs intended to be read only from inside the property and containing copy of a size not readable from outside the property.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "271d8695-9ba0-5a4a-8cc5-38eb0506678e",
+          "convention": "utf8_char_offset",
+          "end": 1756,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:9",
+          "start": 1635
+        },
+        "quote": "(3) Signs located entirely within the interior of a building or structure, except as otherwise provided for window signs.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "3ffe2d37-f0e5-5fb7-9534-ca3cfd68139b",
+          "convention": "utf8_char_offset",
+          "end": 1915,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:10",
+          "start": 1757
+        },
+        "quote": "(4) Signs associated with the temporary use of a building or site, including buildings or sites undergoing construction, during the time of the temporary use.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "73a13666-961e-514b-82ce-a7dd6895ae73",
+          "convention": "utf8_char_offset",
+          "end": 2122,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:11",
+          "start": 1916
+        },
+        "quote": "(5) In order to promote traffic and public safety, any public notice or warning posted or required by valid and applicable Federal, State, or local law, regulation, or ordinance, including street addresses.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "ad874279-2f42-5f9b-86a0-19ec90114ce8",
+          "convention": "utf8_char_offset",
+          "end": 2261,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:12",
+          "start": 2123
+        },
+        "quote": "(6) A sign that is integrated into or on a coin-operated machine, vending machine, or gasoline pump that is used for its intended purpose.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "36aa86b7-c605-5f09-b4b1-228f1bbd26c3",
+          "convention": "utf8_char_offset",
+          "end": 2283,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:13",
+          "start": 2262
+        },
+        "quote": "(7) Decorative flags.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "b7b56773-ec1c-54f0-9b78-0519e01aa18a",
+          "convention": "utf8_char_offset",
+          "end": 2305,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:14",
+          "start": 2284
+        },
+        "quote": "(8) Government flags.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "7e93be75-4ebe-5fc4-b058-960591e4ee32",
+          "convention": "utf8_char_offset",
+          "end": 2347,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:15",
+          "start": 2306
+        },
+        "quote": "(9) Fuel pump and fuel pump topper signs.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "c262006b-a375-5497-9125-ca4b9eb9031c",
+          "convention": "utf8_char_offset",
+          "end": 2371,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:16",
+          "start": 2348
+        },
+        "quote": "(10) Pennant streamers.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "1e46e415-965c-57df-b45d-939b4ad0ebe7",
+          "convention": "utf8_char_offset",
+          "end": 2404,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:17",
+          "start": 2372
+        },
+        "quote": "(11) A sign carried by a person.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "f7128046-87fe-59e3-94a3-d0d9480b0793",
+          "convention": "utf8_char_offset",
+          "end": 2448,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:18",
+          "start": 2405
+        },
+        "quote": "(12) A sign affixed to an operable vehicle.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "c50d99d3-f854-57cc-afb3-ba6cdc723e68",
+          "convention": "utf8_char_offset",
+          "end": 2517,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:19",
+          "start": 2449
+        },
+        "quote": "(13) Address numbers and other nonilluminated incidental wall signs.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "8ec1bb3c-a9b2-532a-ac74-1231f6eff46b",
+          "convention": "utf8_char_offset",
+          "end": 2802,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:20",
+          "start": 2518
+        },
+        "quote": "(c) Districts and Uses. This chapter calibrates sign size, types, and design to the City’s government’s zoning districts in order to protect community character, and to accommodate desired communications and economic activity appropriate to those districts. (Ord. 20207 § 4, 9-10-19.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.030 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "b4d701cc-e7d2-5012-a06a-ff12d1861a79",
+          "convention": "utf8_char_offset",
+          "end": 2864,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.030:block:21",
+          "start": 2803
+        },
+        "quote": "Cross References: Board of Zoning Appeals, Chapter 2.220 TMC.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20207",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2800,
+          "start": 2777
+        },
+        "quote": "Ord. 20207 § 4, 9-10-19",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.030#history:20207",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "f1d77ae51f7f9ac3ae18c3b42408f4314028368efda811b01a7616c97dfd511f",
+      "captured_at": "2026-08-28T04:46:24.109844Z",
+      "kind": "rendered_html_capture",
+      "value": "18.10.030.f1d77ae51f7f.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:18.10.030@f1d77ae51f7f9ac3",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:18.10.030",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:18.10.030",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 18.10.030",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/18.10.030"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.10.030#history:20207",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "9-10-19"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "18.10.030",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.10.030#history:20207",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20207"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.10.030#history:20207",
+      "value": "adopted"
+    },
+    "title": "Applicability."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:46:24.109844Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "f1d77ae51f7f9ac3ae18c3b42408f4314028368efda811b01a7616c97dfd511f",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "f1d77ae51f7f9ac3ae18c3b42408f4314028368efda811b01a7616c97dfd511f",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "f1d77ae51f7f9ac3ae18c3b42408f4314028368efda811b01a7616c97dfd511f",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "9a01c1ad5c21841e64d4b2f8f444a283897e74f4914783aef8d427d05e99933e",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "9a01c1ad5c21841e64d4b2f8f444a283897e74f4914783aef8d427d05e99933e",
+        "output_sha256": "87363c2ce323b03d2c85ca1b82aceea9a0b674612b17be02204317b3d2e30cbc",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "9a01c1ad5c21841e64d4b2f8f444a283897e74f4914783aef8d427d05e99933e",
+        "output_sha256": "7a0ba2f37722d25addf1cb8e6fe97d49818b494e71ed96b3397817c73343a9b6",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/18.10.030",
+    "retained_original": {
+      "byte_count": 35431,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/18.10.030.f1d77ae51f7f.html",
+      "retrieved_at": "2026-08-28T04:46:24.109844Z",
+      "sha256": "f1d77ae51f7f9ac3ae18c3b42408f4314028368efda811b01a7616c97dfd511f"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

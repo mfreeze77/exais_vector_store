@@ -1,0 +1,239 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 560,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "5f25e26f1c6aad268c7caf9e0a2fb4e18fad154792e32c94e34430ef155e20e4"
+    },
+    "structured": {
+      "block_count": 2,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "a3f7f538-9661-5d8b-a729-4e156447830d",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:3.45.120:section",
+      "sha256": "8c9abef9de65a1f96c02223ffa73a7f56fbfe42a117595c7c16df866b8b6f6f3",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 1806,
+      "char_count": 1798,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "254675a7c207d68b262fa1e4a3270758f9b25b2b748b9971efd96b4a400f33c5"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.45.120 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "ea8826be-960f-5e55-86cc-c5fa0415ee1b",
+          "convention": "utf8_char_offset",
+          "end": 501,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.45.120:block:0",
+          "start": 0
+        },
+        "quote": "The City Council may let any of the service work under this chapter to contract or order the work by force account and issue no-fund warrants to pay the cost thereof in an amount not in excess of the contract or the cost of materials and labor necessary to the service performed. Such warrants may be issued to and be payable over a period of three years from and after January 1st of the year following the certification of the assessment to the County Clerk. (Code 1981 § 35-44. Code 1995 § 126-99.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.45.120:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.45.120 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "e31f4ca9-43b8-516e-bca8-9358553fe7e1",
+          "convention": "utf8_char_offset",
+          "end": 559,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.45.120:block:1",
+          "start": 502
+        },
+        "quote": "Cross References: City Council – Mayor, Chapter 2.15 TMC.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.45.120:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.45.120#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "498762e3093deeb6a349bc9e62efd786c1eaf41fdb3f245e4da0711c67499e7b",
+      "captured_at": "2026-08-28T03:46:38.225622Z",
+      "kind": "rendered_html_capture",
+      "value": "3.45.120.498762e3093d.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:3.45.120@498762e3093deeb6",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:3.45.120",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:3.45.120",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 3.45.120",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/3.45.120"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "3.45.120",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Contract for work and issuance of no-fund warrants."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T03:46:38.225622Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "498762e3093deeb6a349bc9e62efd786c1eaf41fdb3f245e4da0711c67499e7b",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "498762e3093deeb6a349bc9e62efd786c1eaf41fdb3f245e4da0711c67499e7b",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "498762e3093deeb6a349bc9e62efd786c1eaf41fdb3f245e4da0711c67499e7b",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "254675a7c207d68b262fa1e4a3270758f9b25b2b748b9971efd96b4a400f33c5",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "254675a7c207d68b262fa1e4a3270758f9b25b2b748b9971efd96b4a400f33c5",
+        "output_sha256": "5f25e26f1c6aad268c7caf9e0a2fb4e18fad154792e32c94e34430ef155e20e4",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "254675a7c207d68b262fa1e4a3270758f9b25b2b748b9971efd96b4a400f33c5",
+        "output_sha256": "8c9abef9de65a1f96c02223ffa73a7f56fbfe42a117595c7c16df866b8b6f6f3",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/3.45.120",
+    "retained_original": {
+      "byte_count": 28296,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/3.45.120.498762e3093d.html",
+      "retrieved_at": "2026-08-28T03:46:38.225622Z",
+      "sha256": "498762e3093deeb6a349bc9e62efd786c1eaf41fdb3f245e4da0711c67499e7b"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

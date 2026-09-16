@@ -1,0 +1,753 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 9305,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "b0779ecec66fbf381748b8b43bee94363e480e9eb8c904b4d9f2e1364aabd5ba"
+    },
+    "structured": {
+      "block_count": 32,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "c53c202d-df7d-5585-8cb6-918fa4ad49c4",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:section",
+      "sha256": "febb29080f2bf9a87fea5ab2d8d52346032ccee382187a87438a13903ef93b73",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 21071,
+      "char_count": 21048,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "f45c20b53f83bc72ed703d51760bdf911200800f315633b35dbd973a97ce2d26"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "d793045d-25a4-51b4-96aa-0c1bf4fc4bf3",
+          "convention": "utf8_char_offset",
+          "end": 298,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:0",
+          "start": 0
+        },
+        "quote": "(a) No permit for floodplain development shall be granted for new construction, substantial improvements, and other improvements, including the placement of manufactured or mobile homes, within any numbered or unnumbered A, AE, AO, and AH zones, unless the conditions of this section are satisfied.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "5fc95895-e743-5a31-97ec-26c6b6e6eb42",
+          "convention": "utf8_char_offset",
+          "end": 793,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:1",
+          "start": 299
+        },
+        "quote": "(b) All areas identified as unnumbered A zones on the FIRM are subject to inundation of the one percent annual chance or 100-year flood; however, the base flood elevation is not provided. Development within unnumbered A zones is subject to all provisions of this chapter. If flood insurance study data is not available, the Floodplain Administrator shall obtain, review, and reasonably utilize any base flood elevation or floodway data currently available from Federal, State, or other sources.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "de0928ee-5ff5-5c02-b64a-401c0850df27",
+          "convention": "utf8_char_offset",
+          "end": 1644,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:2",
+          "start": 794
+        },
+        "quote": "(c) Until a floodway is designated, no new construction, substantial improvements, or other development that exceeds 5,000 square feet of impervious surface or is part of a larger common plan of development that exceeds 5,000 square feet of impervious surface, including fill, shall be permitted within any unnumbered or numbered A zones or AE zones on the FIRM, unless it is demonstrated that the cumulative effect of the proposed development, when combined with all other existing and anticipated development, will not increase the water surface elevation of the base flood more than one foot at any point within the community, will not exceed the lowest adjacent grade of the lowest impacted habitable structure, and will not exceed the current water surface elevation at the location of a habitable structure currently impacted by the floodplain.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "771e85ce-0f19-59fa-9fc8-8796dcbe999a",
+          "convention": "utf8_char_offset",
+          "end": 2092,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:3",
+          "start": 1645
+        },
+        "quote": "(d) No new construction, substantial improvements or other development, including fill, shall be permitted within a designated zone AH floodplain or levee ponding area designated by the City of Topeka unless it is demonstrated that all fill in the zone AH/ponding area is offset by compensating cut to negate volume losses, with the compensatory storage being frequency/stage based for the two-year, 10-year, 25-year, 50-year, and 100-year events.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "88febadc-5f78-5c55-88f6-2336ea1b0f2c",
+          "convention": "utf8_char_offset",
+          "end": 2688,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:4",
+          "start": 2093
+        },
+        "quote": "(e) No new construction, substantial improvements or other development that exceeds 5,000 square feet of impervious surface or is part of a larger common plan of development that exceeds 5,000 square feet of impervious surface, including fill, shall be permitted within a zone AE floodplain fringe zone on the FIRM, unless it is demonstrated that the water surface elevation will not exceed the lowest adjacent grade of the lowest impacted habitable structure, and will not exceed the current water surface elevation at the location of a habitable structure currently impacted by the floodplain.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "50b8d8fd-bf62-5d8f-8b8d-68befcfc00ff",
+          "convention": "utf8_char_offset",
+          "end": 3018,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:5",
+          "start": 2689
+        },
+        "quote": "(f) No new construction, substantial improvements or other development, including fill, resulting in alternations to a stream that has a drainage area greater than 640 acres (one square mile) shall be permitted without KDA-DWR approval for the stream change, unless the change is specifically exempt from the KDA-DWR regulations.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "1129d23e-b100-5946-8234-da361d39b91c",
+          "convention": "utf8_char_offset",
+          "end": 3200,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:6",
+          "start": 3019
+        },
+        "quote": "(g) All new construction, subdivision proposals, substantial improvements, prefabricated structures, placement of manufactured or mobile homes, and other developments shall require:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "bb2e44e4-4bc6-5edb-9e48-74eb84ccbb29",
+          "convention": "utf8_char_offset",
+          "end": 3388,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:7",
+          "start": 3201
+        },
+        "quote": "(1) Design or adequate anchorage to prevent flotation, collapse, or lateral movement of the structure resulting from hydrodynamic and hydrostatic loads, including the effects of buoyancy;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "493cca47-ebb9-57f4-8654-d30fd025b764",
+          "convention": "utf8_char_offset",
+          "end": 3447,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:8",
+          "start": 3389
+        },
+        "quote": "(2) Construction with materials resistant to flood damage;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "93dbbe47-434b-589e-9a74-5ec19b37cd63",
+          "convention": "utf8_char_offset",
+          "end": 3517,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:9",
+          "start": 3448
+        },
+        "quote": "(3) Utilization of methods and practices that minimize flood damages;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "36bb09ca-e0db-5c52-a9a0-faefee7ae57f",
+          "convention": "utf8_char_offset",
+          "end": 3759,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:10",
+          "start": 3518
+        },
+        "quote": "(4) All electrical, heating, ventilation, plumbing, air-conditioning equipment, and other service facilities be designed and/or located so as to prevent water from entering or accumulating within the components during conditions of flooding;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "351ddcf4-bece-5f6d-ae37-058c716e0132",
+          "convention": "utf8_char_offset",
+          "end": 4062,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:11",
+          "start": 3760
+        },
+        "quote": "(5) New or replacement water supply systems and/or sanitary sewage systems be designed to minimize or eliminate infiltration of flood waters into the systems and discharges from the systems into flood waters, and on-site waste disposal systems be located so as to avoid impairment or contamination; and",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "b2fa8f5b-ef4c-5a9a-8323-72d552ddcba3",
+          "convention": "utf8_char_offset",
+          "end": 4246,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:12",
+          "start": 4063
+        },
+        "quote": "(6) Subdivision proposals and other proposed new development, including manufactured home parks or subdivisions, located within special flood hazard areas are required to assure that:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "6155eecd-940a-5353-8315-e09fb2343391",
+          "convention": "utf8_char_offset",
+          "end": 4324,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:13",
+          "start": 4247
+        },
+        "quote": "(i) All such proposals are consistent with the need to minimize flood damage;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "b8ea29bf-37a9-5e44-b616-f802e8b9d49d",
+          "convention": "utf8_char_offset",
+          "end": 4484,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:14",
+          "start": 4325
+        },
+        "quote": "(ii) All public utilities and facilities, such as sewer, gas, electrical, and water systems, are located and constructed to minimize or eliminate flood damage;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "74c26321-e794-596e-8d52-0060a48546af",
+          "convention": "utf8_char_offset",
+          "end": 4567,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:15",
+          "start": 4485
+        },
+        "quote": "(iii) Adequate drainage is provided so as to reduce exposure to flood hazards; and",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "57eac5a4-efa9-598c-84e2-3a2d08513470",
+          "convention": "utf8_char_offset",
+          "end": 4786,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:16",
+          "start": 4568
+        },
+        "quote": "(iv) All proposals for development, including proposals for manufactured home parks and subdivisions, of greater than five acres or 50 lots, whichever is lesser, include within such proposals base flood elevation data.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "b8dbc83c-b9f4-5a0f-bf77-7c495d1a7c72",
+          "convention": "utf8_char_offset",
+          "end": 5008,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:17",
+          "start": 4787
+        },
+        "quote": "(h) Storage of material or equipment may be allowed if not subject to major damage by floods, if firmly anchored to prevent flotation, or if readily removable from the area within the time available after a flood warning.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "26632235-dc89-579d-8d31-09b02c7cc764",
+          "convention": "utf8_char_offset",
+          "end": 5570,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:18",
+          "start": 5009
+        },
+        "quote": "(i) Accessory Structures. Structures used solely for parking and limited storage purposes, not attached to any other structure on the site, of limited investment value, and not larger than 400 square feet, may be constructed at-grade and wet-floodproofed provided there is no human habitation or occupancy of the structure; the structure is of single-wall design; the accessory structure meets the following floodplain management requirements; and a floodplain development permit has been issued. Wet-floodproofing is only allowed for small low cost structures.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "5619f12f-a08b-5d9f-a084-6b84f57c996a",
+          "convention": "utf8_char_offset",
+          "end": 5764,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:19",
+          "start": 5571
+        },
+        "quote": "Any permit granted for an accessory structure shall be decided individually based on a case-by-case analysis of the building’s unique circumstances. Permits shall meet the following conditions:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "12c35765-58d2-5340-aa9a-b5363e0b6d53",
+          "convention": "utf8_char_offset",
+          "end": 6075,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:20",
+          "start": 5765
+        },
+        "quote": "In order to minimize flood damages during the one percent annual chance flood event, also referred to as the 100-year flood, and the threat to public health and safety, the following conditions shall be required for any permit issued for accessory structures that are constructed at-grade and wet-floodproofed:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "da4d8c46-5471-5cc2-9fab-be7c5802f417",
+          "convention": "utf8_char_offset",
+          "end": 6266,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:21",
+          "start": 6076
+        },
+        "quote": "(1) Use of the accessory structures must be solely for parking and limited storage purposes in any special flood hazard area as identified on the community’s flood insurance rate map (FIRM).",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "b837c6b5-07a2-55cc-ab73-aad68dac2c2b",
+          "convention": "utf8_char_offset",
+          "end": 6599,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:22",
+          "start": 6267
+        },
+        "quote": "(2) For any new or substantially damaged accessory structures, the exterior and interior building components and elements (i.e., foundation, wall framing, exterior and interior finishes, flooring, etc.) below the base flood elevation must be built with flood-resistant materials in accordance with subsection (g)(2) of this section.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "1de1c662-b0e2-5e41-aadc-6b98fe39f41e",
+          "convention": "utf8_char_offset",
+          "end": 6958,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:23",
+          "start": 6600
+        },
+        "quote": "(3) The accessory structures must be adequately anchored to prevent flotation, collapse, or lateral movement of the structure in accordance with subsection (g)(1) of this section. All of the building’s structural components must be capable of resisting specific flood-related forces including hydrostatic, buoyancy, and hydrodynamic and debris impact forces.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "e5970e9d-0d6b-5fbf-9e79-58d207d26072",
+          "convention": "utf8_char_offset",
+          "end": 7265,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:24",
+          "start": 6959
+        },
+        "quote": "(4) Any mechanical, electrical, or other utility equipment must be located above the base flood elevation or floodproofed so that they are contained within a watertight, floodproofed enclosure that is capable of resisting damage during flood conditions in accordance with subsection (g)(4) of this section.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "34f46d0d-1191-5a6d-a569-dcaa6f43cf55",
+          "convention": "utf8_char_offset",
+          "end": 7603,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:25",
+          "start": 7266
+        },
+        "quote": "(5) The accessory structures must meet all NFIP opening requirements. The NFIP requires that enclosure or foundation walls, subject to the one percent annual chance flood event, also referred to as the 100-year flood, contain openings that will permit the automatic entry and exit of flood waters in accordance with TMC 17.30.190(a)(3) .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 26",
+        "locator": {
+          "block_index": 26,
+          "component_id": "34215623-9631-561b-950d-8c8879202c97",
+          "convention": "utf8_char_offset",
+          "end": 7884,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:26",
+          "start": 7604
+        },
+        "quote": "(6) The accessory structures must comply with the floodplain management floodway encroachment provisions of TMC 17.30.220(b) . No permits may be issued for accessory structures within any designated floodway, if any increase in flood levels would result during the 100-year flood.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 27",
+        "locator": {
+          "block_index": 27,
+          "component_id": "ae3067dd-b896-56a2-9298-1de4ab3e99c7",
+          "convention": "utf8_char_offset",
+          "end": 7969,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:27",
+          "start": 7885
+        },
+        "quote": "(7) Equipment, machinery, or other contents must be protected from any flood damage.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 28",
+        "locator": {
+          "block_index": 28,
+          "component_id": "4ab174c3-c4b5-5a09-8e88-572e1c84dbb7",
+          "convention": "utf8_char_offset",
+          "end": 8135,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:28",
+          "start": 7970
+        },
+        "quote": "(8) No disaster relief assistance under any program administered by any Federal agency shall be paid for any repair or restoration costs of the accessory structures.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:28#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 29",
+        "locator": {
+          "block_index": 29,
+          "component_id": "a951a806-7a7a-54af-802b-52b30379f60c",
+          "convention": "utf8_char_offset",
+          "end": 8527,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:29",
+          "start": 8136
+        },
+        "quote": "(9) Wet-floodproofing construction techniques must be reviewed and approved by the Floodplain Administrator or designee. The Floodplain Administrator or designee may request approval by a registered professional engineer or architect prior to the issuance of any floodplain development permit for construction. Cost for any required professional certification shall be paid by the developer.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:29#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 30",
+        "locator": {
+          "block_index": 30,
+          "component_id": "bc17b03b-ed6c-59c0-a760-433826909577",
+          "convention": "utf8_char_offset",
+          "end": 8657,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:30",
+          "start": 8528
+        },
+        "quote": "(j) Hazardous Materials. All hazardous material storage and handling sites shall be located out of the special flood hazard area.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:30#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.30.180 block 31",
+        "locator": {
+          "block_index": 31,
+          "component_id": "99065015-ff20-5000-9b93-6e261c940366",
+          "convention": "utf8_char_offset",
+          "end": 9304,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.30.180:block:31",
+          "start": 8658
+        },
+        "quote": "(k) Cumulative Improvement. A structure may be improved (remodeled or enlarged) without conforming to current requirements for elevation so long as the cumulative value of all work done does not exceed 50 percent of the structure’s current market value. If the cumulative value of the improvement exceeds 50 percent of the structure’s current market value, the structure must be brought into compliance with TMC 17.30.190 which requires elevation of residential structures to one foot above the base flood elevation or the elevation/floodproofing of nonresidential structures to one foot above the base flood elevation. (Ord. 20425 § 9, 6-20-23.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180:block:31#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20425",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 9302,
+          "start": 9279
+        },
+        "quote": "Ord. 20425 § 9, 6-20-23",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.30.180#history:20425",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "e332ed9aea9023a3589e54df6c3fedf43cf11e2f3021c5d4ddad151b7d1ed1e3",
+      "captured_at": "2026-08-28T04:46:00.461603Z",
+      "kind": "rendered_html_capture",
+      "value": "17.30.180.e332ed9aea90.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:17.30.180@e332ed9aea9023a3",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:17.30.180",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:17.30.180",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 17.30.180",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/17.30.180"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:17.30.180#history:20425",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "6-20-23"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "17.30.180",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:17.30.180#history:20425",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20425"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:17.30.180#history:20425",
+      "value": "adopted"
+    },
+    "title": "General standards."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:46:00.461603Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "e332ed9aea9023a3589e54df6c3fedf43cf11e2f3021c5d4ddad151b7d1ed1e3",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "e332ed9aea9023a3589e54df6c3fedf43cf11e2f3021c5d4ddad151b7d1ed1e3",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "e332ed9aea9023a3589e54df6c3fedf43cf11e2f3021c5d4ddad151b7d1ed1e3",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "f45c20b53f83bc72ed703d51760bdf911200800f315633b35dbd973a97ce2d26",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "f45c20b53f83bc72ed703d51760bdf911200800f315633b35dbd973a97ce2d26",
+        "output_sha256": "b0779ecec66fbf381748b8b43bee94363e480e9eb8c904b4d9f2e1364aabd5ba",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "f45c20b53f83bc72ed703d51760bdf911200800f315633b35dbd973a97ce2d26",
+        "output_sha256": "febb29080f2bf9a87fea5ab2d8d52346032ccee382187a87438a13903ef93b73",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/17.30.180",
+    "retained_original": {
+      "byte_count": 44110,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/17.30.180.e332ed9aea90.html",
+      "retrieved_at": "2026-08-28T04:46:00.461603Z",
+      "sha256": "e332ed9aea9023a3589e54df6c3fedf43cf11e2f3021c5d4ddad151b7d1ed1e3"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

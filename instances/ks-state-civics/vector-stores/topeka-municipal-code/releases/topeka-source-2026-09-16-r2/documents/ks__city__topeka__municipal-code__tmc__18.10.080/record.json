@@ -1,0 +1,449 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 3615,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "0cc997ef918894ce2c9c260f9a05be2d354e61089fa032e91dcea472f3db3307"
+    },
+    "structured": {
+      "block_count": 13,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "267c1425-6317-5590-8381-28093db05c2e",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.080:section",
+      "sha256": "42f845bd39d4f3aee2b95e48467d411004cbec932a66c63c23a9ce740110249c",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 9250,
+      "char_count": 9223,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "fb36c91f4ae45a1e8581898f9adfae5bd3007f6fd7851b31e9794845c4d0dc25"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.080 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "cec7add8-76f3-57f2-a1d8-67f366cd0473",
+          "convention": "utf8_char_offset",
+          "end": 35,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.080:block:0",
+          "start": 0
+        },
+        "quote": "(a) Sign Area – Freestanding Signs.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.080 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "7cdfe7c0-fe8b-5f78-b271-8d4a6bc4c2c2",
+          "convention": "utf8_char_offset",
+          "end": 468,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.080:block:1",
+          "start": 36
+        },
+        "quote": "(1) Generally. For a sign with one sign face, sign area is computed by means of the smallest square or rectangle that will encompass the extreme limits of the writing, representation, emblem, or other display, together with any panel or material forming an integral part of the background of the display against which it is placed, other than structural supports, but including structural supports for temporary or incidental signs.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.080 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "6ac4bc2c-ef30-5cfb-b7e5-9f9973f83d27",
+          "convention": "utf8_char_offset",
+          "end": 1000,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.080:block:2",
+          "start": 469
+        },
+        "quote": "(2) Computation of Area of Multi-Faced Signs. The sign area for a sign with more than one face is computed by adding together the area, measured as provided in this subsection (a), of all sign faces visible from any one point. When two sign faces are placed back to back, so that both faces cannot be viewed from any point at the same time, and when the sign faces are part of the same sign structure and are not more than 42 inches apart, the sign area is computed by measuring one of the faces as provided in this subsection (a).",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.080 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "5ea29c99-c1f5-5a0f-8bf8-c2380cc7ead0",
+          "convention": "utf8_char_offset",
+          "end": 1032,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.080:block:3",
+          "start": 1001
+        },
+        "quote": "(b) Sign Area – Attached Signs.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.080 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "441d42be-e2bc-5f3c-bae2-bf02ce9389bd",
+          "convention": "utf8_char_offset",
+          "end": 1255,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.080:block:4",
+          "start": 1033
+        },
+        "quote": "(1) Where sign size is prescribed as a percentage of wall area, the “wall area” is a continuous portion of a building facade below the roofline or major architectural feature as viewed by a person approaching the building.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.080 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "c3187f84-6cd3-5b12-8896-fe9b61d8eaa5",
+          "convention": "utf8_char_offset",
+          "end": 1560,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.080:block:5",
+          "start": 1256
+        },
+        "quote": "(2) Where sign size is prescribed as a factor of building frontage, the “building frontage” is the width of the exterior wall on which the sign is located as viewed by a person approaching the building. For the purpose of measurement the wall used as building frontage need not be on the same wall plane.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.080 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "15d42422-2884-5a7c-9c18-231d24214820",
+          "convention": "utf8_char_offset",
+          "end": 1782,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.080:block:6",
+          "start": 1561
+        },
+        "quote": "(3) For an attached sign which is framed, outlined, painted or otherwise prepared and intended to provide a background for a sign display, the area and dimensions include the entire portion within the background or frame.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.080 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "8c67d868-fddb-56d5-8b6d-360956ca38f6",
+          "convention": "utf8_char_offset",
+          "end": 2176,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.080:block:7",
+          "start": 1783
+        },
+        "quote": "(4) For an attached sign comprised of individual letters, figures or elements on a wall or similar surface of the building or structure with no distinct mounting surface (such as a board or plastic face) other than the wall, the area is calculated by applying the smallest regular geometric shape possible (rectangle, circle, trapezoid, triangle, etc.) around all letters, figures or elements.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.080 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "5c050168-2ca3-5dae-aa18-d7d7592e4719",
+          "convention": "utf8_char_offset",
+          "end": 2472,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.080:block:8",
+          "start": 2177
+        },
+        "quote": "(5) When separate elements are organized to form a single sign, but are separated by open space, the sign area and dimensions shall be calculated by determining the geometric form, or combination of forms, which comprises all of the display areas, including the space between different elements.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.080 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "fb51d7c7-639b-5514-b28d-4b51069a22b0",
+          "convention": "utf8_char_offset",
+          "end": 2732,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.080:block:9",
+          "start": 2473
+        },
+        "quote": "(6) The sign area does not include any supporting framework, bracing, artistic elements not part of the sign copy, or decorative fence or wall when the fence or wall otherwise meets zoning ordinance regulations and is clearly incidental to the display itself.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.080 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "118da162-31f6-547e-b68f-6c928e398155",
+          "convention": "utf8_char_offset",
+          "end": 3358,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.080:block:10",
+          "start": 2733
+        },
+        "quote": "(c) Sign Height. The height of a freestanding sign means the vertical distance from the top of the highest part of a sign, whether the highest part be the sign copy or support structure on which the sign is placed, to the adjoining sidewalk, improved surface, or ground surface within a three-foot horizontal distance of the base of the sign. In the event the surface is sloped the average of the height of the adjoining surface shall be used. For signs with artistic elements exceeding the allowed height, the Planning and Development Director may determine if artistic elements shall be excluded when measuring sign height.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.080 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "662febac-ae7e-5b8d-8527-39011209397d",
+          "convention": "utf8_char_offset",
+          "end": 3587,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.080:block:11",
+          "start": 3359
+        },
+        "quote": "(d) Vertical Clearance. Vertical clearance for detached and projecting signs is measured as the smallest vertical distance between finished grade and the lowest point of the sign, including any framework or other embellishments.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.080 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "5ceb131c-763f-5e9d-acd6-363b7897e632",
+          "convention": "utf8_char_offset",
+          "end": 3614,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.080:block:12",
+          "start": 3588
+        },
+        "quote": "(Ord. 20207 § 9, 9-10-19.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20207",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 3612,
+          "start": 3589
+        },
+        "quote": "Ord. 20207 § 9, 9-10-19",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.080#history:20207",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "8322d5ce8f3be8efe86e876ec4887f7f899bddbaba812a3b284e8fa5dfb089f2",
+      "captured_at": "2026-08-28T04:46:34.353967Z",
+      "kind": "rendered_html_capture",
+      "value": "18.10.080.8322d5ce8f3b.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:18.10.080@8322d5ce8f3be8ef",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:18.10.080",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:18.10.080",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 18.10.080",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/18.10.080"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.10.080#history:20207",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "9-10-19"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "18.10.080",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.10.080#history:20207",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20207"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.10.080#history:20207",
+      "value": "adopted"
+    },
+    "title": "Sign area and height measurements."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:46:34.353967Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "8322d5ce8f3be8efe86e876ec4887f7f899bddbaba812a3b284e8fa5dfb089f2",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "8322d5ce8f3be8efe86e876ec4887f7f899bddbaba812a3b284e8fa5dfb089f2",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "8322d5ce8f3be8efe86e876ec4887f7f899bddbaba812a3b284e8fa5dfb089f2",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "fb36c91f4ae45a1e8581898f9adfae5bd3007f6fd7851b31e9794845c4d0dc25",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "fb36c91f4ae45a1e8581898f9adfae5bd3007f6fd7851b31e9794845c4d0dc25",
+        "output_sha256": "0cc997ef918894ce2c9c260f9a05be2d354e61089fa032e91dcea472f3db3307",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "fb36c91f4ae45a1e8581898f9adfae5bd3007f6fd7851b31e9794845c4d0dc25",
+        "output_sha256": "42f845bd39d4f3aee2b95e48467d411004cbec932a66c63c23a9ce740110249c",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/18.10.080",
+    "retained_original": {
+      "byte_count": 34794,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/18.10.080.8322d5ce8f3b.html",
+      "retrieved_at": "2026-08-28T04:46:34.353967Z",
+      "sha256": "8322d5ce8f3be8efe86e876ec4887f7f899bddbaba812a3b284e8fa5dfb089f2"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

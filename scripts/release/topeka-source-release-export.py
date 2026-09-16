@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections import Counter
 import re
 import subprocess
 import sys
@@ -30,6 +31,7 @@ from typing import Any, Iterable
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from jurisdiction_release_contract import (  # noqa: E402
+    CODE_ROOT,
     CONTRACT_VERSION,
     COLLECTIONS_BY_ID,
     COLLECTIONS_BY_SLUG,
@@ -91,19 +93,34 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
         return [json.loads(line) for line in handle if line.strip()]
 
 
-def git_commit() -> tuple[str, bool]:
+# Paths whose contents are pipeline output rather than the code that produced it.
+_ARTIFACT_PREFIXES = ("instances/", ".release/", ".tmp/")
+
+
+def git_commit() -> tuple[str, bool, list[str]]:
+    """(commit, code is dirty, sample of dirty code paths).
+
+    Only *code* dirtiness breaks reproduction. A refresh writes its discovery,
+    extraction and destination artifacts into the tree before the export stage
+    runs, so a whole-tree dirty check reports every full pipeline run as
+    unreproducible and the signal stops meaning anything.
+    """
     try:
         commit = subprocess.run(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True
+            ["git", "rev-parse", "HEAD"], cwd=CODE_ROOT, capture_output=True, text=True, check=True
         ).stdout.strip()
-        dirty = bool(
-            subprocess.run(
-                ["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True, check=True
-            ).stdout.strip()
-        )
+        porcelain = subprocess.run(
+            ["git", "status", "--porcelain"], cwd=CODE_ROOT, capture_output=True, text=True, check=True
+        ).stdout.splitlines()
     except (subprocess.CalledProcessError, FileNotFoundError):
-        return ("unknown", True)
-    return (commit, dirty)
+        return ("unknown", True, ["git unavailable"])
+
+    dirty_code: list[str] = []
+    for line in porcelain:
+        path = line[3:].strip().strip('"')
+        if path and not path.startswith(_ARTIFACT_PREFIXES):
+            dirty_code.append(path)
+    return (commit, bool(dirty_code), sorted(dirty_code)[:10])
 
 
 def normalize_reading_text(raw: str) -> tuple[str, list[dict[str, str]]]:
@@ -330,14 +347,23 @@ def build_tmc_section(citation: str, corpus: Path, *, include_original: bool) ->
     history = section.get("ordinance_history") or []
     relationships: list[dict[str, Any]] = []
     dates: list[dict[str, Any]] = []
+    # A section can print several history rows for one ordinance -- an adoption
+    # line and a section-level amendment line, say. They are distinct evidence
+    # and each needs its own reference, so a repeat gets a disambiguating
+    # suffix. The first occurrence keeps the plain id, which is what existing
+    # released records already carry.
+    seen_history: Counter[str] = Counter()
+    linked_targets: set[str] = set()
     for entry in history:
         number = str(entry.get("ordinance") or "").strip()
         if not number:
             continue
         ordinance_spec = COLLECTIONS_BY_SLUG["ordinances"]
         raw = str(entry.get("raw") or "")
+        seen_history[number] += 1
+        occurrence = seen_history[number]
+        ref_id = f"{doc_id}#history:{number}" if occurrence == 1 else f"{doc_id}#history:{number}:{occurrence}"
         span = char_span(normalized, raw)
-        ref_id = f"{doc_id}#history:{number}"
         references.append({
             "ref_id": ref_id,
             "artifact": "normalized_text",
@@ -349,11 +375,25 @@ def build_tmc_section(citation: str, corpus: Path, *, include_original: bool) ->
             "quote": raw if span else None,
             "label": f"publisher ordinance-history row for Ordinance {number}",
         })
+        target_id = source_document_id(ordinance_spec, number)
+        if target_id in linked_targets:
+            # One relationship per target; the extra history rows stay as
+            # evidence rather than becoming duplicate claims about the same link.
+            if entry.get("date"):
+                dates.append({
+                    "kind": "ordinance_history_date",
+                    "value": str(entry["date"]),
+                    "precision": "day",
+                    "evidence_ref": ref_id,
+                    "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+                })
+            continue
+        linked_targets.add(target_id)
         relationships.append({
             "predicate": "amended_by",
             "target": {
                 "kind": "source_document_id",
-                "value": source_document_id(ordinance_spec, number),
+                "value": target_id,
                 "collection_id": ordinance_spec.collection_id,
             },
             "resolved": True,
@@ -1378,7 +1418,7 @@ def write_bundle(
     released_state: Path | None = None,
 ) -> dict[str, Any]:
     release_schema, document_schema = load_release_schemas()
-    commit, dirty = git_commit()
+    commit, dirty, dirty_paths = git_commit()
     output_dir.mkdir(parents=True, exist_ok=True)
 
     previous: dict[str, Any] | None = None
@@ -1523,6 +1563,7 @@ def write_bundle(
                 "repository": "exai_vector_store",
                 "commit": commit,
                 "dirty_worktree": dirty,
+                "dirty_code_paths": dirty_paths,
                 "exporter": EXPORTER_PATH,
                 "exporter_sha256": sha256_file(Path(__file__)),
                 "command": command,

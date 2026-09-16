@@ -1,0 +1,481 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 2736,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "ecaa877f2af38dd35b4405ee1eb9efd1ddbc9e328462c98bd2f1e7be3d9b00a9"
+    },
+    "structured": {
+      "block_count": 15,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 13,
+      "path": "structured.json",
+      "root_component_id": "555980b3-4747-5479-8214-d6aff9ef5b52",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:section",
+      "sha256": "b0c8f6ad29e5ceb0d083a88af9b2f69b2f5e83e569c53d91b5b74b33817868b5",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 7441,
+      "char_count": 7302,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "0b4736b075d9dcb2131e02b5eb2875cdf443630e1e585fb534548e1d5d1eaa6b"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "7a5cf58c-e94a-5dec-960d-a10eececae94",
+          "convention": "utf8_char_offset",
+          "end": 52,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:0",
+          "start": 0
+        },
+        "quote": "The following words used in this chapter shall mean:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "479422af-1d3a-5eee-aa51-68086c4712dc",
+          "convention": "utf8_char_offset",
+          "end": 133,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:1",
+          "start": 53
+        },
+        "quote": "“Day” means a 24-hour period that commences at 12:00 a.m. and ends at 11:59 p.m.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "c938566f-f78a-5a30-9693-40f4abd2fe39",
+          "convention": "utf8_char_offset",
+          "end": 727,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:2",
+          "start": 134
+        },
+        "quote": "“Farmers’ market” means a common facility or area where producers or growers gather on a regular, recurring basis to sell fresh fruits, vegetables, meats and other farm products directly to consumers. “Farmers’ market” includes, but is not limited to, short-term festivals, roadside stands or other agricultural product sales or other locations or any market, sales event or other related event, series of events or venue that advertises, promotes or uses the term “farmers’ market” or any derivative thereof, as a part of the name of such market, sales event, or other related event or venue.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "a7bcacc2-6a96-5b0d-bfea-834eeba7e398",
+          "convention": "utf8_char_offset",
+          "end": 996,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:3",
+          "start": 728
+        },
+        "quote": "“Flea market” means a market, indoors or outdoors, where new or used items are sold from individual sellers and where each seller operates independently from other sellers. Items sold include, but are not limited to, household items, antiques, decorations, and crafts.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "bbead598-e6f7-5612-8266-78bcdf29bb70",
+          "convention": "utf8_char_offset",
+          "end": 1248,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:4",
+          "start": 997
+        },
+        "quote": "“Flea market promoter” means a person who solicits, invites or permits another person to come upon property under the promoter’s control for the purpose of occupying individual stands from which personal property is bought, sold, traded, or exchanged.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "7e2821eb-152d-5adc-bf87-2bed74a982da",
+          "convention": "utf8_char_offset",
+          "end": 1343,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:5",
+          "start": 1249
+        },
+        "quote": "“Flea market seller” means a person selling items or offering items for sale at a flea market.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "c505d99b-bbca-5b32-b57a-f44c2b991954",
+          "convention": "utf8_char_offset",
+          "end": 1448,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:6",
+          "start": 1344
+        },
+        "quote": "“Merchandise” means any goods, food, food products, or a product of any kind that can be bought or sold.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "4f10d91f-8a91-5ae4-9dde-1832751f87d5",
+          "convention": "utf8_char_offset",
+          "end": 1586,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:7",
+          "start": 1449
+        },
+        "quote": "“Mobile food unit” means a self-contained vehicle, trailer, cart or other conveyance from which food and/or beverage is offered for sale.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "76375fc5-2257-5d81-8593-cbbb562253aa",
+          "convention": "utf8_char_offset",
+          "end": 1742,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:8",
+          "start": 1587
+        },
+        "quote": "“Mobile food vendor” means any person, other than a transient vendor or sidewalk vendor, that offers food and/or beverage for sale from a mobile food unit.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "aa507472-2814-594e-9a1f-345b9952a7d3",
+          "convention": "utf8_char_offset",
+          "end": 1914,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:9",
+          "start": 1743
+        },
+        "quote": "“Peddler” means any person who goes upon the premises of a private residence, not having been invited by the occupant, carrying merchandise and offering the same for sale.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "4392edbd-6f02-5f61-8995-2d59454d3697",
+          "convention": "utf8_char_offset",
+          "end": 2032,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:10",
+          "start": 1915
+        },
+        "quote": "“Person” means any individual, association, corporation partnership, limited liability company or other legal entity.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "52c5b6e3-2dc1-5b72-89f4-3eb43b3d27c9",
+          "convention": "utf8_char_offset",
+          "end": 2174,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:11",
+          "start": 2033
+        },
+        "quote": "“Sidewalk vendor” means any person, other than a mobile food vendor, who engages in the business of selling merchandise on a public sidewalk.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "994fb40a-948d-54f8-a37c-24d433b0fc92",
+          "convention": "utf8_char_offset",
+          "end": 2445,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:12",
+          "start": 2175
+        },
+        "quote": "“Solicitor” means any person who goes upon the premises of a private residence, not having been invited by the occupant, for the purpose of taking or attempting to take orders for the sale of merchandise for future delivery or for services to be performed in the future.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "fe64be38-7bb8-5dbb-9748-a3c07357e53a",
+          "convention": "utf8_char_offset",
+          "end": 2679,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:13",
+          "start": 2446
+        },
+        "quote": "“Transient vendor” means any person, other than a mobile food vendor, flea market promoter or flea market seller, who engages in a temporary business of selling merchandise and operates on private property. (Ord. 20039 § 1, 12-6-16.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.115.010 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "43bab973-030a-5efc-990a-1c284a79d00b",
+          "convention": "utf8_char_offset",
+          "end": 2735,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.115.010:block:14",
+          "start": 2680
+        },
+        "quote": "Cross References: Definitions generally, TMC 1.10.020 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20039",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2677,
+          "start": 2654
+        },
+        "quote": "Ord. 20039 § 1, 12-6-16",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.115.010#history:20039",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "0cc01b5f66b230ad752a6bf3fe6d627e80dbbefec7d204982d3cee2e31fa0d01",
+      "captured_at": "2026-08-28T03:58:39.967584Z",
+      "kind": "rendered_html_capture",
+      "value": "5.115.010.0cc01b5f66b2.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:5.115.010@0cc01b5f66b230ad",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:5.115.010",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:5.115.010",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 5.115.010",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/5.115.010"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.115.010#history:20039",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-6-16"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "5.115.010",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.115.010#history:20039",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20039"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.115.010#history:20039",
+      "value": "adopted"
+    },
+    "title": "Definitions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T03:58:39.967584Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "0cc01b5f66b230ad752a6bf3fe6d627e80dbbefec7d204982d3cee2e31fa0d01",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "0cc01b5f66b230ad752a6bf3fe6d627e80dbbefec7d204982d3cee2e31fa0d01",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "0cc01b5f66b230ad752a6bf3fe6d627e80dbbefec7d204982d3cee2e31fa0d01",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "0b4736b075d9dcb2131e02b5eb2875cdf443630e1e585fb534548e1d5d1eaa6b",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "0b4736b075d9dcb2131e02b5eb2875cdf443630e1e585fb534548e1d5d1eaa6b",
+        "output_sha256": "ecaa877f2af38dd35b4405ee1eb9efd1ddbc9e328462c98bd2f1e7be3d9b00a9",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "0b4736b075d9dcb2131e02b5eb2875cdf443630e1e585fb534548e1d5d1eaa6b",
+        "output_sha256": "b0c8f6ad29e5ceb0d083a88af9b2f69b2f5e83e569c53d91b5b74b33817868b5",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/5.115.010",
+    "retained_original": {
+      "byte_count": 31214,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/5.115.010.0cc01b5f66b2.html",
+      "retrieved_at": "2026-08-28T03:58:39.967584Z",
+      "sha256": "0cc01b5f66b230ad752a6bf3fe6d627e80dbbefec7d204982d3cee2e31fa0d01"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

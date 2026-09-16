@@ -1,0 +1,545 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 3070,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "18450fa30008e203212969004525e93e1fbde4cc65d48b517b20b716f1090ad4"
+    },
+    "structured": {
+      "block_count": 19,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "4819e70d-e36c-5061-9b20-1b775263dc9b",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:section",
+      "sha256": "340e0e62e21686c849ce0fadb408cdf7c977de525602ee303cfda3a2a9874c10",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 7851,
+      "char_count": 7846,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "8317c377dafd8d5202d08b83ec5670b99095db02bfca4f9ac565704fed72e37d"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "59ae2441-979e-5bd6-aecc-52bf29a32dd2",
+          "convention": "utf8_char_offset",
+          "end": 172,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:0",
+          "start": 0
+        },
+        "quote": "(a) Application for a sidewalk cafe permit may be made to the Development Services Director or his or her designee. The application shall contain the following information:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "bad3f3a6-24d1-59bb-bff7-bb7b92bd61df",
+          "convention": "utf8_char_offset",
+          "end": 220,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:1",
+          "start": 173
+        },
+        "quote": "(1) The proposed location of the sidewalk cafe.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "d96d0837-14df-5d37-9bfd-0e3be0d51648",
+          "convention": "utf8_char_offset",
+          "end": 302,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:2",
+          "start": 221
+        },
+        "quote": "(2) Written consent of the building owner if different than the restaurant owner.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "7f5ec03d-b69f-5d6f-895a-140e986e24cc",
+          "convention": "utf8_char_offset",
+          "end": 562,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:3",
+          "start": 303
+        },
+        "quote": "(3) A diagram illustrating the placement of tables and chairs and walkway area, location of entrances and exits to the restaurant with dimensions; the diagram should also include the location, size, and material or style of any trash receptacles for the area.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "a121003f-9370-557d-a314-1db7c195a395",
+          "convention": "utf8_char_offset",
+          "end": 635,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:4",
+          "start": 563
+        },
+        "quote": "(4) Certificate of public liability insurance in the amount of $500,000.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "17149fea-7db7-59f0-a028-01229cfbc66d",
+          "convention": "utf8_char_offset",
+          "end": 676,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:5",
+          "start": 636
+        },
+        "quote": "(5) Payment of the annual fee of $56.00.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "6da0a9b1-be74-5f75-966e-99fc01e89a74",
+          "convention": "utf8_char_offset",
+          "end": 728,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:6",
+          "start": 677
+        },
+        "quote": "(6) Executed sidewalk cafe agreement with the City.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "6ffa392f-35cb-5189-98f4-b7cb4512f511",
+          "convention": "utf8_char_offset",
+          "end": 902,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:7",
+          "start": 729
+        },
+        "quote": "(b) Application for a sidewalk fence permit may be made to the Development Services Director or his or her designee. The application shall contain the following information:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "8736ecf7-ad35-5eba-a424-b010eb7aa237",
+          "convention": "utf8_char_offset",
+          "end": 951,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:8",
+          "start": 903
+        },
+        "quote": "(1) The proposed location of the sidewalk fence.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "d1e6fe3b-db02-58dc-9aa0-98f9c968e0ca",
+          "convention": "utf8_char_offset",
+          "end": 1145,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:9",
+          "start": 952
+        },
+        "quote": "(2) A plan or elevation drawing of the fence which shall include all dimensions and materials. The fence as designed and constructed shall not pose a threat to the safety of persons or animals.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "d38ef8c4-dc2b-5dc5-9854-30a5dae5d0ee",
+          "convention": "utf8_char_offset",
+          "end": 1227,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:10",
+          "start": 1146
+        },
+        "quote": "(3) Written consent of the building owner if different than the restaurant owner.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "865181bf-68ec-526a-98ac-eda27b812611",
+          "convention": "utf8_char_offset",
+          "end": 1533,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:11",
+          "start": 1228
+        },
+        "quote": "(4) A diagram illustrating the placement of fence showing six feet of pedestrian walkway unobstructed by structures including but not limited to the following: the fence, signs, parking meters, planters, trees, utility poles, benches; and location of entrances and exits to the restaurant with dimensions.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "c003cacf-6064-53a8-af0f-2f339f592708",
+          "convention": "utf8_char_offset",
+          "end": 1608,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:12",
+          "start": 1534
+        },
+        "quote": "(5) Certification of public liability insurance in the amount of $500,000.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "7e716ca7-656b-5848-927f-fa889a52f9b3",
+          "convention": "utf8_char_offset",
+          "end": 1649,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:13",
+          "start": 1609
+        },
+        "quote": "(6) Payment of the annual fee of $56.00.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "69598047-1072-5e2e-81d3-e9d6f3d60a65",
+          "convention": "utf8_char_offset",
+          "end": 1702,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:14",
+          "start": 1650
+        },
+        "quote": "(7) Executed sidewalk fence agreement with the City.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "9af411c9-0c81-5485-bc8a-8144d3531eb0",
+          "convention": "utf8_char_offset",
+          "end": 2450,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:15",
+          "start": 1703
+        },
+        "quote": "(c) Applications shall be reviewed by the City Public Works and Planning departments. The Public Works and Planning departments shall forward it to other appropriate City departments for review if necessary. If the Public Works Director or his or her designee and Planning Director or his or her designee finds from the information submitted that the applicant meets the necessary requirements and that operation of a sidewalk cafe or placement of sidewalk fence in the proposed location will not unreasonably interfere with public travel, he or she shall so indicate and the Development Services Director or his or her designee shall issue the applicable permit to the applicant. Such permit shall be valid for one year from the date of issuance.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "fcbfa0fc-01fe-5d20-9b30-2b07e626dd3c",
+          "convention": "utf8_char_offset",
+          "end": 2603,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:16",
+          "start": 2451
+        },
+        "quote": "(d) All sidewalk fences and cafes shall conform with the sidewalk fence and cafe design criteria promulgated by the Public Works and Planning directors.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "d46e6075-cff2-5860-93e8-629625fee59d",
+          "convention": "utf8_char_offset",
+          "end": 2959,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:17",
+          "start": 2604
+        },
+        "quote": "(e) Appeals from the decision of the Public Works Director and Planning Director, or their designees, shall be made in writing to the City Manager within 10 business days of the denial of the sidewalk fence or sidewalk cafe application. The City Manager shall have 30 days to render a decision on the appeal. (Ord. 19086 § 2, 5-13-08. Code 1995 § 130-72.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.10.100 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "8591b44d-325f-524b-830a-a2f5a76f27be",
+          "convention": "utf8_char_offset",
+          "end": 3069,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.10.100:block:18",
+          "start": 2960
+        },
+        "quote": "Cross References: Planning and Development Department, TMC 2.20.080 ; Public Works Department, TMC 2.20.100 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19086",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2937,
+          "start": 2914
+        },
+        "quote": "Ord. 19086 § 2, 5-13-08",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.10.100#history:19086",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "8535e39c5cf1e3059fc2e9e2f8dc46d478d050372902438c929f4d8362b5ffe4",
+      "captured_at": "2026-08-28T04:20:42.891324Z",
+      "kind": "rendered_html_capture",
+      "value": "12.10.100.8535e39c5cf1.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:12.10.100@8535e39c5cf1e305",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:12.10.100",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:12.10.100",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 12.10.100",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/12.10.100"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.10.100#history:19086",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "5-13-08"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "12.10.100",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.10.100#history:19086",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19086"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.10.100#history:19086",
+      "value": "adopted"
+    },
+    "title": "Permit required."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:20:42.891324Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "8535e39c5cf1e3059fc2e9e2f8dc46d478d050372902438c929f4d8362b5ffe4",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "8535e39c5cf1e3059fc2e9e2f8dc46d478d050372902438c929f4d8362b5ffe4",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "8535e39c5cf1e3059fc2e9e2f8dc46d478d050372902438c929f4d8362b5ffe4",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "8317c377dafd8d5202d08b83ec5670b99095db02bfca4f9ac565704fed72e37d",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "8317c377dafd8d5202d08b83ec5670b99095db02bfca4f9ac565704fed72e37d",
+        "output_sha256": "18450fa30008e203212969004525e93e1fbde4cc65d48b517b20b716f1090ad4",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "8317c377dafd8d5202d08b83ec5670b99095db02bfca4f9ac565704fed72e37d",
+        "output_sha256": "340e0e62e21686c849ce0fadb408cdf7c977de525602ee303cfda3a2a9874c10",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/12.10.100",
+    "retained_original": {
+      "byte_count": 35080,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/12.10.100.8535e39c5cf1.html",
+      "retrieved_at": "2026-08-28T04:20:42.891324Z",
+      "sha256": "8535e39c5cf1e3059fc2e9e2f8dc46d478d050372902438c929f4d8362b5ffe4"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

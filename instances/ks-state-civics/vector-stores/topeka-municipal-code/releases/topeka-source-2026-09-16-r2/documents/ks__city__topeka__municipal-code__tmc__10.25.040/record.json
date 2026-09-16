@@ -1,0 +1,377 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 2787,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "8716fd0f140c231a64272079322a331b691e047c5bc9f9b1d2c94fc40306853b"
+    },
+    "structured": {
+      "block_count": 9,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "9f3091cc-3c3c-536a-8ac7-4610a992c141",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.040:section",
+      "sha256": "370ed99f2db15917ffd86a700b48d8c50d09cf1bdba0743fe55e87e0990b122d",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 6751,
+      "char_count": 6742,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "af3e9bb4098ad9a147cf6e70b3cb6b5ba750bd10ce05a3126167357f38e0a266"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.040 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "233a03e0-18ce-5bc1-b877-ea57ee252f14",
+          "convention": "utf8_char_offset",
+          "end": 326,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.040:block:0",
+          "start": 0
+        },
+        "quote": "(a) The City adopts the provisions of K.S.A. 8-1101 and 8-1102 and amendments thereto, with regard to impounding, storage, notification to owners and lienholders of record concerning the seizure and disposition of abandoned vehicles. Such notice is to be mailed before the close of the first full working day after the towing.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.040:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.040 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "0ffec71c-3071-5e01-ab42-659d9853428f",
+          "convention": "utf8_char_offset",
+          "end": 391,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.040:block:1",
+          "start": 327
+        },
+        "quote": "(b) Once a vehicle has been impounded, the owner/lienholder may:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.040:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.040 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "1d8a0f73-4950-5812-bf94-5be95bf9f15f",
+          "convention": "utf8_char_offset",
+          "end": 486,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.040:block:2",
+          "start": 392
+        },
+        "quote": "(1) Immediately pay the accrued towing fee and storage charges, and thereby regain possession;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.040:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.040 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "2ca57e00-19c7-5763-b49a-72069a5dc99e",
+          "convention": "utf8_char_offset",
+          "end": 607,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.040:block:3",
+          "start": 487
+        },
+        "quote": "(2) Sign a signature bond in the amount of the accrued towing fee and storage charges, and thereby regain possession; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.040:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.040 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "f8564628-38b2-5955-88ba-b1a978d84bb6",
+          "convention": "utf8_char_offset",
+          "end": 1269,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.040:block:4",
+          "start": 608
+        },
+        "quote": "(3) Refuse the options in subsections (b)(1) and (b)(2) of this section, and demand a hearing on the validity of the towing, to be held before the Municipal Court judge before the second full working day following such demand. Before the owner/lienholder can regain possession, however, the Municipal Court judge must determine whether or not there was probable cause for the towing. If there was probable cause, the judge will thereby order the owner/lienholder to comply with subsection (b)(1) or (b)(2) of this section before possession may be regained. If no probable cause for the towing can be shown, the vehicle shall be returned to the owner/lienholder.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.040:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.040 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "b5dbadae-dee0-5c2a-b6c7-0afe8c456efd",
+          "convention": "utf8_char_offset",
+          "end": 1782,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.040:block:5",
+          "start": 1270
+        },
+        "quote": "No vehicle shall be returned until the owner/lienholder provides sufficient documentation to establish right to possession. After the vehicle is returned to the owner/lienholder pursuant to this subsection, trial on the traffic violation which led to the actual towing shall then be scheduled in accordance with the normal Municipal Court schedule. Nothing in this section shall prohibit the owner/lienholder from entering a plea of guilty, paying all fines and charges incurred and thus avoiding going to trial.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.040:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.040 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "c598c0eb-58c1-5b77-a9ee-4236bb876e9f",
+          "convention": "utf8_char_offset",
+          "end": 2308,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.040:block:6",
+          "start": 1783
+        },
+        "quote": "(c) Whenever a traffic violation is dismissed, or an owner/lienholder is acquitted, or it is otherwise determined that the towing of a vehicle was improper, and the owner/lienholder has already paid the towing fee and storage charges pursuant to subsection (b) of this section, such fees and charges shall be automatically refunded by the City. Refunds may be ordered by the Municipal Court, and the owner/lienholder shall not be required to resort to the procedure of submitting a claim for the City Council’s consideration.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.040:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.040 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "607303a5-b4e8-5a6c-86e9-c3e4f7b944cb",
+          "convention": "utf8_char_offset",
+          "end": 2736,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.040:block:7",
+          "start": 2309
+        },
+        "quote": "(d) The right of the owner/lienholder, in addition to being set forth in the certified letter as provided for in subsection (a) of this section, shall be made known by the posting of prominent signs in English and Spanish at the Police Department impoundment lot and also at the police headquarters where the owner/lienholder may inquire as to the status of such vehicle. (Ord. 16436 § 1(43-405), 3-17-92. Code 1995 § 142-269.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.040:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.040 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "4f6b52de-9de9-5ef1-bcd9-82f013c2ecc1",
+          "convention": "utf8_char_offset",
+          "end": 2786,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.040:block:8",
+          "start": 2737
+        },
+        "quote": "Cross References: Municipal Judge, TMC 2.20.060 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.040:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.040#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 16436",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2703,
+          "start": 2682
+        },
+        "quote": "Ord. 16436 § 1(43-405",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.040#history:16436",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "71e9d5f26a8604b6caf8bd7e0a9fdc120bc8ac18f512c77426953eff356dba4a",
+      "captured_at": "2026-08-28T04:14:48.542026Z",
+      "kind": "rendered_html_capture",
+      "value": "10.25.040.71e9d5f26a86.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.25.040@71e9d5f26a8604b6",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.25.040",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.25.040",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.25.040",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.25.040"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.25.040",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.25.040#history:16436",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:16436"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.25.040#history:16436",
+      "value": "adopted"
+    },
+    "title": "Notification of impoundment and procedure for claiming impounded vehicles."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:14:48.542026Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "71e9d5f26a8604b6caf8bd7e0a9fdc120bc8ac18f512c77426953eff356dba4a",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "71e9d5f26a8604b6caf8bd7e0a9fdc120bc8ac18f512c77426953eff356dba4a",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "71e9d5f26a8604b6caf8bd7e0a9fdc120bc8ac18f512c77426953eff356dba4a",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "af3e9bb4098ad9a147cf6e70b3cb6b5ba750bd10ce05a3126167357f38e0a266",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "af3e9bb4098ad9a147cf6e70b3cb6b5ba750bd10ce05a3126167357f38e0a266",
+        "output_sha256": "8716fd0f140c231a64272079322a331b691e047c5bc9f9b1d2c94fc40306853b",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "af3e9bb4098ad9a147cf6e70b3cb6b5ba750bd10ce05a3126167357f38e0a266",
+        "output_sha256": "370ed99f2db15917ffd86a700b48d8c50d09cf1bdba0743fe55e87e0990b122d",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.25.040",
+    "retained_original": {
+      "byte_count": 31940,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.25.040.71e9d5f26a86.html",
+      "retrieved_at": "2026-08-28T04:14:48.542026Z",
+      "sha256": "71e9d5f26a8604b6caf8bd7e0a9fdc120bc8ac18f512c77426953eff356dba4a"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

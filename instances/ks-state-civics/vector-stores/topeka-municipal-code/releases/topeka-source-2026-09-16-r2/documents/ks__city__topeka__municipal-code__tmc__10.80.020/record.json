@@ -1,0 +1,625 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1147,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "7339568907ba6c4e2c86e01688753a7d416a5dc45850c545146b66a48c0a4b37"
+    },
+    "structured": {
+      "block_count": 24,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "879cd982-d21e-5b5f-8574-cb8987593f54",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:section",
+      "sha256": "73f7a327b802ba02d3284cf19a8da31870fa0f50b405f2e228bc6e9744ed1db8",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 3950,
+      "char_count": 3947,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "ffe55850ead48ffefbfecb298ccf1904c6bb2cd28c02fd62f4f03ac85585ee2f"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "78e057bf-02c3-5379-8bda-813ca64f8683",
+          "convention": "utf8_char_offset",
+          "end": 249,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:0",
+          "start": 0
+        },
+        "quote": "Due to the high number of reported crashes and the prevalence of distracted driving as a contributing factor in these crashes, the following intersections are hereby designated as having restricted pedestrian activity as specified in TMC 10.80.030 :",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "77b6c54c-a3f3-5014-9389-db2b3b936000",
+          "convention": "utf8_char_offset",
+          "end": 286,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:1",
+          "start": 250
+        },
+        "quote": "S 5th Street and SW Topeka Boulevard",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "d14b3795-5965-52be-9bc4-8175c80b140b",
+          "convention": "utf8_char_offset",
+          "end": 323,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:2",
+          "start": 287
+        },
+        "quote": "SW 12th Street and SW Jackson Street",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "f934132f-305e-5722-9606-4a89f6aa5f89",
+          "convention": "utf8_char_offset",
+          "end": 356,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:3",
+          "start": 324
+        },
+        "quote": "SW 6th Avenue and Orchard Street",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "d426bda2-300a-57c1-8c80-935463c02b3e",
+          "convention": "utf8_char_offset",
+          "end": 394,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:4",
+          "start": 357
+        },
+        "quote": "SW 8th Avenue and SW Topeka Boulevard",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "d28ffe2b-9211-512c-9c46-bd688cd36fe2",
+          "convention": "utf8_char_offset",
+          "end": 433,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:5",
+          "start": 395
+        },
+        "quote": "SW 10th Avenue and SW Topeka Boulevard",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "2a690711-ced1-5716-9840-f57ee226f154",
+          "convention": "utf8_char_offset",
+          "end": 473,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:6",
+          "start": 434
+        },
+        "quote": "SW Huntoon Street and SW Gage Boulevard",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "0171df3b-ae29-53e6-ba54-0a650802df10",
+          "convention": "utf8_char_offset",
+          "end": 509,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:7",
+          "start": 474
+        },
+        "quote": "SW 21st Street and SW Fairlawn Road",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "f7c06623-62ab-548f-8345-3e77c201cce6",
+          "convention": "utf8_char_offset",
+          "end": 547,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:8",
+          "start": 510
+        },
+        "quote": "SW 6th Avenue and SW Topeka Boulevard",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "f63cd69d-962c-53ef-8d01-81a4c9db1e19",
+          "convention": "utf8_char_offset",
+          "end": 581,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:9",
+          "start": 548
+        },
+        "quote": "SW 10th Avenue and SW Lane Street",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "b747d903-06e5-59de-b7ee-0bf770c103a7",
+          "convention": "utf8_char_offset",
+          "end": 616,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:10",
+          "start": 582
+        },
+        "quote": "SE 21st Street and SE Adams Street",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "47a3ec43-1338-5449-bd52-6159c097b579",
+          "convention": "utf8_char_offset",
+          "end": 652,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:11",
+          "start": 617
+        },
+        "quote": "SW 29th Street and SW Fairlawn Road",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "8eeea068-7c2f-545c-bf26-3547826189a5",
+          "convention": "utf8_char_offset",
+          "end": 689,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:12",
+          "start": 653
+        },
+        "quote": "SW 21st Street and SW Gage Boulevard",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "bdd3acd1-679a-57da-95e9-161af2261585",
+          "convention": "utf8_char_offset",
+          "end": 725,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:13",
+          "start": 690
+        },
+        "quote": "SW 6th Avenue and SW Gage Boulevard",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "1ec1b051-519a-5514-86b9-3b71cb4b33c6",
+          "convention": "utf8_char_offset",
+          "end": 762,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:14",
+          "start": 726
+        },
+        "quote": "SW 21st Street and SW Wanamaker Road",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "6472f12d-f957-5a00-adc4-5e2c3aef2acf",
+          "convention": "utf8_char_offset",
+          "end": 799,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:15",
+          "start": 763
+        },
+        "quote": "SW 17th Street and SW Wanamaker Road",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "9c186e22-4e8e-56b5-97e8-93509a3bff80",
+          "convention": "utf8_char_offset",
+          "end": 838,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:16",
+          "start": 800
+        },
+        "quote": "SW Huntoon Street and SW Fairlawn Road",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "2bc470ac-2551-541e-98cb-23941dbfa5eb",
+          "convention": "utf8_char_offset",
+          "end": 873,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:17",
+          "start": 839
+        },
+        "quote": "SE 15th Street and SE Adams Street",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "da4b6322-d6c5-5b83-9deb-636c82215aec",
+          "convention": "utf8_char_offset",
+          "end": 910,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:18",
+          "start": 874
+        },
+        "quote": "SW 29th Street and SW Gage Boulevard",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "0ac6b1a1-41c7-553e-9974-fb9b75340656",
+          "convention": "utf8_char_offset",
+          "end": 949,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:19",
+          "start": 911
+        },
+        "quote": "SW 29th Street and SW Topeka Boulevard",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "e81b1144-7a40-510f-9eae-41c28ef1e3b3",
+          "convention": "utf8_char_offset",
+          "end": 987,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:20",
+          "start": 950
+        },
+        "quote": "SW 21st Street and SW Washburn Avenue",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "ff2b8aa2-a5f0-5bff-ad8b-0e633a578c77",
+          "convention": "utf8_char_offset",
+          "end": 1024,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:21",
+          "start": 988
+        },
+        "quote": "SW 29th Street and SW Wanamaker Road",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "2433db06-fb3d-578e-b64a-3079b26390cf",
+          "convention": "utf8_char_offset",
+          "end": 1063,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:22",
+          "start": 1025
+        },
+        "quote": "SW 21st Street and SW Topeka Boulevard",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.80.020 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "ededeade-baff-5a69-906c-6bca911fe25a",
+          "convention": "utf8_char_offset",
+          "end": 1146,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.80.020:block:23",
+          "start": 1064
+        },
+        "quote": "SW 17th Street and SW Westover Road and SW Oakley Street (Ord. 20234 § 2, 1-7-20.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20234",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1144,
+          "start": 1122
+        },
+        "quote": "Ord. 20234 § 2, 1-7-20",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.80.020#history:20234",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "b472333b5c9c0f87df61e6eca6ff742d54ea0cb79d3b4495e6098499fea07fbd",
+      "captured_at": "2026-08-28T04:19:53.484070Z",
+      "kind": "rendered_html_capture",
+      "value": "10.80.020.b472333b5c9c.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.80.020@b472333b5c9c0f87",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.80.020",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.80.020",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.80.020",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.80.020"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.80.020#history:20234",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "1-7-20"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.80.020",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.80.020#history:20234",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20234"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.80.020#history:20234",
+      "value": "adopted"
+    },
+    "title": "Designated intersections."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:19:53.484070Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "b472333b5c9c0f87df61e6eca6ff742d54ea0cb79d3b4495e6098499fea07fbd",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "b472333b5c9c0f87df61e6eca6ff742d54ea0cb79d3b4495e6098499fea07fbd",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "b472333b5c9c0f87df61e6eca6ff742d54ea0cb79d3b4495e6098499fea07fbd",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "ffe55850ead48ffefbfecb298ccf1904c6bb2cd28c02fd62f4f03ac85585ee2f",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "ffe55850ead48ffefbfecb298ccf1904c6bb2cd28c02fd62f4f03ac85585ee2f",
+        "output_sha256": "7339568907ba6c4e2c86e01688753a7d416a5dc45850c545146b66a48c0a4b37",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "ffe55850ead48ffefbfecb298ccf1904c6bb2cd28c02fd62f4f03ac85585ee2f",
+        "output_sha256": "73f7a327b802ba02d3284cf19a8da31870fa0f50b405f2e228bc6e9744ed1db8",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.80.020",
+    "retained_original": {
+      "byte_count": 27855,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.80.020.b472333b5c9c.html",
+      "retrieved_at": "2026-08-28T04:19:53.484070Z",
+      "sha256": "b472333b5c9c0f87df61e6eca6ff742d54ea0cb79d3b4495e6098499fea07fbd"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

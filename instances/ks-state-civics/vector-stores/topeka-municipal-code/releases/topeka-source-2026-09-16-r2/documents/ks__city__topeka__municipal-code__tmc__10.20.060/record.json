@@ -1,0 +1,353 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1103,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "59954d2955c36efcfcb7af0b283e543e53996c33f6f46979467bc0ac743eed4c"
+    },
+    "structured": {
+      "block_count": 7,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "7c73c7aa-6a95-524d-ac24-4044711c27f2",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.20.060:section",
+      "sha256": "ad75ecc44450a1bad8c1244950e87f78ca54c962bd6e8e6a56e22470eecad11d",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 3237,
+      "char_count": 3228,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "e7756c6096de31b099448dcc2b2111add66614298942b3f334935c459a5ab6a2"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.20.060 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "3100bffb-5d82-5efb-8c19-fbb45d35890c",
+          "convention": "utf8_char_offset",
+          "end": 286,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.20.060:block:0",
+          "start": 0
+        },
+        "quote": "(a) Except when a special hazard or road conditions exist that require lower speed for compliance with Standard Traffic Ordinance Section 32, no person shall drive a vehicle on a roadway, street, alley or highway at a speed greater than the posted speed limit for that area or district.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.060:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.20.060 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "b0d03bbb-0e34-5f25-b867-0986eabe34ab",
+          "convention": "utf8_char_offset",
+          "end": 359,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.20.060:block:1",
+          "start": 287
+        },
+        "quote": "(b) If no speed limit is posted, the following speed limits shall apply:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.060:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.20.060 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "8e22edbb-fea6-504f-bff4-b6f2e7c1a552",
+          "convention": "utf8_char_offset",
+          "end": 408,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.20.060:block:2",
+          "start": 360
+        },
+        "quote": "(1) Thirty miles per hour in any urban district.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.060:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.20.060 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "28fc88a2-b54c-580d-baa2-2422cd611aa5",
+          "convention": "utf8_char_offset",
+          "end": 447,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.20.060:block:3",
+          "start": 409
+        },
+        "quote": "(2) Twenty miles per hour in any park.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.060:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.20.060 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "461b85e3-3587-5d49-b4fb-b4fadd5a781a",
+          "convention": "utf8_char_offset",
+          "end": 531,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.20.060:block:4",
+          "start": 448
+        },
+        "quote": "(3) Fifteen miles per hour in any alley in both business and residential districts.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.060:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.20.060 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "650cf068-cf48-5a29-ba24-ff1a829ff008",
+          "convention": "utf8_char_offset",
+          "end": 955,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.20.060:block:5",
+          "start": 532
+        },
+        "quote": "(c) It is hereby determined and declared that the maximum safe speed limit upon private property used by the public for purposes of vehicular travel by permission of the owner is 12 miles per hour; provided, however, that the provisions of this section are not to be construed to prohibit the owner from requiring other or different speed limits. (Ord. 18814 § 1, 2-13-07. Code 1981 §§ 43-250, 43-251. Code 1995 § 142-187.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.060:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.20.060 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "fd15755d-61c1-5492-ae4a-bc5c5f549184",
+          "convention": "utf8_char_offset",
+          "end": 1102,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.20.060:block:6",
+          "start": 956
+        },
+        "quote": "State Law References: Authority to fix speed limits, K.S.A. 8-2002(a)(5) , (a)(10) , (a)(15) ; speed restrictions generally, K.S.A. 8-1557 et seq.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.060:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.060#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 18814",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 903,
+          "start": 880
+        },
+        "quote": "Ord. 18814 § 1, 2-13-07",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.20.060#history:18814",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "b9ba7a1726af6f1b528553e9336a4da9796a43710e05602dcc9a21a979c4a528",
+      "captured_at": "2026-08-28T04:13:50.570897Z",
+      "kind": "rendered_html_capture",
+      "value": "10.20.060.b9ba7a1726af.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.20.060@b9ba7a1726af6f1b",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.20.060",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.20.060",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.20.060",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.20.060"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.20.060#history:18814",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "2-13-07"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.20.060",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.20.060#history:18814",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:18814"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.20.060#history:18814",
+      "value": "adopted"
+    },
+    "title": "Speed limits."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:13:50.570897Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "b9ba7a1726af6f1b528553e9336a4da9796a43710e05602dcc9a21a979c4a528",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "b9ba7a1726af6f1b528553e9336a4da9796a43710e05602dcc9a21a979c4a528",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "b9ba7a1726af6f1b528553e9336a4da9796a43710e05602dcc9a21a979c4a528",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "e7756c6096de31b099448dcc2b2111add66614298942b3f334935c459a5ab6a2",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "e7756c6096de31b099448dcc2b2111add66614298942b3f334935c459a5ab6a2",
+        "output_sha256": "59954d2955c36efcfcb7af0b283e543e53996c33f6f46979467bc0ac743eed4c",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "e7756c6096de31b099448dcc2b2111add66614298942b3f334935c459a5ab6a2",
+        "output_sha256": "ad75ecc44450a1bad8c1244950e87f78ca54c962bd6e8e6a56e22470eecad11d",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.20.060",
+    "retained_original": {
+      "byte_count": 30271,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.20.060.b9ba7a1726af.html",
+      "retrieved_at": "2026-08-28T04:13:50.570897Z",
+      "sha256": "b9ba7a1726af6f1b528553e9336a4da9796a43710e05602dcc9a21a979c4a528"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

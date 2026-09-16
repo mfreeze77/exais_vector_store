@@ -1,0 +1,1425 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 2013,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "a49557f703861a0e479b5ab6cb195d022b8f7c340c4f0bd10c1eaeeb107297aa"
+    },
+    "structured": {
+      "block_count": 74,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "d1846f01-a917-5928-a10b-2821e806d3a2",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:section",
+      "sha256": "fb1dc7823e8b37cb6e8d71c2768569aefd128a4f638c4407d721addcbf044612",
+      "table_count": 4
+    },
+    "verbatim": {
+      "byte_count": 8729,
+      "char_count": 8710,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "2ae6c82139d3361e171a6f032ee9ab6a4e128a3a5a0943997f10ee531a362d66"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "cbb7d0bb-29f8-5ab4-bc01-3bf963db8452",
+          "convention": "utf8_char_offset",
+          "end": 162,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:0",
+          "start": 0
+        },
+        "quote": "The following are hereby established as the monthly retail water service rates, effective on the dates specified, which the consumer shall pay for water services:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "350f3889-dc6b-506d-9378-222be7853344",
+          "convention": "utf8_char_offset",
+          "end": 554,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:1",
+          "start": 163
+        },
+        "quote": "(a) Base Charge. A customer who has a City service line connected to the City water main shall pay a monthly base charge that is based upon the size of the water meter. This charge shall apply regardless of whether water has passed from the City water main through the City service line during the billing period. The rates for properties inside the City and outside the City are as follows:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "a023285a-f603-5c78-b2e4-f35861e0edc6",
+          "convention": "utf8_char_offset",
+          "end": 693,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:2",
+          "start": 555
+        },
+        "quote": "| Jan. 1, 2026\nBelow 1\" | $18.22\n1\" | $21.94\n1 1/2\" | $40.17\n2\" | $64.30\n3\" | $120.58\n4\" | $200.91\n6\" | $401.84\n8\" | $642.92\n10\" | $924.19",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "c8e0420e-424f-590b-a82d-19bfc2a3bb64",
+          "convention": "utf8_char_offset",
+          "end": 728,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:3",
+          "start": 694
+        },
+        "quote": "Base Charge – Property Inside City",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "9c6513ce-8dac-51c8-b3d4-19e5dfdd5fa3",
+          "convention": "utf8_char_offset",
+          "end": 741,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:4",
+          "start": 729
+        },
+        "quote": "Jan. 1, 2026",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "642518f4-8f41-5494-be52-120c9e5025cc",
+          "convention": "utf8_char_offset",
+          "end": 750,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:5",
+          "start": 742
+        },
+        "quote": "Below 1\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "c741a3d2-fcb8-51e8-b257-580894e1e738",
+          "convention": "utf8_char_offset",
+          "end": 757,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:6",
+          "start": 751
+        },
+        "quote": "$18.22",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "1fd656f4-6a34-5130-95d9-d3b60a04850c",
+          "convention": "utf8_char_offset",
+          "end": 760,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:7",
+          "start": 758
+        },
+        "quote": "1\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "fa4530c1-ccf4-5df2-a89a-2e64b0ad231a",
+          "convention": "utf8_char_offset",
+          "end": 767,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:8",
+          "start": 761
+        },
+        "quote": "$21.94",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "a6a36909-d712-542c-8c66-927cfe58cc47",
+          "convention": "utf8_char_offset",
+          "end": 774,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:9",
+          "start": 768
+        },
+        "quote": "1 1/2\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "4bf0b3d3-5c80-50aa-a69a-2fc797728580",
+          "convention": "utf8_char_offset",
+          "end": 781,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:10",
+          "start": 775
+        },
+        "quote": "$40.17",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "fe483ba6-edee-5422-9611-d778ab7660cb",
+          "convention": "utf8_char_offset",
+          "end": 784,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:11",
+          "start": 782
+        },
+        "quote": "2\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "72b20413-b19f-57b8-9f41-5a42ed373bc2",
+          "convention": "utf8_char_offset",
+          "end": 791,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:12",
+          "start": 785
+        },
+        "quote": "$64.30",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "7ac0b3ea-cde6-5b2d-9fa5-552da4132d9b",
+          "convention": "utf8_char_offset",
+          "end": 794,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:13",
+          "start": 792
+        },
+        "quote": "3\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "7b35f514-4f3d-5ea9-aae3-3960b203a00e",
+          "convention": "utf8_char_offset",
+          "end": 802,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:14",
+          "start": 795
+        },
+        "quote": "$120.58",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "3f51f477-d0da-500f-809a-a199ffaeda85",
+          "convention": "utf8_char_offset",
+          "end": 805,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:15",
+          "start": 803
+        },
+        "quote": "4\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "ef0a6c7a-e8ac-5e6d-b42e-afedcb3a36e4",
+          "convention": "utf8_char_offset",
+          "end": 813,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:16",
+          "start": 806
+        },
+        "quote": "$200.91",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "c48999a1-54e3-5bed-b6ee-b7e033d6c12b",
+          "convention": "utf8_char_offset",
+          "end": 816,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:17",
+          "start": 814
+        },
+        "quote": "6\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "7bf2ca62-7a49-5c6d-9184-47c57a504943",
+          "convention": "utf8_char_offset",
+          "end": 824,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:18",
+          "start": 817
+        },
+        "quote": "$401.84",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "627d76d2-1918-5157-adb3-0339924b0052",
+          "convention": "utf8_char_offset",
+          "end": 827,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:19",
+          "start": 825
+        },
+        "quote": "8\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "1050204c-43d9-5fdc-b623-bae2e9289d53",
+          "convention": "utf8_char_offset",
+          "end": 835,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:20",
+          "start": 828
+        },
+        "quote": "$642.92",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "f81ce103-6535-5c8e-a8c3-19dd9d7f7bc9",
+          "convention": "utf8_char_offset",
+          "end": 839,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:21",
+          "start": 836
+        },
+        "quote": "10\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "737595e7-1083-5478-8180-be27d7fbb690",
+          "convention": "utf8_char_offset",
+          "end": 847,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:22",
+          "start": 840
+        },
+        "quote": "$924.19",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "194ebc98-dc4f-5e3d-9e66-3a70af8f735f",
+          "convention": "utf8_char_offset",
+          "end": 983,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:23",
+          "start": 848
+        },
+        "quote": "| Jan. 1, 2026\n1\" and below | $38.40\n1 1/2\" | $70.30\n2\" | $112.53\n3\" | $211.02\n4\" | $351.59\n6\" | $703.22\n8\" | $1,125.11\n10\" | $1,617.33",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "3d232cec-235e-513d-8cd9-139fa8c1ddd8",
+          "convention": "utf8_char_offset",
+          "end": 1019,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:24",
+          "start": 984
+        },
+        "quote": "Base Charge – Property Outside City",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "44443c6a-6363-5392-9a2d-1620884375e2",
+          "convention": "utf8_char_offset",
+          "end": 1032,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:25",
+          "start": 1020
+        },
+        "quote": "Jan. 1, 2026",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 26",
+        "locator": {
+          "block_index": 26,
+          "component_id": "44c6f1e1-5c8d-5c0b-8cad-1051bf64276b",
+          "convention": "utf8_char_offset",
+          "end": 1045,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:26",
+          "start": 1033
+        },
+        "quote": "1\" and below",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 27",
+        "locator": {
+          "block_index": 27,
+          "component_id": "763a685c-3bd9-50c3-af8b-188f01e1fcc1",
+          "convention": "utf8_char_offset",
+          "end": 1052,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:27",
+          "start": 1046
+        },
+        "quote": "$38.40",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 28",
+        "locator": {
+          "block_index": 28,
+          "component_id": "788b45c1-0848-5930-9822-26a5d23d41c7",
+          "convention": "utf8_char_offset",
+          "end": 1059,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:28",
+          "start": 1053
+        },
+        "quote": "1 1/2\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:28#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 29",
+        "locator": {
+          "block_index": 29,
+          "component_id": "a4781372-fa1b-56fc-a734-d20e15a6a5e6",
+          "convention": "utf8_char_offset",
+          "end": 1066,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:29",
+          "start": 1060
+        },
+        "quote": "$70.30",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:29#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 30",
+        "locator": {
+          "block_index": 30,
+          "component_id": "1fa50ef7-6fd8-5baa-96ce-f7b2360ba29a",
+          "convention": "utf8_char_offset",
+          "end": 1069,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:30",
+          "start": 1067
+        },
+        "quote": "2\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:30#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 31",
+        "locator": {
+          "block_index": 31,
+          "component_id": "3d6e87d8-1165-52f0-a47a-f758569c41d3",
+          "convention": "utf8_char_offset",
+          "end": 1077,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:31",
+          "start": 1070
+        },
+        "quote": "$112.53",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:31#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 32",
+        "locator": {
+          "block_index": 32,
+          "component_id": "50c7aa2e-452c-56b2-8349-e89ceaa41ae3",
+          "convention": "utf8_char_offset",
+          "end": 1080,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:32",
+          "start": 1078
+        },
+        "quote": "3\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:32#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 33",
+        "locator": {
+          "block_index": 33,
+          "component_id": "d799eff1-7adb-5c66-8d9a-d9203facef34",
+          "convention": "utf8_char_offset",
+          "end": 1088,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:33",
+          "start": 1081
+        },
+        "quote": "$211.02",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:33#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 34",
+        "locator": {
+          "block_index": 34,
+          "component_id": "e0daba24-33ee-5749-865b-f0198727ca56",
+          "convention": "utf8_char_offset",
+          "end": 1091,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:34",
+          "start": 1089
+        },
+        "quote": "4\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:34#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 35",
+        "locator": {
+          "block_index": 35,
+          "component_id": "713a78cb-8fef-5dc3-891a-991d0099eebb",
+          "convention": "utf8_char_offset",
+          "end": 1099,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:35",
+          "start": 1092
+        },
+        "quote": "$351.59",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:35#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 36",
+        "locator": {
+          "block_index": 36,
+          "component_id": "d2b6c2c8-8bac-51dc-86b9-b616cf244135",
+          "convention": "utf8_char_offset",
+          "end": 1102,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:36",
+          "start": 1100
+        },
+        "quote": "6\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:36#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 37",
+        "locator": {
+          "block_index": 37,
+          "component_id": "51dfdb18-31a8-509b-a035-5eee2f68dc79",
+          "convention": "utf8_char_offset",
+          "end": 1110,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:37",
+          "start": 1103
+        },
+        "quote": "$703.22",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:37#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 38",
+        "locator": {
+          "block_index": 38,
+          "component_id": "9665c444-f538-542a-aab1-f4d7a2672032",
+          "convention": "utf8_char_offset",
+          "end": 1113,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:38",
+          "start": 1111
+        },
+        "quote": "8\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:38#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 39",
+        "locator": {
+          "block_index": 39,
+          "component_id": "0e8df7dd-7df1-5ea3-9682-aac527be7dc2",
+          "convention": "utf8_char_offset",
+          "end": 1123,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:39",
+          "start": 1114
+        },
+        "quote": "$1,125.11",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:39#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 40",
+        "locator": {
+          "block_index": 40,
+          "component_id": "75312bb6-b323-5b9f-8061-088120a0bfdf",
+          "convention": "utf8_char_offset",
+          "end": 1127,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:40",
+          "start": 1124
+        },
+        "quote": "10\"",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:40#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 41",
+        "locator": {
+          "block_index": 41,
+          "component_id": "f25305bd-c593-52ff-aeb8-1ddef3426526",
+          "convention": "utf8_char_offset",
+          "end": 1137,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:41",
+          "start": 1128
+        },
+        "quote": "$1,617.33",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:41#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 42",
+        "locator": {
+          "block_index": 42,
+          "component_id": "9c40c64a-9b22-5d8e-89e7-9c4a1732e0b5",
+          "convention": "utf8_char_offset",
+          "end": 1346,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:42",
+          "start": 1138
+        },
+        "quote": "(b) Water Volume Charge. The customer shall pay on a monthly basis for the water passing from the City water main to the property. The rates for properties inside the City and outside the City are as follows:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:42#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 43",
+        "locator": {
+          "block_index": 43,
+          "component_id": "8b6209bf-99c4-5080-93f3-bbf02b821cb1",
+          "convention": "utf8_char_offset",
+          "end": 1482,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:43",
+          "start": 1347
+        },
+        "quote": "| Jan. 1, 2026\nSingle-Family | $7.75\nMultifamily | $6.28\nCommercial | $5.99\nIndustrial | $5.35\nIndustrial II | $5.04\nIrrigation | $9.31",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:43#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 44",
+        "locator": {
+          "block_index": 44,
+          "component_id": "34001981-87c2-5743-86e7-2c14fdd6cb5e",
+          "convention": "utf8_char_offset",
+          "end": 1539,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:44",
+          "start": 1483
+        },
+        "quote": "Volume Charge (per 1,000 Gallons) – Property Inside City",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:44#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 45",
+        "locator": {
+          "block_index": 45,
+          "component_id": "6c268c52-eff5-5ee9-bd1f-b1593423be44",
+          "convention": "utf8_char_offset",
+          "end": 1552,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:45",
+          "start": 1540
+        },
+        "quote": "Jan. 1, 2026",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:45#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 46",
+        "locator": {
+          "block_index": 46,
+          "component_id": "b7533559-b073-5ae7-835d-58492a8a78a0",
+          "convention": "utf8_char_offset",
+          "end": 1566,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:46",
+          "start": 1553
+        },
+        "quote": "Single-Family",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:46#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 47",
+        "locator": {
+          "block_index": 47,
+          "component_id": "6084189b-a756-5b46-bad5-503be33d4836",
+          "convention": "utf8_char_offset",
+          "end": 1572,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:47",
+          "start": 1567
+        },
+        "quote": "$7.75",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:47#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 48",
+        "locator": {
+          "block_index": 48,
+          "component_id": "039dd063-200e-5eca-a416-f97ac871ced3",
+          "convention": "utf8_char_offset",
+          "end": 1584,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:48",
+          "start": 1573
+        },
+        "quote": "Multifamily",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:48#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 49",
+        "locator": {
+          "block_index": 49,
+          "component_id": "00d3eb6f-0038-58bd-9e42-9e0743bcdc94",
+          "convention": "utf8_char_offset",
+          "end": 1590,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:49",
+          "start": 1585
+        },
+        "quote": "$6.28",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:49#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 50",
+        "locator": {
+          "block_index": 50,
+          "component_id": "1fdc09ec-2689-54cf-a191-90c213df13d3",
+          "convention": "utf8_char_offset",
+          "end": 1601,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:50",
+          "start": 1591
+        },
+        "quote": "Commercial",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:50#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 51",
+        "locator": {
+          "block_index": 51,
+          "component_id": "6180d5f7-a184-5d0f-ac6a-df91bbbbc390",
+          "convention": "utf8_char_offset",
+          "end": 1607,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:51",
+          "start": 1602
+        },
+        "quote": "$5.99",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:51#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 52",
+        "locator": {
+          "block_index": 52,
+          "component_id": "1eb7f5f6-c88b-5816-8ed3-10b09fd40b79",
+          "convention": "utf8_char_offset",
+          "end": 1618,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:52",
+          "start": 1608
+        },
+        "quote": "Industrial",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:52#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 53",
+        "locator": {
+          "block_index": 53,
+          "component_id": "bd1d5147-1054-5045-acea-0f3ae0fae2a8",
+          "convention": "utf8_char_offset",
+          "end": 1624,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:53",
+          "start": 1619
+        },
+        "quote": "$5.35",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:53#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 54",
+        "locator": {
+          "block_index": 54,
+          "component_id": "aa466fe4-6738-5939-9bbe-05b1f9ba8c9d",
+          "convention": "utf8_char_offset",
+          "end": 1638,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:54",
+          "start": 1625
+        },
+        "quote": "Industrial II",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:54#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 55",
+        "locator": {
+          "block_index": 55,
+          "component_id": "67de6d01-9459-53b9-99fa-851cee1a5a25",
+          "convention": "utf8_char_offset",
+          "end": 1644,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:55",
+          "start": 1639
+        },
+        "quote": "$5.04",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:55#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 56",
+        "locator": {
+          "block_index": 56,
+          "component_id": "573b76bf-0fff-552a-ae78-abdce586a129",
+          "convention": "utf8_char_offset",
+          "end": 1655,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:56",
+          "start": 1645
+        },
+        "quote": "Irrigation",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:56#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 57",
+        "locator": {
+          "block_index": 57,
+          "component_id": "7e19de8f-7ecf-5ed7-86fc-3a9331b0b508",
+          "convention": "utf8_char_offset",
+          "end": 1661,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:57",
+          "start": 1656
+        },
+        "quote": "$9.31",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:57#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 58",
+        "locator": {
+          "block_index": 58,
+          "component_id": "0fc88c0c-ad16-50f8-bfc6-f320bac977f2",
+          "convention": "utf8_char_offset",
+          "end": 1801,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:58",
+          "start": 1662
+        },
+        "quote": "| Jan. 1, 2026\nSingle-Family | $13.56\nMultifamily | $10.99\nCommercial | $10.48\nIndustrial | $9.36\nIndustrial II | $8.82\nIrrigation | $16.29",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:58#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 59",
+        "locator": {
+          "block_index": 59,
+          "component_id": "57e0ad03-e3ff-5019-9631-5bf8d9eba623",
+          "convention": "utf8_char_offset",
+          "end": 1859,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:59",
+          "start": 1802
+        },
+        "quote": "Volume Charge (per 1,000 Gallons) – Property Outside City",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:59#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 60",
+        "locator": {
+          "block_index": 60,
+          "component_id": "69c1f8b8-b5f4-5d51-8332-81bc6412abba",
+          "convention": "utf8_char_offset",
+          "end": 1872,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:60",
+          "start": 1860
+        },
+        "quote": "Jan. 1, 2026",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:60#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 61",
+        "locator": {
+          "block_index": 61,
+          "component_id": "5a1cded5-f941-5596-9ecf-9d6d9ef6c791",
+          "convention": "utf8_char_offset",
+          "end": 1886,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:61",
+          "start": 1873
+        },
+        "quote": "Single-Family",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:61#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 62",
+        "locator": {
+          "block_index": 62,
+          "component_id": "20fb5518-5f97-518b-93eb-65ba1816e659",
+          "convention": "utf8_char_offset",
+          "end": 1893,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:62",
+          "start": 1887
+        },
+        "quote": "$13.56",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:62#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 63",
+        "locator": {
+          "block_index": 63,
+          "component_id": "900b2c1c-c3a6-5e80-aeaf-cbca67c382a3",
+          "convention": "utf8_char_offset",
+          "end": 1905,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:63",
+          "start": 1894
+        },
+        "quote": "Multifamily",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:63#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 64",
+        "locator": {
+          "block_index": 64,
+          "component_id": "cb96cc71-751d-5745-8ab3-74bcc8b8de56",
+          "convention": "utf8_char_offset",
+          "end": 1912,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:64",
+          "start": 1906
+        },
+        "quote": "$10.99",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:64#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 65",
+        "locator": {
+          "block_index": 65,
+          "component_id": "8785ba3e-8e1b-5c33-a67d-aacb0267bfde",
+          "convention": "utf8_char_offset",
+          "end": 1923,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:65",
+          "start": 1913
+        },
+        "quote": "Commercial",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:65#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 66",
+        "locator": {
+          "block_index": 66,
+          "component_id": "6a3d560f-6d59-5f0c-b6f9-2ca38547c7b3",
+          "convention": "utf8_char_offset",
+          "end": 1930,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:66",
+          "start": 1924
+        },
+        "quote": "$10.48",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:66#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 67",
+        "locator": {
+          "block_index": 67,
+          "component_id": "dae8160a-05c8-5752-b615-86bdf86451d4",
+          "convention": "utf8_char_offset",
+          "end": 1941,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:67",
+          "start": 1931
+        },
+        "quote": "Industrial",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:67#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 68",
+        "locator": {
+          "block_index": 68,
+          "component_id": "19d8ce7f-75be-5d15-bb38-c4124e7fb1ee",
+          "convention": "utf8_char_offset",
+          "end": 1947,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:68",
+          "start": 1942
+        },
+        "quote": "$9.36",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:68#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 69",
+        "locator": {
+          "block_index": 69,
+          "component_id": "ef5b4271-13ce-59b0-b1df-fbdd6e84c987",
+          "convention": "utf8_char_offset",
+          "end": 1961,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:69",
+          "start": 1948
+        },
+        "quote": "Industrial II",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:69#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 70",
+        "locator": {
+          "block_index": 70,
+          "component_id": "bd69099a-c458-5640-a210-e806e964de5c",
+          "convention": "utf8_char_offset",
+          "end": 1967,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:70",
+          "start": 1962
+        },
+        "quote": "$8.82",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:70#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 71",
+        "locator": {
+          "block_index": 71,
+          "component_id": "bef35e66-29e7-5108-aa48-65c9b4c6f25b",
+          "convention": "utf8_char_offset",
+          "end": 1978,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:71",
+          "start": 1968
+        },
+        "quote": "Irrigation",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:71#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 72",
+        "locator": {
+          "block_index": 72,
+          "component_id": "70d7e09a-107d-54a7-ab2c-4b33ee8c9fa4",
+          "convention": "utf8_char_offset",
+          "end": 1985,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:72",
+          "start": 1979
+        },
+        "quote": "$16.29",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:72#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.05.020 block 73",
+        "locator": {
+          "block_index": 73,
+          "component_id": "bdea1e9f-0c4c-5995-baed-bd34b50b2bfb",
+          "convention": "utf8_char_offset",
+          "end": 2012,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.05.020:block:73",
+          "start": 1986
+        },
+        "quote": "(Ord. 20614 § 1, 12-2-25.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020:block:73#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20614",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2010,
+          "start": 1987
+        },
+        "quote": "Ord. 20614 § 1, 12-2-25",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.05.020#history:20614",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "1a0555b6f5283affd0b7013175edda373df4c9383f40d372c76b5d6a7acdeefa",
+      "captured_at": "2026-08-28T04:25:06.371440Z",
+      "kind": "rendered_html_capture",
+      "value": "13.05.020.1a0555b6f528.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:13.05.020@1a0555b6f5283aff",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:13.05.020",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:13.05.020",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 13.05.020",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/13.05.020"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.05.020#history:20614",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-2-25"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "13.05.020",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.05.020#history:20614",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20614"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.05.020#history:20614",
+      "value": "adopted"
+    },
+    "title": "Retail water service rates."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:25:06.371440Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "1a0555b6f5283affd0b7013175edda373df4c9383f40d372c76b5d6a7acdeefa",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "1a0555b6f5283affd0b7013175edda373df4c9383f40d372c76b5d6a7acdeefa",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "1a0555b6f5283affd0b7013175edda373df4c9383f40d372c76b5d6a7acdeefa",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "2ae6c82139d3361e171a6f032ee9ab6a4e128a3a5a0943997f10ee531a362d66",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "2ae6c82139d3361e171a6f032ee9ab6a4e128a3a5a0943997f10ee531a362d66",
+        "output_sha256": "a49557f703861a0e479b5ab6cb195d022b8f7c340c4f0bd10c1eaeeb107297aa",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "2ae6c82139d3361e171a6f032ee9ab6a4e128a3a5a0943997f10ee531a362d66",
+        "output_sha256": "fb1dc7823e8b37cb6e8d71c2768569aefd128a4f638c4407d721addcbf044612",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/13.05.020",
+    "retained_original": {
+      "byte_count": 32267,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/13.05.020.1a0555b6f528.html",
+      "retrieved_at": "2026-08-28T04:25:06.371440Z",
+      "sha256": "1a0555b6f5283affd0b7013175edda373df4c9383f40d372c76b5d6a7acdeefa"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

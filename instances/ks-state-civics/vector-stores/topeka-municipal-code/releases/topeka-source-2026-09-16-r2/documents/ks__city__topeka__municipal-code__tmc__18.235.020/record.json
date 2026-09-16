@@ -1,0 +1,593 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 3310,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "158517adb2121669554b04aa2403bd0f4c161912f276845ee95f191b6d609e56"
+    },
+    "structured": {
+      "block_count": 20,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 17,
+      "path": "structured.json",
+      "root_component_id": "d6be782a-ad2f-544d-80e5-3a3c719520a5",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:section",
+      "sha256": "096d73618ed62ea0f778e3120081249a978f98eec2742d12dbd22840c2c19d27",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 9110,
+      "char_count": 8950,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "02e6c55aa7d247fcb8bc554a5da1b9361a4450547e853f0a2c063b8b7ff6ba2b"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "afdf7e57-f6ee-58e9-94ab-194fbdfbde6d",
+          "convention": "utf8_char_offset",
+          "end": 150,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:0",
+          "start": 0
+        },
+        "quote": "The following words, terms and phrases, when used, shall have the meaning ascribed to them herein, except when the context clearly requires otherwise:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "1cf5c927-daa6-5733-b471-12704510c82f",
+          "convention": "utf8_char_offset",
+          "end": 229,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:1",
+          "start": 151
+        },
+        "quote": "“City Forester” refers to the City of Topeka Forester or designated authority.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "0d496489-7ba8-5961-964e-a71bbad3b58d",
+          "convention": "utf8_char_offset",
+          "end": 392,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:2",
+          "start": 230
+        },
+        "quote": "“D.B.H.” means diameter at breast height. D.B.H. is used for trees with a diameter greater than 12 inches and is measured four and one-half feet above the ground.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "2ba1cc54-c59e-5f2f-bace-25e32a72fff7",
+          "convention": "utf8_char_offset",
+          "end": 542,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:3",
+          "start": 393
+        },
+        "quote": "“Developed area” means all land area disturbed during the construction of structures, parking facilities, landscaped areas, and similar improvements.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "352d8dfc-3bdd-5610-ae09-b1f04c370ded",
+          "convention": "utf8_char_offset",
+          "end": 747,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:4",
+          "start": 543
+        },
+        "quote": "“Developer” means the legal or beneficial owner of a lot or parcel or any land proposed for development and/or inclusion in a development, including the owner of an option, contract to purchase, or lease.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "31870a2d-28eb-5f03-8708-5e6fc8dbd77b",
+          "convention": "utf8_char_offset",
+          "end": 920,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:5",
+          "start": 748
+        },
+        "quote": "“Development” means the construction, reconstruction, conversion, structural alteration, relocation, or enlargement of any structure or parking facility, or their environs.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "5eede78c-7db4-5fe8-b5b1-6b384a85de45",
+          "convention": "utf8_char_offset",
+          "end": 1184,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:6",
+          "start": 921
+        },
+        "quote": "“Diameter caliper” means the size of a tree measured through the tree trunk. For trees less than four inches in diameter, it is measured six inches from the ground. For trees between four inches and 12 inches in diameter, it is measured 12 inches from the ground.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "a289ec0f-7e33-54ca-8822-55fd19303e56",
+          "convention": "utf8_char_offset",
+          "end": 1395,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:7",
+          "start": 1185
+        },
+        "quote": "“Groundcover” means an evergreen, deciduous planting or ornamental grass, growing generally to less than 15 inches in height and generally spreads more in width than height. Turf grass is specifically excluded.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "49a17bd0-7311-5567-a1f4-81585444ce99",
+          "convention": "utf8_char_offset",
+          "end": 1582,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:8",
+          "start": 1396
+        },
+        "quote": "“Irrigation system” means a permanent underground piping and sprinkler head system designed using industry standard methods to provide uniform irrigation coverage over a landscaped area.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "8e8953e5-ba59-55e8-8f90-c189e9465d03",
+          "convention": "utf8_char_offset",
+          "end": 1724,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:9",
+          "start": 1583
+        },
+        "quote": "“Landscaped area” means any area planted with groundcover, trees, shrubs, or other plant material that meets the provisions contained herein.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "0456a118-9564-52d4-a66d-6058d9c3e81b",
+          "convention": "utf8_char_offset",
+          "end": 1782,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:10",
+          "start": 1725
+        },
+        "quote": "“Monoculture” means a single type of species of planting.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "a6ac525f-db11-56d2-82f7-2a29a6b71c78",
+          "convention": "utf8_char_offset",
+          "end": 1928,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:11",
+          "start": 1783
+        },
+        "quote": "“Mulch” means a natural planting material such as pine straw or tree bark used to control weed growth, reduce soil erosion and reduce water loss.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "72262bc9-d290-55a6-989c-c21be83c5c26",
+          "convention": "utf8_char_offset",
+          "end": 2104,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:12",
+          "start": 1929
+        },
+        "quote": "“Parallel planting peninsula” means a planting island that extends out into the parking area, and is bounded on at least one side by the outer edge of the asphalt or building.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "3cca3067-c35f-5805-a8ac-cf10671bd1d7",
+          "convention": "utf8_char_offset",
+          "end": 2614,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:13",
+          "start": 2105
+        },
+        "quote": "“Parking lot” means any off-street, unenclosed ground level facility used for the purpose of temporary storage of motor vehicles. Included within this definition are unenclosed carports associated with any or all development governed by this chapter. Enclosed parking facilities, such as single or multistory garages or parking facilities constructed within the confines of a larger building or structure, or parking facilities associated with residential development, are not included within this definition.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "74a20455-3b7e-53d6-ad1c-d16970e78a8a",
+          "convention": "utf8_char_offset",
+          "end": 2723,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:14",
+          "start": 2615
+        },
+        "quote": "“Parking lot island” means a planting island contained completely within the confines of a parking facility.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "9f13dd7c-4549-5cc0-a68b-9eb01d7395ce",
+          "convention": "utf8_char_offset",
+          "end": 2827,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:15",
+          "start": 2724
+        },
+        "quote": "“Parking lot planting” means a planting required due to the construction of noncovered surface parking.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "9f779ff1-e8da-5c49-85ba-bd3cfe6916aa",
+          "convention": "utf8_char_offset",
+          "end": 3013,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:16",
+          "start": 2828
+        },
+        "quote": "“Recommended tree” means any one of the trees listed in “recommended species” of this chapter (TMC 18.235.130 ). These trees are well suited for the soils and climate of Topeka, Kansas.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "8bac3310-c4b0-5e4d-803b-e2c0a423a2f1",
+          "convention": "utf8_char_offset",
+          "end": 3096,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:17",
+          "start": 3014
+        },
+        "quote": "“Shrub” means an evergreen or deciduous planting no less than 15 inches in height.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "0c5cbc80-88cb-5490-9c16-d93462380fba",
+          "convention": "utf8_char_offset",
+          "end": 3253,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:18",
+          "start": 3097
+        },
+        "quote": "“Significant tree” means any tree with a diameter caliper of six inches or greater. (Ord. 18255 § 1, 6-1-04; Ord. 17846 § 2, 6-11-02. Code 1995 § 48-38.01.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.235.020 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "5cab3777-2de3-59c8-8869-37c8e499c171",
+          "convention": "utf8_char_offset",
+          "end": 3309,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.235.020:block:19",
+          "start": 3254
+        },
+        "quote": "Cross References: Definitions generally, TMC 1.10.020 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 18255",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 3204,
+          "start": 3182
+        },
+        "quote": "Ord. 18255 § 1, 6-1-04",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020#history:18255",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 17846",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 3229,
+          "start": 3206
+        },
+        "quote": "Ord. 17846 § 2, 6-11-02",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.235.020#history:17846",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "43f68f53da8368b0e65f7215e131a2ee60ad561e55b8715d2f018ab789cb4749",
+      "captured_at": "2026-08-28T04:54:23.166846Z",
+      "kind": "rendered_html_capture",
+      "value": "18.235.020.43f68f53da83.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:18.235.020@43f68f53da8368b0",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:18.235.020",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:18.235.020",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 18.235.020",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/18.235.020"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.235.020#history:18255",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "6-1-04"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.235.020#history:17846",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "6-11-02"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "18.235.020",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.235.020#history:18255",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:18255"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.235.020#history:17846",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:17846"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.235.020#history:18255",
+      "value": "adopted"
+    },
+    "title": "Definitions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:54:23.166846Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "43f68f53da8368b0e65f7215e131a2ee60ad561e55b8715d2f018ab789cb4749",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "43f68f53da8368b0e65f7215e131a2ee60ad561e55b8715d2f018ab789cb4749",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "43f68f53da8368b0e65f7215e131a2ee60ad561e55b8715d2f018ab789cb4749",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "02e6c55aa7d247fcb8bc554a5da1b9361a4450547e853f0a2c063b8b7ff6ba2b",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "02e6c55aa7d247fcb8bc554a5da1b9361a4450547e853f0a2c063b8b7ff6ba2b",
+        "output_sha256": "158517adb2121669554b04aa2403bd0f4c161912f276845ee95f191b6d609e56",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "02e6c55aa7d247fcb8bc554a5da1b9361a4450547e853f0a2c063b8b7ff6ba2b",
+        "output_sha256": "096d73618ed62ea0f778e3120081249a978f98eec2742d12dbd22840c2c19d27",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/18.235.020",
+    "retained_original": {
+      "byte_count": 33300,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/18.235.020.43f68f53da83.html",
+      "retrieved_at": "2026-08-28T04:54:23.166846Z",
+      "sha256": "43f68f53da8368b0e65f7215e131a2ee60ad561e55b8715d2f018ab789cb4749"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

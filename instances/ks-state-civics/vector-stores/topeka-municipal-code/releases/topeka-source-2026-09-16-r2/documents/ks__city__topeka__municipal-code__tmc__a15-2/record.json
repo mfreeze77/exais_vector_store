@@ -1,0 +1,271 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1081,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "dbd04cb2fe969fa4f936cb4adef7631f02d05823c500c3d3fc82de56ffb3288f"
+    },
+    "structured": {
+      "block_count": 4,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "a3acad2b-7f7f-5eb0-b70c-0593f3fa2be0",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:a15-2:section",
+      "sha256": "cc3700e3b9002dc5dd927ce9f5aa9fbcad9d40d39e81eb06e9413b7456f15052",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 2948,
+      "char_count": 2936,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "4fe8444ac6d5d576f01501a4cdddfee8048d0a4c2fc8813c01f25661515cf08e"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A15-2 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "6e8d866a-c334-5c43-b655-cf79357954fe",
+          "convention": "utf8_char_offset",
+          "end": 489,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a15-2:block:0",
+          "start": 0
+        },
+        "quote": "In order to enable cities of the first class to pay cash in lieu of issuing bonds for the cost of general improvements or the city’s share of the cost of special improvements, the governing bodies of said cities are hereby authorized to levy annually not to exceed three mills on each dollar of assessed tangible valuation of such city for such purposes and such tax levy may be levied outside of the aggregate limited prescribed by K.S.A. 79-1950 and 79-1951 , and any amendments thereto.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a15-2:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A15-2 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "8071e521-ddcd-5872-bb49-43c93e6fb105",
+          "convention": "utf8_char_offset",
+          "end": 722,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a15-2:block:1",
+          "start": 490
+        },
+        "quote": "Those funds derived as a result of such levy, along with any other funds allocated by the governing body for such purposes, shall be placed in a general improvement fund to be incorporated as part of each annual budget for the city.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a15-2:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A15-2 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "d7df106a-fd02-5cb6-92d9-872d9f31495c",
+          "convention": "utf8_char_offset",
+          "end": 1040,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a15-2:block:2",
+          "start": 723
+        },
+        "quote": "Allocations from this general improvement fund of less than $15,000.00 may be approved by the mayor, provided the governing body is notified no later than the next scheduled meeting; allocations of larger amounts shall require advance approval by the city’s governing body. (C.O. 71 § 1, 7-11-87; C.O. 7 § 2, 7-8-67.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a15-2:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A15-2 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "d57656e0-6f75-5a29-afd5-36aa6140b8f5",
+          "convention": "utf8_char_offset",
+          "end": 1080,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a15-2:block:3",
+          "start": 1041
+        },
+        "quote": "State Law References: K.S.A. 79-1950a .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a15-2:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a15-2#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "b18098f60f204d5d785b3a2f033297ae9b432378a8b848c6bf953e4988938bea",
+      "captured_at": "2026-08-28T04:59:48.824807Z",
+      "kind": "rendered_html_capture",
+      "value": "A15-2.b18098f60f20.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:a15-2@b18098f60f204d5d",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:A15-2",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:a15-2",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC A15-2",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/A15-2"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "A15-2",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Sec. A15-2. General and special improvement levies in lieu of bond issues."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:59:48.824807Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "b18098f60f204d5d785b3a2f033297ae9b432378a8b848c6bf953e4988938bea",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "b18098f60f204d5d785b3a2f033297ae9b432378a8b848c6bf953e4988938bea",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "b18098f60f204d5d785b3a2f033297ae9b432378a8b848c6bf953e4988938bea",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "4fe8444ac6d5d576f01501a4cdddfee8048d0a4c2fc8813c01f25661515cf08e",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "4fe8444ac6d5d576f01501a4cdddfee8048d0a4c2fc8813c01f25661515cf08e",
+        "output_sha256": "dbd04cb2fe969fa4f936cb4adef7631f02d05823c500c3d3fc82de56ffb3288f",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "4fe8444ac6d5d576f01501a4cdddfee8048d0a4c2fc8813c01f25661515cf08e",
+        "output_sha256": "cc3700e3b9002dc5dd927ce9f5aa9fbcad9d40d39e81eb06e9413b7456f15052",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/A15-2",
+    "retained_original": {
+      "byte_count": 29265,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/A15-2.b18098f60f20.html",
+      "retrieved_at": "2026-08-28T04:59:48.824807Z",
+      "sha256": "b18098f60f204d5d785b3a2f033297ae9b432378a8b848c6bf953e4988938bea"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

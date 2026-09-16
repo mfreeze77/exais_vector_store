@@ -1,0 +1,223 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 639,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "549969c6a0c22be8017ce667f45158ed563efdb53dda825963bede7f869477bc"
+    },
+    "structured": {
+      "block_count": 1,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "202da60c-b926-5d23-897d-c6973f8ebc06",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.65.200:section",
+      "sha256": "82ab99208d7a381aae94fdba0a875b308670bc107c707d7ce90247efd7d20553",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 1904,
+      "char_count": 1898,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "09b7173405ab1bf1c6256954cfb2b14dfa29da50dcb5986a5e4bff227ffff826"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.65.200 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "314be63d-584b-56f2-b416-ea3bb79e4f80",
+          "convention": "utf8_char_offset",
+          "end": 638,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.65.200:block:0",
+          "start": 0
+        },
+        "quote": "No driver of a taxicab, while carrying passengers or under employment, shall display the signal on the taximeter in such position to denote that the driver is unemployed. While carrying passengers, the signal must be in such position that the taximeter records the distance traveled and the fare. When such driver is not employed, the signal must be displayed in such position to denote that the driver is unemployed. No charge shall be made for the time consumed in response to a call or in returning to the place from which such taxicab was called. This section shall not apply to share-a-ride. (Code 1981 § 46-48. Code 1995 § 154-127.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.65.200:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.65.200#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "866e337934e28da82dfd9b71cce9c369f4319da671e229ae0be8f047cdaaf3ad",
+      "captured_at": "2026-08-28T04:19:04.757641Z",
+      "kind": "rendered_html_capture",
+      "value": "10.65.200.866e337934e2.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.65.200@866e337934e28da8",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.65.200",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.65.200",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.65.200",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.65.200"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.65.200",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Taximeter – Position of signal."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:19:04.757641Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "866e337934e28da82dfd9b71cce9c369f4319da671e229ae0be8f047cdaaf3ad",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "866e337934e28da82dfd9b71cce9c369f4319da671e229ae0be8f047cdaaf3ad",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "866e337934e28da82dfd9b71cce9c369f4319da671e229ae0be8f047cdaaf3ad",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "09b7173405ab1bf1c6256954cfb2b14dfa29da50dcb5986a5e4bff227ffff826",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "09b7173405ab1bf1c6256954cfb2b14dfa29da50dcb5986a5e4bff227ffff826",
+        "output_sha256": "549969c6a0c22be8017ce667f45158ed563efdb53dda825963bede7f869477bc",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "09b7173405ab1bf1c6256954cfb2b14dfa29da50dcb5986a5e4bff227ffff826",
+        "output_sha256": "82ab99208d7a381aae94fdba0a875b308670bc107c707d7ce90247efd7d20553",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.65.200",
+    "retained_original": {
+      "byte_count": 28082,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.65.200.866e337934e2.html",
+      "retrieved_at": "2026-08-28T04:19:04.757641Z",
+      "sha256": "866e337934e28da82dfd9b71cce9c369f4319da671e229ae0be8f047cdaaf3ad"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

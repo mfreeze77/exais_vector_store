@@ -1,0 +1,239 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 289,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "cfe61dac3a5bc273850322843b7cebad1575d0b61fb2e0c9e79bc19509f87ee8"
+    },
+    "structured": {
+      "block_count": 2,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "5beaf877-9854-5e79-bed3-74633562e78b",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:18.35.070:section",
+      "sha256": "4b74d597de0de244ff59e237273ab01761943b3b384a93b62123eefe3ff57590",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 1268,
+      "char_count": 1260,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "44e8b94a152cebc06a4f48597bbd8ed142944f591f78960d8e4f643cf9e4497f"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.35.070 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "becc714b-501f-5a15-ba47-203ece755cff",
+          "convention": "utf8_char_offset",
+          "end": 230,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.35.070:block:0",
+          "start": 0
+        },
+        "quote": "Prior to the filing of the preliminary plat, the subdivider shall submit to the Planning Commission plans and data showing the subdivider’s ideas and intentions in platting of the property. (Code 1981 § 41-32. Code 1995 § 134-51.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.35.070:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.35.070 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "e4ecf327-6c17-510b-9e23-a8ad274beab6",
+          "convention": "utf8_char_offset",
+          "end": 288,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.35.070:block:1",
+          "start": 231
+        },
+        "quote": "Cross References: Planning Commission, Chapter 2.225 TMC.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.35.070:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.35.070#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "e33e7aec84f78efe23c23f39eb70883fd685f8da92d66574a41d6a0e44828216",
+      "captured_at": "2026-08-28T04:47:13.586723Z",
+      "kind": "rendered_html_capture",
+      "value": "18.35.070.e33e7aec84f7.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:18.35.070@e33e7aec84f78efe",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:18.35.070",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:18.35.070",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 18.35.070",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/18.35.070"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "18.35.070",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Submission of plans and data to Planning Commission."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:47:13.586723Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "e33e7aec84f78efe23c23f39eb70883fd685f8da92d66574a41d6a0e44828216",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "e33e7aec84f78efe23c23f39eb70883fd685f8da92d66574a41d6a0e44828216",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "e33e7aec84f78efe23c23f39eb70883fd685f8da92d66574a41d6a0e44828216",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "44e8b94a152cebc06a4f48597bbd8ed142944f591f78960d8e4f643cf9e4497f",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "44e8b94a152cebc06a4f48597bbd8ed142944f591f78960d8e4f643cf9e4497f",
+        "output_sha256": "cfe61dac3a5bc273850322843b7cebad1575d0b61fb2e0c9e79bc19509f87ee8",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "44e8b94a152cebc06a4f48597bbd8ed142944f591f78960d8e4f643cf9e4497f",
+        "output_sha256": "4b74d597de0de244ff59e237273ab01761943b3b384a93b62123eefe3ff57590",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/18.35.070",
+    "retained_original": {
+      "byte_count": 29627,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/18.35.070.e33e7aec84f7.html",
+      "retrieved_at": "2026-08-28T04:47:13.586723Z",
+      "sha256": "e33e7aec84f78efe23c23f39eb70883fd685f8da92d66574a41d6a0e44828216"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

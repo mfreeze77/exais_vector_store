@@ -1,0 +1,449 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 3273,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "723edfd0fb56d7555af2c225ddea412889f574e87771582790ed23a1039189d9"
+    },
+    "structured": {
+      "block_count": 13,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "7fbe9f9c-d350-5d84-9170-b2d13b8e7664",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:8.75.040:section",
+      "sha256": "3e5a44ddf6d913aaa2b53b8ce42e63c73ccce7f9986c854ace722d93aac03dc0",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 7925,
+      "char_count": 7914,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "9d46f60ef738cb6274fdf3a59679d7237617b21a3115b61d1143398a7f256a7b"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.75.040 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "681c5307-e335-59f7-96bb-410a19d76a0e",
+          "convention": "utf8_char_offset",
+          "end": 339,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.75.040:block:0",
+          "start": 0
+        },
+        "quote": "(a) The Administrative Hearing Officer may administer oaths and affirmations, examine witnesses and receive evidence. The Hearing Officer may grant continuances where the officer finds that there is practical difficulty or undue hardship and that such extension is consonant with the general purpose to secure compliance with this chapter.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.75.040 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "f6d068bc-b56e-5b2d-bd7f-3ad0dac5ebfb",
+          "convention": "utf8_char_offset",
+          "end": 792,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.75.040:block:1",
+          "start": 340
+        },
+        "quote": "(b) If the Hearing Officer determines that: (1) the complaint was served in accordance with TMC 8.75.030 ; (2) the structure is so deteriorated or dilapidated or has become so out of repair as to be dangerous, unsafe, unsanitary or otherwise unfit for human habitation or occupancy, such that it is unreasonable to repair the structure, the officer will provide findings to that effect, in writing, and shall issue an order which requires the owner to:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.75.040 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "fcf55482-e7db-5045-8d4f-d35fbee70ded",
+          "convention": "utf8_char_offset",
+          "end": 866,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.75.040:block:2",
+          "start": 793
+        },
+        "quote": "(1) Demolish and remove the structure within a prescribed period of time;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.75.040 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "4611818e-28f4-59f4-b04d-0066ee2e0034",
+          "convention": "utf8_char_offset",
+          "end": 1015,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.75.040:block:3",
+          "start": 867
+        },
+        "quote": "(2) Repair and/or make safe and sanitary the structure within a prescribed period of time if the structure is capable of being made safe by repairs;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.75.040 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "7d8edcaf-5314-5cd5-add1-61d2488c2a32",
+          "convention": "utf8_char_offset",
+          "end": 1087,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.75.040:block:4",
+          "start": 1016
+        },
+        "quote": "(3) Board up the structure for future repair, subject to conditions; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.75.040 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "6b20d4d5-6b5b-569d-9c55-6fdf845de393",
+          "convention": "utf8_char_offset",
+          "end": 1331,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.75.040:block:5",
+          "start": 1088
+        },
+        "quote": "(4) Demolish or board up for future repair a structure under construction where construction has ceased for more than two years. Boarding the structure for future repair shall not extend beyond one year, unless approved by the Hearing Officer.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.75.040 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "fd55216b-a64b-5ab5-be24-34605ce809ce",
+          "convention": "utf8_char_offset",
+          "end": 1721,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.75.040:block:6",
+          "start": 1332
+        },
+        "quote": "(c) Any order shall be served on the property owner pursuant to TMC 8.75.030 and a copy served personally or by first class mail to the other persons identified in TMC 8.75.030 . Additionally, except for continuances, the order shall be posted in a conspicuous place on the premises and filed with the Register of Deeds and the clerk of the district court in which the property is located.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.75.040 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "50e44b7d-2f19-570c-b96c-b0c43d3bc8d2",
+          "convention": "utf8_char_offset",
+          "end": 1901,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.75.040:block:7",
+          "start": 1722
+        },
+        "quote": "(d) Pursuant to K.S.A. 60-2101 and amendments thereto, any of the parties identified in TMC 8.75.030 may appeal to the Shawnee County District Court by doing all of the following:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.75.040 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "d4f1ebb6-e454-5301-abd9-dc5e3ee11a20",
+          "convention": "utf8_char_offset",
+          "end": 2279,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.75.040:block:8",
+          "start": 1902
+        },
+        "quote": "(1) Submit a written notice of appeal to the City Clerk within 30 days of the determination. The notice shall include: (i) the person’s name, mailing address, email address and telephone number; (ii) the date of the order; and (iii) case number. The City Clerk shall memorialize the date of receipt of the notice by file-stamp or another method and return a copy to the person.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.75.040 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "4b39abc4-c97f-501f-a98b-b797a2704b66",
+          "convention": "utf8_char_offset",
+          "end": 2701,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.75.040:block:9",
+          "start": 2280
+        },
+        "quote": "(2) Submit a written request to the City Clerk for one copy of all pertinent records relative to the proceeding including but not limited to any recording or transcript of the proceedings. The request shall be submitted to the City Clerk within 10 days of the date of receipt of the notice of appeal. Prepayment of all copying and other fees set forth in TMC 2.10.120 shall be required prior to production of the records.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.75.040 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "72762fbf-afa5-5104-b696-fca59432cb74",
+          "convention": "utf8_char_offset",
+          "end": 2876,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.75.040:block:10",
+          "start": 2702
+        },
+        "quote": "(3) File with the Clerk of the Shawnee County District Court the pertinent records prepared by the City Clerk within 60 days from the date of receipt of the notice of appeal.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.75.040 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "2022ca50-e450-58f4-8fc2-e1b52f5e5c1e",
+          "convention": "utf8_char_offset",
+          "end": 3049,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.75.040:block:11",
+          "start": 2877
+        },
+        "quote": "(4) Failure to file the records with the Clerk of the Shawnee County District Court within the 60-day period may result in the appeal being dismissed by the district court.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.75.040 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "f25589ce-0bee-5d5f-bdb2-0acaa6a26eb7",
+          "convention": "utf8_char_offset",
+          "end": 3272,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.75.040:block:12",
+          "start": 3050
+        },
+        "quote": "(5) Unless the person requests from the district court a stay of the hearing officer’s order within 70 days from the date of receipt of the notice of appeal, the City may proceed with demolition. (Ord. 20383 § 9, 11-1-22.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20383",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 3270,
+          "start": 3247
+        },
+        "quote": "Ord. 20383 § 9, 11-1-22",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.75.040#history:20383",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "59b6779dc7856563ba6a042c7bdd0933c08180b526cbebc77c21c68054fb799a",
+      "captured_at": "2026-08-28T04:08:10.254783Z",
+      "kind": "rendered_html_capture",
+      "value": "8.75.040.59b6779dc785.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:8.75.040@59b6779dc7856563",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:8.75.040",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:8.75.040",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 8.75.040",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/8.75.040"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:8.75.040#history:20383",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "11-1-22"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "8.75.040",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:8.75.040#history:20383",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20383"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:8.75.040#history:20383",
+      "value": "adopted"
+    },
+    "title": "Hearing."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:08:10.254783Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "59b6779dc7856563ba6a042c7bdd0933c08180b526cbebc77c21c68054fb799a",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "59b6779dc7856563ba6a042c7bdd0933c08180b526cbebc77c21c68054fb799a",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "59b6779dc7856563ba6a042c7bdd0933c08180b526cbebc77c21c68054fb799a",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "9d46f60ef738cb6274fdf3a59679d7237617b21a3115b61d1143398a7f256a7b",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "9d46f60ef738cb6274fdf3a59679d7237617b21a3115b61d1143398a7f256a7b",
+        "output_sha256": "723edfd0fb56d7555af2c225ddea412889f574e87771582790ed23a1039189d9",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "9d46f60ef738cb6274fdf3a59679d7237617b21a3115b61d1143398a7f256a7b",
+        "output_sha256": "3e5a44ddf6d913aaa2b53b8ce42e63c73ccce7f9986c854ace722d93aac03dc0",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/8.75.040",
+    "retained_original": {
+      "byte_count": 33858,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/8.75.040.59b6779dc785.html",
+      "retrieved_at": "2026-08-28T04:08:10.254783Z",
+      "sha256": "59b6779dc7856563ba6a042c7bdd0933c08180b526cbebc77c21c68054fb799a"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

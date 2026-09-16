@@ -1,0 +1,2017 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 13377,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "32dab169b9d2c2e23a32de48573f9cb894208b8a58e95f4f6ae78581b65917e7"
+    },
+    "structured": {
+      "block_count": 111,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "be151b6e-9e66-5953-91ba-b62a02be7c3c",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:section",
+      "sha256": "0c13ed88937a2d164b90ba37b933766096055530757a271346531ff3d7a0bd14",
+      "table_count": 3
+    },
+    "verbatim": {
+      "byte_count": 34363,
+      "char_count": 34220,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "53eb1ddd5ebcb5bafe7dda7a30d27bc7b915f45dffa4880e2f5de5c37b7bdbe2"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "1066782a-d6d6-5d15-9ee1-8eabbe4a8659",
+          "convention": "utf8_char_offset",
+          "end": 95,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:0",
+          "start": 0
+        },
+        "quote": "(a) Definitions. For the purposes of this division, certain terms and words are hereby defined.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "268bb5ea-dc45-5b98-8afc-840b8f58d990",
+          "convention": "utf8_char_offset",
+          "end": 353,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:1",
+          "start": 96
+        },
+        "quote": "(1) “Parkland” means any dedicated public open space specifically designed for active recreational uses, including linkages to the regional trail system, intended to serve one or more neighborhood(s) or the entire community (i.e., a regional park or trail).",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "1ba61ec4-4997-5b61-a3bd-48b90882f165",
+          "convention": "utf8_char_offset",
+          "end": 599,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:2",
+          "start": 354
+        },
+        "quote": "(2) “Parkland acquisition cost” means the average sale price for one acre of vacant land within the City of Topeka and the City’s three-mile extraterritorial jurisdiction. For purposes of this division, said fee shall be set at $15,000 per acre.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "9233061a-5c3d-592f-a0d3-fc0be9100052",
+          "convention": "utf8_char_offset",
+          "end": 811,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:3",
+          "start": 600
+        },
+        "quote": "(3) “Parkland improvement cost” means the average cost to improve a neighborhood level park with typical amenities for recreational uses. For purposes of this division, said fee shall be set at $25,000 per acre.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "42b0a975-9a01-5a39-880d-c9acdd8e66e0",
+          "convention": "utf8_char_offset",
+          "end": 1127,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:4",
+          "start": 812
+        },
+        "quote": "(4) “Parkland development fee” means the combination of parkland acquisition cost and the parkland improvement cost per dwelling unit to support five acres of parkland per 1,000 people. For the purposes of this division, the parkland development fee shall consist of 60 percent of the actual cost per dwelling unit.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "aff5b4f2-7d60-5d0d-8e61-a93100738f85",
+          "convention": "utf8_char_offset",
+          "end": 1268,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:5",
+          "start": 1128
+        },
+        "quote": "(5) “Dwelling unit” means any single-family, two-family, or multifamily dwelling intended for habitation, including group living facilities.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "5addfff7-afdd-5b3a-bb40-db6cbacd90e6",
+          "convention": "utf8_char_offset",
+          "end": 1591,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:6",
+          "start": 1269
+        },
+        "quote": "(6) “Planning areas” means geographic areas for community-level parks as identified as parkland fee districts in the park and open space element of the comprehensive plan. New development outside a designated planning area shall be included in the adjacent or nearest planning area which would best serve that development.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "356aad14-1621-5e83-b73e-1bb406bec611",
+          "convention": "utf8_char_offset",
+          "end": 1719,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:7",
+          "start": 1592
+        },
+        "quote": "(7) “New development” means construction of one or more dwelling units on a lot upon which no dwelling unit previously existed.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "a7b506f2-0bb5-5fd4-b6b9-1cf9d2fafb5e",
+          "convention": "utf8_char_offset",
+          "end": 1940,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:8",
+          "start": 1720
+        },
+        "quote": "(8) “Redevelopment” means construction of one or more dwelling units on a lot upon which a dwelling unit previously existed and which has the effect of creating a greater number of dwelling units than previously existed.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "b923f5e0-efc1-5224-ada7-daf6bcf02322",
+          "convention": "utf8_char_offset",
+          "end": 2207,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:9",
+          "start": 1941
+        },
+        "quote": "(9) “Reconstruction” means rebuilding or replacement of a dwelling unit or units on a lot that previously maintained the same number, type and use of dwelling units, which has the effect of creating the same or fewer number of dwelling units than previously existed.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "f4e097bf-54c2-56b1-b872-9d086e450f83",
+          "convention": "utf8_char_offset",
+          "end": 2300,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:10",
+          "start": 2208
+        },
+        "quote": "(10) “County Commission” means the Board of County Commissioners for Shawnee County, Kansas.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "4e87becb-bba7-5872-963d-0258120993bb",
+          "convention": "utf8_char_offset",
+          "end": 2393,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:11",
+          "start": 2301
+        },
+        "quote": "(11) “Parks and Recreation Director” means the Shawnee County Parks and Recreation Director.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "c5621875-d90b-5652-9ad7-59fc270f91d7",
+          "convention": "utf8_char_offset",
+          "end": 2466,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:12",
+          "start": 2394
+        },
+        "quote": "(12) “Planning Commission” means the City of Topeka Planning Commission.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "fee21782-657d-5b4e-a49e-9db7b2d7a2d9",
+          "convention": "utf8_char_offset",
+          "end": 2551,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:13",
+          "start": 2467
+        },
+        "quote": "(13) “Planning Director” means the Director of the Planning Department for the City.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "63410f98-89f8-5606-bdfa-1b1c175345bf",
+          "convention": "utf8_char_offset",
+          "end": 2874,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:14",
+          "start": 2552
+        },
+        "quote": "(b) Purpose. The purpose of this section is to serve the communities’ population growth with neighborhood and regional parkland based on the comprehensive plan and national recreation and parks association standard of five acres per 1,000 persons for a neighborhood park and 15 acres per 1,000 persons for a regional park.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "f9150e1a-98c0-5f6d-b968-d988ea7f1642",
+          "convention": "utf8_char_offset",
+          "end": 2904,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:15",
+          "start": 2875
+        },
+        "quote": "(c) Parkland Development Fee.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "f36ba42c-a1fb-5c6b-af75-dfe13a24bef6",
+          "convention": "utf8_char_offset",
+          "end": 3674,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:16",
+          "start": 2905
+        },
+        "quote": "(1) In all instances where property owners or developers seek approval of new development or redevelopment or a final plat or replat of land that creates additional residential lots or units, a parkland development fee shall be required. For subdivisions within the City’s corporate limits, all fees shall be collected by the Development Services Division of the City Public Works Department concurrent with the application for a building permit. For subdivisions within the City’s extraterritorial jurisdiction, the fee shall be paid to the County Planning Department or other responsible County agency concurrent with application for a building permit. No building permits may be issued without collection of parkland development fees in accordance with this section.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "b6da4e00-8d2d-57a1-bac4-c5634ede2937",
+          "convention": "utf8_char_offset",
+          "end": 3904,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:17",
+          "start": 3675
+        },
+        "quote": "(2) The parkland development fee shall be assessed based upon the planning area’s health classification contained in the City’s comprehensive plan in which the dwelling unit(s) will be located according to the following schedule:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "c71cc70f-62df-530d-abb7-a5c31c945bfc",
+          "convention": "utf8_char_offset",
+          "end": 4352,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:18",
+          "start": 3905
+        },
+        "quote": "Planning Area Rating | Fee Schedule (per unit) Single- and Two-Family Dwelling Unit Development\nNew Development or Redevelopment | New Development or Redevelopment w/Public Dedication | New Development or Redevelopment w/Private Dedication\nOne tree (intensive care) | $300.00 | $188.00 | $225.00\nTwo trees (at risk) | $225.00 | $141.00 | $169.00\nThree trees (outpatient) | $150.00 | $94.00 | $113.00\nFour trees (healthy) | $75.00 | $47.00 | $56.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "dec954cb-89cf-5b86-8f33-8001a7b57ede",
+          "convention": "utf8_char_offset",
+          "end": 4373,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:19",
+          "start": 4353
+        },
+        "quote": "Planning Area Rating",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "d25b1562-5963-5da2-9411-7b95397fd68b",
+          "convention": "utf8_char_offset",
+          "end": 4397,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:20",
+          "start": 4374
+        },
+        "quote": "Fee Schedule (per unit)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "aaf93bc7-5122-5bc0-8fe6-43b2eea27a9f",
+          "convention": "utf8_char_offset",
+          "end": 4446,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:21",
+          "start": 4398
+        },
+        "quote": "Single- and Two-Family Dwelling Unit Development",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "d6d4bead-6d91-5b38-81eb-b4cf3f9d80a7",
+          "convention": "utf8_char_offset",
+          "end": 4479,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:22",
+          "start": 4447
+        },
+        "quote": "New Development or Redevelopment",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "b7eb42ec-6ef6-5f76-a52d-7a85601e670b",
+          "convention": "utf8_char_offset",
+          "end": 4532,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:23",
+          "start": 4480
+        },
+        "quote": "New Development or Redevelopment w/Public Dedication",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "2ba4dc7c-62da-510c-896e-57e496648b64",
+          "convention": "utf8_char_offset",
+          "end": 4586,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:24",
+          "start": 4533
+        },
+        "quote": "New Development or Redevelopment w/Private Dedication",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "695e2523-bf3c-5c33-9beb-618ca68de406",
+          "convention": "utf8_char_offset",
+          "end": 4612,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:25",
+          "start": 4587
+        },
+        "quote": "One tree (intensive care)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 26",
+        "locator": {
+          "block_index": 26,
+          "component_id": "ffdbaa64-0d51-5e92-a952-83a63509ef2c",
+          "convention": "utf8_char_offset",
+          "end": 4620,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:26",
+          "start": 4613
+        },
+        "quote": "$300.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 27",
+        "locator": {
+          "block_index": 27,
+          "component_id": "275275ed-f6ab-56af-ac7d-655328252a9d",
+          "convention": "utf8_char_offset",
+          "end": 4628,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:27",
+          "start": 4621
+        },
+        "quote": "$188.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 28",
+        "locator": {
+          "block_index": 28,
+          "component_id": "7a50280a-5505-58f8-b28a-50d0dc32b4a0",
+          "convention": "utf8_char_offset",
+          "end": 4636,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:28",
+          "start": 4629
+        },
+        "quote": "$225.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:28#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 29",
+        "locator": {
+          "block_index": 29,
+          "component_id": "40c7c6e7-1d45-5dbf-9b9e-5988bfe33f0c",
+          "convention": "utf8_char_offset",
+          "end": 4656,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:29",
+          "start": 4637
+        },
+        "quote": "Two trees (at risk)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:29#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 30",
+        "locator": {
+          "block_index": 30,
+          "component_id": "807fedf1-d13e-5c64-b1ae-b57e46e149d3",
+          "convention": "utf8_char_offset",
+          "end": 4664,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:30",
+          "start": 4657
+        },
+        "quote": "$225.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:30#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 31",
+        "locator": {
+          "block_index": 31,
+          "component_id": "c6298f02-3451-533f-8ac3-c93dac7a1fa5",
+          "convention": "utf8_char_offset",
+          "end": 4672,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:31",
+          "start": 4665
+        },
+        "quote": "$141.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:31#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 32",
+        "locator": {
+          "block_index": 32,
+          "component_id": "14a560e0-8bec-5167-b8a8-17042fe3fcfe",
+          "convention": "utf8_char_offset",
+          "end": 4680,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:32",
+          "start": 4673
+        },
+        "quote": "$169.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:32#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 33",
+        "locator": {
+          "block_index": 33,
+          "component_id": "bbb1b70f-9798-5c90-acb0-d4e7a2e4779f",
+          "convention": "utf8_char_offset",
+          "end": 4705,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:33",
+          "start": 4681
+        },
+        "quote": "Three trees (outpatient)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:33#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 34",
+        "locator": {
+          "block_index": 34,
+          "component_id": "6b81fdcd-2129-5175-b2ec-8be818a4cf64",
+          "convention": "utf8_char_offset",
+          "end": 4713,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:34",
+          "start": 4706
+        },
+        "quote": "$150.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:34#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 35",
+        "locator": {
+          "block_index": 35,
+          "component_id": "a5163cc5-daaf-52f4-8f48-920b04971387",
+          "convention": "utf8_char_offset",
+          "end": 4720,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:35",
+          "start": 4714
+        },
+        "quote": "$94.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:35#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 36",
+        "locator": {
+          "block_index": 36,
+          "component_id": "8374dbc7-916f-5d3e-ac73-59e70c9321dd",
+          "convention": "utf8_char_offset",
+          "end": 4728,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:36",
+          "start": 4721
+        },
+        "quote": "$113.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:36#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 37",
+        "locator": {
+          "block_index": 37,
+          "component_id": "02648f06-4de5-5774-bf34-c78f128e01c5",
+          "convention": "utf8_char_offset",
+          "end": 4749,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:37",
+          "start": 4729
+        },
+        "quote": "Four trees (healthy)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:37#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 38",
+        "locator": {
+          "block_index": 38,
+          "component_id": "15fcb9a6-e82a-58a7-b8cc-4785f3a8dfe2",
+          "convention": "utf8_char_offset",
+          "end": 4756,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:38",
+          "start": 4750
+        },
+        "quote": "$75.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:38#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 39",
+        "locator": {
+          "block_index": 39,
+          "component_id": "8fe5020a-7522-5ac6-a879-e476f7a83537",
+          "convention": "utf8_char_offset",
+          "end": 4763,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:39",
+          "start": 4757
+        },
+        "quote": "$47.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:39#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 40",
+        "locator": {
+          "block_index": 40,
+          "component_id": "104a3f9f-ce38-5d91-841d-0309f839155d",
+          "convention": "utf8_char_offset",
+          "end": 4770,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:40",
+          "start": 4764
+        },
+        "quote": "$56.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:40#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 41",
+        "locator": {
+          "block_index": 41,
+          "component_id": "e73ec8c7-e2bf-559f-91da-fcaec81dfe1a",
+          "convention": "utf8_char_offset",
+          "end": 5218,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:41",
+          "start": 4771
+        },
+        "quote": "Planning Area Rating | Fee Schedule (per unit) Three- to Eight-Family Dwelling Unit Development\nNew Development or Redevelopment | New Development or Redevelopment w/Public Dedication | New Development or Redevelopment w/Private Dedication\nOne tree (intensive care) | $267.00 | $167.00 | $200.00\nTwo trees (at risk) | $200.00 | $125.00 | $150.00\nThree trees (outpatient) | $134.00 | $83.00 | $100.00\nFour trees (healthy) | $67.00 | $42.00 | $50.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:41#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 42",
+        "locator": {
+          "block_index": 42,
+          "component_id": "9d1d9667-bc04-5e7a-a5dd-182ef5efcf1d",
+          "convention": "utf8_char_offset",
+          "end": 5239,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:42",
+          "start": 5219
+        },
+        "quote": "Planning Area Rating",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:42#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 43",
+        "locator": {
+          "block_index": 43,
+          "component_id": "daf9db32-6100-5595-9b4d-7f744e129b7e",
+          "convention": "utf8_char_offset",
+          "end": 5263,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:43",
+          "start": 5240
+        },
+        "quote": "Fee Schedule (per unit)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:43#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 44",
+        "locator": {
+          "block_index": 44,
+          "component_id": "f8730606-c1ec-5219-90c7-0adfd4824e6a",
+          "convention": "utf8_char_offset",
+          "end": 5312,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:44",
+          "start": 5264
+        },
+        "quote": "Three- to Eight-Family Dwelling Unit Development",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:44#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 45",
+        "locator": {
+          "block_index": 45,
+          "component_id": "61387d73-6a7a-5e81-8340-457c0ff1780b",
+          "convention": "utf8_char_offset",
+          "end": 5345,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:45",
+          "start": 5313
+        },
+        "quote": "New Development or Redevelopment",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:45#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 46",
+        "locator": {
+          "block_index": 46,
+          "component_id": "aa7fc7a9-eedc-515e-a95c-08cfa53a0c07",
+          "convention": "utf8_char_offset",
+          "end": 5398,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:46",
+          "start": 5346
+        },
+        "quote": "New Development or Redevelopment w/Public Dedication",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:46#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 47",
+        "locator": {
+          "block_index": 47,
+          "component_id": "8ed0c29c-af03-53bc-9338-6440f4e84a22",
+          "convention": "utf8_char_offset",
+          "end": 5452,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:47",
+          "start": 5399
+        },
+        "quote": "New Development or Redevelopment w/Private Dedication",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:47#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 48",
+        "locator": {
+          "block_index": 48,
+          "component_id": "0fd41c27-dfc6-5517-879b-8fa95605d5b7",
+          "convention": "utf8_char_offset",
+          "end": 5478,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:48",
+          "start": 5453
+        },
+        "quote": "One tree (intensive care)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:48#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 49",
+        "locator": {
+          "block_index": 49,
+          "component_id": "13ac1585-88ac-5083-bf57-a5315406ee54",
+          "convention": "utf8_char_offset",
+          "end": 5486,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:49",
+          "start": 5479
+        },
+        "quote": "$267.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:49#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 50",
+        "locator": {
+          "block_index": 50,
+          "component_id": "2aac70ec-837e-51f7-955e-0c52e6f65ad4",
+          "convention": "utf8_char_offset",
+          "end": 5494,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:50",
+          "start": 5487
+        },
+        "quote": "$167.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:50#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 51",
+        "locator": {
+          "block_index": 51,
+          "component_id": "e8418205-a568-5786-8d1a-27498394199e",
+          "convention": "utf8_char_offset",
+          "end": 5502,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:51",
+          "start": 5495
+        },
+        "quote": "$200.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:51#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 52",
+        "locator": {
+          "block_index": 52,
+          "component_id": "6063212d-2b6a-54cc-a896-ff30e0ab6c56",
+          "convention": "utf8_char_offset",
+          "end": 5522,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:52",
+          "start": 5503
+        },
+        "quote": "Two trees (at risk)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:52#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 53",
+        "locator": {
+          "block_index": 53,
+          "component_id": "c5c193b1-466b-5862-8bcc-69c2c6552ca8",
+          "convention": "utf8_char_offset",
+          "end": 5530,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:53",
+          "start": 5523
+        },
+        "quote": "$200.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:53#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 54",
+        "locator": {
+          "block_index": 54,
+          "component_id": "be945b60-af7c-51aa-892d-fa95f2ee8700",
+          "convention": "utf8_char_offset",
+          "end": 5538,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:54",
+          "start": 5531
+        },
+        "quote": "$125.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:54#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 55",
+        "locator": {
+          "block_index": 55,
+          "component_id": "12b5b297-a1b8-5390-8222-75828584059f",
+          "convention": "utf8_char_offset",
+          "end": 5546,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:55",
+          "start": 5539
+        },
+        "quote": "$150.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:55#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 56",
+        "locator": {
+          "block_index": 56,
+          "component_id": "500d88d7-e0f7-5522-98b1-8214c33ad413",
+          "convention": "utf8_char_offset",
+          "end": 5571,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:56",
+          "start": 5547
+        },
+        "quote": "Three trees (outpatient)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:56#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 57",
+        "locator": {
+          "block_index": 57,
+          "component_id": "e7b6a84e-f5b1-5386-a8d6-b017a0745833",
+          "convention": "utf8_char_offset",
+          "end": 5579,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:57",
+          "start": 5572
+        },
+        "quote": "$134.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:57#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 58",
+        "locator": {
+          "block_index": 58,
+          "component_id": "81a78fcb-b400-5889-83b1-c486e289a639",
+          "convention": "utf8_char_offset",
+          "end": 5586,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:58",
+          "start": 5580
+        },
+        "quote": "$83.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:58#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 59",
+        "locator": {
+          "block_index": 59,
+          "component_id": "2c4d687a-6398-51e2-b682-7ad1ea219f13",
+          "convention": "utf8_char_offset",
+          "end": 5594,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:59",
+          "start": 5587
+        },
+        "quote": "$100.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:59#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 60",
+        "locator": {
+          "block_index": 60,
+          "component_id": "d8de79ac-3c7c-5885-96f6-ec600f2f0d66",
+          "convention": "utf8_char_offset",
+          "end": 5615,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:60",
+          "start": 5595
+        },
+        "quote": "Four trees (healthy)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:60#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 61",
+        "locator": {
+          "block_index": 61,
+          "component_id": "cbc605cb-cb18-5724-a89e-f31934677e16",
+          "convention": "utf8_char_offset",
+          "end": 5622,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:61",
+          "start": 5616
+        },
+        "quote": "$67.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:61#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 62",
+        "locator": {
+          "block_index": 62,
+          "component_id": "84725122-b416-558e-afa6-f52c359b4c09",
+          "convention": "utf8_char_offset",
+          "end": 5629,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:62",
+          "start": 5623
+        },
+        "quote": "$42.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:62#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 63",
+        "locator": {
+          "block_index": 63,
+          "component_id": "4a597d1d-fea8-5b21-afae-ac12acb334b3",
+          "convention": "utf8_char_offset",
+          "end": 5636,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:63",
+          "start": 5630
+        },
+        "quote": "$50.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:63#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 64",
+        "locator": {
+          "block_index": 64,
+          "component_id": "0d197fca-a654-5c58-a1af-902686fb708e",
+          "convention": "utf8_char_offset",
+          "end": 6082,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:64",
+          "start": 5637
+        },
+        "quote": "Planning Area Rating | Fee Schedule (per unit) Nine-Family Dwelling Unit Development and Above\nNew Development or Redevelopment | New Development or Redevelopment w/Public Dedication | New Development or Redevelopment w/Private Dedication\nOne tree (intensive care) | $234.00 | $146.00 | $175.00\nTwo trees (at risk) | $175.00 | $110.00 | $131.00\nThree trees (outpatient) | $117.00 | $73.00 | $88.00\nFour trees (healthy) | $58.00 | $37.00 | $44.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:64#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 65",
+        "locator": {
+          "block_index": 65,
+          "component_id": "4a0bbe92-f5f3-5d33-972e-3c1972f1a8ff",
+          "convention": "utf8_char_offset",
+          "end": 6103,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:65",
+          "start": 6083
+        },
+        "quote": "Planning Area Rating",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:65#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 66",
+        "locator": {
+          "block_index": 66,
+          "component_id": "356aa9ab-02c2-53ee-bc05-d3d0a28138be",
+          "convention": "utf8_char_offset",
+          "end": 6127,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:66",
+          "start": 6104
+        },
+        "quote": "Fee Schedule (per unit)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:66#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 67",
+        "locator": {
+          "block_index": 67,
+          "component_id": "cd00aefe-4d28-5f76-b70e-4213bc3b31b2",
+          "convention": "utf8_char_offset",
+          "end": 6175,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:67",
+          "start": 6128
+        },
+        "quote": "Nine-Family Dwelling Unit Development and Above",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:67#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 68",
+        "locator": {
+          "block_index": 68,
+          "component_id": "3633a08c-09cc-5c92-8f58-10b3a6da58d7",
+          "convention": "utf8_char_offset",
+          "end": 6208,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:68",
+          "start": 6176
+        },
+        "quote": "New Development or Redevelopment",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:68#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 69",
+        "locator": {
+          "block_index": 69,
+          "component_id": "121eb41c-6860-506b-a090-ba01e65c3b68",
+          "convention": "utf8_char_offset",
+          "end": 6261,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:69",
+          "start": 6209
+        },
+        "quote": "New Development or Redevelopment w/Public Dedication",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:69#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 70",
+        "locator": {
+          "block_index": 70,
+          "component_id": "ee92b691-192c-53c7-90b4-2315db340884",
+          "convention": "utf8_char_offset",
+          "end": 6315,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:70",
+          "start": 6262
+        },
+        "quote": "New Development or Redevelopment w/Private Dedication",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:70#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 71",
+        "locator": {
+          "block_index": 71,
+          "component_id": "d0a50838-58d3-52b6-9e27-6c65f6d10038",
+          "convention": "utf8_char_offset",
+          "end": 6341,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:71",
+          "start": 6316
+        },
+        "quote": "One tree (intensive care)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:71#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 72",
+        "locator": {
+          "block_index": 72,
+          "component_id": "ae0c0638-237b-55a9-9623-be0760d9a50e",
+          "convention": "utf8_char_offset",
+          "end": 6349,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:72",
+          "start": 6342
+        },
+        "quote": "$234.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:72#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 73",
+        "locator": {
+          "block_index": 73,
+          "component_id": "d1cdc4fb-573a-540b-950f-6afa145df616",
+          "convention": "utf8_char_offset",
+          "end": 6357,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:73",
+          "start": 6350
+        },
+        "quote": "$146.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:73#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 74",
+        "locator": {
+          "block_index": 74,
+          "component_id": "c432fb99-32b8-554c-b5ee-1d1cf17819f9",
+          "convention": "utf8_char_offset",
+          "end": 6365,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:74",
+          "start": 6358
+        },
+        "quote": "$175.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:74#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 75",
+        "locator": {
+          "block_index": 75,
+          "component_id": "4ea1913d-89b8-5c92-a7e0-4359577eb9cf",
+          "convention": "utf8_char_offset",
+          "end": 6385,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:75",
+          "start": 6366
+        },
+        "quote": "Two trees (at risk)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:75#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 76",
+        "locator": {
+          "block_index": 76,
+          "component_id": "453b7dc2-eb53-5b62-b84d-52c1cfb68e2b",
+          "convention": "utf8_char_offset",
+          "end": 6393,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:76",
+          "start": 6386
+        },
+        "quote": "$175.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:76#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 77",
+        "locator": {
+          "block_index": 77,
+          "component_id": "4631c6f8-c59f-5b0f-8a32-9e03eaa6fd2f",
+          "convention": "utf8_char_offset",
+          "end": 6401,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:77",
+          "start": 6394
+        },
+        "quote": "$110.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:77#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 78",
+        "locator": {
+          "block_index": 78,
+          "component_id": "61095477-3f81-5601-89a0-172e1d4ffa54",
+          "convention": "utf8_char_offset",
+          "end": 6409,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:78",
+          "start": 6402
+        },
+        "quote": "$131.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:78#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 79",
+        "locator": {
+          "block_index": 79,
+          "component_id": "0ffdbbcd-dbc2-5fa2-8e59-f11a507a8161",
+          "convention": "utf8_char_offset",
+          "end": 6434,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:79",
+          "start": 6410
+        },
+        "quote": "Three trees (outpatient)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:79#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 80",
+        "locator": {
+          "block_index": 80,
+          "component_id": "de17b90d-2934-571a-b815-b7432cf71503",
+          "convention": "utf8_char_offset",
+          "end": 6442,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:80",
+          "start": 6435
+        },
+        "quote": "$117.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:80#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 81",
+        "locator": {
+          "block_index": 81,
+          "component_id": "21c4ea1c-e78c-5618-ae3c-2db933f7e763",
+          "convention": "utf8_char_offset",
+          "end": 6449,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:81",
+          "start": 6443
+        },
+        "quote": "$73.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:81#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 82",
+        "locator": {
+          "block_index": 82,
+          "component_id": "36edaefd-b257-5fd8-b8d6-acfdfff334e3",
+          "convention": "utf8_char_offset",
+          "end": 6456,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:82",
+          "start": 6450
+        },
+        "quote": "$88.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:82#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 83",
+        "locator": {
+          "block_index": 83,
+          "component_id": "25a6032a-fe02-5ad0-9bc1-1c792196be06",
+          "convention": "utf8_char_offset",
+          "end": 6477,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:83",
+          "start": 6457
+        },
+        "quote": "Four trees (healthy)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:83#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 84",
+        "locator": {
+          "block_index": 84,
+          "component_id": "d99a5c10-746c-532a-9134-d2ad8f75c1f9",
+          "convention": "utf8_char_offset",
+          "end": 6484,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:84",
+          "start": 6478
+        },
+        "quote": "$58.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:84#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 85",
+        "locator": {
+          "block_index": 85,
+          "component_id": "fdd85581-46e8-5deb-bf08-fb4dc87de297",
+          "convention": "utf8_char_offset",
+          "end": 6491,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:85",
+          "start": 6485
+        },
+        "quote": "$37.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:85#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 86",
+        "locator": {
+          "block_index": 86,
+          "component_id": "ef12112a-efd4-52cc-b95e-a3d2c09327fd",
+          "convention": "utf8_char_offset",
+          "end": 6498,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:86",
+          "start": 6492
+        },
+        "quote": "$44.00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:86#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 87",
+        "locator": {
+          "block_index": 87,
+          "component_id": "dea18fbe-4641-58cd-b900-c3323f436ca2",
+          "convention": "utf8_char_offset",
+          "end": 6833,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:87",
+          "start": 6499
+        },
+        "quote": "(3) All fees shall be deposited in the City’s parkland acquisition and development fund by planning area. Fees collected shall be used for the acquisition and improvement of new or undeveloped parkland within the same planning area as where the fee is collected, including the improvement of undeveloped land within existing parkland.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:87#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 88",
+        "locator": {
+          "block_index": 88,
+          "component_id": "c236cc4c-5a87-5405-829b-e75cd0c9a895",
+          "convention": "utf8_char_offset",
+          "end": 6837,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:88",
+          "start": 6834
+        },
+        "quote": "(4)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:88#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 89",
+        "locator": {
+          "block_index": 89,
+          "component_id": "160abddc-47f2-5ae5-bd02-d41d6a26bcf9",
+          "convention": "utf8_char_offset",
+          "end": 7214,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:89",
+          "start": 6838
+        },
+        "quote": "(i) Except as described in subsection (c)(4)(ii) of this section, upon application of the property owner, the County shall refund that portion of any parkland development fee which has been on deposit over seven years and which is unexpended and uncommitted. The refund shall be made to the then-current owner or owners of lots or units of the development project or projects.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:89#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 90",
+        "locator": {
+          "block_index": 90,
+          "component_id": "04e76fdd-d8d5-5ed7-882c-aa5a29ebb661",
+          "convention": "utf8_char_offset",
+          "end": 7883,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:90",
+          "start": 7215
+        },
+        "quote": "(ii) If fees in any parkland development fee account are unexpended or uncommitted for more than six calendar years after deposit, the County Commission shall make findings by resolution on or before December 31st of the sixth calendar year after receipt of the fee and annually thereafter until the funds are expended or committed. For so long as the County retains the fees, the resolution shall identify the purpose to which such fees shall be put and to show a roughly proportional and reasonable relationship between the fee and the purpose for which it was collected. If the County Commission makes such findings, the fees are exempt from the refund requirement.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:90#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 91",
+        "locator": {
+          "block_index": 91,
+          "component_id": "96902bf5-b2b2-56ba-a601-32f3d9d02391",
+          "convention": "utf8_char_offset",
+          "end": 8426,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:91",
+          "start": 7884
+        },
+        "quote": "(d) Credit for Parkland Dedications. Developers may dedicate a portion of their land for public parkland. In such instances where parkland is accepted for dedication, a credit equal to $15,000 per acre, or fraction thereof, of dedicated parkland shall be applied against the balance of parkland acquisition costs required under this section for the subdivision. Provided, however, such dedication shall not reduce the payment for parkland improvement costs as reflected in the minimum fee schedule listed in subsection (c)(2) of this section.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:91#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 92",
+        "locator": {
+          "block_index": 92,
+          "component_id": "511cd2c5-2a3c-54e7-b703-60404c54d12d",
+          "convention": "utf8_char_offset",
+          "end": 8937,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:92",
+          "start": 8427
+        },
+        "quote": "(e) Credit for Parkland Improvements in a Benefit District. In addition to dedicating a portion of their land, developers may also petition the City to include the cost of public parkland improvements within a benefit district for the service area. Where such dedication occurs and public parkland is approved for inclusion in a benefit district, a credit equal to 100 percent of the required parkland improvement cost defined under this section shall be applied to the subdivision within the benefit district.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:92#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 93",
+        "locator": {
+          "block_index": 93,
+          "component_id": "7fb6dee6-b7d8-51d1-8eee-94c35b6a8c14",
+          "convention": "utf8_char_offset",
+          "end": 9306,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:93",
+          "start": 8938
+        },
+        "quote": "(f) Dedication Criteria. The Parks and Recreation Director, after consultation with the Planning Director, shall determine the suitability of the land for parkland, and determine any improvements required to bring the land into usable condition. Factors to be considered in evaluating potential parkland sites shall include, but shall not be limited to, the following:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:93#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 94",
+        "locator": {
+          "block_index": 94,
+          "component_id": "d364cb2e-4bae-5bc4-8b79-f3267e88f103",
+          "convention": "utf8_char_offset",
+          "end": 9419,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:94",
+          "start": 9307
+        },
+        "quote": "(1) All land proposed for dedication as a park or other recreational site shall contain a minimum of five acres.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:94#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 95",
+        "locator": {
+          "block_index": 95,
+          "component_id": "06c7809b-c4f0-5670-8ccf-0186e2dc199a",
+          "convention": "utf8_char_offset",
+          "end": 9659,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:95",
+          "start": 9420
+        },
+        "quote": "(2) Not more than 10 percent of the park or open space shall contain stormwater detention/retention facilities, floodplain, or wetland, unless such area is part of a linear trail system, or is accepted by the Parks and Recreation Director.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:95#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 96",
+        "locator": {
+          "block_index": 96,
+          "component_id": "20d4c968-e64e-556b-ab9c-a47f6a629f82",
+          "convention": "utf8_char_offset",
+          "end": 9743,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:96",
+          "start": 9660
+        },
+        "quote": "(3) The park or open space shall not have an average slope greater than 10 percent.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:96#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 97",
+        "locator": {
+          "block_index": 97,
+          "component_id": "d68c2444-43f4-53ab-9006-dc33bf294b05",
+          "convention": "utf8_char_offset",
+          "end": 9949,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:97",
+          "start": 9744
+        },
+        "quote": "(4) Undisturbed natural open space may be accepted for a portion of the dedication requirements at the ratio of four acres of undisturbed natural open space for each one acre of active parkland dedication.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:97#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 98",
+        "locator": {
+          "block_index": 98,
+          "component_id": "4e38031e-7df0-5c1e-917b-be24f93e4d26",
+          "convention": "utf8_char_offset",
+          "end": 10072,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:98",
+          "start": 9950
+        },
+        "quote": "(5) The Parks and Recreation Director shall have the authority to waive or modify any or all of the above-listed criteria.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:98#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 99",
+        "locator": {
+          "block_index": 99,
+          "component_id": "37267f25-1d17-5e63-8dd4-5231e6c95ac6",
+          "convention": "utf8_char_offset",
+          "end": 10184,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:99",
+          "start": 10073
+        },
+        "quote": "(6) The park or open space shall be consistent with design policies/standards of the City’s comprehensive plan.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:99#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 100",
+        "locator": {
+          "block_index": 100,
+          "component_id": "b163f799-89c9-527d-afbf-9cd4570ed155",
+          "convention": "utf8_char_offset",
+          "end": 10559,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:100",
+          "start": 10185
+        },
+        "quote": "(g) Trail Dedication. Where the Topeka-Shawnee County trails and greenways plan identifies a trail planned for an area within a proposed subdivision, the property owner or developer shall be required to dedicate that portion of land for a public trail easement or trail right-of-way. Any such dedication shall receive a credit as specified in subsection (d) of this section.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:100#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 101",
+        "locator": {
+          "block_index": 101,
+          "component_id": "9dddf96d-1ad5-588b-935d-4a8bb1982c2c",
+          "convention": "utf8_char_offset",
+          "end": 10799,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:101",
+          "start": 10560
+        },
+        "quote": "(h) Other Considerations Prior to Deeding. The Parks and Recreation Director may require that any dedicated parkland be improved prior to dedication. Factors that may be considered shall include, but shall not be limited to, the following:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:101#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 102",
+        "locator": {
+          "block_index": 102,
+          "component_id": "74f2ec17-a379-5091-a89d-f5519bf6d9bc",
+          "convention": "utf8_char_offset",
+          "end": 11202,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:102",
+          "start": 10800
+        },
+        "quote": "(1) To the greatest extent possible, the developer may be required to preserve existing trees or other species of vegetation, or other natural features on the land to be dedicated for a park, trail, or recreational space. Significant trees lost during the construction process may be required to be replaced with suitable species and of suitable size as determined by the Parks and Recreation Director.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:102#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 103",
+        "locator": {
+          "block_index": 103,
+          "component_id": "930404c3-1ccf-5f34-826d-2ca82e1ac801",
+          "convention": "utf8_char_offset",
+          "end": 11386,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:103",
+          "start": 11203
+        },
+        "quote": "(2) Grass or other quick establishing vegetative ground cover may be required to prevent soil erosion, according to the specifications determined by the Parks and Recreation Director.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:103#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 104",
+        "locator": {
+          "block_index": 104,
+          "component_id": "95d32153-183e-5994-ae4f-2c8e4194b8c2",
+          "convention": "utf8_char_offset",
+          "end": 11772,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:104",
+          "start": 11387
+        },
+        "quote": "(3) The developer may be required to bring utilities to the boundary of the proposed park or open space and shall cap them off at no cost to the City. Utilities may include, but shall not be limited to, gas, storm sewer, sanitary sewer, and electricity. The location where such utilities are to be brought shall be determined by the City Engineer and the Parks and Recreation Director.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:104#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 105",
+        "locator": {
+          "block_index": 105,
+          "component_id": "e54952b0-8c7f-56f6-ab51-7eab852d5646",
+          "convention": "utf8_char_offset",
+          "end": 11796,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:105",
+          "start": 11773
+        },
+        "quote": "(i) Dedication Process.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:105#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 106",
+        "locator": {
+          "block_index": 106,
+          "component_id": "902a4917-7a80-56d5-a6a5-d508f3106eb0",
+          "convention": "utf8_char_offset",
+          "end": 11926,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:106",
+          "start": 11797
+        },
+        "quote": "(1) Land to be accepted as a park or trail under this section shall be designated as public park area or trail on the final plat.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:106#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 107",
+        "locator": {
+          "block_index": 107,
+          "component_id": "14704198-d48c-5862-95e6-49249569c4d0",
+          "convention": "utf8_char_offset",
+          "end": 12415,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:107",
+          "start": 11927
+        },
+        "quote": "(2) Prior to the dedication of parkland, the owner or developer shall provide the County with evidence of title in a form acceptable to the Shawnee County Counselor or a title insurance policy insuring the County’s interest in the property. In any dedication of required land, the developer must have good and marketable title to the land, free and clear of any mortgages, liens, encumbrances, or assessments, except easements or minor imperfections of the title acceptable to the County.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:107#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 108",
+        "locator": {
+          "block_index": 108,
+          "component_id": "c9f204c6-54c6-5da9-8d58-64c9cdda0042",
+          "convention": "utf8_char_offset",
+          "end": 12663,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:108",
+          "start": 12416
+        },
+        "quote": "(3) The parkland or trail shall be dedicated at the time of approval of the final plat. However, the County shall not accept the parkland or trail until the completion of required improvements and the approval of the Parks and Recreation Director.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:108#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 109",
+        "locator": {
+          "block_index": 109,
+          "component_id": "e73c4e47-c89f-5906-bfed-978811069948",
+          "convention": "utf8_char_offset",
+          "end": 13226,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:109",
+          "start": 12664
+        },
+        "quote": "(j) Credit for Private Open Space. Property owners or developers may choose to reserve a portion of a subdivision for use as private open space for the benefit of subdivision residents. In such instances, a credit of 25 percent shall be applied against the parkland development fee as required by this division. All land proposed for reservation as private open space must be deemed usable and accessible by all residents within the proposed subdivision, as determined by the Planning Director, and approved by the Planning Commission. (Ord. 19715 § 2, 3-20-12.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:109#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.40.130 block 110",
+        "locator": {
+          "block_index": 110,
+          "component_id": "5813b857-6771-5ef9-8b50-bfd7a586fe9d",
+          "convention": "utf8_char_offset",
+          "end": 13376,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.40.130:block:110",
+          "start": 13227
+        },
+        "quote": "Cross References: Planning and Development Department, TMC 2.20.080 ; Public Works Department, TMC 2.20.100 ; Planning Commission, Chapter 2.225 TMC.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130:block:110#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19715",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 13224,
+          "start": 13201
+        },
+        "quote": "Ord. 19715 § 2, 3-20-12",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.40.130#history:19715",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "f798478e264f1b683730223d613b0b8718633710285f131684c339b188ebea6b",
+      "captured_at": "2026-08-28T04:48:18.734396Z",
+      "kind": "rendered_html_capture",
+      "value": "18.40.130.f798478e264f.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:18.40.130@f798478e264f1b68",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:18.40.130",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:18.40.130",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 18.40.130",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/18.40.130"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.40.130#history:19715",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "3-20-12"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "18.40.130",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.40.130#history:19715",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19715"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.40.130#history:19715",
+      "value": "adopted"
+    },
+    "title": "Dedication, reservation and acquisition of public sites and open spaces."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:48:18.734396Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "f798478e264f1b683730223d613b0b8718633710285f131684c339b188ebea6b",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "f798478e264f1b683730223d613b0b8718633710285f131684c339b188ebea6b",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "f798478e264f1b683730223d613b0b8718633710285f131684c339b188ebea6b",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "53eb1ddd5ebcb5bafe7dda7a30d27bc7b915f45dffa4880e2f5de5c37b7bdbe2",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "53eb1ddd5ebcb5bafe7dda7a30d27bc7b915f45dffa4880e2f5de5c37b7bdbe2",
+        "output_sha256": "32dab169b9d2c2e23a32de48573f9cb894208b8a58e95f4f6ae78581b65917e7",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "53eb1ddd5ebcb5bafe7dda7a30d27bc7b915f45dffa4880e2f5de5c37b7bdbe2",
+        "output_sha256": "0c13ed88937a2d164b90ba37b933766096055530757a271346531ff3d7a0bd14",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/18.40.130",
+    "retained_original": {
+      "byte_count": 53015,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/18.40.130.f798478e264f.html",
+      "retrieved_at": "2026-08-28T04:48:18.734396Z",
+      "sha256": "f798478e264f1b683730223d613b0b8718633710285f131684c339b188ebea6b"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

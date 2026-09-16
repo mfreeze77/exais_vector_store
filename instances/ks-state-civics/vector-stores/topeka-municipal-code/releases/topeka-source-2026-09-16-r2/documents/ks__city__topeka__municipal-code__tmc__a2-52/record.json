@@ -1,0 +1,223 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 228,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "29bae3075075d7cb7fd0978d371f0f89ee2261e5600536fa19e7e59ffd16f32c"
+    },
+    "structured": {
+      "block_count": 1,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "0c6d4dec-fdf7-566f-9cfa-1671166430d0",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:a2-52:section",
+      "sha256": "a436b18be9df51c361f6abec6c9a6706d750d1d2e1b2f655516fc87c6d49177e",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 1067,
+      "char_count": 1065,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "16c6fec8432417fc2869506a30a16eed4c79239763c8dc6da4139e467630041e"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A2-52 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "3701cff5-6ec6-5ac0-8fd6-8644fcae5762",
+          "convention": "utf8_char_offset",
+          "end": 227,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a2-52:block:0",
+          "start": 0
+        },
+        "quote": "The Governing Body shall designate a qualified person, including an employee to exercise the powers and perform the duties of City Manager during any temporary absence or disability of the City Manager. (C.O. 124 § 1, 6-11-24.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a2-52:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a2-52#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "84206d1af37db3ce69bd751f058e4ba01ef8d3642fe2e59bc9eb013630b9e968",
+      "captured_at": "2026-08-28T04:57:03.170905Z",
+      "kind": "rendered_html_capture",
+      "value": "A2-52.84206d1af37d.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:a2-52@84206d1af37db3ce",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:A2-52",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:a2-52",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC A2-52",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/A2-52"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "A2-52",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Sec. A2-52. Acting City Manager."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:57:03.170905Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "84206d1af37db3ce69bd751f058e4ba01ef8d3642fe2e59bc9eb013630b9e968",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "84206d1af37db3ce69bd751f058e4ba01ef8d3642fe2e59bc9eb013630b9e968",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "84206d1af37db3ce69bd751f058e4ba01ef8d3642fe2e59bc9eb013630b9e968",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "16c6fec8432417fc2869506a30a16eed4c79239763c8dc6da4139e467630041e",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "16c6fec8432417fc2869506a30a16eed4c79239763c8dc6da4139e467630041e",
+        "output_sha256": "29bae3075075d7cb7fd0978d371f0f89ee2261e5600536fa19e7e59ffd16f32c",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "16c6fec8432417fc2869506a30a16eed4c79239763c8dc6da4139e467630041e",
+        "output_sha256": "a436b18be9df51c361f6abec6c9a6706d750d1d2e1b2f655516fc87c6d49177e",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/A2-52",
+    "retained_original": {
+      "byte_count": 27973,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/A2-52.84206d1af37d.html",
+      "retrieved_at": "2026-08-28T04:57:03.170905Z",
+      "sha256": "84206d1af37db3ce69bd751f058e4ba01ef8d3642fe2e59bc9eb013630b9e968"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

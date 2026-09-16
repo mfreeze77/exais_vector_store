@@ -1,0 +1,545 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 2110,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "2be725f06f94d0f099017f8423f17fd3143c68e76df74a3302277dc49b0306c6"
+    },
+    "structured": {
+      "block_count": 17,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "304dc93c-297a-59cb-8410-8554d46adc1a",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:section",
+      "sha256": "516989c1dce808e7a7f5e0b1c764b4503c2a5f2a9e2536c62744f7d8de8ef129",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 5889,
+      "char_count": 5881,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "4f8aadbf69f8b5fe2f601196f07e97570e7c1ae262f84eeb50107179ce285d43"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "2f94d134-3c8a-5a6c-aa1d-484946765059",
+          "convention": "utf8_char_offset",
+          "end": 128,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:0",
+          "start": 0
+        },
+        "quote": "The following described waters or wastes are considered exempt and may be discharged without being in violation of this chapter:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "e06ae3d1-b6bb-57eb-98a3-09cb0302ec9e",
+          "convention": "utf8_char_offset",
+          "end": 205,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:1",
+          "start": 129
+        },
+        "quote": "(a) A discharge authorized by, and in full compliance with, an NPDES permit;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "a0bf5182-28d4-5840-9b45-e70180e94989",
+          "convention": "utf8_char_offset",
+          "end": 352,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:2",
+          "start": 206
+        },
+        "quote": "(b) A discharge or flow of water resulting from firefighting by a Fire Department which does not contain oil or hazardous substances or materials;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "1867fa6d-7221-574c-9957-0655da5ad7bd",
+          "convention": "utf8_char_offset",
+          "end": 388,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:3",
+          "start": 353
+        },
+        "quote": "(c) Agricultural stormwater runoff;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "23680b24-83e9-5788-a077-2371bcc4f312",
+          "convention": "utf8_char_offset",
+          "end": 493,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:4",
+          "start": 389
+        },
+        "quote": "(d) A discharge or flow of water from lawn watering, or landscape irrigation, or other irrigation water;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "6b92501c-cc79-55c3-827e-020683dd0a80",
+          "convention": "utf8_char_offset",
+          "end": 573,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:5",
+          "start": 494
+        },
+        "quote": "(e) A discharge or flow of water from a diverted stream flow or natural spring;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "19a51726-5a56-5828-a89a-c2c701d0ffa0",
+          "convention": "utf8_char_offset",
+          "end": 671,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:6",
+          "start": 574
+        },
+        "quote": "(f) A discharge or flow of water from uncontaminated, pumped ground water or rising ground water;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "f35c4a09-1ecc-56f0-9c0f-bc14095fe776",
+          "convention": "utf8_char_offset",
+          "end": 794,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:7",
+          "start": 672
+        },
+        "quote": "(g) Uncontaminated ground water infiltration as defined in 40 CFR Section 35.2005(20) to the municipal storm sewer system;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "e3304a7f-fb31-5b0a-982a-5bc52651d3cc",
+          "convention": "utf8_char_offset",
+          "end": 912,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:8",
+          "start": 795
+        },
+        "quote": "(h) Uncontaminated discharge or flow of water from a foundation drain, crawl space pump, footing drain, or sump pump;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "df546009-2ddb-562e-988a-d5e8c1aa14ee",
+          "convention": "utf8_char_offset",
+          "end": 1092,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:9",
+          "start": 913
+        },
+        "quote": "(i) A discharge or flow of water from a potable water source not containing any hazardous substance or material from the cleaning or draining of a storage tank or other container;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "40bfdebe-c40e-5605-a8b8-2976302819a7",
+          "convention": "utf8_char_offset",
+          "end": 1281,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:10",
+          "start": 1093
+        },
+        "quote": "(j) A discharge or flow of water from air conditioning condensation that is unmixed with water from a cooling tower, emissions scrubber, emissions filter, or any other source of pollutant;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "7094d7f3-c475-599d-b400-cd845f4b9024",
+          "convention": "utf8_char_offset",
+          "end": 1346,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:11",
+          "start": 1282
+        },
+        "quote": "(k) A discharge or flow of water from noncommercial car washing;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "2a060233-4c9b-5b17-989e-c6dfc220c8da",
+          "convention": "utf8_char_offset",
+          "end": 1415,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:12",
+          "start": 1347
+        },
+        "quote": "(l) A discharge or flow of water from a riparian habitat or wetland;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "b92388e8-c8ac-5ddf-808f-fc56425f2fa0",
+          "convention": "utf8_char_offset",
+          "end": 1618,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:13",
+          "start": 1416
+        },
+        "quote": "(m) A discharge or flow of water from water used in street washing that is not contaminated with any soap, detergent, degreaser, solvent, emulsifier, dispersant, or any other harmful cleaning substance;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "a6535498-58d0-512d-96b9-c446da20b690",
+          "convention": "utf8_char_offset",
+          "end": 1775,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:14",
+          "start": 1619
+        },
+        "quote": "(n) Stormwater runoff from a roof that is not contaminated by any runoff or discharge from an emissions scrubber or filter or any other source of pollutant;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "8f2689e3-c2d8-5c5e-b03e-0b5e7c66dc02",
+          "convention": "utf8_char_offset",
+          "end": 2059,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:15",
+          "start": 1776
+        },
+        "quote": "(o) Swimming pool water that contains no harmful quantity of chlorine, muriatic acid or other chemical used in the treatment or disinfecting of the swimming pool water or in pool cleaning. (Ord. 19496 § 131, 12-21-10; Ord. 17399 § 4, 9-7-99. Code 1995 § 146-454. Formerly 14.90.040.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.30.030 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "22c7fac8-08cc-590a-aa99-be5e06cc4870",
+          "convention": "utf8_char_offset",
+          "end": 2109,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.30.030:block:16",
+          "start": 2060
+        },
+        "quote": "Cross References: Fire Department, TMC 2.20.030 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19496",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1992,
+          "start": 1966
+        },
+        "quote": "Ord. 19496 § 131, 12-21-10",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030#history:19496",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 17399",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2016,
+          "start": 1994
+        },
+        "quote": "Ord. 17399 § 4, 9-7-99",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.30.030#history:17399",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "0469c401eccf68e2b39d7cbc7388bdc70d942b65072cd51d20fc1a49552b4ecd",
+      "captured_at": "2026-08-28T04:32:19.763468Z",
+      "kind": "rendered_html_capture",
+      "value": "13.30.030.0469c401eccf.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:13.30.030@0469c401eccf68e2",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:13.30.030",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:13.30.030",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 13.30.030",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/13.30.030"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.30.030#history:19496",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-21-10"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.30.030#history:17399",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "9-7-99"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "13.30.030",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.30.030#history:19496",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19496"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.30.030#history:17399",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:17399"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.30.030#history:19496",
+      "value": "adopted"
+    },
+    "title": "Exceptions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:32:19.763468Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "0469c401eccf68e2b39d7cbc7388bdc70d942b65072cd51d20fc1a49552b4ecd",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "0469c401eccf68e2b39d7cbc7388bdc70d942b65072cd51d20fc1a49552b4ecd",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "0469c401eccf68e2b39d7cbc7388bdc70d942b65072cd51d20fc1a49552b4ecd",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "4f8aadbf69f8b5fe2f601196f07e97570e7c1ae262f84eeb50107179ce285d43",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "4f8aadbf69f8b5fe2f601196f07e97570e7c1ae262f84eeb50107179ce285d43",
+        "output_sha256": "2be725f06f94d0f099017f8423f17fd3143c68e76df74a3302277dc49b0306c6",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "4f8aadbf69f8b5fe2f601196f07e97570e7c1ae262f84eeb50107179ce285d43",
+        "output_sha256": "516989c1dce808e7a7f5e0b1c764b4503c2a5f2a9e2536c62744f7d8de8ef129",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/13.30.030",
+    "retained_original": {
+      "byte_count": 32436,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/13.30.030.0469c401eccf.html",
+      "retrieved_at": "2026-08-28T04:32:19.763468Z",
+      "sha256": "0469c401eccf68e2b39d7cbc7388bdc70d942b65072cd51d20fc1a49552b4ecd"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

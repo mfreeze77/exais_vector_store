@@ -1,0 +1,367 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 2242,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "da9d11def6c5ec315ecc9dfc4e7ca8f12faebb1e798c173bdc37a00aca6016f3"
+    },
+    "structured": {
+      "block_count": 10,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "b951d8ec-493d-5201-bead-bd44e35be27f",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:a2-30:section",
+      "sha256": "8658427c07ee53a89315134a770850f3e9984ac5a74878bad9801801543a435a",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 5630,
+      "char_count": 5626,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "7a128362d5cc814afe4bb2333d6aa3014fad2e321333f09be65b896a67701466"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A2-30 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "3491cf45-87c9-5460-9280-86d4e7dfb6c8",
+          "convention": "utf8_char_offset",
+          "end": 295,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a2-30:block:0",
+          "start": 0
+        },
+        "quote": "(a) Meetings. The governing body shall meet at least twice in every month at times and places as may be prescribed by ordinary ordinance. Special meetings may be held on the call of the Mayor or of four (4) or more district Councilmembers in the manner prescribed by rules of the governing body.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a2-30:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A2-30 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "8091db9f-7c0b-539b-b8bb-2d6eccc9c162",
+          "convention": "utf8_char_offset",
+          "end": 449,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a2-30:block:1",
+          "start": 296
+        },
+        "quote": "(b) Rules and journal. The governing body shall determine its own rules and order of business and shall provide for keeping a journal of its proceedings.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a2-30:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A2-30 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "be877ffb-ca79-5c30-a748-c0a48cc0e601",
+          "convention": "utf8_char_offset",
+          "end": 469,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a2-30:block:2",
+          "start": 450
+        },
+        "quote": "(c) Voting; Quorum.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a2-30:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A2-30 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "77a9d04e-eb32-59d7-a298-88e8fcef1d6e",
+          "convention": "utf8_char_offset",
+          "end": 538,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a2-30:block:3",
+          "start": 470
+        },
+        "quote": "(1) Six (6) members of the governing body shall constitute a quorum.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a2-30:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A2-30 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "35774e9a-7e9b-57db-a5d6-4f10a0cf96f2",
+          "convention": "utf8_char_offset",
+          "end": 724,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a2-30:block:4",
+          "start": 539
+        },
+        "quote": "(2) All actions by the governing body shall be taken by an affirmative vote of six (6) or more members, unless a greater or lesser number of votes is required by ordinance or state law.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a2-30:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A2-30 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "a5ad234f-6e69-5d5a-aaf8-170128a1f60e",
+          "convention": "utf8_char_offset",
+          "end": 944,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a2-30:block:5",
+          "start": 725
+        },
+        "quote": "(3) All actions by the Council with regard to ordinances enacted pursuant to Article 12 , § 5(b) of the Kansas Constitution (ordinary ordinances) shall be taken by an affirmative vote of five (5) or more Councilmembers.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a2-30:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A2-30 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "1417750b-8859-5a2e-a6b8-4ccc1b76c755",
+          "convention": "utf8_char_offset",
+          "end": 1314,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a2-30:block:6",
+          "start": 945
+        },
+        "quote": "(d) Form. Proposed ordinances and resolutions shall be in written or printed form. Any ordinance which repeals or amends an existing ordinance shall set out in full the sections or subsections to be repealed or amended, and shall indicate matter to be omitted by enclosing it in brackets or by strikeout type and shall indicate new matter by underscoring or by italics.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a2-30:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A2-30 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "0616659f-c995-5f4a-9f4e-34bc5755dc3d",
+          "convention": "utf8_char_offset",
+          "end": 1557,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a2-30:block:7",
+          "start": 1315
+        },
+        "quote": "(e) Procedure. All ordinances shall be considered at a governing body meeting. Persons interested in a proposed ordinance shall be given an opportunity to be heard in accordance with such rules and regulations as the governing body may adopt.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a2-30:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A2-30 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "555fe46e-9749-5d9e-a6ab-4f3041df5f17",
+          "convention": "utf8_char_offset",
+          "end": 2002,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a2-30:block:8",
+          "start": 1558
+        },
+        "quote": "(f) Publication. The City Clerk or such other city officer as the governing body may designate shall cause all ordinances, as soon as practicable after they have been passed and signed, to be published once in the official city newspaper, unless Kansas Statutes or other applicable law require more publications. In lieu of publication of the entire ordinance, the City Clerk may publish a summary of the ordinance in accordance with state law.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a2-30:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A2-30 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "c18f456d-890b-5ba2-93a1-4d6509858926",
+          "convention": "utf8_char_offset",
+          "end": 2241,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a2-30:block:9",
+          "start": 2003
+        },
+        "quote": "(g) Signature, authentication and recording. All ordinances and resolutions shall be authenticated by the signatures of the Mayor and City Clerk or such other appointive officer as the governing body may designate. (C.O. 117 § 7, 2-9-16.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a2-30:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a2-30#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "75e977a2ff70a88db08f25eb773e35f3ab14080a6e3847a14f64f6ec6e3489f1",
+      "captured_at": "2026-08-28T04:56:55.563072Z",
+      "kind": "rendered_html_capture",
+      "value": "A2-30.75e977a2ff70.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:a2-30@75e977a2ff70a88d",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:A2-30",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:a2-30",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC A2-30",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/A2-30"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "A2-30",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Sec. A2-30. Governing body rules of procedure."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:56:55.563072Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "75e977a2ff70a88db08f25eb773e35f3ab14080a6e3847a14f64f6ec6e3489f1",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "75e977a2ff70a88db08f25eb773e35f3ab14080a6e3847a14f64f6ec6e3489f1",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "75e977a2ff70a88db08f25eb773e35f3ab14080a6e3847a14f64f6ec6e3489f1",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "7a128362d5cc814afe4bb2333d6aa3014fad2e321333f09be65b896a67701466",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "7a128362d5cc814afe4bb2333d6aa3014fad2e321333f09be65b896a67701466",
+        "output_sha256": "da9d11def6c5ec315ecc9dfc4e7ca8f12faebb1e798c173bdc37a00aca6016f3",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "7a128362d5cc814afe4bb2333d6aa3014fad2e321333f09be65b896a67701466",
+        "output_sha256": "8658427c07ee53a89315134a770850f3e9984ac5a74878bad9801801543a435a",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/A2-30",
+    "retained_original": {
+      "byte_count": 33032,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/A2-30.75e977a2ff70.html",
+      "retrieved_at": "2026-08-28T04:56:55.563072Z",
+      "sha256": "75e977a2ff70a88db08f25eb773e35f3ab14080a6e3847a14f64f6ec6e3489f1"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

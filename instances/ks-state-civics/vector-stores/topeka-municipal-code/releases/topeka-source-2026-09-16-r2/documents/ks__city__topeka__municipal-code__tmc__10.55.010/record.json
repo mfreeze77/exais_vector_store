@@ -1,0 +1,319 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1347,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "494d060fd27bd556ead4a1bc64c1b7aec10bd975a62553a99f41bb1094a3d697"
+    },
+    "structured": {
+      "block_count": 7,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 2,
+      "path": "structured.json",
+      "root_component_id": "17a43543-d2b2-516a-b20b-005c10e45786",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.55.010:section",
+      "sha256": "97320c0c0f757993241b042388f366ff580c1d173fae13eecea63f1ac8074c46",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 3710,
+      "char_count": 3666,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "0cbfff110640e482a9e91b2e125ded66d45d300bbf5c92898adf909fc6ff758e"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.55.010 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "bd940b5e-08f5-584f-8035-b4ccfc96a7cc",
+          "convention": "utf8_char_offset",
+          "end": 188,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.55.010:block:0",
+          "start": 0
+        },
+        "quote": "The following words, terms and phrases, when used in this chapter, shall have the meanings ascribed to them in this section, except where the context clearly indicates a different meaning:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.55.010:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.55.010 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "7e54b10a-cf66-5f7e-aa69-6bd4e17b4888",
+          "convention": "utf8_char_offset",
+          "end": 606,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.55.010:block:1",
+          "start": 189
+        },
+        "quote": "“Snow tire” means a tire which, when compared with conventional rib type tires, has a relatively aggressive tread pattern and is designed primarily to provide additional starting, stopping and driving traction in snow, and shall have a tread depth of at least four thirty-seconds of an inch. The tread has ribs, lugs, blocks or buttons; is generally discontinuous, and has the following characteristics when inflated:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.55.010:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.55.010 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "8d14f935-60c0-51c6-ba01-ce3be849dc9d",
+          "convention": "utf8_char_offset",
+          "end": 763,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.55.010:block:2",
+          "start": 607
+        },
+        "quote": "(1) A substantial portion of the lug, block or rib edges in the tread design are at an angle greater than 30 degrees to the tire circumferential centerline.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.55.010:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.55.010 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "1a84ac40-1362-5bc8-b4e8-08497fb72a46",
+          "convention": "utf8_char_offset",
+          "end": 926,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.55.010:block:3",
+          "start": 764
+        },
+        "quote": "(2) On at least one side of the tread design, the shoulder lugs protrude at least one-half inch in a direction generally perpendicular to the direction of travel.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.55.010:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.55.010 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "b1ba5baa-282b-5c2d-b0ec-d6097fffe05d",
+          "convention": "utf8_char_offset",
+          "end": 1115,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.55.010:block:4",
+          "start": 927
+        },
+        "quote": "(3) Tires, as defined above, manufactured after January 1, 1976, will be permanently labeled on one sidewall with the words “MUD and SNOW” or any contraction using the letters “M” and “S.”",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.55.010:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.55.010 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "da9faee2-5169-57b5-9ea3-2f16e6c89a20",
+          "convention": "utf8_char_offset",
+          "end": 1290,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.55.010:block:5",
+          "start": 1116
+        },
+        "quote": "“Tire chain” means a device which, when attached to the tires, provides additional starting, stopping and driving traction in snow. (Code 1981 § 43-289. Code 1995 § 142-536.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.55.010:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.55.010 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "9e965b37-09e3-5a52-912a-2b522320f3bf",
+          "convention": "utf8_char_offset",
+          "end": 1346,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.55.010:block:6",
+          "start": 1291
+        },
+        "quote": "Cross References: Definitions generally, TMC 1.10.020 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.55.010:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.55.010#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "b3f0ac5fcc02e3c2737c0bff38121b32e0af13547cc70b157061901a0583cab3",
+      "captured_at": "2026-08-28T04:15:49.609607Z",
+      "kind": "rendered_html_capture",
+      "value": "10.55.010.b3f0ac5fcc02.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.55.010@b3f0ac5fcc02e3c2",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.55.010",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.55.010",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.55.010",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.55.010"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.55.010",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Definitions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:15:49.609607Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "b3f0ac5fcc02e3c2737c0bff38121b32e0af13547cc70b157061901a0583cab3",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "b3f0ac5fcc02e3c2737c0bff38121b32e0af13547cc70b157061901a0583cab3",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "b3f0ac5fcc02e3c2737c0bff38121b32e0af13547cc70b157061901a0583cab3",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "0cbfff110640e482a9e91b2e125ded66d45d300bbf5c92898adf909fc6ff758e",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "0cbfff110640e482a9e91b2e125ded66d45d300bbf5c92898adf909fc6ff758e",
+        "output_sha256": "494d060fd27bd556ead4a1bc64c1b7aec10bd975a62553a99f41bb1094a3d697",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "0cbfff110640e482a9e91b2e125ded66d45d300bbf5c92898adf909fc6ff758e",
+        "output_sha256": "97320c0c0f757993241b042388f366ff580c1d173fae13eecea63f1ac8074c46",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.55.010",
+    "retained_original": {
+      "byte_count": 28544,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.55.010.b3f0ac5fcc02.html",
+      "retrieved_at": "2026-08-28T04:15:49.609607Z",
+      "sha256": "b3f0ac5fcc02e3c2737c0bff38121b32e0af13547cc70b157061901a0583cab3"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

@@ -1,0 +1,2321 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 17443,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "8f909d3195ee9c3c6388dc3fb264f6679244a05bbf25f540879522872fec08b9"
+    },
+    "structured": {
+      "block_count": 130,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "2c20ae6d-5b99-59b5-ab3e-07286b5b2aee",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:section",
+      "sha256": "dbaa4084fc87275c5e1407fd7c005c6a44b6765942cf725634c7988559891ecb",
+      "table_count": 1
+    },
+    "verbatim": {
+      "byte_count": 51109,
+      "char_count": 51106,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "0eb96401be1ed83e603cc7200c5de0579279877348cbb639b51db1101fb5b621"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "adc44e80-db7e-5854-9845-cd4647d05221",
+          "convention": "utf8_char_offset",
+          "end": 274,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:0",
+          "start": 0
+        },
+        "quote": "In all districts, except the C-5 district, there shall be provided prior to the occupation of a building or commencement of a principal use a minimum number of off-street parking and stacking spaces as set forth herein except as otherwise provided for in TMC 18.240.040(b) .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "51ba6063-e616-5b1b-acbe-60925943136b",
+          "convention": "utf8_char_offset",
+          "end": 8913,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:1",
+          "start": 275
+        },
+        "quote": "Principal Use | Number of Spaces\n(a) Residential uses. |\n(1) Single- and two-family dwellings. | 1 per dwelling unit having not more than 950 square feet of floor area\n| 2 per dwelling unit having more than 950 square feet of floor area\n(2) Multiple-family dwelling and apartment hotels. | 2 per dwelling unit for first 20 units, and 1.5 per dwelling unit after the first 20 units for dwelling units not more than 800 square feet of floor area\n| 2 per dwelling unit having more than 800 square feet of floor area\n(3) Multiple-family dwelling, elderly housing. | 1 per every 2 dwelling units\n(4) Multiple-family dwelling, high-rise. | 1.5 per dwelling unit for first 20 dwelling units and 1 per dwelling unit thereafter\n(5) Short-term residential rental, types I and III. | 1 per every 2 bedrooms for guests in addition to parking required for the residence. In the calculation of parking for guest rooms, a fraction of one-half or more shall be rounded up to the next whole number. Up to 3 on-street parking spaces may substitute for required off-street parking if the property contains frontage of 22 feet or more, exclusive of driveway approaches, sidewalk ramps, and no parking zones. A minimum of 22 feet of frontage on a street is required for each on-street parking space.\n(6) Short-term residential rental, type II. | As required for single- and two-family dwellings. Up to 2 on-street parking spaces may substitute for required off-street parking if the property contains frontage of 22 feet or more, exclusive of driveway approaches, sidewalk ramps, and no parking zones. A minimum of 22 feet of frontage on a street is required for each on-street parking space.\n(7) Hotels and motels. | 1 per sleeping room plus additional space for restaurant, convention centers and other facilities as may be open to public\n(8) Congregate living and dormitory type dwellings. | 1 per sleeping room\n(9) Fraternity/sorority house. | 1 per 300 square feet of floor area\n(10) Developmentally disabled group home. | 1 per each 2 sleeping rooms\n(b) Community facilities and institutional uses. |\n(1) Public and private educational facilities. |\n(i) Elementary and secondary. | 2.5 per classroom\n(ii) Senior high. | 10 per classroom\n(2) Religious assembly. | 1 per every 4 seats in auditorium or largest room\n(3) Cultural facility. | 1 per 300 square feet of floor area\n(4) Community center. | 1 per 300 square feet of floor area\n(5) Reception, conference and assembly facility. | 1 per 150 square feet of floor area or 1/3 of the occupant load, whichever is less\n(6) Day care center, type II. | 1 per every 10 persons the facility is licensed to serve, but not less than 5 spaces. To provide for the safe and convenient loading and unloading of persons as well as minimize traffic congestion, a paved unobstructed pickup space with adequate stacking area (as determined by the City or County Building Official) shall be provided at the building entrance or stacking space to accommodate 5 vehicles.\n(7) Residential care facility, types II and III. | 1 per every 3 roomers, but not less than 2 spaces\n(8) Medical care facility, type II. | 1 per every 3 beds\n(9) Community living facility, type I. | 1 per every 2 roomers\n(10) Community living facility, type II. | 1 per every staff member determined by the maximum number of staff present at any one time, but not less than 5 spaces\n(11) Crisis center, type I. | 1 per 300 square feet of floor area\n(12) Crisis center, type II. | 1 per 200 square feet of floor area\n(13) Hospital or medical center. | 1.75 per hospital bed\n(14) Private membership association, club, lodge or fraternal organization. | 1 per 300 square feet of floor area\n(15) Business or vocational school, technical college. | 1 per 200 square feet of floor area\n(16) College or university. | 1 per 2.63 students enrolled\n(c) Professional offices. |\n(1) Medical and related offices and clinics, chiropractic, dental, optometrist, osteopath, pediatrician, etc. | 1 per 300 square feet of floor area\n(2) Professional and governmental offices: accounting, architectural, engineering, governmental, insurance sales, law, real estate, sales and brokerage, etc. | 1 per 400 square feet of floor area\n(3) Financial institution. | 1 per 200 square feet of floor area, plus 3 stacking spaces for each external teller or customer service window\n(4) Veterinarian. | 1 per 400 square feet of floor area\n(d) Commercial uses. |\n(1) Business and retail establishments (other than listed). | 1 per 200 square feet of floor area\n(2) Restaurants: |\n(i) Family dining type, where all food consumed within an enclosed structure. | 1 per 150 square feet of floor area or 1/3 the occupant load, whichever is less\n(ii) Carry-out and delivery only, where no food consumed on the premises. | 1 per each employee based upon maximum shift, plus 5 stacking spaces per drive-in window. Such stacking spaces shall not be designed to impede pedestrian or vehicular circulation on the site or on any abutting street.\n(iii) Drive-in type, where food may be consumed on the premises, outside a completely enclosed building, or served directly to customers in parked vehicles. | 1 per 35 square feet of floor area, plus 5 stacking spaces per drive-in window. Such stacking spaces shall not be designed to impede pedestrian or vehicular circulation on the site or on any abutting street.\n(iv) Fast food, an establishment whose principal business is the sale of pre-prepared or rapidly prepared food directly to the customer in a ready-to-consume state for consumption either within the restaurant building or off premises. | 1 per 85 square feet of floor area or 1/3 the occupant load, whichever is less, plus 5 stacking spaces per drive-in window. Such stacking spaces shall not be designed to impede pedestrian or vehicular circulation on the site or on any abutting street.\n(3) Automotive service station, types I and II. | 1 per 4 gas pumps, but not fewer than 4 spaces. In no instance shall a required parking space or its maneuvering area conflict with vehicles being fueled or awaiting fuel.\n(4) Funeral home or mortuary. | 1 per every 3 seats in the main seating area\n(5) Theater, adult/nonadult. | 1 per each 2.5 seats\n(6) Automotive or vehicle car wash. | 1 per each 2 washing stalls plus 2 stacking spaces per washing stall\n(7) Shopping centers. | 4.55 per 1,000 square feet of gross floor area\n(e) Recreation, entertainment and amusement. |\n(1) Commercial recreational facility (unless otherwise listed). | 1 per 150 square feet of floor area\n(2) Courts, racquetball, handball, squash and tennis (when operated as an independent use). | 4 per each court, or 1 per 3 spectator seats, whichever is greater\n(3) Amusement indoor establishments. | 1 per 100 square feet of floor area\n(4) Bowling alley. | 5 per alley, plus additional space for any other associated use (e.g., bar, restaurant, etc.) open to the public\n(5) Amusement park. | 1 per 200 square feet of floor area plus 1 per 200 square feet of land area used for outdoor recreational areas\n(6) Auditorium, fairgrounds, stadiums and grandstands. | 1 per every 4 seats\n(7) Athletic field. | 15 spaces for every diamond; 20 spaces for every soccer or athletic field, or 1 space for every 4 seats, whichever is greater\n(8) Golf courses. | 4 per each green, plus additional space for any other associated uses (e.g., tavern, restaurant, etc.) open to the public\n(9) Golf driving range. | 1.5 per every tee, if provided, or 1.5 per each 20 feet of range width along the tees\n(10) Miniature golf course. | 2 per hole\n(11) Outdoor range, archery, rifle, trap or skeet. | 2 per target area or 1 per 5 seats, whichever is greater\n(f) Industrial uses. |\n(1) Industrial establishments (other than listed). | 1 per 1,000 square feet of floor area\n(2) Research and testing laboratory. | 1 per 600 square feet of floor area\n(3) Warehousing. | 1 per 1,000 square feet of floor area to a maximum of 5 spaces for establishments up to 25,000 square feet of floor area. For warehouses over 25,000 square feet, 5 spaces plus 1 for each additional 5,000 square feet above 25,000 square feet of floor area.\n(4) Manufacturing or establishments engaged in production, processing, packing and crating, cleaning, servicing, or repair of materials, goods or products. | 1 per 600 square feet of floor area up to 25,000 square feet of floor area; and 1 per 1,000 square feet of floor area above 25,000 square feet of floor area\n(g) Other uses. For uses not listed, parking spaces shall be provided on the same basis as required for the most similar listed use as determined by the appropriate City or County Building Official. |",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "f2a23795-c46b-5f00-916b-693c623723c3",
+          "convention": "utf8_char_offset",
+          "end": 8927,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:2",
+          "start": 8914
+        },
+        "quote": "Principal Use",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "4e17bb96-99a5-594c-a74e-2fbee4c1deac",
+          "convention": "utf8_char_offset",
+          "end": 8944,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:3",
+          "start": 8928
+        },
+        "quote": "Number of Spaces",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "eef0f174-12b7-5b7f-9c3c-896484029f29",
+          "convention": "utf8_char_offset",
+          "end": 8966,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:4",
+          "start": 8945
+        },
+        "quote": "(a) Residential uses.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "bde4531f-fbef-5ddb-810a-a092c620aad7",
+          "convention": "utf8_char_offset",
+          "end": 9004,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:5",
+          "start": 8967
+        },
+        "quote": "(1) Single- and two-family dwellings.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "a736b3b4-91cd-5c20-8923-7e736b9db15e",
+          "convention": "utf8_char_offset",
+          "end": 9075,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:6",
+          "start": 9005
+        },
+        "quote": "1 per dwelling unit having not more than 950 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "70462bee-1cd4-53b2-832c-93349a114ae3",
+          "convention": "utf8_char_offset",
+          "end": 9142,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:7",
+          "start": 9076
+        },
+        "quote": "2 per dwelling unit having more than 950 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "3d398e3f-e544-59a6-b34c-d7e8072275fa",
+          "convention": "utf8_char_offset",
+          "end": 9193,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:8",
+          "start": 9143
+        },
+        "quote": "(2) Multiple-family dwelling and apartment hotels.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "96402d6c-cced-5de3-80e5-bd1ff3d90ae0",
+          "convention": "utf8_char_offset",
+          "end": 9347,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:9",
+          "start": 9194
+        },
+        "quote": "2 per dwelling unit for first 20 units, and 1.5 per dwelling unit after the first 20 units for dwelling units not more than 800 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "2fff93a3-02e7-514b-884d-324bd0dfbe56",
+          "convention": "utf8_char_offset",
+          "end": 9414,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:10",
+          "start": 9348
+        },
+        "quote": "2 per dwelling unit having more than 800 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "9b2328fa-2010-5a39-83b2-360c2a202225",
+          "convention": "utf8_char_offset",
+          "end": 9461,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:11",
+          "start": 9415
+        },
+        "quote": "(3) Multiple-family dwelling, elderly housing.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "bc542bea-0daf-59f1-9f3b-ccb51c327712",
+          "convention": "utf8_char_offset",
+          "end": 9490,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:12",
+          "start": 9462
+        },
+        "quote": "1 per every 2 dwelling units",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "5f53f473-6057-5678-b755-de171fd4e96c",
+          "convention": "utf8_char_offset",
+          "end": 9531,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:13",
+          "start": 9491
+        },
+        "quote": "(4) Multiple-family dwelling, high-rise.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "582a5fb0-ec4a-5403-9516-ba6f03cd3143",
+          "convention": "utf8_char_offset",
+          "end": 9616,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:14",
+          "start": 9532
+        },
+        "quote": "1.5 per dwelling unit for first 20 dwelling units and 1 per dwelling unit thereafter",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "8c010a4c-4112-597f-b897-f93be61847e4",
+          "convention": "utf8_char_offset",
+          "end": 9668,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:15",
+          "start": 9617
+        },
+        "quote": "(5) Short-term residential rental, types I and III.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "dd68e491-5a9f-544b-a4db-50739b70ca85",
+          "convention": "utf8_char_offset",
+          "end": 9877,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:16",
+          "start": 9669
+        },
+        "quote": "1 per every 2 bedrooms for guests in addition to parking required for the residence. In the calculation of parking for guest rooms, a fraction of one-half or more shall be rounded up to the next whole number.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "ec9588cc-3108-5431-b9a7-ac796165e078",
+          "convention": "utf8_char_offset",
+          "end": 10174,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:17",
+          "start": 9878
+        },
+        "quote": "Up to 3 on-street parking spaces may substitute for required off-street parking if the property contains frontage of 22 feet or more, exclusive of driveway approaches, sidewalk ramps, and no parking zones. A minimum of 22 feet of frontage on a street is required for each on-street parking space.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "7ad63289-8d39-50bb-8079-ff5068701a3e",
+          "convention": "utf8_char_offset",
+          "end": 10218,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:18",
+          "start": 10175
+        },
+        "quote": "(6) Short-term residential rental, type II.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "92c21d1d-0311-5f46-bc38-24e8a74d214a",
+          "convention": "utf8_char_offset",
+          "end": 10268,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:19",
+          "start": 10219
+        },
+        "quote": "As required for single- and two-family dwellings.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "0575bbbf-8876-58b2-b3a7-6c337c4323ed",
+          "convention": "utf8_char_offset",
+          "end": 10565,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:20",
+          "start": 10269
+        },
+        "quote": "Up to 2 on-street parking spaces may substitute for required off-street parking if the property contains frontage of 22 feet or more, exclusive of driveway approaches, sidewalk ramps, and no parking zones. A minimum of 22 feet of frontage on a street is required for each on-street parking space.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "d17f9d26-0bd7-5da6-8d19-c6f389f53ca9",
+          "convention": "utf8_char_offset",
+          "end": 10588,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:21",
+          "start": 10566
+        },
+        "quote": "(7) Hotels and motels.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "7999ee4b-5cd2-5c97-9980-685848592588",
+          "convention": "utf8_char_offset",
+          "end": 10711,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:22",
+          "start": 10589
+        },
+        "quote": "1 per sleeping room plus additional space for restaurant, convention centers and other facilities as may be open to public",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "6d32b3d4-6ba7-5c14-8f19-bf7f35aaddfc",
+          "convention": "utf8_char_offset",
+          "end": 10763,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:23",
+          "start": 10712
+        },
+        "quote": "(8) Congregate living and dormitory type dwellings.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "ee3c8cba-61d6-5a65-bbe4-814a25dd4353",
+          "convention": "utf8_char_offset",
+          "end": 10783,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:24",
+          "start": 10764
+        },
+        "quote": "1 per sleeping room",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "29d3f6b9-8f1c-58ac-b8dc-2bfaf25cde42",
+          "convention": "utf8_char_offset",
+          "end": 10814,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:25",
+          "start": 10784
+        },
+        "quote": "(9) Fraternity/sorority house.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 26",
+        "locator": {
+          "block_index": 26,
+          "component_id": "11b7649c-f886-5c30-a3a7-2de5522d11ae",
+          "convention": "utf8_char_offset",
+          "end": 10850,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:26",
+          "start": 10815
+        },
+        "quote": "1 per 300 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 27",
+        "locator": {
+          "block_index": 27,
+          "component_id": "18a8fc8f-a141-5718-bd64-db179a6c17e1",
+          "convention": "utf8_char_offset",
+          "end": 10892,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:27",
+          "start": 10851
+        },
+        "quote": "(10) Developmentally disabled group home.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 28",
+        "locator": {
+          "block_index": 28,
+          "component_id": "af168cfb-cc55-57ef-8305-5f248f1e12e6",
+          "convention": "utf8_char_offset",
+          "end": 10920,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:28",
+          "start": 10893
+        },
+        "quote": "1 per each 2 sleeping rooms",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:28#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 29",
+        "locator": {
+          "block_index": 29,
+          "component_id": "fb548afe-4cd9-5107-820b-770fc5aa3741",
+          "convention": "utf8_char_offset",
+          "end": 10969,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:29",
+          "start": 10921
+        },
+        "quote": "(b) Community facilities and institutional uses.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:29#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 30",
+        "locator": {
+          "block_index": 30,
+          "component_id": "33b4eded-5935-5206-b449-d1f996e3078f",
+          "convention": "utf8_char_offset",
+          "end": 11016,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:30",
+          "start": 10970
+        },
+        "quote": "(1) Public and private educational facilities.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:30#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 31",
+        "locator": {
+          "block_index": 31,
+          "component_id": "93e3041a-d10b-522a-b266-e7d146a05008",
+          "convention": "utf8_char_offset",
+          "end": 11046,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:31",
+          "start": 11017
+        },
+        "quote": "(i) Elementary and secondary.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:31#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 32",
+        "locator": {
+          "block_index": 32,
+          "component_id": "1194d6e7-582d-52f0-ab7b-c0d43bca7157",
+          "convention": "utf8_char_offset",
+          "end": 11064,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:32",
+          "start": 11047
+        },
+        "quote": "2.5 per classroom",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:32#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 33",
+        "locator": {
+          "block_index": 33,
+          "component_id": "1001fea9-99a3-52f1-91dd-abcccc99458d",
+          "convention": "utf8_char_offset",
+          "end": 11082,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:33",
+          "start": 11065
+        },
+        "quote": "(ii) Senior high.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:33#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 34",
+        "locator": {
+          "block_index": 34,
+          "component_id": "02964b3c-2b31-5a94-81a6-38d806f2a66d",
+          "convention": "utf8_char_offset",
+          "end": 11099,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:34",
+          "start": 11083
+        },
+        "quote": "10 per classroom",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:34#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 35",
+        "locator": {
+          "block_index": 35,
+          "component_id": "bdded52d-5b7f-5ab0-8503-14d804d7abb0",
+          "convention": "utf8_char_offset",
+          "end": 11123,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:35",
+          "start": 11100
+        },
+        "quote": "(2) Religious assembly.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:35#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 36",
+        "locator": {
+          "block_index": 36,
+          "component_id": "2ee6ceed-3d48-5ed5-ac88-695b459109de",
+          "convention": "utf8_char_offset",
+          "end": 11173,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:36",
+          "start": 11124
+        },
+        "quote": "1 per every 4 seats in auditorium or largest room",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:36#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 37",
+        "locator": {
+          "block_index": 37,
+          "component_id": "818b908b-2209-5099-b2ff-ed0603250f49",
+          "convention": "utf8_char_offset",
+          "end": 11196,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:37",
+          "start": 11174
+        },
+        "quote": "(3) Cultural facility.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:37#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 38",
+        "locator": {
+          "block_index": 38,
+          "component_id": "64223bd0-ba25-55a0-b171-a875b7941ad6",
+          "convention": "utf8_char_offset",
+          "end": 11232,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:38",
+          "start": 11197
+        },
+        "quote": "1 per 300 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:38#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 39",
+        "locator": {
+          "block_index": 39,
+          "component_id": "74d22c83-bb99-569d-b010-bc20899aa5e1",
+          "convention": "utf8_char_offset",
+          "end": 11254,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:39",
+          "start": 11233
+        },
+        "quote": "(4) Community center.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:39#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 40",
+        "locator": {
+          "block_index": 40,
+          "component_id": "f2d01f04-dd48-5ab4-8a4e-400be9e8246f",
+          "convention": "utf8_char_offset",
+          "end": 11290,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:40",
+          "start": 11255
+        },
+        "quote": "1 per 300 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:40#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 41",
+        "locator": {
+          "block_index": 41,
+          "component_id": "170fd88d-18e2-5aef-93a6-5d02a739d2c2",
+          "convention": "utf8_char_offset",
+          "end": 11339,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:41",
+          "start": 11291
+        },
+        "quote": "(5) Reception, conference and assembly facility.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:41#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 42",
+        "locator": {
+          "block_index": 42,
+          "component_id": "1c113965-1f24-5331-b9ab-daaac1d22c54",
+          "convention": "utf8_char_offset",
+          "end": 11422,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:42",
+          "start": 11340
+        },
+        "quote": "1 per 150 square feet of floor area or 1/3 of the occupant load, whichever is less",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:42#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 43",
+        "locator": {
+          "block_index": 43,
+          "component_id": "eb591107-3640-538e-834f-98fc45c31357",
+          "convention": "utf8_char_offset",
+          "end": 11452,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:43",
+          "start": 11423
+        },
+        "quote": "(6) Day care center, type II.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:43#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 44",
+        "locator": {
+          "block_index": 44,
+          "component_id": "c58ffb21-3464-5ba9-bbe8-a078ed554d85",
+          "convention": "utf8_char_offset",
+          "end": 11856,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:44",
+          "start": 11453
+        },
+        "quote": "1 per every 10 persons the facility is licensed to serve, but not less than 5 spaces. To provide for the safe and convenient loading and unloading of persons as well as minimize traffic congestion, a paved unobstructed pickup space with adequate stacking area (as determined by the City or County Building Official) shall be provided at the building entrance or stacking space to accommodate 5 vehicles.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:44#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 45",
+        "locator": {
+          "block_index": 45,
+          "component_id": "c0e5ad6d-51e1-5fcb-bc9b-6ccdad007bad",
+          "convention": "utf8_char_offset",
+          "end": 11905,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:45",
+          "start": 11857
+        },
+        "quote": "(7) Residential care facility, types II and III.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:45#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 46",
+        "locator": {
+          "block_index": 46,
+          "component_id": "35b279d2-a215-5f12-a98e-87683da30ba9",
+          "convention": "utf8_char_offset",
+          "end": 11955,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:46",
+          "start": 11906
+        },
+        "quote": "1 per every 3 roomers, but not less than 2 spaces",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:46#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 47",
+        "locator": {
+          "block_index": 47,
+          "component_id": "7e3a7a46-1740-5626-b3d5-f0e789ad7a7f",
+          "convention": "utf8_char_offset",
+          "end": 11991,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:47",
+          "start": 11956
+        },
+        "quote": "(8) Medical care facility, type II.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:47#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 48",
+        "locator": {
+          "block_index": 48,
+          "component_id": "1b571e5f-f421-5062-8a9c-d4e1903f8705",
+          "convention": "utf8_char_offset",
+          "end": 12010,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:48",
+          "start": 11992
+        },
+        "quote": "1 per every 3 beds",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:48#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 49",
+        "locator": {
+          "block_index": 49,
+          "component_id": "39a50d76-60a8-5da1-a423-329c60d16d68",
+          "convention": "utf8_char_offset",
+          "end": 12049,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:49",
+          "start": 12011
+        },
+        "quote": "(9) Community living facility, type I.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:49#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 50",
+        "locator": {
+          "block_index": 50,
+          "component_id": "0cf1c89a-4813-56f4-b5e8-e188ace82060",
+          "convention": "utf8_char_offset",
+          "end": 12071,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:50",
+          "start": 12050
+        },
+        "quote": "1 per every 2 roomers",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:50#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 51",
+        "locator": {
+          "block_index": 51,
+          "component_id": "37287fc0-a15c-5bbc-870a-2eef1f8ba9a3",
+          "convention": "utf8_char_offset",
+          "end": 12112,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:51",
+          "start": 12072
+        },
+        "quote": "(10) Community living facility, type II.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:51#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 52",
+        "locator": {
+          "block_index": 52,
+          "component_id": "7ebd6c81-d034-50b2-8772-b577697a175a",
+          "convention": "utf8_char_offset",
+          "end": 12231,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:52",
+          "start": 12113
+        },
+        "quote": "1 per every staff member determined by the maximum number of staff present at any one time, but not less than 5 spaces",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:52#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 53",
+        "locator": {
+          "block_index": 53,
+          "component_id": "64921dc4-9010-5f64-9f88-8619fef6ce16",
+          "convention": "utf8_char_offset",
+          "end": 12259,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:53",
+          "start": 12232
+        },
+        "quote": "(11) Crisis center, type I.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:53#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 54",
+        "locator": {
+          "block_index": 54,
+          "component_id": "d169789c-a9b9-574d-9310-f846d8002e6a",
+          "convention": "utf8_char_offset",
+          "end": 12295,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:54",
+          "start": 12260
+        },
+        "quote": "1 per 300 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:54#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 55",
+        "locator": {
+          "block_index": 55,
+          "component_id": "dd1dd8e7-8f39-5c0f-b0bc-e78d8ad06c59",
+          "convention": "utf8_char_offset",
+          "end": 12324,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:55",
+          "start": 12296
+        },
+        "quote": "(12) Crisis center, type II.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:55#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 56",
+        "locator": {
+          "block_index": 56,
+          "component_id": "a9c12628-9206-540a-ac8b-5429f29400d4",
+          "convention": "utf8_char_offset",
+          "end": 12360,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:56",
+          "start": 12325
+        },
+        "quote": "1 per 200 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:56#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 57",
+        "locator": {
+          "block_index": 57,
+          "component_id": "8872dadf-3ee6-53c2-9fd5-bc6ce5eeaad1",
+          "convention": "utf8_char_offset",
+          "end": 12393,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:57",
+          "start": 12361
+        },
+        "quote": "(13) Hospital or medical center.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:57#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 58",
+        "locator": {
+          "block_index": 58,
+          "component_id": "5d9e5858-98af-5771-b9fc-9d9ebbbf01d7",
+          "convention": "utf8_char_offset",
+          "end": 12415,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:58",
+          "start": 12394
+        },
+        "quote": "1.75 per hospital bed",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:58#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 59",
+        "locator": {
+          "block_index": 59,
+          "component_id": "eab705df-2a60-521f-905d-5c79612325b4",
+          "convention": "utf8_char_offset",
+          "end": 12491,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:59",
+          "start": 12416
+        },
+        "quote": "(14) Private membership association, club, lodge or fraternal organization.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:59#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 60",
+        "locator": {
+          "block_index": 60,
+          "component_id": "2e1c666f-2793-5a25-aeca-f562a49d6d0f",
+          "convention": "utf8_char_offset",
+          "end": 12527,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:60",
+          "start": 12492
+        },
+        "quote": "1 per 300 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:60#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 61",
+        "locator": {
+          "block_index": 61,
+          "component_id": "6d1e6a44-3f5f-5695-808a-965ce909bc2d",
+          "convention": "utf8_char_offset",
+          "end": 12582,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:61",
+          "start": 12528
+        },
+        "quote": "(15) Business or vocational school, technical college.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:61#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 62",
+        "locator": {
+          "block_index": 62,
+          "component_id": "680621b5-9e74-5a0b-841e-a1270700e7b3",
+          "convention": "utf8_char_offset",
+          "end": 12618,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:62",
+          "start": 12583
+        },
+        "quote": "1 per 200 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:62#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 63",
+        "locator": {
+          "block_index": 63,
+          "component_id": "0810b33f-6105-5119-8105-95b291f80d40",
+          "convention": "utf8_char_offset",
+          "end": 12646,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:63",
+          "start": 12619
+        },
+        "quote": "(16) College or university.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:63#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 64",
+        "locator": {
+          "block_index": 64,
+          "component_id": "3ee85a09-8ab7-53b1-b36f-7ec8d97df26e",
+          "convention": "utf8_char_offset",
+          "end": 12675,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:64",
+          "start": 12647
+        },
+        "quote": "1 per 2.63 students enrolled",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:64#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 65",
+        "locator": {
+          "block_index": 65,
+          "component_id": "dfca6eb1-d1e7-5a87-8745-cd6d70520c83",
+          "convention": "utf8_char_offset",
+          "end": 12701,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:65",
+          "start": 12676
+        },
+        "quote": "(c) Professional offices.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:65#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 66",
+        "locator": {
+          "block_index": 66,
+          "component_id": "50791f1f-1bde-5ccd-9479-da7a0fe81b63",
+          "convention": "utf8_char_offset",
+          "end": 12811,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:66",
+          "start": 12702
+        },
+        "quote": "(1) Medical and related offices and clinics, chiropractic, dental, optometrist, osteopath, pediatrician, etc.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:66#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 67",
+        "locator": {
+          "block_index": 67,
+          "component_id": "23a699b1-4dfa-5580-8fc5-e2648dce9758",
+          "convention": "utf8_char_offset",
+          "end": 12847,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:67",
+          "start": 12812
+        },
+        "quote": "1 per 300 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:67#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 68",
+        "locator": {
+          "block_index": 68,
+          "component_id": "0f9697ba-6d5b-5559-9d39-7391bae54950",
+          "convention": "utf8_char_offset",
+          "end": 13005,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:68",
+          "start": 12848
+        },
+        "quote": "(2) Professional and governmental offices: accounting, architectural, engineering, governmental, insurance sales, law, real estate, sales and brokerage, etc.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:68#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 69",
+        "locator": {
+          "block_index": 69,
+          "component_id": "990bf868-1fbc-50f1-9847-6d9485b27729",
+          "convention": "utf8_char_offset",
+          "end": 13041,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:69",
+          "start": 13006
+        },
+        "quote": "1 per 400 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:69#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 70",
+        "locator": {
+          "block_index": 70,
+          "component_id": "97330807-582e-5bbf-903f-d387137c1369",
+          "convention": "utf8_char_offset",
+          "end": 13068,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:70",
+          "start": 13042
+        },
+        "quote": "(3) Financial institution.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:70#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 71",
+        "locator": {
+          "block_index": 71,
+          "component_id": "38d4960f-7297-59ad-8781-b6897f8a6b0e",
+          "convention": "utf8_char_offset",
+          "end": 13180,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:71",
+          "start": 13069
+        },
+        "quote": "1 per 200 square feet of floor area, plus 3 stacking spaces for each external teller or customer service window",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:71#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 72",
+        "locator": {
+          "block_index": 72,
+          "component_id": "53c754f9-c249-5362-8823-5ae6d689144a",
+          "convention": "utf8_char_offset",
+          "end": 13198,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:72",
+          "start": 13181
+        },
+        "quote": "(4) Veterinarian.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:72#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 73",
+        "locator": {
+          "block_index": 73,
+          "component_id": "8d8bad13-eab1-5f90-a6af-236c89349a68",
+          "convention": "utf8_char_offset",
+          "end": 13234,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:73",
+          "start": 13199
+        },
+        "quote": "1 per 400 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:73#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 74",
+        "locator": {
+          "block_index": 74,
+          "component_id": "3226b820-99f6-5a86-8882-06cdfec0efb2",
+          "convention": "utf8_char_offset",
+          "end": 13255,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:74",
+          "start": 13235
+        },
+        "quote": "(d) Commercial uses.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:74#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 75",
+        "locator": {
+          "block_index": 75,
+          "component_id": "f2709f47-738d-5741-9482-8eeda9c4c909",
+          "convention": "utf8_char_offset",
+          "end": 13315,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:75",
+          "start": 13256
+        },
+        "quote": "(1) Business and retail establishments (other than listed).",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:75#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 76",
+        "locator": {
+          "block_index": 76,
+          "component_id": "b65c045c-f678-5796-8bf3-3470720683d9",
+          "convention": "utf8_char_offset",
+          "end": 13351,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:76",
+          "start": 13316
+        },
+        "quote": "1 per 200 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:76#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 77",
+        "locator": {
+          "block_index": 77,
+          "component_id": "7d5fbfda-68be-59b7-910b-a51bbfaf04de",
+          "convention": "utf8_char_offset",
+          "end": 13368,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:77",
+          "start": 13352
+        },
+        "quote": "(2) Restaurants:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:77#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 78",
+        "locator": {
+          "block_index": 78,
+          "component_id": "def10fab-f166-5689-95a1-cba82afb7757",
+          "convention": "utf8_char_offset",
+          "end": 13446,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:78",
+          "start": 13369
+        },
+        "quote": "(i) Family dining type, where all food consumed within an enclosed structure.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:78#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 79",
+        "locator": {
+          "block_index": 79,
+          "component_id": "58274821-d547-58b8-98de-17c0c70dfac7",
+          "convention": "utf8_char_offset",
+          "end": 13526,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:79",
+          "start": 13447
+        },
+        "quote": "1 per 150 square feet of floor area or 1/3 the occupant load, whichever is less",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:79#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 80",
+        "locator": {
+          "block_index": 80,
+          "component_id": "5707096c-96d5-5e80-a0dc-ae707e88d8bf",
+          "convention": "utf8_char_offset",
+          "end": 13600,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:80",
+          "start": 13527
+        },
+        "quote": "(ii) Carry-out and delivery only, where no food consumed on the premises.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:80#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 81",
+        "locator": {
+          "block_index": 81,
+          "component_id": "dbdd6ca7-c4ca-5aaa-8078-19657d3a51fa",
+          "convention": "utf8_char_offset",
+          "end": 13818,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:81",
+          "start": 13601
+        },
+        "quote": "1 per each employee based upon maximum shift, plus 5 stacking spaces per drive-in window. Such stacking spaces shall not be designed to impede pedestrian or vehicular circulation on the site or on any abutting street.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:81#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 82",
+        "locator": {
+          "block_index": 82,
+          "component_id": "7c15ec3c-3ef1-582a-9fef-7af444d15dc9",
+          "convention": "utf8_char_offset",
+          "end": 13975,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:82",
+          "start": 13819
+        },
+        "quote": "(iii) Drive-in type, where food may be consumed on the premises, outside a completely enclosed building, or served directly to customers in parked vehicles.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:82#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 83",
+        "locator": {
+          "block_index": 83,
+          "component_id": "7789f3b2-7e45-534e-b353-be084b37ad03",
+          "convention": "utf8_char_offset",
+          "end": 14183,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:83",
+          "start": 13976
+        },
+        "quote": "1 per 35 square feet of floor area, plus 5 stacking spaces per drive-in window. Such stacking spaces shall not be designed to impede pedestrian or vehicular circulation on the site or on any abutting street.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:83#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 84",
+        "locator": {
+          "block_index": 84,
+          "component_id": "c2cf6c2e-c64b-5ffa-abf1-630ca481c353",
+          "convention": "utf8_char_offset",
+          "end": 14418,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:84",
+          "start": 14184
+        },
+        "quote": "(iv) Fast food, an establishment whose principal business is the sale of pre-prepared or rapidly prepared food directly to the customer in a ready-to-consume state for consumption either within the restaurant building or off premises.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:84#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 85",
+        "locator": {
+          "block_index": 85,
+          "component_id": "533dd2fa-2b46-5d1a-bdac-158aedf6e9d0",
+          "convention": "utf8_char_offset",
+          "end": 14670,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:85",
+          "start": 14419
+        },
+        "quote": "1 per 85 square feet of floor area or 1/3 the occupant load, whichever is less, plus 5 stacking spaces per drive-in window. Such stacking spaces shall not be designed to impede pedestrian or vehicular circulation on the site or on any abutting street.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:85#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 86",
+        "locator": {
+          "block_index": 86,
+          "component_id": "ae81d870-f2ab-5ca1-b571-9cfd1d6177da",
+          "convention": "utf8_char_offset",
+          "end": 14718,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:86",
+          "start": 14671
+        },
+        "quote": "(3) Automotive service station, types I and II.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:86#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 87",
+        "locator": {
+          "block_index": 87,
+          "component_id": "17d363dd-84bd-5d24-afdf-7f09c77ecad8",
+          "convention": "utf8_char_offset",
+          "end": 14890,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:87",
+          "start": 14719
+        },
+        "quote": "1 per 4 gas pumps, but not fewer than 4 spaces. In no instance shall a required parking space or its maneuvering area conflict with vehicles being fueled or awaiting fuel.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:87#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 88",
+        "locator": {
+          "block_index": 88,
+          "component_id": "cf912fcf-88bb-5e66-8cd5-d9c48d396159",
+          "convention": "utf8_char_offset",
+          "end": 14920,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:88",
+          "start": 14891
+        },
+        "quote": "(4) Funeral home or mortuary.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:88#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 89",
+        "locator": {
+          "block_index": 89,
+          "component_id": "f384cc02-62fa-56f6-a702-5abdaecab3a9",
+          "convention": "utf8_char_offset",
+          "end": 14965,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:89",
+          "start": 14921
+        },
+        "quote": "1 per every 3 seats in the main seating area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:89#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 90",
+        "locator": {
+          "block_index": 90,
+          "component_id": "af46d265-e45d-5ef6-b9d3-8c4b661a679b",
+          "convention": "utf8_char_offset",
+          "end": 14994,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:90",
+          "start": 14966
+        },
+        "quote": "(5) Theater, adult/nonadult.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:90#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 91",
+        "locator": {
+          "block_index": 91,
+          "component_id": "e54cbb1c-8485-5b47-a435-a13c0c0d2968",
+          "convention": "utf8_char_offset",
+          "end": 15015,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:91",
+          "start": 14995
+        },
+        "quote": "1 per each 2.5 seats",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:91#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 92",
+        "locator": {
+          "block_index": 92,
+          "component_id": "ae03dc45-dc3e-5c83-8f8a-b02851a99f50",
+          "convention": "utf8_char_offset",
+          "end": 15051,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:92",
+          "start": 15016
+        },
+        "quote": "(6) Automotive or vehicle car wash.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:92#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 93",
+        "locator": {
+          "block_index": 93,
+          "component_id": "d2df1e52-02b5-50f6-b7de-fec82c7765ab",
+          "convention": "utf8_char_offset",
+          "end": 15120,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:93",
+          "start": 15052
+        },
+        "quote": "1 per each 2 washing stalls plus 2 stacking spaces per washing stall",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:93#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 94",
+        "locator": {
+          "block_index": 94,
+          "component_id": "b40f2822-3e0b-5068-8e62-e888e6a43a94",
+          "convention": "utf8_char_offset",
+          "end": 15142,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:94",
+          "start": 15121
+        },
+        "quote": "(7) Shopping centers.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:94#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 95",
+        "locator": {
+          "block_index": 95,
+          "component_id": "175d4a60-3c0a-59c6-ad07-2036530e57e4",
+          "convention": "utf8_char_offset",
+          "end": 15189,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:95",
+          "start": 15143
+        },
+        "quote": "4.55 per 1,000 square feet of gross floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:95#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 96",
+        "locator": {
+          "block_index": 96,
+          "component_id": "903e171a-e6c8-5bd7-ac03-3a31be55b0cd",
+          "convention": "utf8_char_offset",
+          "end": 15234,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:96",
+          "start": 15190
+        },
+        "quote": "(e) Recreation, entertainment and amusement.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:96#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 97",
+        "locator": {
+          "block_index": 97,
+          "component_id": "823d7c1c-9a7f-54d9-b9a7-94e53151e3fd",
+          "convention": "utf8_char_offset",
+          "end": 15298,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:97",
+          "start": 15235
+        },
+        "quote": "(1) Commercial recreational facility (unless otherwise listed).",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:97#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 98",
+        "locator": {
+          "block_index": 98,
+          "component_id": "20da6522-5f7b-5bb2-8b0e-5a5579d2b168",
+          "convention": "utf8_char_offset",
+          "end": 15334,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:98",
+          "start": 15299
+        },
+        "quote": "1 per 150 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:98#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 99",
+        "locator": {
+          "block_index": 99,
+          "component_id": "581663c4-1f5a-560f-bfa4-8ed6cd43aeef",
+          "convention": "utf8_char_offset",
+          "end": 15426,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:99",
+          "start": 15335
+        },
+        "quote": "(2) Courts, racquetball, handball, squash and tennis (when operated as an independent use).",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:99#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 100",
+        "locator": {
+          "block_index": 100,
+          "component_id": "318e9cd6-0273-5d7a-bb22-b7e174a66a6b",
+          "convention": "utf8_char_offset",
+          "end": 15493,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:100",
+          "start": 15427
+        },
+        "quote": "4 per each court, or 1 per 3 spectator seats, whichever is greater",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:100#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 101",
+        "locator": {
+          "block_index": 101,
+          "component_id": "f7cb1da2-3453-57e8-98e4-a9b4d475a754",
+          "convention": "utf8_char_offset",
+          "end": 15530,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:101",
+          "start": 15494
+        },
+        "quote": "(3) Amusement indoor establishments.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:101#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 102",
+        "locator": {
+          "block_index": 102,
+          "component_id": "09460c43-33ba-5977-b0f1-112756ee13e8",
+          "convention": "utf8_char_offset",
+          "end": 15566,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:102",
+          "start": 15531
+        },
+        "quote": "1 per 100 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:102#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 103",
+        "locator": {
+          "block_index": 103,
+          "component_id": "4f101b30-5622-567c-82e3-be8235d1562e",
+          "convention": "utf8_char_offset",
+          "end": 15585,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:103",
+          "start": 15567
+        },
+        "quote": "(4) Bowling alley.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:103#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 104",
+        "locator": {
+          "block_index": 104,
+          "component_id": "750869f6-8519-5fa7-911e-b8041793dee2",
+          "convention": "utf8_char_offset",
+          "end": 15698,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:104",
+          "start": 15586
+        },
+        "quote": "5 per alley, plus additional space for any other associated use (e.g., bar, restaurant, etc.) open to the public",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:104#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 105",
+        "locator": {
+          "block_index": 105,
+          "component_id": "4d015c96-cbc5-5936-9a02-943002fb6fff",
+          "convention": "utf8_char_offset",
+          "end": 15718,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:105",
+          "start": 15699
+        },
+        "quote": "(5) Amusement park.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:105#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 106",
+        "locator": {
+          "block_index": 106,
+          "component_id": "14195177-53bb-560c-b6df-f2f7292f3206",
+          "convention": "utf8_char_offset",
+          "end": 15830,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:106",
+          "start": 15719
+        },
+        "quote": "1 per 200 square feet of floor area plus 1 per 200 square feet of land area used for outdoor recreational areas",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:106#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 107",
+        "locator": {
+          "block_index": 107,
+          "component_id": "22ce4873-8361-5181-9acb-bfae5c92de6d",
+          "convention": "utf8_char_offset",
+          "end": 15885,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:107",
+          "start": 15831
+        },
+        "quote": "(6) Auditorium, fairgrounds, stadiums and grandstands.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:107#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 108",
+        "locator": {
+          "block_index": 108,
+          "component_id": "1f06b6a2-cf24-59b3-8631-a1ebdd1d4924",
+          "convention": "utf8_char_offset",
+          "end": 15905,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:108",
+          "start": 15886
+        },
+        "quote": "1 per every 4 seats",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:108#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 109",
+        "locator": {
+          "block_index": 109,
+          "component_id": "804654ba-9559-582e-93c7-3353f44b515c",
+          "convention": "utf8_char_offset",
+          "end": 15925,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:109",
+          "start": 15906
+        },
+        "quote": "(7) Athletic field.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:109#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 110",
+        "locator": {
+          "block_index": 110,
+          "component_id": "ec1500ba-d0dd-5b1c-98cc-09109d018695",
+          "convention": "utf8_char_offset",
+          "end": 16051,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:110",
+          "start": 15926
+        },
+        "quote": "15 spaces for every diamond; 20 spaces for every soccer or athletic field, or 1 space for every 4 seats, whichever is greater",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:110#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 111",
+        "locator": {
+          "block_index": 111,
+          "component_id": "318c5c91-679d-5309-8c9d-1cb85745cd12",
+          "convention": "utf8_char_offset",
+          "end": 16069,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:111",
+          "start": 16052
+        },
+        "quote": "(8) Golf courses.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:111#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 112",
+        "locator": {
+          "block_index": 112,
+          "component_id": "7920899c-93ce-5ba5-8b3e-c5109a32cc0c",
+          "convention": "utf8_char_offset",
+          "end": 16191,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:112",
+          "start": 16070
+        },
+        "quote": "4 per each green, plus additional space for any other associated uses (e.g., tavern, restaurant, etc.) open to the public",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:112#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 113",
+        "locator": {
+          "block_index": 113,
+          "component_id": "f6a8d9e6-4cd3-5280-9ec6-715355f0e487",
+          "convention": "utf8_char_offset",
+          "end": 16215,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:113",
+          "start": 16192
+        },
+        "quote": "(9) Golf driving range.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:113#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 114",
+        "locator": {
+          "block_index": 114,
+          "component_id": "4736aee1-a025-5a39-acb3-3f8d4a09c920",
+          "convention": "utf8_char_offset",
+          "end": 16301,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:114",
+          "start": 16216
+        },
+        "quote": "1.5 per every tee, if provided, or 1.5 per each 20 feet of range width along the tees",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:114#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 115",
+        "locator": {
+          "block_index": 115,
+          "component_id": "a2cb84e7-5008-53e0-8198-9d89ac921d71",
+          "convention": "utf8_char_offset",
+          "end": 16329,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:115",
+          "start": 16302
+        },
+        "quote": "(10) Miniature golf course.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:115#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 116",
+        "locator": {
+          "block_index": 116,
+          "component_id": "ab09f6a0-a4db-5b30-be27-4bd347bb05f0",
+          "convention": "utf8_char_offset",
+          "end": 16340,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:116",
+          "start": 16330
+        },
+        "quote": "2 per hole",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:116#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 117",
+        "locator": {
+          "block_index": 117,
+          "component_id": "cd75a86a-dd06-5efb-afa1-c80487b052fa",
+          "convention": "utf8_char_offset",
+          "end": 16391,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:117",
+          "start": 16341
+        },
+        "quote": "(11) Outdoor range, archery, rifle, trap or skeet.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:117#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 118",
+        "locator": {
+          "block_index": 118,
+          "component_id": "25a3a10e-7b20-5c98-b63f-01f19ec7d6ac",
+          "convention": "utf8_char_offset",
+          "end": 16448,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:118",
+          "start": 16392
+        },
+        "quote": "2 per target area or 1 per 5 seats, whichever is greater",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:118#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 119",
+        "locator": {
+          "block_index": 119,
+          "component_id": "6518701b-0bd5-56b8-ae3b-4e13423a6efa",
+          "convention": "utf8_char_offset",
+          "end": 16469,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:119",
+          "start": 16449
+        },
+        "quote": "(f) Industrial uses.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:119#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 120",
+        "locator": {
+          "block_index": 120,
+          "component_id": "55153344-462e-5b57-a035-eb9e9613a36a",
+          "convention": "utf8_char_offset",
+          "end": 16520,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:120",
+          "start": 16470
+        },
+        "quote": "(1) Industrial establishments (other than listed).",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:120#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 121",
+        "locator": {
+          "block_index": 121,
+          "component_id": "3218794f-55cf-51c1-a091-d4f712431421",
+          "convention": "utf8_char_offset",
+          "end": 16558,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:121",
+          "start": 16521
+        },
+        "quote": "1 per 1,000 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:121#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 122",
+        "locator": {
+          "block_index": 122,
+          "component_id": "7d3ce2b4-04f2-5630-8f7e-091317330e4e",
+          "convention": "utf8_char_offset",
+          "end": 16595,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:122",
+          "start": 16559
+        },
+        "quote": "(2) Research and testing laboratory.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:122#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 123",
+        "locator": {
+          "block_index": 123,
+          "component_id": "194742cf-6d27-531b-a2f5-3f2b13fd8d7c",
+          "convention": "utf8_char_offset",
+          "end": 16631,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:123",
+          "start": 16596
+        },
+        "quote": "1 per 600 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:123#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 124",
+        "locator": {
+          "block_index": 124,
+          "component_id": "7204b078-7c21-54fb-9e65-2eb932b7e968",
+          "convention": "utf8_char_offset",
+          "end": 16648,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:124",
+          "start": 16632
+        },
+        "quote": "(3) Warehousing.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:124#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 125",
+        "locator": {
+          "block_index": 125,
+          "component_id": "f10fd3a2-eabd-55d2-8404-6277c273ba67",
+          "convention": "utf8_char_offset",
+          "end": 16904,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:125",
+          "start": 16649
+        },
+        "quote": "1 per 1,000 square feet of floor area to a maximum of 5 spaces for establishments up to 25,000 square feet of floor area. For warehouses over 25,000 square feet, 5 spaces plus 1 for each additional 5,000 square feet above 25,000 square feet of floor area.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:125#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 126",
+        "locator": {
+          "block_index": 126,
+          "component_id": "4356f250-b8ac-5ce8-a33b-2c6ec7f4e8d4",
+          "convention": "utf8_char_offset",
+          "end": 17060,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:126",
+          "start": 16905
+        },
+        "quote": "(4) Manufacturing or establishments engaged in production, processing, packing and crating, cleaning, servicing, or repair of materials, goods or products.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:126#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 127",
+        "locator": {
+          "block_index": 127,
+          "component_id": "0e9816b4-7c69-5224-9dc0-614db1aba589",
+          "convention": "utf8_char_offset",
+          "end": 17217,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:127",
+          "start": 17061
+        },
+        "quote": "1 per 600 square feet of floor area up to 25,000 square feet of floor area; and 1 per 1,000 square feet of floor area above 25,000 square feet of floor area",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:127#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 128",
+        "locator": {
+          "block_index": 128,
+          "component_id": "49b27164-7159-5cb5-a307-01a4d0ee847a",
+          "convention": "utf8_char_offset",
+          "end": 17416,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:128",
+          "start": 17218
+        },
+        "quote": "(g) Other uses. For uses not listed, parking spaces shall be provided on the same basis as required for the most similar listed use as determined by the appropriate City or County Building Official.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:128#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.240.030 block 129",
+        "locator": {
+          "block_index": 129,
+          "component_id": "c03351f0-07e5-5797-9e43-eb2440fb9fae",
+          "convention": "utf8_char_offset",
+          "end": 17442,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.240.030:block:129",
+          "start": 17417
+        },
+        "quote": "(Ord. 20283 § 9, 3-2-21.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030:block:129#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20283",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 17440,
+          "start": 17418
+        },
+        "quote": "Ord. 20283 § 9, 3-2-21",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.240.030#history:20283",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "7abed875805290b57ce48030688c4208b5bbcdda66bf8375f37ede330741fdb4",
+      "captured_at": "2026-08-28T04:54:46.111527Z",
+      "kind": "rendered_html_capture",
+      "value": "18.240.030.7abed8758052.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:18.240.030@7abed875805290b5",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:18.240.030",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:18.240.030",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 18.240.030",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/18.240.030"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.240.030#history:20283",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "3-2-21"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "18.240.030",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.240.030#history:20283",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20283"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.240.030#history:20283",
+      "value": "adopted"
+    },
+    "title": "Required number of off-street parking spaces."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:54:46.111527Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "7abed875805290b57ce48030688c4208b5bbcdda66bf8375f37ede330741fdb4",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "7abed875805290b57ce48030688c4208b5bbcdda66bf8375f37ede330741fdb4",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "7abed875805290b57ce48030688c4208b5bbcdda66bf8375f37ede330741fdb4",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "0eb96401be1ed83e603cc7200c5de0579279877348cbb639b51db1101fb5b621",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "0eb96401be1ed83e603cc7200c5de0579279877348cbb639b51db1101fb5b621",
+        "output_sha256": "8f909d3195ee9c3c6388dc3fb264f6679244a05bbf25f540879522872fec08b9",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "0eb96401be1ed83e603cc7200c5de0579279877348cbb639b51db1101fb5b621",
+        "output_sha256": "dbaa4084fc87275c5e1407fd7c005c6a44b6765942cf725634c7988559891ecb",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/18.240.030",
+    "retained_original": {
+      "byte_count": 40916,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/18.240.030.7abed8758052.html",
+      "retrieved_at": "2026-08-28T04:54:46.111527Z",
+      "sha256": "7abed875805290b57ce48030688c4208b5bbcdda66bf8375f37ede330741fdb4"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

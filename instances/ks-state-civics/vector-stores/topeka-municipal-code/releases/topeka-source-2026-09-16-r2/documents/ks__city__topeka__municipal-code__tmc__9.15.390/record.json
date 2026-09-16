@@ -1,0 +1,257 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 337,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "524035963b878d51354b31fe3072926fc3c8839c87730989b4e0d38a72c6c3cc"
+    },
+    "structured": {
+      "block_count": 1,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "16939333-df72-5b66-aca5-a5b8ebc2ec51",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.390:section",
+      "sha256": "72fc901de1e9feae062c53374ebae9013246b4d568f055fd06038b7f1ff57d1a",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 1413,
+      "char_count": 1406,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "5fe131fbd4c08d3bbdb9272f615c406db02351476a7bc02e6d51e8bc8776221c"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.15.390 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "df39a536-038a-52e5-b17b-f1ace04e6ed2",
+          "convention": "utf8_char_offset",
+          "end": 336,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.390:block:0",
+          "start": 0
+        },
+        "quote": "All alcoholic liquor or cereal malt beverage removed from a premises licensed by the Director shall be served in a container that displays the licensee’s name, logo or other identifying mark that is unique to the licensee. No alcoholic beverage removed from a licensed premises shall be in a glass container. (Ord. 20474 § 6, 12-19-23.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.390:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.390#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20474",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 334,
+          "start": 310
+        },
+        "quote": "Ord. 20474 § 6, 12-19-23",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.390#history:20474",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "6e25c7ba487822ee68c636c4bea47eafcb301c12d849a58a3bc0325e7558488e",
+      "captured_at": "2026-08-28T04:10:14.441340Z",
+      "kind": "rendered_html_capture",
+      "value": "9.15.390.6e25c7ba4878.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:9.15.390@6e25c7ba487822ee",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:9.15.390",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:9.15.390",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 9.15.390",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/9.15.390"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.15.390#history:20474",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-19-23"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "9.15.390",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.15.390#history:20474",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20474"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.15.390#history:20474",
+      "value": "adopted"
+    },
+    "title": "Authorized alcoholic liquor/cereal malt beverage containers."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:10:14.441340Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "6e25c7ba487822ee68c636c4bea47eafcb301c12d849a58a3bc0325e7558488e",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "6e25c7ba487822ee68c636c4bea47eafcb301c12d849a58a3bc0325e7558488e",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "6e25c7ba487822ee68c636c4bea47eafcb301c12d849a58a3bc0325e7558488e",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "5fe131fbd4c08d3bbdb9272f615c406db02351476a7bc02e6d51e8bc8776221c",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "5fe131fbd4c08d3bbdb9272f615c406db02351476a7bc02e6d51e8bc8776221c",
+        "output_sha256": "524035963b878d51354b31fe3072926fc3c8839c87730989b4e0d38a72c6c3cc",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "5fe131fbd4c08d3bbdb9272f615c406db02351476a7bc02e6d51e8bc8776221c",
+        "output_sha256": "72fc901de1e9feae062c53374ebae9013246b4d568f055fd06038b7f1ff57d1a",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/9.15.390",
+    "retained_original": {
+      "byte_count": 27939,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/9.15.390.6e25c7ba4878.html",
+      "retrieved_at": "2026-08-28T04:10:14.441340Z",
+      "sha256": "6e25c7ba487822ee68c636c4bea47eafcb301c12d849a58a3bc0325e7558488e"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

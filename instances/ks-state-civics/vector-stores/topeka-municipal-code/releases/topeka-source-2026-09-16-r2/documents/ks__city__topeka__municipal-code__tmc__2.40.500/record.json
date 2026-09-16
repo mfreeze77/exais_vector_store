@@ -1,0 +1,513 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 3743,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "bc0b1266e1784256cdbc4303b73abcffa23e3d57c43c1c370d07921e54ec7967"
+    },
+    "structured": {
+      "block_count": 15,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "89e94924-81cf-5df9-871e-4f88c9098e0f",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:section",
+      "sha256": "6f54fa0fd69ff4cf32f400e06f3b90fdb8d37a7d962b7487d4c2fc8158edf783",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 9244,
+      "char_count": 9208,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "b7f79ea9dacdb30d0368d9e859b2e962ffd9f503fa454b78adba1d173e9d4800"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "1d1fa993-7a92-52c1-8ab2-28693d28f728",
+          "convention": "utf8_char_offset",
+          "end": 921,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:0",
+          "start": 0
+        },
+        "quote": "(a) A diversion agreement shall provide that if the defendant fulfills the obligations of the program described therein, as determined by the City Attorney, the City Attorney shall act to have the criminal charges against the defendant dismissed with prejudice. The diversion agreement shall include specifically the waiver of all rights under the law or the Constitution of Kansas or of the United States to counsel, a speedy arraignment, a speedy trial, and the right to trial by jury. The diversion agreement may include, but is not limited to, provisions concerning payment of restitution, including court costs and diversion costs, residence in a specified facility, maintenance of gainful employment, and participation in programs offering medical, educational, vocational, social and psychological services, corrective and preventive guidance and other rehabilitative services. The diversion agreement shall state:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "c108cfd8-072b-55a5-89ad-88b31372b7fd",
+          "convention": "utf8_char_offset",
+          "end": 952,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:1",
+          "start": 922
+        },
+        "quote": "(1) The defendant’s full name;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "ce63bd95-19b5-57ea-92f8-4b0a70fd3bc2",
+          "convention": "utf8_char_offset",
+          "end": 1067,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:2",
+          "start": 953
+        },
+        "quote": "(2) The defendant’s full name at the time the complaint was filed, if different from the defendant’s current name;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "a1f61a12-35c0-5333-b683-a1bb65102312",
+          "convention": "utf8_char_offset",
+          "end": 1116,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:3",
+          "start": 1068
+        },
+        "quote": "(3) The defendant’s sex, race and date of birth;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "11df241e-5534-5f66-937d-ae9b2647e34e",
+          "convention": "utf8_char_offset",
+          "end": 1167,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:4",
+          "start": 1117
+        },
+        "quote": "(4) The crime with which the defendant is charged;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "7bdc3148-7a73-5905-af0b-879d92993c01",
+          "convention": "utf8_char_offset",
+          "end": 1209,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:5",
+          "start": 1168
+        },
+        "quote": "(5) The date the complaint was filed; and",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "2e145988-d721-5fe6-be08-b32df9f5adc0",
+          "convention": "utf8_char_offset",
+          "end": 1268,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:6",
+          "start": 1210
+        },
+        "quote": "(6) The Municipal Court with which the agreement is filed.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "69e5b1ff-b63b-52fd-b652-9ad90f92f888",
+          "convention": "utf8_char_offset",
+          "end": 1929,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:7",
+          "start": 1269
+        },
+        "quote": "(b) If a diversion agreement is entered into in lieu of further criminal proceedings on a complaint alleging an alcohol-related offense, the diversion agreement shall include a stipulation, agreed to by the defendant and the City Attorney, of the facts upon which the charge is based and a provision that if the defendant fails to fulfill the terms of the specific diversion agreement and the criminal proceedings on the complaint are resumed, the proceedings, including any proceedings on appeal, shall be conducted on the record of the stipulation of facts relating to the complaint. In addition, the agreement shall include a requirement that the defendant:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "6186e5d5-407d-5ab6-8cc1-abf4d3dc8930",
+          "convention": "utf8_char_offset",
+          "end": 2226,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:8",
+          "start": 1930
+        },
+        "quote": "(1) Pay a fine specified by the agreement in an amount equal to an amount authorized by K.S.A. 8-1567 , and amendments thereto, for a first offense or, in lieu of payment of the fine, perform community service specified by the agreement, consonant with K.S.A. 8-1567 , and amendments thereto; and",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "e9a35312-08c6-5017-b854-c5344e86da02",
+          "convention": "utf8_char_offset",
+          "end": 2503,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:9",
+          "start": 2227
+        },
+        "quote": "(2) Enroll in and successfully complete an alcohol and drug safety action program or a treatment program, or both, as provided in K.S.A. 8-1008 , and amendments thereto, and specified by the agreement, and pay the assessment required by K.S.A. 8-1008 , and amendments thereto.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "23a705a3-69af-5b53-af46-2bae5955939f",
+          "convention": "utf8_char_offset",
+          "end": 2791,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:10",
+          "start": 2504
+        },
+        "quote": "(c) If the person entering into a diversion agreement is a nonresident, the City Attorney shall transmit a copy of the diversion agreement to the Division. The Division shall forward a copy of the diversion agreement to the motor vehicle administrator of the person’s state of residence.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "fb7416ae-b8e1-5fbb-a70e-2e0393254b74",
+          "convention": "utf8_char_offset",
+          "end": 3231,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:11",
+          "start": 2792
+        },
+        "quote": "(d) If the City Attorney elects to offer diversion in lieu of further criminal proceedings on the complaint and the defendant agrees to all of the terms of the proposed agreement, the diversion agreement shall be filed with the Municipal Court and the Municipal Court shall stay further proceedings on the complaint. If the defendant declines to accept diversion, the Municipal Court shall resume the criminal proceedings on the complaint.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "24ab1b6b-59cc-5a5e-8b1e-c5a8bcab53c3",
+          "convention": "utf8_char_offset",
+          "end": 3632,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:12",
+          "start": 3232
+        },
+        "quote": "(e) The City Attorney shall forward to the Division of Vehicles of the State Department of Revenue a copy of the diversion agreement at the time such agreement is filed with the Municipal Court. The copy of the agreement shall be made available upon request to any county, district or city attorney or court. (Ord. 20206 § 9, 9-10-19; Ord. 17666 § 52, 3-27-01. Code 1995 § 50-87. Formerly 2.110.500.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "5290cc7f-5c9f-5771-8acf-93f916d8560c",
+          "convention": "utf8_char_offset",
+          "end": 3680,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:13",
+          "start": 3633
+        },
+        "quote": "Cross References: City Attorney, TMC 2.20.070 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.500 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "24bb265a-5888-53f0-8489-b04bb18775c5",
+          "convention": "utf8_char_offset",
+          "end": 3742,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.500:block:14",
+          "start": 3681
+        },
+        "quote": "State Law References: Similar State statute, K.S.A. 12-4416 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20206",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 3565,
+          "start": 3542
+        },
+        "quote": "Ord. 20206 § 9, 9-10-19",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500#history:20206",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 17666",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 3591,
+          "start": 3567
+        },
+        "quote": "Ord. 17666 § 52, 3-27-01",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.500#history:17666",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "25af713ff254a4d9bb6cd0dde1c53e5e8bf63f25d6a611fc0482cc19905300b3",
+      "captured_at": "2026-08-28T03:10:18.757968Z",
+      "kind": "rendered_html_capture",
+      "value": "2.40.500.25af713ff254.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:2.40.500@25af713ff254a4d9",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:2.40.500",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:2.40.500",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 2.40.500",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/2.40.500"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:2.40.500#history:20206",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "9-10-19"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:2.40.500#history:17666",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "3-27-01"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "2.40.500",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:2.40.500#history:20206",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20206"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:2.40.500#history:17666",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:17666"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:2.40.500#history:20206",
+      "value": "adopted"
+    },
+    "title": "Municipal Court diversion – Provisions of diversion agreement – Waiver of certain rights – Effect of failure to fulfill or accept agreement – Duties of City Attorney and Division of Vehicles."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T03:10:18.757968Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "25af713ff254a4d9bb6cd0dde1c53e5e8bf63f25d6a611fc0482cc19905300b3",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "25af713ff254a4d9bb6cd0dde1c53e5e8bf63f25d6a611fc0482cc19905300b3",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "25af713ff254a4d9bb6cd0dde1c53e5e8bf63f25d6a611fc0482cc19905300b3",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "b7f79ea9dacdb30d0368d9e859b2e962ffd9f503fa454b78adba1d173e9d4800",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "b7f79ea9dacdb30d0368d9e859b2e962ffd9f503fa454b78adba1d173e9d4800",
+        "output_sha256": "bc0b1266e1784256cdbc4303b73abcffa23e3d57c43c1c370d07921e54ec7967",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "b7f79ea9dacdb30d0368d9e859b2e962ffd9f503fa454b78adba1d173e9d4800",
+        "output_sha256": "6f54fa0fd69ff4cf32f400e06f3b90fdb8d37a7d962b7487d4c2fc8158edf783",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/2.40.500",
+    "retained_original": {
+      "byte_count": 37224,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/2.40.500.25af713ff254.html",
+      "retrieved_at": "2026-08-28T03:10:18.757968Z",
+      "sha256": "25af713ff254a4d9bb6cd0dde1c53e5e8bf63f25d6a611fc0482cc19905300b3"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

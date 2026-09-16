@@ -1,0 +1,270 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 4153,
+      "normalizations": [
+        {
+          "description": "Removed the ExAIS-added title and Source collection/Ordinance number/Official PDF lines prepended to the retained extraction; the same facts are carried in source.*.",
+          "name": "strip_exais_provenance_preamble"
+        },
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.md",
+      "sha256": "d027c0987b6c5e4d6bebd00b0e49bc9943d7ef9b799f1144544c0c2d18c9fafc"
+    },
+    "structured": {
+      "block_count": 4,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "9bdf069a-d5a8-58b4-8a1f-f69ef3ee633d",
+      "root_source_component_key": "ks:city:topeka:charter-ordinances:charter-ordinance:093:document",
+      "sha256": "423eeec6a899af90f66e8b14da6bdfb68ea9bd008e6effb67a14379d7a665eaf",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 4294,
+      "char_count": 4294,
+      "form": "retained_extraction_markdown",
+      "path": "verbatim.md",
+      "sha256": "df79d8fabccabc7265b4796cab1ef8fd3506b7efff81c40d8225b419247320e9"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.md",
+        "unit": "unicode codepoint"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(Published in the Topeka Metro News mauck 7",
+        "locator": {
+          "component_id": "9fe8d753-9c03-56c4-8c35-d79374cccee8",
+          "convention": "utf8_char_offset",
+          "end": 46,
+          "source_component_key": "ks:city:topeka:charter-ordinances:charter-ordinance:093:heading:0",
+          "start": 3
+        },
+        "quote": "(Published in the Topeka Metro News mauck 7",
+        "ref_id": "ks:city:topeka:charter-ordinances:charter-ordinance:093:heading:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "BE IT ORDAINED BY THE COUNCIL OF THE CITY OF TOPEKA, KANSAS:",
+        "locator": {
+          "component_id": "defb0796-d0b6-529b-8071-c152484b5353",
+          "convention": "utf8_char_offset",
+          "end": 446,
+          "source_component_key": "ks:city:topeka:charter-ordinances:charter-ordinance:093:heading:1",
+          "start": 386
+        },
+        "quote": "BE IT ORDAINED BY THE COUNCIL OF THE CITY OF TOPEKA, KANSAS:",
+        "ref_id": "ks:city:topeka:charter-ordinances:charter-ordinance:093:heading:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Sec. A2-16. Composition and eligibility.",
+        "locator": {
+          "component_id": "58684b87-27e8-5088-bd47-a6c466def471",
+          "convention": "utf8_char_offset",
+          "end": 641,
+          "source_component_key": "ks:city:topeka:charter-ordinances:charter-ordinance:093:heading:2",
+          "start": 601
+        },
+        "quote": "Sec. A2-16. Composition and eligibility.",
+        "ref_id": "ks:city:topeka:charter-ordinances:charter-ordinance:093:heading:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "CERTIFICATE",
+        "locator": {
+          "component_id": "52802c50-3cfe-51d8-8d10-2c1ba4ad53b3",
+          "convention": "utf8_char_offset",
+          "end": 3525,
+          "source_component_key": "ks:city:topeka:charter-ordinances:charter-ordinance:093:heading:3",
+          "start": 3514
+        },
+        "quote": "CERTIFICATE",
+        "ref_id": "ks:city:topeka:charter-ordinances:charter-ordinance:093:heading:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "PDF page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:charter-ordinances:charter-ordinance:093#page",
+        "unavailable_reason": "the retained extraction carries no page boundary markers, so no PDF page number is known for any span; markdown line numbers are not page numbers and are never converted into one"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "c4fa15b9d2468abf2a07ced9dc06e9b1fdc7035cc74dfff66966bd405ed17c88",
+      "captured_at": "2026-08-27T21:48:44+00:00",
+      "kind": "retained_publisher_pdf",
+      "value": "CharterOrdinance093.pdf"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:charter-ordinances",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:charter-ordinances:charter-ordinance:093@c4fa15b9d2468abf",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "topeka-ordinance:6ce6d66876f3dae1b385987c",
+        "note": "id in manifests/ordinances.jsonl",
+        "system": "topeka_ordinance_seed_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:charter-ordinances:charter-ordinance:093",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "Charter Ordinance 093",
+        "scope": "document",
+        "url": "https://files.topeka.gov/community/ordinances/charter/CharterOrdinance093.pdf"
+      }
+    ],
+    "dates": [],
+    "document_subtype": "charter_ordinance",
+    "document_type": "charter_ordinance",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [
+        {
+          "affects": "evidence",
+          "code": "no_page_coordinates",
+          "description": "The retained Markdown has no page boundaries, so page-level citation into the original PDF is unavailable for this document."
+        }
+      ],
+      "usable_text": true
+    },
+    "publisher_number": "093",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "no_page_coordinates"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher lists this instrument in its official adopted Topeka Charter Ordinances library and the document carries an enacting clause",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Charter Ordinance 093"
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "publisher PDF retained and hash-verified against the manifest",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "retained Markdown present and non-empty",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "state": "not_applicable"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-27T21:48:44+00:00",
+      "connector_entrypoint": "scripts/release/topeka-ordinances-collect.py",
+      "connector_revision": "observed-2026-08-27",
+      "method": "official_city_document_center_download"
+    },
+    "extractor": {
+      "mode": "remote_pdf_to_markdown",
+      "name": "marker",
+      "version": "runpod-hosted-2026-08"
+    },
+    "lineage": [
+      {
+        "input_sha256": "c4fa15b9d2468abf2a07ced9dc06e9b1fdc7035cc74dfff66966bd405ed17c88",
+        "note": "publisher PDF retained unmodified; input and output are the same bytes",
+        "output_sha256": "c4fa15b9d2468abf2a07ced9dc06e9b1fdc7035cc74dfff66966bd405ed17c88",
+        "step": "download",
+        "tool": "scripts/release/topeka-ordinances-collect.py",
+        "tool_version": "observed-2026-08-27"
+      },
+      {
+        "input_sha256": "c4fa15b9d2468abf2a07ced9dc06e9b1fdc7035cc74dfff66966bd405ed17c88",
+        "note": "Markdown produced by the bounded remote extraction path",
+        "output_sha256": "df79d8fabccabc7265b4796cab1ef8fd3506b7efff81c40d8225b419247320e9",
+        "step": "extract",
+        "tool": "marker",
+        "tool_version": "runpod-hosted-2026-08"
+      },
+      {
+        "input_sha256": "df79d8fabccabc7265b4796cab1ef8fd3506b7efff81c40d8225b419247320e9",
+        "output_sha256": "d027c0987b6c5e4d6bebd00b0e49bc9943d7ef9b799f1144544c0c2d18c9fafc",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "df79d8fabccabc7265b4796cab1ef8fd3506b7efff81c40d8225b419247320e9",
+        "output_sha256": "423eeec6a899af90f66e8b14da6bdfb68ea9bd008e6effb67a14379d7a665eaf",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.gov/community/ordinances/index.php",
+    "official_url": "https://files.topeka.gov/community/ordinances/charter/CharterOrdinance093.pdf",
+    "retained_original": {
+      "byte_count": 119796,
+      "local_path": null,
+      "media_type": "application/pdf",
+      "reference_uri": "seed://topeka-ordinances/raw/pdfs/CharterOrdinance093.pdf",
+      "retrieved_at": "2026-08-27T21:48:44+00:00",
+      "sha256": "c4fa15b9d2468abf2a07ced9dc06e9b1fdc7035cc74dfff66966bd405ed17c88"
+    },
+    "source_schema_version": "topeka_ordinance_seed_v1"
+  }
+}

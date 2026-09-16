@@ -1,0 +1,673 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1294,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "411a79e609aac563dc5eb7c668e9efbf68dd082e1ef00f9af97b92da2368ef84"
+    },
+    "structured": {
+      "block_count": 1,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "4f3ba2e4-5e70-5b6d-a067-e2c305f6c8b4",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11:section",
+      "sha256": "0faff75665fdd0e0215af8e12e775371d3549d61f721cf2dce99e784a12cecdb",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 4494,
+      "char_count": 4439,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "f0b7aa9a62cdac110baa0d94a1734c9d009467de6f75ca6fdd4bc19f889108a5"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC AxB Art. XI § 11 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "59bcae15-c6c6-59ac-9214-cc0547e518ff",
+          "convention": "utf8_char_offset",
+          "end": 1293,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11:block:0",
+          "start": 0
+        },
+        "quote": "If, during the term of this franchise ordinance, AMR does not earn a fair rate of return upon the value of property used and useful in providing such ambulance service for a period of six months; and it is determined by AMR that it would not be practical, possible or in the public interest to cure the deficiency by an increase in rates and/or a reduction in service; and AMR has complied with all applicable procedures as prescribed by the Board of County Commissioners of Shawnee County, Kansas, including the giving of notice of surrender to the City; then AMR upon 180 days’ written notice to the City Clerk may elect to surrender this franchise ordinance and cease operation of the ambulance service hereunder. “Fair rate of return” means receipt of revenues for patient charges and public funds, if any, to include the sum of operating costs, depreciation reserves, growth and development costs and management fees. (Ord. 20613 § 11, 12-2-25; Ord. 20535 § 11, 12-10-24; Ord. 20469 § 11, 12-12-23; Ord. 20399 § 11, 12-20-22; Ord. 20331 § 11, 12-14-21; Ord. 20275 § 11, 12-15-20; Ord. 20225 § 10, 12-10-19; Ord. 20105 § 10, 12-19-17; Ord. 20036 § 10, 12-6-16; Ord. 19975 § 10, 12-1-15; Ord. 19874 § 10, 1-7-14; Ord. 19797 § 10, 2-19-13; Ord. 19698 § 10, 2-7-12; Ord. 18782 § 2, 12-19-06.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20613",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 948,
+          "start": 924
+        },
+        "quote": "Ord. 20613 § 11, 12-2-25",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20613",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20535",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 975,
+          "start": 950
+        },
+        "quote": "Ord. 20535 § 11, 12-10-24",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20535",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20469",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1002,
+          "start": 977
+        },
+        "quote": "Ord. 20469 § 11, 12-12-23",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20469",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20399",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1029,
+          "start": 1004
+        },
+        "quote": "Ord. 20399 § 11, 12-20-22",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20399",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20331",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1056,
+          "start": 1031
+        },
+        "quote": "Ord. 20331 § 11, 12-14-21",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20331",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20275",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1083,
+          "start": 1058
+        },
+        "quote": "Ord. 20275 § 11, 12-15-20",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20275",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20225",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1110,
+          "start": 1085
+        },
+        "quote": "Ord. 20225 § 10, 12-10-19",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20225",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20105",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1137,
+          "start": 1112
+        },
+        "quote": "Ord. 20105 § 10, 12-19-17",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20105",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20036",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1163,
+          "start": 1139
+        },
+        "quote": "Ord. 20036 § 10, 12-6-16",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20036",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19975",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1189,
+          "start": 1165
+        },
+        "quote": "Ord. 19975 § 10, 12-1-15",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:19975",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19874",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1214,
+          "start": 1191
+        },
+        "quote": "Ord. 19874 § 10, 1-7-14",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:19874",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19797",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1240,
+          "start": 1216
+        },
+        "quote": "Ord. 19797 § 10, 2-19-13",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:19797",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19698",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1265,
+          "start": 1242
+        },
+        "quote": "Ord. 19698 § 10, 2-7-12",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:19698",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 18782",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1291,
+          "start": 1267
+        },
+        "quote": "Ord. 18782 § 2, 12-19-06",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:18782",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "c4f4be8738b538305d07cae163c135eefdbaa30e0b3950f24bbe8482a9ad72fc",
+      "captured_at": "2026-08-28T05:03:02.540501Z",
+      "kind": "rendered_html_capture",
+      "value": "AxB_ArtXI_11.c4f4be8738b5.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11@c4f4be8738b53830",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:AxB_ArtXI_11",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC AxB Art. XI § 11",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/AxB_ArtXI_11"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20613",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-2-25"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20535",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-10-24"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20469",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-12-23"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20399",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-20-22"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20331",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-14-21"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20275",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-15-20"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20225",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-10-19"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20105",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-19-17"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20036",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-6-16"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:19975",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-1-15"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:19874",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "1-7-14"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:19797",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "2-19-13"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:19698",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "2-7-12"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:18782",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-19-06"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "AxB Art. XI § 11",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20613",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20613"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20535",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20535"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20469",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20469"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20399",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20399"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20331",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20331"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20275",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20275"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20225",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20225"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20105",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20105"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20036",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20036"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:19975",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19975"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:19874",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19874"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:19797",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19797"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:19698",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19698"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:18782",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:18782"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xi-11#history:20613",
+      "value": "adopted"
+    },
+    "title": "Section 11. Surrender."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T05:03:02.540501Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "c4f4be8738b538305d07cae163c135eefdbaa30e0b3950f24bbe8482a9ad72fc",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "c4f4be8738b538305d07cae163c135eefdbaa30e0b3950f24bbe8482a9ad72fc",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "c4f4be8738b538305d07cae163c135eefdbaa30e0b3950f24bbe8482a9ad72fc",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "f0b7aa9a62cdac110baa0d94a1734c9d009467de6f75ca6fdd4bc19f889108a5",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "f0b7aa9a62cdac110baa0d94a1734c9d009467de6f75ca6fdd4bc19f889108a5",
+        "output_sha256": "411a79e609aac563dc5eb7c668e9efbf68dd082e1ef00f9af97b92da2368ef84",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "f0b7aa9a62cdac110baa0d94a1734c9d009467de6f75ca6fdd4bc19f889108a5",
+        "output_sha256": "0faff75665fdd0e0215af8e12e775371d3549d61f721cf2dce99e784a12cecdb",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/AxB_ArtXI_11",
+    "retained_original": {
+      "byte_count": 28239,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/AxB_ArtXI_11.c4f4be8738b5.html",
+      "retrieved_at": "2026-08-28T05:03:02.540501Z",
+      "sha256": "c4f4be8738b538305d07cae163c135eefdbaa30e0b3950f24bbe8482a9ad72fc"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

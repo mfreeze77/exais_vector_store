@@ -1,0 +1,641 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 4536,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "102661254380b3e13018fef5a1d5d1d9becead34d822856e409a5d9895eac028"
+    },
+    "structured": {
+      "block_count": 25,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "3bce8f9c-b17d-5d63-99ac-01578eb44776",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:section",
+      "sha256": "1a316b23f86e6e94a453001404a7fae6922a6a0c166518067649d27d2a7aaade",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 11129,
+      "char_count": 11078,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "2289a9d7a80a7862f4f3ba0275e3ade59041ba7d3c210e505fde863538ca17b5"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "dda980bd-1bc2-5ff1-b9a6-ab7b1c2881e5",
+          "convention": "utf8_char_offset",
+          "end": 305,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:0",
+          "start": 0
+        },
+        "quote": "(a) No person shall abandon any vehicle on any street or highway or on any other public property within the City and no person shall leave any vehicle at or on any such place within the City for such times and under such circumstances as to cause such vehicles reasonably to appear to have been abandoned.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "0b0e506b-3ef5-53a2-99f3-f7e02ebb0bbd",
+          "convention": "utf8_char_offset",
+          "end": 692,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:1",
+          "start": 306
+        },
+        "quote": "(b) No person shall abandon in any manner any vehicle, as defined in subsection (d) of this section, on any private property within the City which the person is not lawfully entitled to so use; and no person shall leave any vehicle at or on any such place within the City for such times and under such circumstances as to cause such vehicles reasonably to appear to have been abandoned.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "88d096e0-05c6-587e-9a86-b2354b9423bd",
+          "convention": "utf8_char_offset",
+          "end": 851,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:2",
+          "start": 693
+        },
+        "quote": "(c) No person shall leave any partially dismantled, nonoperating, wrecked or junked vehicle on any street or highway or other public property within the City.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "da71e84a-e3bb-5fdc-ba46-a4d4aeb91183",
+          "convention": "utf8_char_offset",
+          "end": 898,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:3",
+          "start": 852
+        },
+        "quote": "(d) An “abandoned vehicle” is a vehicle which:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "f5bf4588-1b0f-54d3-9298-e6a72b490804",
+          "convention": "utf8_char_offset",
+          "end": 974,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:4",
+          "start": 899
+        },
+        "quote": "(1) Remains on the streets or other public property for more than 48 hours;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "b1e9563b-d1e5-52e4-a8f8-4997b39bac4b",
+          "convention": "utf8_char_offset",
+          "end": 1115,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:5",
+          "start": 975
+        },
+        "quote": "(2) Has been impounded by the Police Department under authority of any vehicle traffic ordinance and which remains unclaimed after 48 hours;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "8a4b5773-1d24-56ca-bfa6-0bb10dab0a80",
+          "convention": "utf8_char_offset",
+          "end": 1326,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:6",
+          "start": 1116
+        },
+        "quote": "(3) Remains on private property for more than 48 hours following notification to remove the vehicle to the owner or person in charge of such vehicle by the owner or person in possession of the private property;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "ea0cc39f-41c3-53a4-b994-882fb2670b0c",
+          "convention": "utf8_char_offset",
+          "end": 1659,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:7",
+          "start": 1327
+        },
+        "quote": "(4) Remains on private property for more than 48 hours following the posting of a notice in a conspicuous place therein or thereon ordering immediate removal of the vehicle by the owner or person entitled to possession of the private property, regardless of whether the vehicle was lawfully placed on the private property initially;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "110ef520-9091-51d3-bd4e-f2f59e9729f4",
+          "convention": "utf8_char_offset",
+          "end": 1838,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:8",
+          "start": 1660
+        },
+        "quote": "(5) Is parked or placed in the driveway or other regular place of ingress or egress of a particular private property, regardless of the length of time the vehicle is so situated;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "4427b11b-2618-5235-bd95-aa819208e977",
+          "convention": "utf8_char_offset",
+          "end": 2365,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:9",
+          "start": 1839
+        },
+        "quote": "(6) Is placed or parked on any private lot or parcel of ground which is posted or designated as a lot or parcel of ground for public automobile parking for hire, or as reserved space for the parking of automobiles of persons who have special permission for such use, and the vehicle is so parked or placed without payment of the required fee therefor or otherwise placed or parked in violation of or contrary to the posting or designation described in this section, regardless of the length of time the vehicle is so situated;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "c90e4d66-8919-56e1-9a15-f5ca8d880359",
+          "convention": "utf8_char_offset",
+          "end": 2491,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:10",
+          "start": 2366
+        },
+        "quote": "(7) Is found stopped, standing, or parked in a tow away zone, regardless of the length of time the vehicle is so situated; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "6f80f722-7429-5f22-93b3-d50b924d2594",
+          "convention": "utf8_char_offset",
+          "end": 2647,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:11",
+          "start": 2492
+        },
+        "quote": "(8) Is found stopped, standing, or parked in a tow away zone or fire lane on private property, regardless of the length of time the vehicle is so situated.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "351d7e61-f350-54f4-8d33-f874ef685d83",
+          "convention": "utf8_char_offset",
+          "end": 2910,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:12",
+          "start": 2648
+        },
+        "quote": "(9) In addition to law enforcement officers, property maintenance inspectors shall also have the authority to issue a uniform complaint and notice to appear for violations of subsections (a) through (d) of this section, as provided in TMC 2.40.130 and 2.40.210 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "1869e2f0-f8bd-5ff4-9782-fa106f8bf933",
+          "convention": "utf8_char_offset",
+          "end": 2914,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:13",
+          "start": 2911
+        },
+        "quote": "(e)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "75809bd9-f256-583e-bfec-995a8b520c7d",
+          "convention": "utf8_char_offset",
+          "end": 3154,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:14",
+          "start": 2915
+        },
+        "quote": "(1) The Chief of Police may designate tow away no parking zones subject to approval of the Traffic Engineer. Tow away no parking zones will be posted with signs containing the words “No Parking” and “Tow Away Zone” by the Traffic Engineer.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "cb0690ba-4983-5e4f-bf02-978b5e738914",
+          "convention": "utf8_char_offset",
+          "end": 3392,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:15",
+          "start": 3155
+        },
+        "quote": "The Chief of Police may designate a tow away zone on a temporary basis, not to exceed seven days. Such zone shall be posted with temporary signs containing the words “No Parking” and “Tow Away Zone” and “By Order of the Chief of Police.”",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "76623530-bd53-5dd9-b820-3992b6211d54",
+          "convention": "utf8_char_offset",
+          "end": 3638,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:16",
+          "start": 3393
+        },
+        "quote": "(2) No person shall stop, stand or park an unoccupied vehicle in any tow away zone or any area of the street between the curbline and the edge of the right-of-way or any street, alley or drive or any drive approach onto a public street or alley.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "86e47275-56bf-5299-9128-dcaefbb88323",
+          "convention": "utf8_char_offset",
+          "end": 3642,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:17",
+          "start": 3639
+        },
+        "quote": "(f)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "3743420b-33fd-518e-bfba-b96981def529",
+          "convention": "utf8_char_offset",
+          "end": 3826,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:18",
+          "start": 3643
+        },
+        "quote": "(1) A legally parked vehicle may be towed from any location when a police or fire supervisor has reason to believe the removal of the vehicle is necessary to facilitate public safety.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "7e9efa0f-8909-5549-aab9-4c740332f212",
+          "convention": "utf8_char_offset",
+          "end": 3901,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:19",
+          "start": 3827
+        },
+        "quote": "(2) When a vehicle is towed pursuant to subsection (f)(1) of this section:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "2ce8b2ac-5f1e-56b9-8eb9-53c48bb616bb",
+          "convention": "utf8_char_offset",
+          "end": 3966,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:20",
+          "start": 3902
+        },
+        "quote": "(i) The City will bear the expense for such removal and storage.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "a9af8628-6f88-5a94-8f7a-0b0bd495db17",
+          "convention": "utf8_char_offset",
+          "end": 4105,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:21",
+          "start": 3967
+        },
+        "quote": "(ii) The reason for the removal will be documented on the appropriate report filed at the Police or Fire Department by the towing officer.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "8e252b9d-da36-5538-b330-c39a857ba3e5",
+          "convention": "utf8_char_offset",
+          "end": 4259,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:22",
+          "start": 4106
+        },
+        "quote": "(iii) The Police or Fire Department will take reasonable steps to locate the owner prior to towing only as time permits in the interest of public safety.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "67b4c0f0-2abb-5b46-b94c-4dc2347bcfa6",
+          "convention": "utf8_char_offset",
+          "end": 4451,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:23",
+          "start": 4260
+        },
+        "quote": "(iv) The Police or Fire Department will take reasonable steps to notify the owner of a towed vehicle as to the location of the vehicle and the reason it was towed. (Ord. 20605 § 3, 10-14-25.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.010 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "76aaea2a-66f6-56a2-b917-9b6ac1a52ad3",
+          "convention": "utf8_char_offset",
+          "end": 4535,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.010:block:24",
+          "start": 4452
+        },
+        "quote": "Cross References: Fire Department, TMC 2.20.030 ; Traffic Engineer, TMC 10.10.010 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20605",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 4449,
+          "start": 4425
+        },
+        "quote": "Ord. 20605 § 3, 10-14-25",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.010#history:20605",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "68f38597cc592a656a9f178fb338d8bafd98bed0a7ec333ed47c8ec071cb92e2",
+      "captured_at": "2026-08-28T04:14:41.660469Z",
+      "kind": "rendered_html_capture",
+      "value": "10.25.010.68f38597cc59.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.25.010@68f38597cc592a65",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.25.010",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.25.010",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.25.010",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.25.010"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.25.010#history:20605",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "10-14-25"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.25.010",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.25.010#history:20605",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20605"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.25.010#history:20605",
+      "value": "adopted"
+    },
+    "title": "Prohibitions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:14:41.660469Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "68f38597cc592a656a9f178fb338d8bafd98bed0a7ec333ed47c8ec071cb92e2",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "68f38597cc592a656a9f178fb338d8bafd98bed0a7ec333ed47c8ec071cb92e2",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "68f38597cc592a656a9f178fb338d8bafd98bed0a7ec333ed47c8ec071cb92e2",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "2289a9d7a80a7862f4f3ba0275e3ade59041ba7d3c210e505fde863538ca17b5",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "2289a9d7a80a7862f4f3ba0275e3ade59041ba7d3c210e505fde863538ca17b5",
+        "output_sha256": "102661254380b3e13018fef5a1d5d1d9becead34d822856e409a5d9895eac028",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "2289a9d7a80a7862f4f3ba0275e3ade59041ba7d3c210e505fde863538ca17b5",
+        "output_sha256": "1a316b23f86e6e94a453001404a7fae6922a6a0c166518067649d27d2a7aaade",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.25.010",
+    "retained_original": {
+      "byte_count": 36925,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.25.010.68f38597cc59.html",
+      "retrieved_at": "2026-08-28T04:14:41.660469Z",
+      "sha256": "68f38597cc592a656a9f178fb338d8bafd98bed0a7ec333ed47c8ec071cb92e2"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

@@ -1,0 +1,417 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 833,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "513836e51775631ee7f0227df215a297bcf6b2d3bc23cd2e2162c71aaa09b532"
+    },
+    "structured": {
+      "block_count": 11,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "9d6f74d6-87ce-5ba3-9c84-e79c1bf1a84c",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:5.10.070:section",
+      "sha256": "1ddbe5de92e205b6af5d222fa7596f7068c45c2504a8be9ded337e3e02618417",
+      "table_count": 1
+    },
+    "verbatim": {
+      "byte_count": 3040,
+      "char_count": 3033,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "f50faaaeee60187d3ab2919bb504fc68e6e5c86c3ebe1b9829afc404d38da4b5"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.10.070 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "1671f552-ae90-57f1-af25-c38b92c943eb",
+          "convention": "utf8_char_offset",
+          "end": 137,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.10.070:block:0",
+          "start": 0
+        },
+        "quote": "(a) The annual license fee for an automobile bus shall be as prescribed by the City’s fee schedule and based on the following capacities:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.10.070:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.10.070 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "10cb9d86-f1aa-583c-9b78-60bdb4fcd111",
+          "convention": "utf8_char_offset",
+          "end": 329,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.10.070:block:1",
+          "start": 138
+        },
+        "quote": "(1) | Per vehicle of seating capacity less than six passengers\n(2) | Per vehicle, seating capacity of six or seven passengers\n(3) | Per vehicle, seating capacity of more than seven passengers",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.10.070:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.10.070 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "361a47ef-09b7-51d0-92ec-68fc1ca5decb",
+          "convention": "utf8_char_offset",
+          "end": 333,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.10.070:block:2",
+          "start": 330
+        },
+        "quote": "(1)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.10.070:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.10.070 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "2f58a81a-1ef7-5d40-99da-7e353be57d13",
+          "convention": "utf8_char_offset",
+          "end": 390,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.10.070:block:3",
+          "start": 334
+        },
+        "quote": "Per vehicle of seating capacity less than six passengers",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.10.070:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.10.070 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "d4021e45-025b-5032-a1a0-438152dac705",
+          "convention": "utf8_char_offset",
+          "end": 394,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.10.070:block:4",
+          "start": 391
+        },
+        "quote": "(2)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.10.070:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.10.070 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "f1320f92-8511-552a-b466-a8e31f54a257",
+          "convention": "utf8_char_offset",
+          "end": 451,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.10.070:block:5",
+          "start": 395
+        },
+        "quote": "Per vehicle, seating capacity of six or seven passengers",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.10.070:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.10.070 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "46ad287b-dff4-5bba-9d38-95cd87289554",
+          "convention": "utf8_char_offset",
+          "end": 455,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.10.070:block:6",
+          "start": 452
+        },
+        "quote": "(3)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.10.070:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.10.070 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "651cc33d-dba0-530c-a2b7-5a9ca9430b4b",
+          "convention": "utf8_char_offset",
+          "end": 515,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.10.070:block:7",
+          "start": 456
+        },
+        "quote": "Per vehicle, seating capacity of more than seven passengers",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.10.070:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.10.070 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "c78a20c0-9178-5059-9f68-058dfd95d2a2",
+          "convention": "utf8_char_offset",
+          "end": 637,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.10.070:block:8",
+          "start": 516
+        },
+        "quote": "(b) The full amount of the license fee shall be required regardless of the time of the year in which application is made.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.10.070:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.10.070 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "8fc7e06e-b7ee-5673-b091-12022858e420",
+          "convention": "utf8_char_offset",
+          "end": 768,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.10.070:block:9",
+          "start": 638
+        },
+        "quote": "(c) Licenses under this section shall expire on September 10th next following the date of application. (Ord. 20631 § 10, 1-13-26.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.10.070:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.10.070 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "daaecc8b-92c6-5b5a-832a-09b54b84eb8d",
+          "convention": "utf8_char_offset",
+          "end": 832,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.10.070:block:10",
+          "start": 769
+        },
+        "quote": "Cross References: Automobile bus licenses, TMC 5.35.040 et seq.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.10.070:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.10.070#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20631",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 766,
+          "start": 742
+        },
+        "quote": "Ord. 20631 § 10, 1-13-26",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.10.070#history:20631",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "d8f8f5843b153527ad320db67fce5d36618367eba0465410f595de8756d9ee43",
+      "captured_at": "2026-08-28T03:48:22.928241Z",
+      "kind": "rendered_html_capture",
+      "value": "5.10.070.d8f8f5843b15.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:5.10.070@d8f8f5843b153527",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:5.10.070",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:5.10.070",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 5.10.070",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/5.10.070"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.10.070#history:20631",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "1-13-26"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "5.10.070",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.10.070#history:20631",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20631"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.10.070#history:20631",
+      "value": "adopted"
+    },
+    "title": "Automobile bus."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T03:48:22.928241Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "d8f8f5843b153527ad320db67fce5d36618367eba0465410f595de8756d9ee43",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "d8f8f5843b153527ad320db67fce5d36618367eba0465410f595de8756d9ee43",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "d8f8f5843b153527ad320db67fce5d36618367eba0465410f595de8756d9ee43",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "f50faaaeee60187d3ab2919bb504fc68e6e5c86c3ebe1b9829afc404d38da4b5",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "f50faaaeee60187d3ab2919bb504fc68e6e5c86c3ebe1b9829afc404d38da4b5",
+        "output_sha256": "513836e51775631ee7f0227df215a297bcf6b2d3bc23cd2e2162c71aaa09b532",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "f50faaaeee60187d3ab2919bb504fc68e6e5c86c3ebe1b9829afc404d38da4b5",
+        "output_sha256": "1ddbe5de92e205b6af5d222fa7596f7068c45c2504a8be9ded337e3e02618417",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/5.10.070",
+    "retained_original": {
+      "byte_count": 28036,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/5.10.070.d8f8f5843b15.html",
+      "retrieved_at": "2026-08-28T03:48:22.928241Z",
+      "sha256": "d8f8f5843b153527ad320db67fce5d36618367eba0465410f595de8756d9ee43"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

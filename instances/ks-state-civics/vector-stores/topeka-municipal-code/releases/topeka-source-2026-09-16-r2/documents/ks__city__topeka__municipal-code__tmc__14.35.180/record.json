@@ -1,0 +1,385 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 730,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "853c407078d5ee20a8a2ab1ab9b367324634b341b0b0bb4a129e7127fb8fe6ab"
+    },
+    "structured": {
+      "block_count": 9,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "21dba591-b171-5163-ab12-48d0b35641ed",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:14.35.180:section",
+      "sha256": "f45fe6fdb49ed03cbad48c3497d615862e1d917005bbab5fd6d3773c9e0ad010",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 2618,
+      "char_count": 2615,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "b24ec886628a5ac4366fb722120f9083b5e6ddbc5fc4230402f29ec4e2e3a28e"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.35.180 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "7a1f2221-fb46-5ab1-94a0-8cbf8fbf1b83",
+          "convention": "utf8_char_offset",
+          "end": 158,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.35.180:block:0",
+          "start": 0
+        },
+        "quote": "603.5.6, Protection from Lawn Sprinklers and Irrigation Systems, is hereby deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.35.180:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.35.180 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "e6061737-c756-54f3-94f9-2f08f7e71af7",
+          "convention": "utf8_char_offset",
+          "end": 376,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.35.180:block:1",
+          "start": 159
+        },
+        "quote": "Potable water supplies to systems having no pumps or connections for pumping equipment, and no chemical injection or provisions for chemical injection, shall be protected from backflow by one of the following devices:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.35.180:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.35.180 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "87fa652a-17b5-542f-ae8f-c07f9ef77bfb",
+          "convention": "utf8_char_offset",
+          "end": 414,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.35.180:block:2",
+          "start": 377
+        },
+        "quote": "(1) Atmospheric vacuum breaker (AVB);",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.35.180:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.35.180 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "62f6c20c-65e2-5487-8053-4134ab5cf6e5",
+          "convention": "utf8_char_offset",
+          "end": 478,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.35.180:block:3",
+          "start": 415
+        },
+        "quote": "(2) Pressure vacuum breaker backflow prevention assembly (PVB);",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.35.180:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.35.180 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "b0f756d5-f915-520b-8343-88083b899f0e",
+          "convention": "utf8_char_offset",
+          "end": 529,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.35.180:block:4",
+          "start": 479
+        },
+        "quote": "(3) Spill-resistant pressure vacuum breaker (SVB);",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.35.180:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.35.180 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "01884163-5069-5302-b01a-f274041303d0",
+          "convention": "utf8_char_offset",
+          "end": 595,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.35.180:block:5",
+          "start": 530
+        },
+        "quote": "(4) Reduced pressure principle backflow prevention assembly (RP);",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.35.180:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.35.180 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "d374e56c-7af6-5268-899c-c68b486ec4b0",
+          "convention": "utf8_char_offset",
+          "end": 635,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.35.180:block:6",
+          "start": 596
+        },
+        "quote": "(5) Valve complying with IAPO OS 72; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.35.180:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.35.180 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "ade3ba03-0ae1-5e2c-b4ef-f5d23b8ca438",
+          "convention": "utf8_char_offset",
+          "end": 702,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.35.180:block:7",
+          "start": 636
+        },
+        "quote": "(6) Approved double-check valve backflow prevention assembly (DC).",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.35.180:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.35.180 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "f1be1f6e-72c6-5546-95d9-2b04df204692",
+          "convention": "utf8_char_offset",
+          "end": 729,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.35.180:block:8",
+          "start": 703
+        },
+        "quote": "(Ord. 20570 § 19, 7-1-25.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.35.180:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.35.180#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20570",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 727,
+          "start": 704
+        },
+        "quote": "Ord. 20570 § 19, 7-1-25",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.35.180#history:20570",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "045dcf33ed8bf9863b70a0258ee6906d5666be152f3c9e7b7a405de2bd3ff605",
+      "captured_at": "2026-08-28T04:35:53.363799Z",
+      "kind": "rendered_html_capture",
+      "value": "14.35.180.045dcf33ed8b.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:14.35.180@045dcf33ed8bf986",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:14.35.180",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:14.35.180",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 14.35.180",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/14.35.180"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.35.180#history:20570",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "7-1-25"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "14.35.180",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.35.180#history:20570",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20570"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.35.180#history:20570",
+      "value": "adopted"
+    },
+    "title": "603.5.6, Protection from Lawn Sprinklers and Irrigation Systems."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:35:53.363799Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "045dcf33ed8bf9863b70a0258ee6906d5666be152f3c9e7b7a405de2bd3ff605",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "045dcf33ed8bf9863b70a0258ee6906d5666be152f3c9e7b7a405de2bd3ff605",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "045dcf33ed8bf9863b70a0258ee6906d5666be152f3c9e7b7a405de2bd3ff605",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "b24ec886628a5ac4366fb722120f9083b5e6ddbc5fc4230402f29ec4e2e3a28e",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "b24ec886628a5ac4366fb722120f9083b5e6ddbc5fc4230402f29ec4e2e3a28e",
+        "output_sha256": "853c407078d5ee20a8a2ab1ab9b367324634b341b0b0bb4a129e7127fb8fe6ab",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "b24ec886628a5ac4366fb722120f9083b5e6ddbc5fc4230402f29ec4e2e3a28e",
+        "output_sha256": "f45fe6fdb49ed03cbad48c3497d615862e1d917005bbab5fd6d3773c9e0ad010",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/14.35.180",
+    "retained_original": {
+      "byte_count": 28664,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/14.35.180.045dcf33ed8b.html",
+      "retrieved_at": "2026-08-28T04:35:53.363799Z",
+      "sha256": "045dcf33ed8bf9863b70a0258ee6906d5666be152f3c9e7b7a405de2bd3ff605"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

@@ -38,7 +38,12 @@
             "commit": {"type": "string", "minLength": 7},
             "dirty_worktree": {
               "type": "boolean",
-              "description": "true means the exporter ran against uncommitted changes; consumers must treat commit as non-reproducing."
+              "description": "true means the exporter ran against uncommitted CODE changes, so `commit` does not reproduce this bundle. Pipeline artifacts written into the instance tree during the run do not count; only code does."
+            },
+            "dirty_code_paths": {
+              "type": "array",
+              "description": "Sample of the uncommitted code paths, so a consumer can see what differs rather than only that something does.",
+              "items": {"type": "string"}
             },
             "exporter": {"type": "string", "minLength": 1},
             "exporter_sha256": {"$ref": "#/$defs/sha256"},

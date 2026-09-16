@@ -1,0 +1,223 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 266,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "c7de4eaf086929d615ccf29785a91e4353839329e2bf0e394b68195b5ea1bcb1"
+    },
+    "structured": {
+      "block_count": 1,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "a022b414-da8e-5ab9-abe9-679f9352cd6b",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:12.05.060:section",
+      "sha256": "3e84d1937e9b5218be487e3233792249bc8af765aba6ab78bef5874ce772373a",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 1161,
+      "char_count": 1157,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "876fee05e521e415ed6555f3c833cc82470368ef2e0c7f8a12fdbb5e85d9dd53"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.05.060 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "e69cf3fd-b096-5c9b-8e10-6bd5462fa002",
+          "convention": "utf8_char_offset",
+          "end": 265,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.05.060:block:0",
+          "start": 0
+        },
+        "quote": "It shall be unlawful for any person to mix or make mortar, plaster or cement upon any paved street, avenue or alley in the City, unless such mortar, plaster or cement is mixed or made in a tight box provided for such purpose. (Code 1981 § 40-30. Code 1995 § 130-6.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.05.060:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.05.060#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "377b10ecd47664cb6574a2d4c630bb88c265a2ac6beb208f8a92b48359f7e5b5",
+      "captured_at": "2026-08-28T04:20:18.096400Z",
+      "kind": "rendered_html_capture",
+      "value": "12.05.060.377b10ecd476.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:12.05.060@377b10ecd47664cb",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:12.05.060",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:12.05.060",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 12.05.060",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/12.05.060"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "12.05.060",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Mixing of mortar, plaster or cement."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:20:18.096400Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "377b10ecd47664cb6574a2d4c630bb88c265a2ac6beb208f8a92b48359f7e5b5",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "377b10ecd47664cb6574a2d4c630bb88c265a2ac6beb208f8a92b48359f7e5b5",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "377b10ecd47664cb6574a2d4c630bb88c265a2ac6beb208f8a92b48359f7e5b5",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "876fee05e521e415ed6555f3c833cc82470368ef2e0c7f8a12fdbb5e85d9dd53",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "876fee05e521e415ed6555f3c833cc82470368ef2e0c7f8a12fdbb5e85d9dd53",
+        "output_sha256": "c7de4eaf086929d615ccf29785a91e4353839329e2bf0e394b68195b5ea1bcb1",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "876fee05e521e415ed6555f3c833cc82470368ef2e0c7f8a12fdbb5e85d9dd53",
+        "output_sha256": "3e84d1937e9b5218be487e3233792249bc8af765aba6ab78bef5874ce772373a",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/12.05.060",
+    "retained_original": {
+      "byte_count": 26575,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/12.05.060.377b10ecd476.html",
+      "retrieved_at": "2026-08-28T04:20:18.096400Z",
+      "sha256": "377b10ecd47664cb6574a2d4c630bb88c265a2ac6beb208f8a92b48359f7e5b5"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

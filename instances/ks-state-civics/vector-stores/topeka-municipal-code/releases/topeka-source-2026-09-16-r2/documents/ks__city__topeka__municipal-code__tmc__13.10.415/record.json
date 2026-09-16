@@ -1,0 +1,401 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1661,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "23e23fdf616c392084d02103bc7ab40c6a3ec011dab31cd4c46b2c66799deaf9"
+    },
+    "structured": {
+      "block_count": 10,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "2ea37a4e-3364-5b9c-8179-3aa95c9c6f61",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:13.10.415:section",
+      "sha256": "71db0021372009332d988ac958a86c42655b5b8a95d5c35ca800003721315d6d",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 4519,
+      "char_count": 4516,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "f5bd07263903e319e1657baeceb7378398caa2b9c9cb84fff92e16de64733b00"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.10.415 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "411f118e-d710-5017-a8ed-bc1f101bc2af",
+          "convention": "utf8_char_offset",
+          "end": 93,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.10.415:block:0",
+          "start": 0
+        },
+        "quote": "(a) Each owner of a private fire hydrant shall comply with all of the following requirements:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.10.415:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.10.415 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "7affa73d-0cf7-5ac6-8281-865209688134",
+          "convention": "utf8_char_offset",
+          "end": 149,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.10.415:block:1",
+          "start": 94
+        },
+        "quote": "(1) The hydrant shall be used only for fire protection;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.10.415:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.10.415 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "65f5391c-89d9-5a64-b1b9-a5e7cc7b4e73",
+          "convention": "utf8_char_offset",
+          "end": 270,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.10.415:block:2",
+          "start": 150
+        },
+        "quote": "(2) The hydrant shall be approved by the Fire Chief and the Utilities Director or their designees prior to installation.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.10.415:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.10.415 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "ddd41e22-a61f-52fc-84e4-e26fe2ef8ad2",
+          "convention": "utf8_char_offset",
+          "end": 529,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.10.415:block:3",
+          "start": 271
+        },
+        "quote": "(3) The hydrant shall be installed in accordance with the City of Topeka and Shawnee County standard technical specifications in such a manner and location that the hydrant is accessible at all times to the Fire Department for the purpose of fire protection.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.10.415:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.10.415 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "c42c843e-8147-5a30-a33e-e9a914227def",
+          "convention": "utf8_char_offset",
+          "end": 768,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.10.415:block:4",
+          "start": 530
+        },
+        "quote": "(4) The connecting water line between the City water main shall not be less than six inches in diameter. When connected to a fire protection line, the owner shall ensure that there is backflow protection in accordance with TMC 14.35.560 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.10.415:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.10.415 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "2d7b1fde-7a2c-548a-86b9-6000f516f34a",
+          "convention": "utf8_char_offset",
+          "end": 981,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.10.415:block:5",
+          "start": 769
+        },
+        "quote": "(5) The hydrant shall be painted a bright red color and the pumper nozzle cap (or hose nozzle caps in absence of pumper nozzle) is painted industrial yellow in accordance with the standards of the Water Division.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.10.415:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.10.415 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "d37ab951-8566-57c3-89d0-ae8e067940e5",
+          "convention": "utf8_char_offset",
+          "end": 1201,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.10.415:block:6",
+          "start": 982
+        },
+        "quote": "(b) Inspection, Testing, Maintenance, Repair. Each owner of a private fire hydrant shall be responsible for the repair and maintenance of each hydrant. This responsibility includes, but is not limited to, the following:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.10.415:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.10.415 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "29c2d1a5-75db-527e-a208-abe078c26944",
+          "convention": "utf8_char_offset",
+          "end": 1369,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.10.415:block:7",
+          "start": 1202
+        },
+        "quote": "(1) The owner shall perform testing, at the request of the Fire Department or Water Division, which demonstrates that the hydrant is in proper operating condition; and",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.10.415:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.10.415 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "16c8ec09-87b5-555b-ad43-f7b6a7b0bbee",
+          "convention": "utf8_char_offset",
+          "end": 1610,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.10.415:block:8",
+          "start": 1370
+        },
+        "quote": "(2) The owner shall perform a flow test on a schedule established by the Utilities Director and submit the results, on a form provided by the Water Division, to the Utilities Director within 10 days of the test. (Ord. 20089 § 18, 10-17-17.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.10.415:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.10.415 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "ba480da9-9792-54d9-8e7c-09f508b9c762",
+          "convention": "utf8_char_offset",
+          "end": 1660,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.10.415:block:9",
+          "start": 1611
+        },
+        "quote": "Cross References: Fire Department, TMC 2.20.030 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.10.415:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.10.415#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20089",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1608,
+          "start": 1583
+        },
+        "quote": "Ord. 20089 § 18, 10-17-17",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.10.415#history:20089",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "9cf791e6ae077fba03bf110bd8f1558fda94355424832b28534e8a6cad29e2c0",
+      "captured_at": "2026-08-28T04:26:18.178252Z",
+      "kind": "rendered_html_capture",
+      "value": "13.10.415.9cf791e6ae07.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:13.10.415@9cf791e6ae077fba",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:13.10.415",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:13.10.415",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 13.10.415",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/13.10.415"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.10.415#history:20089",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "10-17-17"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "13.10.415",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.10.415#history:20089",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20089"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.10.415#history:20089",
+      "value": "adopted"
+    },
+    "title": "Requirements."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:26:18.178252Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "9cf791e6ae077fba03bf110bd8f1558fda94355424832b28534e8a6cad29e2c0",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "9cf791e6ae077fba03bf110bd8f1558fda94355424832b28534e8a6cad29e2c0",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "9cf791e6ae077fba03bf110bd8f1558fda94355424832b28534e8a6cad29e2c0",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "f5bd07263903e319e1657baeceb7378398caa2b9c9cb84fff92e16de64733b00",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "f5bd07263903e319e1657baeceb7378398caa2b9c9cb84fff92e16de64733b00",
+        "output_sha256": "23e23fdf616c392084d02103bc7ab40c6a3ec011dab31cd4c46b2c66799deaf9",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "f5bd07263903e319e1657baeceb7378398caa2b9c9cb84fff92e16de64733b00",
+        "output_sha256": "71db0021372009332d988ac958a86c42655b5b8a95d5c35ca800003721315d6d",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/13.10.415",
+    "retained_original": {
+      "byte_count": 31421,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/13.10.415.9cf791e6ae07.html",
+      "retrieved_at": "2026-08-28T04:26:18.178252Z",
+      "sha256": "9cf791e6ae077fba03bf110bd8f1558fda94355424832b28534e8a6cad29e2c0"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

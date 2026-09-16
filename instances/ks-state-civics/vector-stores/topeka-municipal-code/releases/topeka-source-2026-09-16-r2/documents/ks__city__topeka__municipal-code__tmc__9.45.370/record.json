@@ -1,0 +1,337 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1646,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "81e404186580e16d579d9acc0adccdcc04d3f4fdcdeab1f87b09534ba89e293e"
+    },
+    "structured": {
+      "block_count": 6,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "16502858-4212-5092-a595-231f849fb785",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.370:section",
+      "sha256": "1784adca154e8fcb3739255a65e15e3e16ddcdccf879cc01313ed3db486b9e13",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 4301,
+      "char_count": 4286,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "1614b43e007eb4dd840dc80a344abf99d1340fd7b2088dc057d9ec20ab7e07bf"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.370 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "1b04b6a5-b84a-5c18-9e78-35b4415ec9d5",
+          "convention": "utf8_char_offset",
+          "end": 181,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.370:block:0",
+          "start": 0
+        },
+        "quote": "(a) It shall be unlawful to fail to remove stored personal property located in areas identified in TMC 9.45.360 within 24 hours of receiving written notice pursuant to this section.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.370:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.370 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "608dc865-7268-5363-a20b-7e44539d5cb5",
+          "convention": "utf8_char_offset",
+          "end": 311,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.370:block:1",
+          "start": 182
+        },
+        "quote": "(b) All stored personal property in an area covered by this article may be impounded by the City in accordance with this section.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.370:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.370 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "cb6852bf-8d01-518a-8ce7-46dada225984",
+          "convention": "utf8_char_offset",
+          "end": 842,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.370:block:2",
+          "start": 312
+        },
+        "quote": "(c) Personal property placed in an area covered by this article shall be deemed to be stored personal property if it has not been removed within 24 hours of service of written notice requiring such removal. Moving personal property to another area covered by this article or returning personal property to the same area on a daily or regular basis shall not be considered to be removing the personal property. A law enforcement officer may remove and impound such stored personal property after providing 24 hours’ written notice.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.370:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.370 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "631e2f5c-2be7-5525-b9df-733970606c7b",
+          "convention": "utf8_char_offset",
+          "end": 1089,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.370:block:3",
+          "start": 843
+        },
+        "quote": "(d) Personal property placed in an area covered by this article that has a clearly posted closure time may be removed and impounded after the closure time, without prior notice. Post-removal notice shall be provided as set forth in TMC 9.45.380 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.370:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.370 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "7aeddcbc-693f-5c70-9718-f5d05821efe1",
+          "convention": "utf8_char_offset",
+          "end": 1505,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.370:block:4",
+          "start": 1090
+        },
+        "quote": "(e) In the event personal property placed in an area covered by this article poses an immediate threat to the health or safety of the public, it may be removed without prior notice and discarded. For purposes of this section, “immediate threat” shall include, but not necessarily be limited to, personal property that has been tainted with blood or other bodily fluids, feces, urine, bed bugs, fleas or other pests.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.370:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.45.370 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "287fc536-a700-563d-8673-31b4155dc19d",
+          "convention": "utf8_char_offset",
+          "end": 1645,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.45.370:block:5",
+          "start": 1506
+        },
+        "quote": "(f) Evidence of a crime or contraband may be removed from any area covered by this article without prior notice. (Ord. 20224 § 4, 12-3-19.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.370:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.370#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20224",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1643,
+          "start": 1620
+        },
+        "quote": "Ord. 20224 § 4, 12-3-19",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.45.370#history:20224",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "78a9fa713d9478754d0a10be437babbfb45d5a6acc69f08f425f66015540e97e",
+      "captured_at": "2026-08-28T04:12:06.599117Z",
+      "kind": "rendered_html_capture",
+      "value": "9.45.370.78a9fa713d94.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:9.45.370@78a9fa713d947875",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:9.45.370",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:9.45.370",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 9.45.370",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/9.45.370"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.45.370#history:20224",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-3-19"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "9.45.370",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.45.370#history:20224",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20224"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.45.370#history:20224",
+      "value": "adopted"
+    },
+    "title": "Storage of personal property."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:12:06.599117Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "78a9fa713d9478754d0a10be437babbfb45d5a6acc69f08f425f66015540e97e",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "78a9fa713d9478754d0a10be437babbfb45d5a6acc69f08f425f66015540e97e",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "78a9fa713d9478754d0a10be437babbfb45d5a6acc69f08f425f66015540e97e",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "1614b43e007eb4dd840dc80a344abf99d1340fd7b2088dc057d9ec20ab7e07bf",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "1614b43e007eb4dd840dc80a344abf99d1340fd7b2088dc057d9ec20ab7e07bf",
+        "output_sha256": "81e404186580e16d579d9acc0adccdcc04d3f4fdcdeab1f87b09534ba89e293e",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "1614b43e007eb4dd840dc80a344abf99d1340fd7b2088dc057d9ec20ab7e07bf",
+        "output_sha256": "1784adca154e8fcb3739255a65e15e3e16ddcdccf879cc01313ed3db486b9e13",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/9.45.370",
+    "retained_original": {
+      "byte_count": 30534,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/9.45.370.78a9fa713d94.html",
+      "retrieved_at": "2026-08-28T04:12:06.599117Z",
+      "sha256": "78a9fa713d9478754d0a10be437babbfb45d5a6acc69f08f425f66015540e97e"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

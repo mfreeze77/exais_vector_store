@@ -1,0 +1,401 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1489,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "2e4b653fdb2bf95c717126d03a354575a60cbf44fbe8c4d005b21cd25f8e93cb"
+    },
+    "structured": {
+      "block_count": 10,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "cb97002c-5c4d-52aa-8465-eee780f2645c",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.080:section",
+      "sha256": "ef3881641f3fbde38e5518a2e3a4ca11f18db88f6fce0db81d846c184411606a",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 4194,
+      "char_count": 4189,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "a023dcef0351779ea9223105be18d69340052e40e2b4050b0e85eca772290105"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.080 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "15f9a892-8e2a-5b13-b875-f556971bee28",
+          "convention": "utf8_char_offset",
+          "end": 219,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.080:block:0",
+          "start": 0
+        },
+        "quote": "As required by K.S.A. 8-1103 and amendments thereto, whenever a private wrecker or tow service operator tows an abandoned vehicle, as defined in TMC 10.25.010 , the operator shall comply with the following requirements:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.080:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.080 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "14bfdce4-8025-59bc-9cb1-423e6c12c993",
+          "convention": "utf8_char_offset",
+          "end": 357,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.080:block:1",
+          "start": 220
+        },
+        "quote": "(a) The maximum rate for towing, storage and other fees for any vehicle towed from private property shall not exceed the following rates:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.080:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.080 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "37bcb943-fdc8-5ec5-80e5-8742c4ffa9e4",
+          "convention": "utf8_char_offset",
+          "end": 450,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.080:block:2",
+          "start": 358
+        },
+        "quote": "(1) For towing, including the use of wheel lifts, rollback and flatbed, a maximum charge of:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.080:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.080 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "d3dcdb8d-70f8-5005-8b97-a1c33fa5c08a",
+          "convention": "utf8_char_offset",
+          "end": 566,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.080:block:3",
+          "start": 451
+        },
+        "quote": "(i) One hundred dollars for a vehicle having a licensed gross weight of 12,000 pounds or less, plus $3.00 per mile;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.080:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.080 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "87afe774-6b14-51eb-ab29-dba5a82fc961",
+          "convention": "utf8_char_offset",
+          "end": 745,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.080:block:4",
+          "start": 567
+        },
+        "quote": "(ii) Two hundred fifty for trucks and other vehicles having a licensed gross weight of less than 18,000 pounds or having more than four wheels on the ground, plus $4.00 per mile.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.080:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.080 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "4ea7e9e0-08c0-5378-9d94-6a141d96da3b",
+          "convention": "utf8_char_offset",
+          "end": 981,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.080:block:5",
+          "start": 746
+        },
+        "quote": "(2) For storage of a vehicle, a maximum charge of $30.00 per calendar day. Daily charges shall be determined for any portion of a calendar day the vehicle is stored, beginning at the time the vehicle is first placed in the storage lot.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.080:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.080 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "544c7e3f-9943-5121-906e-59b7a378381a",
+          "convention": "utf8_char_offset",
+          "end": 1048,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.080:block:6",
+          "start": 982
+        },
+        "quote": "(3) For dolly use in towing a vehicle, a maximum charge of $50.00.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.080:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.080 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "5d8fda60-fe9e-54b9-b54c-8be0946ca775",
+          "convention": "utf8_char_offset",
+          "end": 1154,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.080:block:7",
+          "start": 1049
+        },
+        "quote": "(4) For winching when necessary, a maximum charge of $150.00 per hour, prorated by each one-quarter hour.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.080:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.080 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "2457e533-50fb-5c9c-8295-a1a77107069f",
+          "convention": "utf8_char_offset",
+          "end": 1347,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.080:block:8",
+          "start": 1155
+        },
+        "quote": "(b) An owner of a vehicle shall have access to personal property in such vehicle for up to 48 hours after such vehicle has been towed and such personal property shall be released to the owner.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.080:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.25.080 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "a6e4a94f-46b4-56e8-b01a-7acaefd5db8b",
+          "convention": "utf8_char_offset",
+          "end": 1488,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.25.080:block:9",
+          "start": 1348
+        },
+        "quote": "(c) A tow operator shall report the location of the vehicle to local law enforcement within two hours of the tow. (Ord. 20317 § 1, 10-5-21.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.080:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.080#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20317",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1486,
+          "start": 1463
+        },
+        "quote": "Ord. 20317 § 1, 10-5-21",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.25.080#history:20317",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "9f737fd1dbd4cf53d0236af6ee2052a852efb47b7f6ea871b8b516af6e3ad94e",
+      "captured_at": "2026-08-28T04:14:53.807434Z",
+      "kind": "rendered_html_capture",
+      "value": "10.25.080.9f737fd1dbd4.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.25.080@9f737fd1dbd4cf53",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.25.080",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.25.080",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.25.080",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.25.080"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.25.080#history:20317",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "10-5-21"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.25.080",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.25.080#history:20317",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20317"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.25.080#history:20317",
+      "value": "adopted"
+    },
+    "title": "Private wrecker – Towing service."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:14:53.807434Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "9f737fd1dbd4cf53d0236af6ee2052a852efb47b7f6ea871b8b516af6e3ad94e",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "9f737fd1dbd4cf53d0236af6ee2052a852efb47b7f6ea871b8b516af6e3ad94e",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "9f737fd1dbd4cf53d0236af6ee2052a852efb47b7f6ea871b8b516af6e3ad94e",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "a023dcef0351779ea9223105be18d69340052e40e2b4050b0e85eca772290105",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "a023dcef0351779ea9223105be18d69340052e40e2b4050b0e85eca772290105",
+        "output_sha256": "2e4b653fdb2bf95c717126d03a354575a60cbf44fbe8c4d005b21cd25f8e93cb",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "a023dcef0351779ea9223105be18d69340052e40e2b4050b0e85eca772290105",
+        "output_sha256": "ef3881641f3fbde38e5518a2e3a4ca11f18db88f6fce0db81d846c184411606a",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.25.080",
+    "retained_original": {
+      "byte_count": 30042,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.25.080.9f737fd1dbd4.html",
+      "retrieved_at": "2026-08-28T04:14:53.807434Z",
+      "sha256": "9f737fd1dbd4cf53d0236af6ee2052a852efb47b7f6ea871b8b516af6e3ad94e"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

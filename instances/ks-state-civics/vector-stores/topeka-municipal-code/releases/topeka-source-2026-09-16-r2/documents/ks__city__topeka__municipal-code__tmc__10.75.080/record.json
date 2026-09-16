@@ -1,0 +1,223 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 219,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "5f7437deb5cbd50ab67927a59ffbd79bba2d710a66f9c96b9205de6c437283e6"
+    },
+    "structured": {
+      "block_count": 1,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "0404b308-0f5d-570f-a115-5ad89316450c",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.75.080:section",
+      "sha256": "300e765991c154d6c682b8833ef2abe7e26e1ae95f805ae434f9bb8b79351185",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 1052,
+      "char_count": 1048,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "88a2371d96b65a2d5ad65c971c831a81ca039069dce7d959866abc5e7d104cec"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.75.080 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "b407b06b-9d5f-50e1-87e4-93ffa29ea3fb",
+          "convention": "utf8_char_offset",
+          "end": 218,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.75.080:block:0",
+          "start": 0
+        },
+        "quote": "Any axle located within seven feet of any adjacent axle shall be a weight-bearing axle and shall at all times carry its proportionate part of the load permitted on such axles. (Code 1981 § 43-675. Code 1995 § 142-743.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.75.080:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.75.080#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "77b73ec949ce59ac942fea2b51cb718e5339e013f1b4270536c399de2e0ea7b5",
+      "captured_at": "2026-08-28T04:19:32.650979Z",
+      "kind": "rendered_html_capture",
+      "value": "10.75.080.77b73ec949ce.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.75.080@77b73ec949ce59ac",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.75.080",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.75.080",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.75.080",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.75.080"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.75.080",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Weight-bearing axles."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:19:32.650979Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "77b73ec949ce59ac942fea2b51cb718e5339e013f1b4270536c399de2e0ea7b5",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "77b73ec949ce59ac942fea2b51cb718e5339e013f1b4270536c399de2e0ea7b5",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "77b73ec949ce59ac942fea2b51cb718e5339e013f1b4270536c399de2e0ea7b5",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "88a2371d96b65a2d5ad65c971c831a81ca039069dce7d959866abc5e7d104cec",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "88a2371d96b65a2d5ad65c971c831a81ca039069dce7d959866abc5e7d104cec",
+        "output_sha256": "5f7437deb5cbd50ab67927a59ffbd79bba2d710a66f9c96b9205de6c437283e6",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "88a2371d96b65a2d5ad65c971c831a81ca039069dce7d959866abc5e7d104cec",
+        "output_sha256": "300e765991c154d6c682b8833ef2abe7e26e1ae95f805ae434f9bb8b79351185",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.75.080",
+    "retained_original": {
+      "byte_count": 26587,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.75.080.77b73ec949ce.html",
+      "retrieved_at": "2026-08-28T04:19:32.650979Z",
+      "sha256": "77b73ec949ce59ac942fea2b51cb718e5339e013f1b4270536c399de2e0ea7b5"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

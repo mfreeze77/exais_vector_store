@@ -1,0 +1,329 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1586,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "43c07c1f00f421a021f49680d3afd9f789131a119485de34bbdd6817af50e2e0"
+    },
+    "structured": {
+      "block_count": 6,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "ef0ca369-6d4a-5680-b286-6e219dccb099",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:17.05.210:section",
+      "sha256": "7bd35908c4cba19738b18ab20673b8982ad0d0f13d650bfa6a01f7faf839d9f2",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 4139,
+      "char_count": 4134,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "4671dec5bc017b2275e411a5d5c1486f80584fba78bdd20f1362cb543a6166ee"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.05.210 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "1f0ca8e0-208d-51d2-97dc-c23a33f434fd",
+          "convention": "utf8_char_offset",
+          "end": 442,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.05.210:block:0",
+          "start": 0
+        },
+        "quote": "(a) Slopes. The faces of cut and fill slopes shall be prepared and maintained to control against erosion. The protection for the slopes shall be installed as soon as practicable. Where necessary, check dams, cribbing, riprap or other devices or methods shall be employed to control erosion and provide safety. Where cut slopes are not subject to erosion due to the erosion-resistant character of the materials, such protection may be omitted.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.05.210:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.05.210 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "add02468-d0fa-5cb3-843f-b3f029948ed7",
+          "convention": "utf8_char_offset",
+          "end": 481,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.05.210:block:1",
+          "start": 443
+        },
+        "quote": "(b) Plant Material Protection Methods.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.05.210:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.05.210 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "2f807478-d8a3-58e4-93ff-15e5f7b7fae7",
+          "convention": "utf8_char_offset",
+          "end": 805,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.05.210:block:2",
+          "start": 482
+        },
+        "quote": "(1) Restriction of Vehicles to Graded Areas. Construction equipment shall be limited to the actual area to be graded according to the approved grading and erosion control plans. Every effort shall be made to restrict the passage of vehicles over areas intended to be left in their natural state according to approved plans.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.05.210:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.05.210 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "c041cb66-65e7-5d62-bd93-bcc0ab2cba0f",
+          "convention": "utf8_char_offset",
+          "end": 1086,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.05.210:block:3",
+          "start": 806
+        },
+        "quote": "(2) Tree Buffer Zone. No grading or operation of heavy equipment shall take place within the areas bounded by the dripline of any tree that is intended to be retained on the site unless an alternate method of preservation of the tree is approved by the Department of Public Works.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.05.210:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.05.210 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "e29ea162-db30-5946-a02c-63f5b14413c4",
+          "convention": "utf8_char_offset",
+          "end": 1239,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.05.210:block:4",
+          "start": 1087
+        },
+        "quote": "(3) Protective Barriers. During grading operations the permittee shall provide appropriate barriers around all native vegetation proposed for retention.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.05.210:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.05.210 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "55087aae-7dc9-5d48-9172-50740e0f11d4",
+          "convention": "utf8_char_offset",
+          "end": 1585,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.05.210:block:5",
+          "start": 1240
+        },
+        "quote": "(c) Responsibility of Contractor. The permittee shall be fully responsible for any damage caused to existing trees or other vegetation not within the construction area, and shall carry the responsibility both for his own employees and for all subcontractors until grading operations have ceased. (Ord. 16432 § 6(8), 3-10-92. Code 1995 § 66-128.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.05.210:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.05.210#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 16432",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1553,
+          "start": 1537
+        },
+        "quote": "Ord. 16432 § 6(8",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.05.210#history:16432",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "e1c45a57e70702a16860be3173a7708709bd0d76409cdaaf993dbf7273fde9af",
+      "captured_at": "2026-08-28T04:44:46.145265Z",
+      "kind": "rendered_html_capture",
+      "value": "17.05.210.e1c45a57e707.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:17.05.210@e1c45a57e70702a1",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:17.05.210",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:17.05.210",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 17.05.210",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/17.05.210"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "17.05.210",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:17.05.210#history:16432",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:16432"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:17.05.210#history:16432",
+      "value": "adopted"
+    },
+    "title": "Erosion control."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:44:46.145265Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "e1c45a57e70702a16860be3173a7708709bd0d76409cdaaf993dbf7273fde9af",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "e1c45a57e70702a16860be3173a7708709bd0d76409cdaaf993dbf7273fde9af",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "e1c45a57e70702a16860be3173a7708709bd0d76409cdaaf993dbf7273fde9af",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "4671dec5bc017b2275e411a5d5c1486f80584fba78bdd20f1362cb543a6166ee",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "4671dec5bc017b2275e411a5d5c1486f80584fba78bdd20f1362cb543a6166ee",
+        "output_sha256": "43c07c1f00f421a021f49680d3afd9f789131a119485de34bbdd6817af50e2e0",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "4671dec5bc017b2275e411a5d5c1486f80584fba78bdd20f1362cb543a6166ee",
+        "output_sha256": "7bd35908c4cba19738b18ab20673b8982ad0d0f13d650bfa6a01f7faf839d9f2",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/17.05.210",
+    "retained_original": {
+      "byte_count": 29983,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/17.05.210.e1c45a57e707.html",
+      "retrieved_at": "2026-08-28T04:44:46.145265Z",
+      "sha256": "e1c45a57e70702a16860be3173a7708709bd0d76409cdaaf993dbf7273fde9af"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

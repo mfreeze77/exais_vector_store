@@ -1,0 +1,289 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 996,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "b99535171d087c866dd1237a4791a99d2692ba8053aafc34d5c3223b454fe9fe"
+    },
+    "structured": {
+      "block_count": 3,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "b45c318a-cf73-5a2d-a6df-aa259e72d04e",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.350:section",
+      "sha256": "d8bfd07eaa554f72a9146622c8a6e4675226a0df468a2b9cb31b4dcf9ab5b703",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 2807,
+      "char_count": 2804,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "0ea4c18595fe93b0dfe361ce0778769546cc75b91fae981f4a05f5e5f99b94e0"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.350 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "085ff862-dc9e-52b2-8f26-cf71d5a97b36",
+          "convention": "utf8_char_offset",
+          "end": 454,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.350:block:0",
+          "start": 0
+        },
+        "quote": "(a) Parking control officers shall have the authority to issue parking tickets, and a uniform complaint and notice to appear for violations of Standard Traffic Ordinance Sections 83 through and including 102 and TMC 10.60.130 , 10.60.230(a) and 10.60.500 within the central business district. This authority is limited exclusively to the designated violations and restricted to the central business district and the College Hill TIF development district.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.350:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.350 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "bbb336b8-96bc-5d69-a120-d2ccc1a52083",
+          "convention": "utf8_char_offset",
+          "end": 943,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.350:block:1",
+          "start": 455
+        },
+        "quote": "(b) It shall be the duty of each parking control officer or police officer to take the block number and the street name at which any vehicle is parked in violation of the provisions of this article and take the license tag number or any other available identification number of each such vehicle and issue a parking ticket or uniform citation, as the case may be. Each such officer shall leave on such vehicle a ticket or summons stating thereon the violation. (Ord. 20566 § 15, 6-10-25.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.350:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.350 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "db4dc11a-d747-52b6-b339-6e38ea3504c9",
+          "convention": "utf8_char_offset",
+          "end": 995,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.350:block:2",
+          "start": 944
+        },
+        "quote": "Cross References: Police Department, TMC 2.20.090 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.350:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.350#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20566",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 941,
+          "start": 917
+        },
+        "quote": "Ord. 20566 § 15, 6-10-25",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.350#history:20566",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "d5d61e3e40a86bda95b608332d3bb508e0fa257f7b8f2c4889e95710e219d3ec",
+      "captured_at": "2026-08-28T04:17:16.018152Z",
+      "kind": "rendered_html_capture",
+      "value": "10.60.350.d5d61e3e40a8.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.60.350@d5d61e3e40a86bda",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.60.350",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.60.350",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.60.350",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.60.350"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.60.350#history:20566",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "6-10-25"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.60.350",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.60.350#history:20566",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20566"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.60.350#history:20566",
+      "value": "adopted"
+    },
+    "title": "Duty of traffic officers."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:17:16.018152Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "d5d61e3e40a86bda95b608332d3bb508e0fa257f7b8f2c4889e95710e219d3ec",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "d5d61e3e40a86bda95b608332d3bb508e0fa257f7b8f2c4889e95710e219d3ec",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "d5d61e3e40a86bda95b608332d3bb508e0fa257f7b8f2c4889e95710e219d3ec",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "0ea4c18595fe93b0dfe361ce0778769546cc75b91fae981f4a05f5e5f99b94e0",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "0ea4c18595fe93b0dfe361ce0778769546cc75b91fae981f4a05f5e5f99b94e0",
+        "output_sha256": "b99535171d087c866dd1237a4791a99d2692ba8053aafc34d5c3223b454fe9fe",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "0ea4c18595fe93b0dfe361ce0778769546cc75b91fae981f4a05f5e5f99b94e0",
+        "output_sha256": "d8bfd07eaa554f72a9146622c8a6e4675226a0df468a2b9cb31b4dcf9ab5b703",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.60.350",
+    "retained_original": {
+      "byte_count": 29428,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.60.350.d5d61e3e40a8.html",
+      "retrieved_at": "2026-08-28T04:17:16.018152Z",
+      "sha256": "d5d61e3e40a86bda95b608332d3bb508e0fa257f7b8f2c4889e95710e219d3ec"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

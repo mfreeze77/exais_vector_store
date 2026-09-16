@@ -1,0 +1,425 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1287,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "8fefc3947c5caea60d14e9115deef98fe2c10a4c1613970cdf45d24610cb9099"
+    },
+    "structured": {
+      "block_count": 12,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "ac5e2a20-044c-5bb0-802e-ce5c33886b78",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.05.060:section",
+      "sha256": "14b85812adba44468d24d48c1c62c191af7660a7d53a07f53ec59ffd699e62b6",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 3884,
+      "char_count": 3879,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "c2fcfa98063a9abfdc495d77f4ab3e38f36e7e8c84a0f04581b8939f95b51d25"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.05.060 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "16f531ee-99af-56a7-bf8d-ce726533a9c1",
+          "convention": "utf8_char_offset",
+          "end": 288,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.05.060:block:0",
+          "start": 0
+        },
+        "quote": "(a) Every vehicle, motor vehicle and motorized bicycle parked, stopped, standing or operated on the streets, public areas, park grounds, public or private parking lots or other publicly accessible areas of the City shall display a State license plate as provided by the laws of the State.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.05.060:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.05.060 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "40e1666d-7b78-5c61-8c55-1690b3c97f34",
+          "convention": "utf8_char_offset",
+          "end": 384,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.05.060:block:1",
+          "start": 289
+        },
+        "quote": "(b) It shall be unlawful to display on any vehicle described in subsection (a) of this section:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.05.060:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.05.060 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "aa4f76c7-0893-59cc-894f-19e95fd0eaeb",
+          "convention": "utf8_char_offset",
+          "end": 443,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.05.060:block:2",
+          "start": 385
+        },
+        "quote": "(1) Any license plate not lawfully issued to such vehicle;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.05.060:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.05.060 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "b4070a29-a755-5cf8-aa28-1bbfe09d8160",
+          "convention": "utf8_char_offset",
+          "end": 474,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.05.060:block:3",
+          "start": 444
+        },
+        "quote": "(2) Any expired license plate;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.05.060:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.05.060 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "fa274a43-b052-5acf-8d97-7d4da4d69038",
+          "convention": "utf8_char_offset",
+          "end": 528,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.05.060:block:4",
+          "start": 475
+        },
+        "quote": "(3) Any suspended, revoked or canceled license plate;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.05.060:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.05.060 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "1b19f1ca-ae3c-566e-afff-e91eab582cdd",
+          "convention": "utf8_char_offset",
+          "end": 558,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.05.060:block:5",
+          "start": 529
+        },
+        "quote": "(4) Any stolen license plate;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.05.060:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.05.060 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "70b9707b-c564-5466-9180-d0d3767eb038",
+          "convention": "utf8_char_offset",
+          "end": 612,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.05.060:block:6",
+          "start": 559
+        },
+        "quote": "(5) Any altered, defaced or fictitious license plate;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.05.060:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.05.060 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "4cebdeeb-3de7-50b9-aa15-2db40a84653a",
+          "convention": "utf8_char_offset",
+          "end": 714,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.05.060:block:7",
+          "start": 613
+        },
+        "quote": "(6) Any license plate without the current registration decal attached to it as required by State law;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.05.060:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.05.060 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "c51dfe5d-b921-5fb2-8245-15c1c6a06a2e",
+          "convention": "utf8_char_offset",
+          "end": 928,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.05.060:block:8",
+          "start": 715
+        },
+        "quote": "(7) Any State license plate that is not securely attached to the rear of the vehicle (unless such vehicle is a truck tractor), with the correct side up and in a manner that makes it clearly visible and legible; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.05.060:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.05.060 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "555b44f8-975d-51ab-976c-7f47d5ccb673",
+          "convention": "utf8_char_offset",
+          "end": 1034,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.05.060:block:9",
+          "start": 929
+        },
+        "quote": "(8) Any accessible parking placard which is fictitious, altered, defaced, canceled, revoked or suspended.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.05.060:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.05.060 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "528dd855-568f-54e2-9c2e-39d62b5d0573",
+          "convention": "utf8_char_offset",
+          "end": 1222,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.05.060:block:10",
+          "start": 1035
+        },
+        "quote": "(c) It shall be unlawful for any person to allow any State license plate registered to such person to be used in any unlawful manner. (Ord. 16584 § 1(43-707), 4-20-93. Code 1995 § 142-6.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.05.060:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.05.060 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "f8f63ac5-a341-59db-ab28-c8ac5d8b6fce",
+          "convention": "utf8_char_offset",
+          "end": 1286,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.05.060:block:11",
+          "start": 1223
+        },
+        "quote": "State Law References: Display of license plates, K.S.A. 8-133 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.05.060:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.05.060#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 16584",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1191,
+          "start": 1170
+        },
+        "quote": "Ord. 16584 § 1(43-707",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.05.060#history:16584",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "d932fa073b4f017c7ad62d1a0a253db8e227e3479ccf792a14ce1d47960abaf6",
+      "captured_at": "2026-08-28T04:12:51.268167Z",
+      "kind": "rendered_html_capture",
+      "value": "10.05.060.d932fa073b4f.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.05.060@d932fa073b4f017c",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.05.060",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.05.060",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.05.060",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.05.060"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.05.060",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.05.060#history:16584",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:16584"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.05.060#history:16584",
+      "value": "adopted"
+    },
+    "title": "Display of license plates."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:12:51.268167Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "d932fa073b4f017c7ad62d1a0a253db8e227e3479ccf792a14ce1d47960abaf6",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "d932fa073b4f017c7ad62d1a0a253db8e227e3479ccf792a14ce1d47960abaf6",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "d932fa073b4f017c7ad62d1a0a253db8e227e3479ccf792a14ce1d47960abaf6",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "c2fcfa98063a9abfdc495d77f4ab3e38f36e7e8c84a0f04581b8939f95b51d25",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "c2fcfa98063a9abfdc495d77f4ab3e38f36e7e8c84a0f04581b8939f95b51d25",
+        "output_sha256": "8fefc3947c5caea60d14e9115deef98fe2c10a4c1613970cdf45d24610cb9099",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "c2fcfa98063a9abfdc495d77f4ab3e38f36e7e8c84a0f04581b8939f95b51d25",
+        "output_sha256": "14b85812adba44468d24d48c1c62c191af7660a7d53a07f53ec59ffd699e62b6",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.05.060",
+    "retained_original": {
+      "byte_count": 30480,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.05.060.d932fa073b4f.html",
+      "retrieved_at": "2026-08-28T04:12:51.268167Z",
+      "sha256": "d932fa073b4f017c7ad62d1a0a253db8e227e3479ccf792a14ce1d47960abaf6"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

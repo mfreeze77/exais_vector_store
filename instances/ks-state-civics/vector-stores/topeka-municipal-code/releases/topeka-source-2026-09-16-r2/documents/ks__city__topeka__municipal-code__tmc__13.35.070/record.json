@@ -1,0 +1,305 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1430,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "3033114e07c178f48949e77c74ba513fabd2102e96a469168938f94a40fd0d18"
+    },
+    "structured": {
+      "block_count": 4,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "e5f73955-aea4-56d3-88e6-d6f41df206f1",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:13.35.070:section",
+      "sha256": "1bc083e26a9279764554ca4637557753e94ed4e370d785f7269dfcb9025df9b1",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 3771,
+      "char_count": 3768,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "5502b49172726d79862dc7525efee348466215e52b9cd4252c6edce04575709f"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.35.070 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "6aa14620-e059-564b-9d4d-01df044a24db",
+          "convention": "utf8_char_offset",
+          "end": 320,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.35.070:block:0",
+          "start": 0
+        },
+        "quote": "(a) An approved final stormwater management plan shall not be amended without prior written notification and written approval of the alteration by the Director. A written plan amendment shall be required. In the event of substantial amendments, the Director may require submittal of a revised stormwater management plan.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.35.070:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.35.070 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "e7d61891-0ad3-51c8-a54c-87b7afc74947",
+          "convention": "utf8_char_offset",
+          "end": 901,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.35.070:block:1",
+          "start": 321
+        },
+        "quote": "(b) If the proposed specifications of the project change after approval of the final stormwater management plan, the applicant shall notify the Director immediately. The Director may require cessation of all, or a portion of, construction, and/or resubmittal and approval of a revised stormwater management plan or appropriate portions thereof. Such proposed conditions include, but are not limited to, the intended land use, impervious surfaces layout and surface areas, extents of clearing and grading, and the selection, location, or design of stormwater management facilities.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.35.070:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.35.070 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "18d2461c-6599-5eca-8ca5-8399dba5ae9a",
+          "convention": "utf8_char_offset",
+          "end": 1172,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.35.070:block:2",
+          "start": 902
+        },
+        "quote": "(c) Approval of a stormwater management plan shall not prevent the Director from thereafter requiring the correction of errors or revisions to the plan due to unforeseen geologic, hydrologic, hydraulic, or construction-related conditions encountered after plan approval.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.35.070:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.35.070 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "67414adc-0da8-5185-af4b-89366d988551",
+          "convention": "utf8_char_offset",
+          "end": 1429,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.35.070:block:3",
+          "start": 1173
+        },
+        "quote": "(d) When revision of an approved stormwater management plan is required, the Director may also require the cessation of all, or a portion of, land disturbance or construction activities pending his/her approval of a revised plan. (Ord. 20262 § 7, 10-6-20.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.35.070:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.35.070#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20262",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1427,
+          "start": 1404
+        },
+        "quote": "Ord. 20262 § 7, 10-6-20",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.35.070#history:20262",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "5584bee8238d99d90162b23545f5bf3b4ba7a5293652b939ae27dd5c9cfaebbc",
+      "captured_at": "2026-08-28T04:32:56.616749Z",
+      "kind": "rendered_html_capture",
+      "value": "13.35.070.5584bee8238d.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:13.35.070@5584bee8238d99d9",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:13.35.070",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:13.35.070",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 13.35.070",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/13.35.070"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.35.070#history:20262",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "10-6-20"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "13.35.070",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.35.070#history:20262",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20262"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.35.070#history:20262",
+      "value": "adopted"
+    },
+    "title": "Amendment of an approved stormwater management plan."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:32:56.616749Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "5584bee8238d99d90162b23545f5bf3b4ba7a5293652b939ae27dd5c9cfaebbc",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "5584bee8238d99d90162b23545f5bf3b4ba7a5293652b939ae27dd5c9cfaebbc",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "5584bee8238d99d90162b23545f5bf3b4ba7a5293652b939ae27dd5c9cfaebbc",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "5502b49172726d79862dc7525efee348466215e52b9cd4252c6edce04575709f",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "5502b49172726d79862dc7525efee348466215e52b9cd4252c6edce04575709f",
+        "output_sha256": "3033114e07c178f48949e77c74ba513fabd2102e96a469168938f94a40fd0d18",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "5502b49172726d79862dc7525efee348466215e52b9cd4252c6edce04575709f",
+        "output_sha256": "1bc083e26a9279764554ca4637557753e94ed4e370d785f7269dfcb9025df9b1",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/13.35.070",
+    "retained_original": {
+      "byte_count": 28963,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/13.35.070.5584bee8238d.html",
+      "retrieved_at": "2026-08-28T04:32:56.616749Z",
+      "sha256": "5584bee8238d99d90162b23545f5bf3b4ba7a5293652b939ae27dd5c9cfaebbc"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

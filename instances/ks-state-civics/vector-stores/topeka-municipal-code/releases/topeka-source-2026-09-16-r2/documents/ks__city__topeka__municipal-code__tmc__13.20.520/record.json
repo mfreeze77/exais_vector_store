@@ -1,0 +1,849 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 12388,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "c14358a40ec4cb98514f18b8f5f0fa0825f0f17431c63409ea18d224eefb9e06"
+    },
+    "structured": {
+      "block_count": 38,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "bb600d3d-d792-5402-9664-4d0909ac82d8",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:section",
+      "sha256": "00c11e95cb8535bbd72b1e35a3dbad3ef8a79aa8d6d7fc31dcbe3b2d748e2a88",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 27607,
+      "char_count": 27592,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "44a22b00a1c7e3aee8d51a922aee68c8e68d8952c8bfe785a308ca03be8815a3"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "bb634a00-44ce-59d1-965c-6fc829c2ece5",
+          "convention": "utf8_char_offset",
+          "end": 415,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:0",
+          "start": 0
+        },
+        "quote": "(a) Baseline Monitoring Report. Within 180 days after the effective date of a categorical pretreatment standard, or 180 days after the final administrative decision made upon a categorical determination, industrial users subject to such categorical pretreatment standards and currently discharging to or scheduled to discharge to a POTW shall be required to submit a report which contains the following information:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "48905be5-dac0-51d8-88ca-f070332ccf81",
+          "convention": "utf8_char_offset",
+          "end": 533,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:1",
+          "start": 416
+        },
+        "quote": "(1) Identifying information including the name and address of the facility with the name of the operators and owners.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "21b1958c-1154-56be-a8be-6d474d334e21",
+          "convention": "utf8_char_offset",
+          "end": 595,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:2",
+          "start": 534
+        },
+        "quote": "(2) A list of environmental control permits held by the user.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "367a3914-3e5b-5faa-acf5-19173f5d926d",
+          "convention": "utf8_char_offset",
+          "end": 726,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:3",
+          "start": 596
+        },
+        "quote": "(3) A brief description of the nature, average rate of production, and standard industrial classification carried out by the user.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "0614bef9-f227-53e4-999b-8800fcd37c17",
+          "convention": "utf8_char_offset",
+          "end": 801,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:4",
+          "start": 727
+        },
+        "quote": "(4) Flow measurements showing the measured average and maximum daily flow.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "73362fd6-fe7c-553a-8265-ede1e3d902e1",
+          "convention": "utf8_char_offset",
+          "end": 909,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:5",
+          "start": 802
+        },
+        "quote": "(5) Measurements of pollutants identifying the pretreatment standards applicable to each regulated process.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "bc3f3e91-ce6e-5856-8b38-21eecf68491e",
+          "convention": "utf8_char_offset",
+          "end": 1043,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:6",
+          "start": 910
+        },
+        "quote": "(6) Certification statement reviewed by an authorized representative of the industrial user as outlined in 40 CFR Section 403.12(l) .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "354526c3-e781-57db-bda7-e231167f2fdb",
+          "convention": "utf8_char_offset",
+          "end": 1181,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:7",
+          "start": 1044
+        },
+        "quote": "(7) Compliance schedule if additional pretreatment and/or operations and maintenance will be required to meet the pretreatment standards.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "779acab2-35f4-5044-921d-bc253eeffa8d",
+          "convention": "utf8_char_offset",
+          "end": 1282,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:8",
+          "start": 1182
+        },
+        "quote": "(8) Such report shall also contain a certification statement signed by an authorized representative.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "97e2fd2e-6e01-5ada-84d8-35733beed7e5",
+          "convention": "utf8_char_offset",
+          "end": 2339,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:9",
+          "start": 1283
+        },
+        "quote": "(b) Ninety-Day Compliance Report. Within 90 days following the date of final compliance with applicable pretreatment standards or, in the case of a new source, following commencement of the introduction of wastewater to the POTW, any user subject to the pretreatment standards and requirements shall submit to the Utilities Director a report indicating the nature and concentration of all pollutants in the discharge from the regulated process which are limited by pretreatment standards and requirements and the average and maximum daily flow for the process units in the user’s facility which are limited by such pretreatment standards and requirements. The report shall state whether the applicable pretreatment standards or requirements are being met on a consistent basis, and if not, what additional operations and maintenance and/or pretreatment is necessary to bring the user into compliance with the applicable pretreatment standards or requirements. Such report shall also contain a certification statement signed by an authorized representative.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "2229e945-8efb-58d4-85ff-2c66e7ee5b24",
+          "convention": "utf8_char_offset",
+          "end": 2372,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:10",
+          "start": 2340
+        },
+        "quote": "(c) Periodic Compliance Reports.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "8993247e-51e8-505f-b2cf-6190502a18e1",
+          "convention": "utf8_char_offset",
+          "end": 2835,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:11",
+          "start": 2373
+        },
+        "quote": "(1) Any user subject to a pretreatment standard, after the compliance date of such pretreatment standard, or, in the case of a new source, after commencement of the discharge of waste to the POTW, shall submit to the Utilities Director reports as required by the permit. Such reports shall also contain a certification statement signed by an authorized representative. In no case will the report cover a period in excess of six months for categorical industries.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "ecdca7fe-43c6-582a-bc39-efe237cd9efd",
+          "convention": "utf8_char_offset",
+          "end": 3130,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:12",
+          "start": 2836
+        },
+        "quote": "(2) Significant noncategorical industrial users shall submit to the Water Pollution Control Division at least once every six months a description of the nature, concentration and flow of the pollutants required to be reported in accordance with the wastewater treatment discharge permit issued.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "3a1ac708-ad2c-5c93-83d1-ae8fde3afde0",
+          "convention": "utf8_char_offset",
+          "end": 3230,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:13",
+          "start": 3131
+        },
+        "quote": "(3) All periodic compliance reports must be signed and certified in accordance with TMC 13.20.525 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "5d67f4e5-5ede-5465-ac39-0472f27a89fc",
+          "convention": "utf8_char_offset",
+          "end": 3272,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:14",
+          "start": 3231
+        },
+        "quote": "(d) Monitoring and Sampling Requirements.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "34783903-343c-534a-9036-93cad6b1cf90",
+          "convention": "utf8_char_offset",
+          "end": 4192,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:15",
+          "start": 3273
+        },
+        "quote": "(1) The monitoring reports required in subsection (c) of this section shall contain the results of sampling and analysis of the discharge, including the flow and the nature and concentration or mass limitations, where requested by the Utilities Director, of pollutants contained therein which are limited by the applicable pretreatment standards. This sampling and analysis may be performed by the Utilities Director, in lieu of the industrial user. Where the Utilities Director performs the required sampling and analysis in lieu of the industrial user, the industrial user will not be required to submit the compliance certification required in the baseline monitoring and 90-day reports, required in 40 CFR Section 403.12 . In addition, where the Utilities Director collects all the information required for these reports, including flow data, the industrial user will not be required to submit the same information.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "dec69df6-6796-57fa-ac77-3b91e382e279",
+          "convention": "utf8_char_offset",
+          "end": 4611,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:16",
+          "start": 4193
+        },
+        "quote": "(2) If sampling performed by an industrial user indicates a violation, the user shall notify the Utilities Director within 24 hours of becoming aware of the violation. The industrial user shall also repeat the sampling and analysis and submit the results of the repeat analysis to the Utilities Director within 30 days after becoming aware of the violation. However, the industrial user is not required to resample if:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "bbc354fe-760a-54bf-9ae6-f5f376c27555",
+          "convention": "utf8_char_offset",
+          "end": 4725,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:17",
+          "start": 4612
+        },
+        "quote": "(i) The Utilities Director performs sampling at the industrial user at a frequency of at least once per month; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "0b121b02-7f10-599a-b647-713c827c9f76",
+          "convention": "utf8_char_offset",
+          "end": 4932,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:18",
+          "start": 4726
+        },
+        "quote": "(ii) The Utilities Director performs sampling at the industrial user between the time when the user performs its initial sampling and the time when the industrial user receives the results of this sampling.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "fc1f24a6-a7fd-585a-9bc6-9c384f73ec8e",
+          "convention": "utf8_char_offset",
+          "end": 5394,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:19",
+          "start": 4933
+        },
+        "quote": "(3) The monitoring reports submitted to the Utilities Director shall be based upon data obtained through appropriate sampling and analysis, performed during the period identified in the permit and shall be representative of discharge occurring during the reporting period. The Utilities Director shall require that frequency of monitoring necessary to assess and assure compliance by the industrial user, with applicable pretreatment standards and requirements.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "55a48e06-3e59-51b7-88b5-14fd4f30d69a",
+          "convention": "utf8_char_offset",
+          "end": 6217,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:20",
+          "start": 5395
+        },
+        "quote": "(4) All analyses shall be performed in accordance with procedures established by the EPA pursuant to Section 304(h) of the Act and contained in 40 CFR Part 136 and amendments thereto or with any other test procedures approved by the EPA in accordance with 40 CFR Sections 136.4 and 136.5 . Sampling shall be performed in accordance with the techniques approved by the EPA. Where 40 CFR Part 136 does not include sampling or analytical techniques for the pollutants in question or where the EPA determines that the Part 136 sampling and analytical techniques are inappropriate for the pollutant in question, sampling and analyses shall be performed using validated analytical methods or any other sampling and analytical procedures, including procedures suggested by the Utilities Director or other parties approved by EPA.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "d0134c24-8395-5502-adbf-5612b833e685",
+          "convention": "utf8_char_offset",
+          "end": 6499,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:21",
+          "start": 6218
+        },
+        "quote": "(5) If an industrial user subject to the reporting requirements monitors any pollutant more frequently than required by the Utilities Director and uses approved wastewater sampling and analytical methods, the results of this monitoring shall be included in their monitoring report.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "6de46a82-c406-56e6-a39d-8dfd957ecddc",
+          "convention": "utf8_char_offset",
+          "end": 6791,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:22",
+          "start": 6500
+        },
+        "quote": "(e) Sample Collection. Samples collected to satisfy reporting requirements must be based on data obtained through appropriate sampling and analysis performed during the period covered by the report and based on data that is representative of conditions occurring during the reporting period.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "1e0156b1-479a-58e5-aa75-bfec2c096394",
+          "convention": "utf8_char_offset",
+          "end": 7915,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:23",
+          "start": 6792
+        },
+        "quote": "(1) Except as indicated in subsections (e)(2) and (e)(3) of this section, the user must collect wastewater samples using 24-hour flow proportional composite sampling techniques, unless time proportional composite sampling or grab sampling is authorized by the Utilities Director. Where time proportional composite sampling or grab sampling is authorized by the Utilities Director, the samples must be representative of the discharge. Using protocols (including appropriate preservation) specified in 40 CFR Part 136 and appropriate EPA guidance, multiple grab samples collected during a 24-hour period may be composited prior to the analysis as follows: for cyanide, total phenols, and sulfides the samples may be composited in the laboratory or in the field; for volatile organics and oil and grease, the samples may be composited in the laboratory. Composite samples for other parameters unaffected by the compositing procedures as documented in approved EPA methodologies may be authorized by the Utilities Director, as appropriate. In addition, grab samples may be required to show compliance with instantaneous limits.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "649383cd-f4e4-5657-b97f-aa7a04ead6db",
+          "convention": "utf8_char_offset",
+          "end": 8080,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:24",
+          "start": 7916
+        },
+        "quote": "(2) Samples for oil and grease, temperature, pH, cyanide, total phenols, sulfides, and volatile organic compounds must be obtained using grab collection techniques.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "41913cdc-e9b4-5cab-a323-3990453dfd06",
+          "convention": "utf8_char_offset",
+          "end": 8808,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:25",
+          "start": 8081
+        },
+        "quote": "(3) For sampling required in support of baseline monitoring and 90-day compliance reports required in subsections (a) and (b) of this section ( 40 CFR Sections 403.12(b) and (d) ), a minimum of four grab samples must be used for pH, cyanide, total phenols, oil and grease, sulfide and volatile organic compounds for facilities for which historical sampling data do not exist; for facilities for which historical sampling data are available, the Utilities Director may authorize a lower minimum. For the reports required by 40 CFR Sections 403.12(e) and (h) , the industrial user is required to collect the number of grab samples necessary to assess and assure compliance with applicable pretreatment standards and requirements.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 26",
+        "locator": {
+          "block_index": 26,
+          "component_id": "9af45f28-00a2-5a62-bf10-6152b93f740b",
+          "convention": "utf8_char_offset",
+          "end": 9084,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:26",
+          "start": 8809
+        },
+        "quote": "(f) Reports of Changed Conditions. Each user must notify the Utilities Director of any significant changes to the user’s operations or system which might alter the nature, quality, or 10 percent change in the volume of its wastewater at least 30 days before its introduction.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 27",
+        "locator": {
+          "block_index": 27,
+          "component_id": "0467dce3-e0b5-5f03-ab51-8f5ff058d730",
+          "convention": "utf8_char_offset",
+          "end": 9119,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:27",
+          "start": 9085
+        },
+        "quote": "(g) Reports of Potential Problems.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 28",
+        "locator": {
+          "block_index": 28,
+          "component_id": "a6c96e24-1c10-59dd-b7cb-1a82f35cb61e",
+          "convention": "utf8_char_offset",
+          "end": 9609,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:28",
+          "start": 9120
+        },
+        "quote": "(1) In the case of any discharge, including, but not limited to, accidental discharges, discharges of a nonroutine, episodic nature, a noncustomary batch discharge, a slug discharge or slug load, that might cause potential problems for the POTW, the user shall immediately telephone and notify the Utilities Director of the incident. This notification shall include the location of the discharge, type of waste, concentration and volume, if known, and corrective actions taken by the user.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:28#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 29",
+        "locator": {
+          "block_index": 29,
+          "component_id": "a001ca2d-54a8-59e3-89f8-f981a69daeb7",
+          "convention": "utf8_char_offset",
+          "end": 10218,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:29",
+          "start": 9610
+        },
+        "quote": "(2) Within five days following such discharge, the user shall, unless waived by the Utilities Director, submit a detailed written report describing the cause(s) of the discharge and the measures to be taken by the user to prevent similar future occurrences. Such notification shall not relieve the user of any expense, loss, damage, or other liability which might be incurred as a result of damage to the POTW, natural resources, or any other damage to person or property; nor shall such notification relieve the user of any fines, penalties, or other liability which may be imposed pursuant to this chapter.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:29#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 30",
+        "locator": {
+          "block_index": 30,
+          "component_id": "3224ff58-db94-5ccd-b196-e6373f351a9a",
+          "convention": "utf8_char_offset",
+          "end": 10558,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:30",
+          "start": 10219
+        },
+        "quote": "(3) A notice shall be permanently posted on the user’s bulletin board or other prominent place advising employees whom to call in the event of a discharge described in subsection (g)(1) of this section. Employers shall ensure that all employees who could cause such a discharge to occur are advised of the emergency notification procedure.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:30#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 31",
+        "locator": {
+          "block_index": 31,
+          "component_id": "79b93655-9cf7-58a7-a9fd-e72ce6a73478",
+          "convention": "utf8_char_offset",
+          "end": 10726,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:31",
+          "start": 10559
+        },
+        "quote": "(4) Significant industrial users are required to notify the Utilities Director immediately of any changes at its facility affecting the potential for a slug discharge.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:31#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 32",
+        "locator": {
+          "block_index": 32,
+          "component_id": "a025073a-1983-5458-8a45-0c8fb2fdaf36",
+          "convention": "utf8_char_offset",
+          "end": 11189,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:32",
+          "start": 10727
+        },
+        "quote": "(h) Compliance Schedule. If additional pretreatment and/or O&M will be required to meet the pretreatment standards, the shortest schedule by which the user will provide such additional pretreatment and/or O&M must be provided. The completion date in this schedule shall not be later than the compliance date established for the applicable pretreatment standard. A compliance schedule pursuant to this section must meet the requirements set out in TMC 13.20.450 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:32#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 33",
+        "locator": {
+          "block_index": 33,
+          "component_id": "2c71522c-4d68-5701-ad4e-8689eb0c5aef",
+          "convention": "utf8_char_offset",
+          "end": 11322,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:33",
+          "start": 11190
+        },
+        "quote": "(i) Compliance Schedule Progress Report. The following conditions shall apply to the compliance schedule required by TMC 13.20.450 :",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:33#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 34",
+        "locator": {
+          "block_index": 34,
+          "component_id": "1ab80dbc-b2a3-55fb-8b0b-c628b6cbc9f9",
+          "convention": "utf8_char_offset",
+          "end": 11820,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:34",
+          "start": 11323
+        },
+        "quote": "(1) The schedule shall contain progress increments in the form of dates for the commencement and completion of major events leading to the construction and operation of additional pretreatment required for the user to meet the applicable pretreatment standards (such events include, but are not limited to, hiring an engineer, completing preliminary and final plans, executing contracts for major components, commencing and completing construction, and beginning and conducting routine operation);",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:34#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 35",
+        "locator": {
+          "block_index": 35,
+          "component_id": "3015c6ba-d876-5ed9-a317-bd0fd0c3c682",
+          "convention": "utf8_char_offset",
+          "end": 11881,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:35",
+          "start": 11821
+        },
+        "quote": "(2) No increment referred to above shall exceed nine months;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:35#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 36",
+        "locator": {
+          "block_index": 36,
+          "component_id": "d8c919ca-adaa-53b2-8256-805056daae71",
+          "convention": "utf8_char_offset",
+          "end": 12250,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:36",
+          "start": 11882
+        },
+        "quote": "(3) The user shall submit a progress report to the Utilities Director no later than 14 days following each date in the schedule and the final date of compliance including, as a minimum, whether or not it complied with the increment of progress, the reason for any delay, and, if appropriate, the steps being taken by the user to return to the established schedule; and",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:36#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 13.20.520 block 37",
+        "locator": {
+          "block_index": 37,
+          "component_id": "bbaaad1f-7149-5480-9a7a-2a7164255ba4",
+          "convention": "utf8_char_offset",
+          "end": 12387,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:13.20.520:block:37",
+          "start": 12251
+        },
+        "quote": "(4) In no event shall more than nine months elapse between such progress reports to the Utilities Director. (Ord. 20089 § 73, 10-17-17.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520:block:37#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20089",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 12385,
+          "start": 12360
+        },
+        "quote": "Ord. 20089 § 73, 10-17-17",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:13.20.520#history:20089",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "2214b2c50022fc2a31f8bed4bd3dadc3c3d9857ca2dc479abd0f0b63a844d4cb",
+      "captured_at": "2026-08-28T04:30:00.310855Z",
+      "kind": "rendered_html_capture",
+      "value": "13.20.520.2214b2c50022.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:13.20.520@2214b2c50022fc2a",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:13.20.520",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:13.20.520",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 13.20.520",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/13.20.520"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.520#history:20089",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "10-17-17"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "13.20.520",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.520#history:20089",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20089"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:13.20.520#history:20089",
+      "value": "adopted"
+    },
+    "title": "Reporting requirements."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:30:00.310855Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "2214b2c50022fc2a31f8bed4bd3dadc3c3d9857ca2dc479abd0f0b63a844d4cb",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "2214b2c50022fc2a31f8bed4bd3dadc3c3d9857ca2dc479abd0f0b63a844d4cb",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "2214b2c50022fc2a31f8bed4bd3dadc3c3d9857ca2dc479abd0f0b63a844d4cb",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "44a22b00a1c7e3aee8d51a922aee68c8e68d8952c8bfe785a308ca03be8815a3",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "44a22b00a1c7e3aee8d51a922aee68c8e68d8952c8bfe785a308ca03be8815a3",
+        "output_sha256": "c14358a40ec4cb98514f18b8f5f0fa0825f0f17431c63409ea18d224eefb9e06",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "44a22b00a1c7e3aee8d51a922aee68c8e68d8952c8bfe785a308ca03be8815a3",
+        "output_sha256": "00c11e95cb8535bbd72b1e35a3dbad3ef8a79aa8d6d7fc31dcbe3b2d748e2a88",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/13.20.520",
+    "retained_original": {
+      "byte_count": 51084,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/13.20.520.2214b2c50022.html",
+      "retrieved_at": "2026-08-28T04:30:00.310855Z",
+      "sha256": "2214b2c50022fc2a31f8bed4bd3dadc3c3d9857ca2dc479abd0f0b63a844d4cb"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

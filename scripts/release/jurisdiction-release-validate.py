@@ -213,7 +213,9 @@ def _check_bundle_kind(manifest, expect_kind: str | None, report: ValidationRepo
     if manifest["release"]["producer"]["dirty_worktree"]:
         report.add(
             "warning", "DIRTY_PRODUCER", "release.producer",
-            "produced from a dirty worktree; release.producer.commit does not reproduce this bundle",
+            "produced with uncommitted code changes "
+            f"({manifest['release']['producer'].get('dirty_code_paths') or 'paths not recorded'}); "
+            "release.producer.commit does not reproduce this bundle",
         )
     if kind == "production" and manifest["release"]["producer"]["commit"] == "unknown":
         report.add(

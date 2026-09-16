@@ -1,0 +1,865 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 6822,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "380431a4c75759d6b1c982644d8898a779ea8a9a392b4944e164aefb6d5b6220"
+    },
+    "structured": {
+      "block_count": 39,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 29,
+      "path": "structured.json",
+      "root_component_id": "0dc9a4ef-0541-51b3-8198-fe96718fc4f0",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:section",
+      "sha256": "0746ff1cfe5846eccd3080dc122497f59ca692606e5b6ae3a9a0592ed50a9c0f",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 17604,
+      "char_count": 17311,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "7f4605adc949a538f2d86aa047a6b285e8b177701aa19557815eb4ebfc846d0b"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "a11929ba-4c03-5b2e-b5f1-dd29392ab069",
+          "convention": "utf8_char_offset",
+          "end": 326,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:0",
+          "start": 0
+        },
+        "quote": "The following words and phrases shall have the meaning ascribed to them as set forth. References hereafter to “sections” are, unless otherwise specified, references to sections in this chapter. Defined terms remain defined terms whether or not capitalized. Words importing the masculine gender only may be extended to females.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "94cab30b-7fae-5939-a93e-24201df63318",
+          "convention": "utf8_char_offset",
+          "end": 417,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:1",
+          "start": 327
+        },
+        "quote": "“Applicant” means any person requesting permission to excavate or obstruct a right-of-way.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "478346aa-efb3-5bbf-85bb-96188d72efe1",
+          "convention": "utf8_char_offset",
+          "end": 524,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:2",
+          "start": 418
+        },
+        "quote": "“Central business district” means that portion of the City lying within the area defined in TMC 3.40.010 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "0b02d7c1-584a-54a9-933d-a0b8a2b06ce6",
+          "convention": "utf8_char_offset",
+          "end": 620,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:3",
+          "start": 525
+        },
+        "quote": "“City” means the City of Topeka, Kansas, to include its elected officials, officers, employees.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "ce1e66e9-f1c0-5805-86af-6896eb610fea",
+          "convention": "utf8_char_offset",
+          "end": 1265,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:4",
+          "start": 621
+        },
+        "quote": "“City cost” means the actual cost incurred by the City for public rights-of-way management, including, but not limited to, costs associated with registering applicants; issuing, processing, and verifying right-of-way permit applications; inspecting job sites and restoration projects; maintaining, supporting, protecting, or moving user equipment during public right-of-way work; determining the adequacy of right-of-way restoration; restoring work inadequately performed; revoking right-of-way permits and performing all other tasks required by this chapter, including other costs the City may incur in managing the provisions of this chapter.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "eb55772c-a39e-5086-a32a-c71a5e1da6a9",
+          "convention": "utf8_char_offset",
+          "end": 1515,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:5",
+          "start": 1266
+        },
+        "quote": "“Degradation” means the accelerated deterioration of the right-of-way caused by excavation in or disturbance of the right-of-way, resulting in the need to reconstruct such right-of-way, earlier than would be required if the excavation did not occur.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "c0c9f860-e708-5bfd-a601-372781c76294",
+          "convention": "utf8_char_offset",
+          "end": 1588,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:6",
+          "start": 1516
+        },
+        "quote": "“Department” means the Department of Public Works of the City of Topeka.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "138f966f-32c9-55c5-8984-9e68af65db99",
+          "convention": "utf8_char_offset",
+          "end": 1723,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:7",
+          "start": 1589
+        },
+        "quote": "“Department Inspector” means any person authorized by the Director to carry out inspections related to the provisions of this chapter.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "7ac967f7-c5a3-55d3-a86c-7590d0972458",
+          "convention": "utf8_char_offset",
+          "end": 1824,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:8",
+          "start": 1724
+        },
+        "quote": "“Director” means the Director of the Department of Public Works of the City, or her or his designee.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "bcdaa042-bbd5-509f-81f1-84c9b79a6686",
+          "convention": "utf8_char_offset",
+          "end": 1988,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:9",
+          "start": 1825
+        },
+        "quote": "“Driveway permit” means the City authorization for construction or reconstruction of driveway approaches including the cutting and/or removal of curbs and gutters.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "d8fc3f73-0972-5142-9278-1936e423de69",
+          "convention": "utf8_char_offset",
+          "end": 2024,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:10",
+          "start": 1989
+        },
+        "quote": "“Emergency” means a condition that:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "7df4ff2c-327b-55c6-a582-7492fe5f8ea5",
+          "convention": "utf8_char_offset",
+          "end": 2123,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:11",
+          "start": 2025
+        },
+        "quote": "(1) Poses a clear and immediate danger to life or health, or of a significant loss of property; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "a1b5552a-fa9b-5223-9ac5-ca759b4a88b2",
+          "convention": "utf8_char_offset",
+          "end": 2211,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:12",
+          "start": 2124
+        },
+        "quote": "(2) Requires immediate repair or replacement in order to restore service to a customer.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "5ed4f173-37e9-541a-9476-5cd26c7ec095",
+          "convention": "utf8_char_offset",
+          "end": 2500,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:13",
+          "start": 2212
+        },
+        "quote": "“Equipment” means any type of utility service or system component, including but not limited to pipe, electric cable, cable, or fiber optic cable located within the right-of-way, but shall not include plantings maintained in the right-of-way between the property line and the street curb.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "302e1773-446e-53e8-8f46-03e67025e96c",
+          "convention": "utf8_char_offset",
+          "end": 2712,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:14",
+          "start": 2501
+        },
+        "quote": "“Excavate” means to dig into or in any way remove, physically disturb, or penetrate any part of a right-of-way, except horticultural practices of penetrating the boulevard area to a depth of less than 12 inches.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "97e4ad97-a683-5d47-9641-94dd9d709cb4",
+          "convention": "utf8_char_offset",
+          "end": 2839,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:15",
+          "start": 2713
+        },
+        "quote": "“Excavation permit” means the City authorization for excavation within that part of the right-of-way described in such permit.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "0b2d50d7-16ea-535e-85e5-d5a080c9f8ba",
+          "convention": "utf8_char_offset",
+          "end": 2951,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:16",
+          "start": 2840
+        },
+        "quote": "“In,” when used in conjunction with “right-of-way,” means over, above, in, within, on, or under a right-of-way.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "a875be17-6e03-50af-8527-d4b1a60875e1",
+          "convention": "utf8_char_offset",
+          "end": 3140,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:17",
+          "start": 2952
+        },
+        "quote": "“Local representative” means a local person(s) authorized by an applicant to accept service and to make decisions for that applicant regarding all matters within the scope of this chapter.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "3269cd7f-28db-5cac-9b5f-a30924c8584f",
+          "convention": "utf8_char_offset",
+          "end": 3276,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:18",
+          "start": 3141
+        },
+        "quote": "“Obstruct” means to place any object in a right-of-way so as to hinder free and open passage over that or any part of the right-of-way.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "cf52d024-be9a-5820-98a4-543c4fd4b87d",
+          "convention": "utf8_char_offset",
+          "end": 3404,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:19",
+          "start": 3277
+        },
+        "quote": "“Permittee” means any person to whom a permit to do work within a right-of-way has been granted by the City under this chapter.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "43478953-a914-51bb-af89-7b4c0fb6d360",
+          "convention": "utf8_char_offset",
+          "end": 3776,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:20",
+          "start": 3405
+        },
+        "quote": "“Person” means any natural or corporate person, business association or other business entity including, but not limited to, a partnership, a sole proprietorship, a political subdivision, a public or private agency of any kind, a utility, a successor or assignor of any of the foregoing, or any other legal entity which has or seeks to have equipment in any right-of-way.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "220cef2e-ac02-5d7c-9f95-249ad3e7cf44",
+          "convention": "utf8_char_offset",
+          "end": 3876,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:21",
+          "start": 3777
+        },
+        "quote": "“Probation” means the status of a person that has not complied with the conditions of this chapter.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "0bb04d5c-b771-5009-b377-3d3ed6218be8",
+          "convention": "utf8_char_offset",
+          "end": 4030,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:22",
+          "start": 3877
+        },
+        "quote": "“Probationary period” means the time period in months or days from the date that a person has been notified in writing that he has been put on probation.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "1047ccca-cd68-55cc-a95f-d5cfa606630a",
+          "convention": "utf8_char_offset",
+          "end": 4249,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:23",
+          "start": 4031
+        },
+        "quote": "“Registrant” means any person who has or seeks to have its equipment located within any right-of-way. Examples of registrant include public utilities providing utility service, telecommunication providers and carriers.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "3ec9aa46-5134-5412-b4c0-1f8b50e29cb4",
+          "convention": "utf8_char_offset",
+          "end": 4350,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:24",
+          "start": 4250
+        },
+        "quote": "“Repair” means the temporary construction work necessary to make the right-of-way usable for travel.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "79bb7df9-3d6c-5946-9a79-ac7f81d97315",
+          "convention": "utf8_char_offset",
+          "end": 4573,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:25",
+          "start": 4351
+        },
+        "quote": "“Restoration bond” means a performance bond or cash deposit posted to ensure the availability of sufficient funds to complete, if necessary, right-of-way excavation and obstruction work in both a timely and quality manner.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 26",
+        "locator": {
+          "block_index": 26,
+          "component_id": "e723231b-9ff2-5e14-866b-49b54caa5d61",
+          "convention": "utf8_char_offset",
+          "end": 4691,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:26",
+          "start": 4574
+        },
+        "quote": "“Restoration cost” means an amount of money paid or owed to the City by a permittee to cover the cost of restoration.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 27",
+        "locator": {
+          "block_index": 27,
+          "component_id": "6d8dc286-6cc4-5160-8492-d52b889f3b60",
+          "convention": "utf8_char_offset",
+          "end": 4912,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:27",
+          "start": 4692
+        },
+        "quote": "“Restore” or “restoration” means the process by which an excavated right-of-way and surrounding area, including pavement and foundation, is returned to the same condition that existed before the commencement of the work.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 28",
+        "locator": {
+          "block_index": 28,
+          "component_id": "a78301f3-a88f-5614-aa08-5898452962ba",
+          "convention": "utf8_char_offset",
+          "end": 5179,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:28",
+          "start": 4913
+        },
+        "quote": "“Right-of-way” means the surface and space above and below a public roadway, highway, street, alley, bicycle lane and public sidewalk in which the City has legal interest, including other dedicated rights-of-way for travel purposes and utility easements of the City.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:28#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 29",
+        "locator": {
+          "block_index": 29,
+          "component_id": "3f5feac9-dc01-58ac-91c1-d4013fa78d2b",
+          "convention": "utf8_char_offset",
+          "end": 5404,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:29",
+          "start": 5180
+        },
+        "quote": "“Right-of-way permit” means the driveway permit, excavation permit, sidewalk permit, temporary use of right-of-way permit, or traffic disruption permit, or all of these, depending on the context, as required by this chapter.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:29#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 30",
+        "locator": {
+          "block_index": 30,
+          "component_id": "65eb2070-ecc6-59db-a588-7445afe60071",
+          "convention": "utf8_char_offset",
+          "end": 5467,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:30",
+          "start": 5405
+        },
+        "quote": "“Service” or “utility service” includes but is not limited to:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:30#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 31",
+        "locator": {
+          "block_index": 31,
+          "component_id": "4c5669fe-2e05-5828-95bd-36e99a99a95b",
+          "convention": "utf8_char_offset",
+          "end": 5546,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:31",
+          "start": 5468
+        },
+        "quote": "(1) Those services provided by a public utility as defined by Kansas Statutes;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:31#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 32",
+        "locator": {
+          "block_index": 32,
+          "component_id": "f41342ae-ce96-5cc2-b492-a8b44dd61ab8",
+          "convention": "utf8_char_offset",
+          "end": 5709,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:32",
+          "start": 5547
+        },
+        "quote": "(2) Telecommunications, pipeline, community antenna television, fire and alarm communications, water, electricity, light, heat, cooling energy, or power services;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:32#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 33",
+        "locator": {
+          "block_index": 33,
+          "component_id": "2d1f28a1-a6b1-55bb-a79e-37b5b3678c24",
+          "convention": "utf8_char_offset",
+          "end": 5780,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:33",
+          "start": 5710
+        },
+        "quote": "(3) The services provided by a district heating or cooling system; and",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:33#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 34",
+        "locator": {
+          "block_index": 34,
+          "component_id": "1abe1c86-40b0-54f4-a4a7-76b4c5e7cb1f",
+          "convention": "utf8_char_offset",
+          "end": 5844,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:34",
+          "start": 5781
+        },
+        "quote": "(4) Cable communications systems as defined in Kansas Statutes.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:34#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 35",
+        "locator": {
+          "block_index": 35,
+          "component_id": "73b260f9-21e5-5d6d-b317-3c367330a1ef",
+          "convention": "utf8_char_offset",
+          "end": 5946,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:35",
+          "start": 5845
+        },
+        "quote": "“Sidewalk permit” means the City authorization for construction or reconstruction of public sidewalk.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:35#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 36",
+        "locator": {
+          "block_index": 36,
+          "component_id": "472197bc-85e7-5a96-9e5f-98a5372692a1",
+          "convention": "utf8_char_offset",
+          "end": 6137,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:36",
+          "start": 5947
+        },
+        "quote": "“Supplementary application” means an application made to excavate more of the right-of-way than allowed in a permit that had already been issued, or to extend the time of City authorization.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:36#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 37",
+        "locator": {
+          "block_index": 37,
+          "component_id": "5e8057d7-9b56-54ef-98eb-9c3d1063a494",
+          "convention": "utf8_char_offset",
+          "end": 6590,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:37",
+          "start": 6138
+        },
+        "quote": "“Temporary use of right-of-way permit” means the permit which, pursuant to this chapter, authorizes the temporary encroachment upon public streets, sidewalks, or other public property during construction for storage of materials construction or equipment, or for the erection of fencing, barricades, sidewalk, passageways, or construction office, such area being used in a manner as to deny the public the use of such street, alley, or public property.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:37#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.30.020 block 38",
+        "locator": {
+          "block_index": 38,
+          "component_id": "3eb48ca6-d2f6-5f44-8e48-f696f6dc648e",
+          "convention": "utf8_char_offset",
+          "end": 6821,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.30.020:block:38",
+          "start": 6591
+        },
+        "quote": "“Traffic disruption permit” means the City authorization for closing down lane(s) of traffic, utilizing proper traffic control devices and, if applicable, providing detour route(s). (Ord. 17587 § 2, 10-24-00. Code 1995 § 130-632.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020:block:38#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 17587",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 6798,
+          "start": 6774
+        },
+        "quote": "Ord. 17587 § 2, 10-24-00",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.30.020#history:17587",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "a395878d72635fafe39b3caf0ab247584edfc2584b838a5849aaae4e1e0c612d",
+      "captured_at": "2026-08-28T04:21:16.276270Z",
+      "kind": "rendered_html_capture",
+      "value": "12.30.020.a395878d7263.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:12.30.020@a395878d72635faf",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:12.30.020",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:12.30.020",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 12.30.020",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/12.30.020"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.30.020#history:17587",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "10-24-00"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "12.30.020",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.30.020#history:17587",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:17587"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.30.020#history:17587",
+      "value": "adopted"
+    },
+    "title": "Definitions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:21:16.276270Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "a395878d72635fafe39b3caf0ab247584edfc2584b838a5849aaae4e1e0c612d",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "a395878d72635fafe39b3caf0ab247584edfc2584b838a5849aaae4e1e0c612d",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "a395878d72635fafe39b3caf0ab247584edfc2584b838a5849aaae4e1e0c612d",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "7f4605adc949a538f2d86aa047a6b285e8b177701aa19557815eb4ebfc846d0b",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "7f4605adc949a538f2d86aa047a6b285e8b177701aa19557815eb4ebfc846d0b",
+        "output_sha256": "380431a4c75759d6b1c982644d8898a779ea8a9a392b4944e164aefb6d5b6220",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "7f4605adc949a538f2d86aa047a6b285e8b177701aa19557815eb4ebfc846d0b",
+        "output_sha256": "0746ff1cfe5846eccd3080dc122497f59ca692606e5b6ae3a9a0592ed50a9c0f",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/12.30.020",
+    "retained_original": {
+      "byte_count": 40095,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/12.30.020.a395878d7263.html",
+      "retrieved_at": "2026-08-28T04:21:16.276270Z",
+      "sha256": "a395878d72635fafe39b3caf0ab247584edfc2584b838a5849aaae4e1e0c612d"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

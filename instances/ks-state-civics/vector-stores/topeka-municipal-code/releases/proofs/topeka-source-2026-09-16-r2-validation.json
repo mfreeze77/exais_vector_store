@@ -9,24 +9,48 @@
       "ks:city:topeka:ordinances",
       "ks:city:topeka:resolutions"
     ],
-    "document_count": 26,
-    "evidence_references_resolved": 1269,
-    "evidence_references_unavailable": 29,
-    "file_count_recomputed": 130,
-    "inventory_sha256_recomputed": "8ed50691bfdceafc381f15ec37f5d1d5619dccab40d19c4ff758fc30e9a7f345",
-    "manifest_sha256": "adbaa700d6c6d8fc3043184a226822e220d6e966ba1747cefd5e3af048bf50a3",
-    "present_byte_count_recomputed": 2264230,
+    "document_count": 3088,
+    "evidence_references_resolved": 28284,
+    "evidence_references_unavailable": 3091,
+    "file_count_recomputed": 15440,
+    "inventory_sha256_recomputed": "6a81afe06840f944d1c18b404fd8732953ecbe4b40f8d3416f54645ca8c804b9",
+    "manifest_sha256": "b93c6b1964fee1942cba4409d352dfbe9b180e985cef69f86b896e32ae8ae36f",
+    "present_byte_count_recomputed": 94076364,
     "release_id": "topeka-source-2026-09-16-r2"
   },
-  "error_count": 0,
+  "error_count": 4,
   "issues": [
     {
       "code": "DIRTY_PRODUCER",
       "location": "release.producer",
       "message": "produced from a dirty worktree; release.producer.commit does not reproduce this bundle",
       "severity": "warning"
+    },
+    {
+      "code": "EVIDENCE_DUPLICATE_ID",
+      "location": "documents/ks__city__topeka__municipal-code__tmc__1.05.010/record.json:evidence[ks:city:topeka:municipal-code:tmc:1.05.010#history:20243]",
+      "message": "duplicate evidence ref_id",
+      "severity": "error"
+    },
+    {
+      "code": "EVIDENCE_DUPLICATE_ID",
+      "location": "documents/ks__city__topeka__municipal-code__tmc__10.10.060/record.json:evidence[ks:city:topeka:municipal-code:tmc:10.10.060#history:17620]",
+      "message": "duplicate evidence ref_id",
+      "severity": "error"
+    },
+    {
+      "code": "EVIDENCE_DUPLICATE_ID",
+      "location": "documents/ks__city__topeka__municipal-code__tmc__10.15.010/record.json:evidence[ks:city:topeka:municipal-code:tmc:10.15.010#history:20589]",
+      "message": "duplicate evidence ref_id",
+      "severity": "error"
+    },
+    {
+      "code": "EVIDENCE_DUPLICATE_ID",
+      "location": "documents/ks__city__topeka__municipal-code__tmc__9.05.080/record.json:evidence[ks:city:topeka:municipal-code:tmc:9.05.080#history:20588]",
+      "message": "duplicate evidence ref_id",
+      "severity": "error"
     }
   ],
-  "passed": true,
+  "passed": false,
   "warning_count": 1
 }

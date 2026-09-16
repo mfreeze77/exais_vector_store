@@ -1,0 +1,433 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 785,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "cb1207061c3f3135ccba1e79107dcef32cd9c114b1cefd33c3c77da8bee3212d"
+    },
+    "structured": {
+      "block_count": 12,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "6a7e8807-030e-55d2-9c80-7b72c1839234",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.150:section",
+      "sha256": "5de025dc4385e56db15997cb5ba7db6e31db1c6edd56c28cded2653521f7d52b",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 2939,
+      "char_count": 2936,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "0f8ade06319dbcba6b205704ddc9e6315429a9a6556f7ed091ca18beeb9d0595"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.15.150 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "66616b6d-33ca-57ba-8f64-7e2edd914877",
+          "convention": "utf8_char_offset",
+          "end": 71,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.150:block:0",
+          "start": 0
+        },
+        "quote": "(a) An off-premises retailer shall sell cereal malt beverages and beer:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.150:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.15.150 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "ff4c009a-6229-5b8c-85b9-2630f5ccd418",
+          "convention": "utf8_char_offset",
+          "end": 135,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.150:block:1",
+          "start": 72
+        },
+        "quote": "(1) Only at the premises identified on the license application.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.150:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.15.150 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "fa0b3a53-e492-5ebc-bd77-f14b7bd9be28",
+          "convention": "utf8_char_offset",
+          "end": 155,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.150:block:2",
+          "start": 136
+        },
+        "quote": "(2) Only at retail.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.150:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.15.150 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "71b88154-b78f-52db-b779-3882b7b3afe4",
+          "convention": "utf8_char_offset",
+          "end": 201,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.150:block:3",
+          "start": 156
+        },
+        "quote": "(3) Only in original and unopened containers.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.150:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.15.150 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "0f6d2586-5618-5de0-aa52-53d25dc13c7d",
+          "convention": "utf8_char_offset",
+          "end": 241,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.150:block:4",
+          "start": 202
+        },
+        "quote": "(b) An off-premises retailer shall not:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.150:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.15.150 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "4ba8a800-067b-5dd1-a67b-66acc2b1a3a5",
+          "convention": "utf8_char_offset",
+          "end": 323,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.150:block:5",
+          "start": 242
+        },
+        "quote": "(1) Sell cereal malt beverages and beer for consumption at the licensed premises.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.150:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.15.150 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "390e27bb-714f-5109-a182-f9469f49dc7a",
+          "convention": "utf8_char_offset",
+          "end": 405,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.150:block:6",
+          "start": 324
+        },
+        "quote": "(2) Permit cereal malt beverages or beer to be consumed at the licensed premises.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.150:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.15.150 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "5491c2b7-91d6-5a94-b6bb-f10e9462c501",
+          "convention": "utf8_char_offset",
+          "end": 486,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.150:block:7",
+          "start": 406
+        },
+        "quote": "(3) Sell cereal malt beverages or beer through curb service or drive-up service.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.150:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.15.150 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "50a27304-1808-5b1d-97da-9b8a71736b68",
+          "convention": "utf8_char_offset",
+          "end": 557,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.150:block:8",
+          "start": 487
+        },
+        "quote": "(c) An on-premises retailer shall sell cereal malt beverages and beer:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.150:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.15.150 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "d02ff842-b5cb-5396-ac6a-74cfa4b456b3",
+          "convention": "utf8_char_offset",
+          "end": 621,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.150:block:9",
+          "start": 558
+        },
+        "quote": "(1) Only at the premises identified on the license application.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.150:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.15.150 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "d60de62f-1843-5dc4-a86e-9bba50524d49",
+          "convention": "utf8_char_offset",
+          "end": 641,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.150:block:10",
+          "start": 622
+        },
+        "quote": "(2) Only at retail.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.150:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 9.15.150 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "bd96be9d-679e-5ba7-8228-3df83afa16a9",
+          "convention": "utf8_char_offset",
+          "end": 784,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:9.15.150:block:11",
+          "start": 642
+        },
+        "quote": "(d) An on-premises retailer shall not sell cereal malt beverages or beer through curb service or drive-up service. (Ord. 20175 § 24, 3-12-19.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.150:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.150#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20175",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 782,
+          "start": 758
+        },
+        "quote": "Ord. 20175 § 24, 3-12-19",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:9.15.150#history:20175",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "ed2403f0b60a90984d44fa857f2ba4e28f51de2d1afd3123fcf80227cdbddb82",
+      "captured_at": "2026-08-28T04:09:07.366791Z",
+      "kind": "rendered_html_capture",
+      "value": "9.15.150.ed2403f0b60a.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:9.15.150@ed2403f0b60a9098",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:9.15.150",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:9.15.150",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 9.15.150",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/9.15.150"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.15.150#history:20175",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "3-12-19"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "9.15.150",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.15.150#history:20175",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20175"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:9.15.150#history:20175",
+      "value": "adopted"
+    },
+    "title": "Condition of sales by off-premises and on-premises retailers."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:09:07.366791Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "ed2403f0b60a90984d44fa857f2ba4e28f51de2d1afd3123fcf80227cdbddb82",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "ed2403f0b60a90984d44fa857f2ba4e28f51de2d1afd3123fcf80227cdbddb82",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "ed2403f0b60a90984d44fa857f2ba4e28f51de2d1afd3123fcf80227cdbddb82",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "0f8ade06319dbcba6b205704ddc9e6315429a9a6556f7ed091ca18beeb9d0595",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "0f8ade06319dbcba6b205704ddc9e6315429a9a6556f7ed091ca18beeb9d0595",
+        "output_sha256": "cb1207061c3f3135ccba1e79107dcef32cd9c114b1cefd33c3c77da8bee3212d",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "0f8ade06319dbcba6b205704ddc9e6315429a9a6556f7ed091ca18beeb9d0595",
+        "output_sha256": "5de025dc4385e56db15997cb5ba7db6e31db1c6edd56c28cded2653521f7d52b",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/9.15.150",
+    "retained_original": {
+      "byte_count": 32637,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/9.15.150.ed2403f0b60a.html",
+      "retrieved_at": "2026-08-28T04:09:07.366791Z",
+      "sha256": "ed2403f0b60a90984d44fa857f2ba4e28f51de2d1afd3123fcf80227cdbddb82"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

@@ -1,0 +1,785 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 7197,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "a78e781180dbe1735272db6ca8826e05f5401abc1c6d118a618b683ab3774ac6"
+    },
+    "structured": {
+      "block_count": 34,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "7b38fd7a-e8d2-54d8-8972-75d2f441ba69",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:section",
+      "sha256": "baf0361c162e913c7b7dc2641f1707462ac4a3c6b81f6cb51df5b6c99aebcbae",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 16776,
+      "char_count": 16749,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "65746bf06e19788a194566125431e7576a489e350b1aebadd991c5748049df0f"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "8d26b0b8-ed96-5ff2-adb8-693ec1a39d34",
+          "convention": "utf8_char_offset",
+          "end": 97,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:0",
+          "start": 0
+        },
+        "quote": "(a) 402.2.5, Steel-frame ceilings, walls and floors—Exception, is hereby deleted in its entirety.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "939111eb-4a38-573c-b4be-b55190a72a1c",
+          "convention": "utf8_char_offset",
+          "end": 220,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:1",
+          "start": 98
+        },
+        "quote": "(b) 402.2.7, Basement walls, is hereby deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "d990034e-89b2-500d-af2c-e7f2fa87ebdf",
+          "convention": "utf8_char_offset",
+          "end": 403,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:2",
+          "start": 221
+        },
+        "quote": "Conditioned spaces in finished basement areas shall be insulated from the top of the basement wall down to 10 feet (3,048 mm) below grade or to the basement floor, whichever is less.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "7742c364-be32-585b-a977-6adcc998f544",
+          "convention": "utf8_char_offset",
+          "end": 532,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:3",
+          "start": 404
+        },
+        "quote": "(c) 402.2.8, Slab-on-grade floors, is hereby deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "e225cc76-c8a8-5f29-910e-23c4a0ebb3db",
+          "convention": "utf8_char_offset",
+          "end": 1431,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:4",
+          "start": 533
+        },
+        "quote": "Slab-on-grade floors with a floor surface less than 12 inches (305 mm) below grade shall be insulated in accordance with Table 402.1.1. The insulation shall extend downward from the top of the slab on the outside or inside of the foundation wall. Insulation located below grade shall be extended the distance provided in Table 402.1.1 by any combination of vertical insulation, insulation extending under the slab or insulation extending out from the building. Insulation extending away from the building shall be protected by pavement or by a minimum of 10 inches (254 mm) of soil. The top edge of the insulation installed between the exterior wall and the edge of the interior slab shall be permitted to be cut at a 45-degree (0.79 rad) angle away from the exterior wall. Slab-edge insulation is not required in jurisdictions designated by the Code Official as having a heavy termite infestation.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "292da118-15d0-521d-87af-0a87d7451bc7",
+          "convention": "utf8_char_offset",
+          "end": 1557,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:5",
+          "start": 1432
+        },
+        "quote": "(d) 402.2.9, Crawl space walls, is hereby deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "850aec2b-83fc-517a-9f93-aa8c2ebd650e",
+          "convention": "utf8_char_offset",
+          "end": 2386,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:6",
+          "start": 1558
+        },
+        "quote": "As an alternative to insulating floors over crawl spaces, crawl space walls shall be permitted to be insulated when the crawl space is not vented to the outside. Crawl space wall insulation shall be permanently fastened to the wall and extend downward from the floor to within 9 inches of the finished interior grade adjacent to the foundation wall. A 3-inch inspection gap immediately below the floor joists shall be provided to permit inspections for termites. Exposed earth in unvented crawl space foundations shall be covered with a continuous Class I vapor retarder in accordance with the International Residential Code. All joints of the vapor retarder shall overlap by 6 inches and be sealed or taped. The edges of the vapor retarder shall extend at least 6 inches up the stem wall and shall be attached to the stem wall.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "ab234898-3d21-5c73-95fa-a55e3af33434",
+          "convention": "utf8_char_offset",
+          "end": 2460,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:7",
+          "start": 2387
+        },
+        "quote": "(e) 402.3.2, Glazed fenestration SHGC, is hereby deleted in its entirety.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "1e0e2cbb-faaa-5e7e-b167-86e6329dcfc2",
+          "convention": "utf8_char_offset",
+          "end": 2539,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:8",
+          "start": 2461
+        },
+        "quote": "(f) 402.3.3, Glazed fenestration exemption, is hereby deleted in its entirety.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "66e688b1-db91-5738-82c2-f732b8e3e36a",
+          "convention": "utf8_char_offset",
+          "end": 2683,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:9",
+          "start": 2540
+        },
+        "quote": "(g) 402.3.5, Thermally isolated sunroom U-factor, is hereby deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "b696205b-3c0b-5a57-940a-8e4bcd00550a",
+          "convention": "utf8_char_offset",
+          "end": 2903,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:10",
+          "start": 2684
+        },
+        "quote": "The maximum fenestration U-factor shall be 0.50 and the maximum skylight U-factor shall be 0.75. New windows and doors separating the sunroom from conditioned space shall meet the building thermal envelope requirements.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "813f8e51-1a25-5b62-ba8b-9d104f0fe133",
+          "convention": "utf8_char_offset",
+          "end": 3036,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:11",
+          "start": 2904
+        },
+        "quote": "(h) 402.3.6, Replacement fenestration, is hereby deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "214afe91-6894-5bb2-9790-179b334133bd",
+          "convention": "utf8_char_offset",
+          "end": 3264,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:12",
+          "start": 3037
+        },
+        "quote": "Where some or all of an existing fenestration unit is replaced with a new fenestration product, including sash and glazing, the replacement fenestration unit shall meet the applicable requirements for U-factor in Table 402.1.1.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "7ea7d58e-2c88-5416-9e1a-e3b4654da4b5",
+          "convention": "utf8_char_offset",
+          "end": 3383,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:13",
+          "start": 3265
+        },
+        "quote": "(i) 402.4.3, Fireplaces, is hereby deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "e169df07-1819-5ea7-8fd3-8d756e653000",
+          "convention": "utf8_char_offset",
+          "end": 3741,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:14",
+          "start": 3384
+        },
+        "quote": "New wood-burning factory-built fireplaces shall have gasketed doors and outdoor combustion air. New wood-burning masonry fireplaces shall have outdoor combustion air. Ducts for combustion air supply shall be installed according to the terms of their listing, the manufacturer’s instructions, and the currently adopted edition of the Uniform Mechanical Code.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "e614d3a4-9f44-5d6d-bab1-a0e46b19b49c",
+          "convention": "utf8_char_offset",
+          "end": 3898,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:15",
+          "start": 3742
+        },
+        "quote": "(j) 402.5, Maximum fenestration U-factor and SHGC (Mandatory), is hereby deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "85009134-6898-5e95-94df-16c9a0287efe",
+          "convention": "utf8_char_offset",
+          "end": 4073,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:16",
+          "start": 3899
+        },
+        "quote": "The area-weighted average maximum fenestration U-factor permitted using trade-offs from Section 402.1.4 or 405 shall be 0.48 for vertical fenestration and 0.75 for skylights.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "ca5fceaf-ee90-5175-9070-5dbb2d2c1244",
+          "convention": "utf8_char_offset",
+          "end": 4163,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:17",
+          "start": 4074
+        },
+        "quote": "(k) 403.1.2, Heat pump supplementary heat (Mandatory), is hereby deleted in its entirety.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "8c9326a0-ad57-5967-a810-da23edaa1abe",
+          "convention": "utf8_char_offset",
+          "end": 4297,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:18",
+          "start": 4164
+        },
+        "quote": "(l) 403.2.1, Insulation (Prescriptive), is hereby deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "952fa17a-ec38-55d5-9bd5-0ecb70c91e37",
+          "convention": "utf8_char_offset",
+          "end": 4416,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:19",
+          "start": 4298
+        },
+        "quote": "Supply ducts in attics shall be insulated to a minimum of R-8. All other ducts shall be insulated to a minimum of R-6.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "7c796939-fb49-5bd2-9b34-2a6a1ab6720f",
+          "convention": "utf8_char_offset",
+          "end": 4500,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:20",
+          "start": 4417
+        },
+        "quote": "Exception: Ducts or portions thereof located completely inside a conditioned space.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "25066e73-9054-506a-a760-d9ce396d4c9d",
+          "convention": "utf8_char_offset",
+          "end": 4628,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:21",
+          "start": 4501
+        },
+        "quote": "(m) 403.2.2, Sealing (Mandatory), is hereby deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "3fd87d9f-bd8c-56e1-b576-c15a26fa4240",
+          "convention": "utf8_char_offset",
+          "end": 4936,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:22",
+          "start": 4629
+        },
+        "quote": "All ducts, air handlers, filter boxes and building cavities used as ducts shall be sealed when not located in conditioned space. Joints and seams shall comply with the currently adopted version of the Uniform Mechanical Code. Duct tightness shall be verified by visual inspection or either of the following:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "0afdc849-bb80-5f35-b961-7ac41bc2e33b",
+          "convention": "utf8_char_offset",
+          "end": 5409,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:23",
+          "start": 4937
+        },
+        "quote": "1. Postconstruction test: Leakage to outdoors shall be less than or equal to 8 cfm (226.5 L/min) per 100 ft 2 (9.29 m 2 ) of conditioned floor area or a total leakage less than or equal to 12 cfm (12 L/min) per 100 ft 2 (9.29 m 2 ) of conditioned floor area when tested at a pressure differential of 0.1 inches w.g. (25 Pa) across the entire system, including the manufacturer’s air handler enclosure. All register boots shall be taped or otherwise sealed during the test.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "7107d177-a659-5bd2-91bd-cca4a7de6f9a",
+          "convention": "utf8_char_offset",
+          "end": 5940,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:24",
+          "start": 5410
+        },
+        "quote": "2. Rough-in test: Total leakage shall be less than or equal to 6 cfm (169.9 L/min) per 100 ft 2 (9.29 m 2 ) of conditioned floor area when tested at a pressure differential of 0.1 inches w.g. (25 Pa) across the roughed in system, including the manufacturer’s air handler enclosure. All register boots shall be taped or otherwise sealed during the test. If the air handler is not installed at the time of the test, total leakage shall be less than or equal to 4 cfm (113.3 L/min) per 100 ft 2 (9.29 m 2 ) of conditioned floor area.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "cc59fdc5-f92d-5782-a434-5c3464db18e7",
+          "convention": "utf8_char_offset",
+          "end": 6059,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:25",
+          "start": 5941
+        },
+        "quote": "Exceptions: Duct tightness test is not required if the air handler and all ducts are located within conditioned space.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 26",
+        "locator": {
+          "block_index": 26,
+          "component_id": "cc06ca7a-eba7-5bbe-96af-219bc3d742c8",
+          "convention": "utf8_char_offset",
+          "end": 6213,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:26",
+          "start": 6060
+        },
+        "quote": "(n) 403.3, Mechanical system piping insulation (Mandatory), is hereby deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 27",
+        "locator": {
+          "block_index": 27,
+          "component_id": "a7fa3e3d-05b4-5309-b53b-25f95161ffb3",
+          "convention": "utf8_char_offset",
+          "end": 6349,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:27",
+          "start": 6214
+        },
+        "quote": "Mechanical system piping capable of carrying fluids above 105° F (41° C) or below 55° F (13° C) shall be insulated to a minimum of R-3.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 28",
+        "locator": {
+          "block_index": 28,
+          "component_id": "a17c46b2-eded-51ef-a3b8-dcdb9143a854",
+          "convention": "utf8_char_offset",
+          "end": 6386,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:28",
+          "start": 6350
+        },
+        "quote": "Exception: Refrigerant liquid lines.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:28#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 29",
+        "locator": {
+          "block_index": 29,
+          "component_id": "33e7b0ff-3566-532d-88d9-7082fd62f690",
+          "convention": "utf8_char_offset",
+          "end": 6518,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:29",
+          "start": 6387
+        },
+        "quote": "(o) 403.4, Circulating hot water systems (Mandatory), is hereby deleted and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:29#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 30",
+        "locator": {
+          "block_index": 30,
+          "component_id": "150d2b79-0c72-5a42-8606-8d89c4e37d85",
+          "convention": "utf8_char_offset",
+          "end": 6810,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:30",
+          "start": 6519
+        },
+        "quote": "All circulating service hot water piping shall be insulated to at least R-2 when located outside of conditioned space. Circulating hot water systems shall include an automatic or readily accessible manual switch that can turn off the hot water circulating pump when the system is not in use.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:30#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 31",
+        "locator": {
+          "block_index": 31,
+          "component_id": "6c60eafb-c951-5230-abce-0875122e8641",
+          "convention": "utf8_char_offset",
+          "end": 6945,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:31",
+          "start": 6811
+        },
+        "quote": "(p) 403.6, Equipment sizing (Mandatory), is hereby deleted in its entirety and the following provisions shall be substituted therefor:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:31#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 32",
+        "locator": {
+          "block_index": 32,
+          "component_id": "6438ceb3-b009-51ae-bc3f-f6b765169ec9",
+          "convention": "utf8_char_offset",
+          "end": 7071,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:32",
+          "start": 6946
+        },
+        "quote": "Heating and cooling equipment shall be sized in accordance with the currently adopted version of the Uniform Mechanical Code.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:32#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 14.80.080 block 33",
+        "locator": {
+          "block_index": 33,
+          "component_id": "41edda5e-e949-5d41-86d6-8cf6c8613bb2",
+          "convention": "utf8_char_offset",
+          "end": 7196,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:14.80.080:block:33",
+          "start": 7072
+        },
+        "quote": "(q) 403.7, Systems serving multiple dwelling units (Mandatory), is hereby deleted in its entirety. (Ord. 19697 § 9, 2-7-12.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080:block:33#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19697",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 7194,
+          "start": 7172
+        },
+        "quote": "Ord. 19697 § 9, 2-7-12",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:14.80.080#history:19697",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "717d9be9b85f91f902639c32f37dac9685da4355e359c39ca65fa3a080ea51ee",
+      "captured_at": "2026-08-28T04:43:48.928681Z",
+      "kind": "rendered_html_capture",
+      "value": "14.80.080.717d9be9b85f.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:14.80.080@717d9be9b85f91f9",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:14.80.080",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:14.80.080",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 14.80.080",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/14.80.080"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.80.080#history:19697",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "2-7-12"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "14.80.080",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.80.080#history:19697",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19697"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:14.80.080#history:19697",
+      "value": "adopted"
+    },
+    "title": "Amendments to Chapter 4."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:43:48.928681Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "717d9be9b85f91f902639c32f37dac9685da4355e359c39ca65fa3a080ea51ee",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "717d9be9b85f91f902639c32f37dac9685da4355e359c39ca65fa3a080ea51ee",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "717d9be9b85f91f902639c32f37dac9685da4355e359c39ca65fa3a080ea51ee",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "65746bf06e19788a194566125431e7576a489e350b1aebadd991c5748049df0f",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "65746bf06e19788a194566125431e7576a489e350b1aebadd991c5748049df0f",
+        "output_sha256": "a78e781180dbe1735272db6ca8826e05f5401abc1c6d118a618b683ab3774ac6",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "65746bf06e19788a194566125431e7576a489e350b1aebadd991c5748049df0f",
+        "output_sha256": "baf0361c162e913c7b7dc2641f1707462ac4a3c6b81f6cb51df5b6c99aebcbae",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/14.80.080",
+    "retained_original": {
+      "byte_count": 38259,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/14.80.080.717d9be9b85f.html",
+      "retrieved_at": "2026-08-28T04:43:48.928681Z",
+      "sha256": "717d9be9b85f91f902639c32f37dac9685da4355e359c39ca65fa3a080ea51ee"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

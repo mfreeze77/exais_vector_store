@@ -1,0 +1,337 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1027,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "b48371258329a571084a66712639e839ed0ec075291f370cad3c758ced8593fb"
+    },
+    "structured": {
+      "block_count": 6,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "dec27d28-8698-5ddf-88d9-e9a788b5624c",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.100:section",
+      "sha256": "ad003b0a975af71b8bff83db7c4f67e3a75b910dc582020b5b0ac00036a29e1b",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 3051,
+      "char_count": 3040,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "90324be5a55db9cec18d10f9b23b3bac2450941dfeb323ffdc83b363295cddb3"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.100 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "e5b3a2bd-2215-561e-8267-53e97305d452",
+          "convention": "utf8_char_offset",
+          "end": 141,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.100:block:0",
+          "start": 0
+        },
+        "quote": "(a) An abandoned sign is any sign for which the use to which it had applied has changed or the property containing the use has become vacant.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.100:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.100 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "f5acc203-96fc-5c4a-bc19-cd38e6dc2f74",
+          "convention": "utf8_char_offset",
+          "end": 494,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.100:block:1",
+          "start": 142
+        },
+        "quote": "(b) A property owner shall either: (i) remove an abandoned sign that has been located on the property for more than six months; or (ii) shall cover the sign. For the purpose of this section, “covered” shall mean all sign copy including graphics is rendered invisible by being painted over, removed, replaced, or shielded by a rigid and opaque material.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.100:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.100 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "7c30c7e2-6184-565f-801b-eef4eb70967b",
+          "convention": "utf8_char_offset",
+          "end": 632,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.100:block:2",
+          "start": 495
+        },
+        "quote": "(c) For a nonconforming abandoned sign that has been located on the property for more than 24 months, the property owner shall remove it.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.100:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.100 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "8621a74e-97ec-5e89-9409-8fb5b6406ed5",
+          "convention": "utf8_char_offset",
+          "end": 825,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.100:block:3",
+          "start": 633
+        },
+        "quote": "(d) Notwithstanding subsection (b) of this section, a property owner shall remove a nonconforming abandoned sign immediately when the primary building on the property is demolished or removed.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.100:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.100 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "85e17980-5400-57f9-8b95-7fb494c82e2f",
+          "convention": "utf8_char_offset",
+          "end": 908,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.100:block:4",
+          "start": 826
+        },
+        "quote": "(e) Any abandoned sign shall comply with this section on or after October 1, 2020.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.100:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.10.100 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "cb718660-1d0f-552b-99f1-9b21deca85d4",
+          "convention": "utf8_char_offset",
+          "end": 1026,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.10.100:block:5",
+          "start": 909
+        },
+        "quote": "(f) Upon removal, all parts of the sign, including structural supports, shall be removed. (Ord. 20207 § 11, 9-10-19.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.100:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.100#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20207",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1024,
+          "start": 1000
+        },
+        "quote": "Ord. 20207 § 11, 9-10-19",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.10.100#history:20207",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "8feca18e388ae6ea1f8622d92404e09069f883bc534c7eb1a701e1fa404ded30",
+      "captured_at": "2026-08-28T04:46:37.891830Z",
+      "kind": "rendered_html_capture",
+      "value": "18.10.100.8feca18e388a.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:18.10.100@8feca18e388ae6ea",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:18.10.100",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:18.10.100",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 18.10.100",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/18.10.100"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.10.100#history:20207",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "9-10-19"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "18.10.100",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.10.100#history:20207",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20207"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.10.100#history:20207",
+      "value": "adopted"
+    },
+    "title": "Abandoned signs."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:46:37.891830Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "8feca18e388ae6ea1f8622d92404e09069f883bc534c7eb1a701e1fa404ded30",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "8feca18e388ae6ea1f8622d92404e09069f883bc534c7eb1a701e1fa404ded30",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "8feca18e388ae6ea1f8622d92404e09069f883bc534c7eb1a701e1fa404ded30",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "90324be5a55db9cec18d10f9b23b3bac2450941dfeb323ffdc83b363295cddb3",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "90324be5a55db9cec18d10f9b23b3bac2450941dfeb323ffdc83b363295cddb3",
+        "output_sha256": "b48371258329a571084a66712639e839ed0ec075291f370cad3c758ced8593fb",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "90324be5a55db9cec18d10f9b23b3bac2450941dfeb323ffdc83b363295cddb3",
+        "output_sha256": "ad003b0a975af71b8bff83db7c4f67e3a75b910dc582020b5b0ac00036a29e1b",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/18.10.100",
+    "retained_original": {
+      "byte_count": 29479,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/18.10.100.8feca18e388a.html",
+      "retrieved_at": "2026-08-28T04:46:37.891830Z",
+      "sha256": "8feca18e388ae6ea1f8622d92404e09069f883bc534c7eb1a701e1fa404ded30"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

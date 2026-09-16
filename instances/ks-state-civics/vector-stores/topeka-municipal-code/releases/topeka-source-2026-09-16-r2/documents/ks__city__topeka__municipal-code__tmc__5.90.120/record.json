@@ -1,0 +1,337 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1297,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "53ef40ffe4a1bc2fa0e0dc79311fd32a2cab71356fa8a77d89f43d3005fb3bf0"
+    },
+    "structured": {
+      "block_count": 6,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "7db585b4-138b-5101-8664-4f0d82afad40",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:5.90.120:section",
+      "sha256": "754187199e29cab739aab53d8b255d9e52a8d98995d7f816f59cfea73f0f1e75",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 3587,
+      "char_count": 3584,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "a70b6fd26af603c34c667cb8c7f4a1105949b017ab42d43ba3c17db7d1ccc011"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.90.120 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "27d68ac2-48e7-51fe-99f0-69a92dc9acfa",
+          "convention": "utf8_char_offset",
+          "end": 209,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.90.120:block:0",
+          "start": 0
+        },
+        "quote": "(a) The Chief of Police or his or her designee is hereby authorized to issue a temporary license permit to an applicant as an employee, agent, or guard of a private security firm upon the following conditions:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.90.120:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.90.120 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "20ba1612-ec3d-53c8-ace5-79b9a7c7f9ba",
+          "convention": "utf8_char_offset",
+          "end": 295,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.90.120:block:1",
+          "start": 210
+        },
+        "quote": "(1) The private security firm gives written notice of intent to employ the applicant;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.90.120:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.90.120 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "febe2ed6-aedb-583a-a2e7-9db2eadf4196",
+          "convention": "utf8_char_offset",
+          "end": 385,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.90.120:block:2",
+          "start": 296
+        },
+        "quote": "(2) The applicant submits a completed application for a license to the Police Department;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.90.120:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.90.120 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "df94a23c-2095-5c6a-b64b-16577c4641ce",
+          "convention": "utf8_char_offset",
+          "end": 523,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.90.120:block:3",
+          "start": 386
+        },
+        "quote": "(3) The Police Department makes a security check and certifies the applicant eligible for a temporary private security guard license; and",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.90.120:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.90.120 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "b99efbd0-3151-57b6-a204-f50fa5b15992",
+          "convention": "utf8_char_offset",
+          "end": 733,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.90.120:block:4",
+          "start": 524
+        },
+        "quote": "(4) The payment of a fee as prescribed in TMC 5.10.160 and amendments thereto for a private security employee, agent or guard temporary license will be paid to the Police Department at the time of application.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.90.120:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.90.120 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "c4d722e1-d9e9-57db-8111-f7ccc0a6672b",
+          "convention": "utf8_char_offset",
+          "end": 1296,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.90.120:block:5",
+          "start": 734
+        },
+        "quote": "(b) The temporary license issued under this section shall be effective for a period of up to 60 days and shall be subject to suspension or revocation for the same reasons as business licenses and employee, agent or guard licenses. A temporary license issued under this section may be extended for not more than two additional 60-day periods at the discretion of the Chief of Police. An application for a temporary license permit shall be accepted or rejected by the Police Department within one working day of the time it is submitted. (Ord. 20037 § 4, 12-6-16.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.90.120:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.90.120#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20037",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1294,
+          "start": 1271
+        },
+        "quote": "Ord. 20037 § 4, 12-6-16",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.90.120#history:20037",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "df7ee291acdda9039c85dab92303b76ea5527535130123d7f89b48c023a57e72",
+      "captured_at": "2026-08-28T03:52:06.646326Z",
+      "kind": "rendered_html_capture",
+      "value": "5.90.120.df7ee291acdd.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:5.90.120@df7ee291acdda903",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:5.90.120",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:5.90.120",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 5.90.120",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/5.90.120"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.90.120#history:20037",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "12-6-16"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "5.90.120",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.90.120#history:20037",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20037"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.90.120#history:20037",
+      "value": "adopted"
+    },
+    "title": "Temporary license permit."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T03:52:06.646326Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "df7ee291acdda9039c85dab92303b76ea5527535130123d7f89b48c023a57e72",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "df7ee291acdda9039c85dab92303b76ea5527535130123d7f89b48c023a57e72",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "df7ee291acdda9039c85dab92303b76ea5527535130123d7f89b48c023a57e72",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "a70b6fd26af603c34c667cb8c7f4a1105949b017ab42d43ba3c17db7d1ccc011",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "a70b6fd26af603c34c667cb8c7f4a1105949b017ab42d43ba3c17db7d1ccc011",
+        "output_sha256": "53ef40ffe4a1bc2fa0e0dc79311fd32a2cab71356fa8a77d89f43d3005fb3bf0",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "a70b6fd26af603c34c667cb8c7f4a1105949b017ab42d43ba3c17db7d1ccc011",
+        "output_sha256": "754187199e29cab739aab53d8b255d9e52a8d98995d7f816f59cfea73f0f1e75",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/5.90.120",
+    "retained_original": {
+      "byte_count": 30111,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/5.90.120.df7ee291acdd.html",
+      "retrieved_at": "2026-08-28T03:52:06.646326Z",
+      "sha256": "df7ee291acdda9039c85dab92303b76ea5527535130123d7f89b48c023a57e72"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

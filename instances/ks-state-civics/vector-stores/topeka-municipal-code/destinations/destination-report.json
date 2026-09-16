@@ -1,0 +1,116 @@
+{
+  "acquired_revisions_superseding_retained": [],
+  "artifact": "topeka_destination_manifests",
+  "built_at": "2026-09-16T00:43:25Z",
+  "destinations": [
+    {
+      "collection_id": "ks:city:topeka:municipal-code",
+      "corrected_urls": 0,
+      "document_count": 2702,
+      "held_for_review": 0,
+      "ingest_path_available": false,
+      "ingest_slice": null,
+      "ingest_slice_gaps": [],
+      "ingest_slice_rows": 0,
+      "manifest": "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/municipal-code.manifest.jsonl",
+      "name": "Topeka Municipal Code",
+      "origins": {
+        "retained_split": 2702
+      },
+      "review_manifest": "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/municipal-code.review.jsonl",
+      "review_reasons": {},
+      "slug": "municipal-code",
+      "vector_store_id": null
+    },
+    {
+      "collection_id": "ks:city:topeka:ordinances",
+      "corrected_urls": 1,
+      "document_count": 347,
+      "held_for_review": 3,
+      "ingest_path_available": true,
+      "ingest_slice": "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/ordinances.ingest-slice.jsonl",
+      "ingest_slice_gaps": [],
+      "ingest_slice_rows": 322,
+      "manifest": "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/ordinances.manifest.jsonl",
+      "name": "Topeka Ordinances",
+      "origins": {
+        "acquisition": 25,
+        "retained_split": 322
+      },
+      "review_manifest": "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/ordinances.review.jsonl",
+      "review_reasons": {
+        "identity_ambiguous": 2,
+        "membership_review_needed": 1
+      },
+      "slug": "ordinances",
+      "vector_store_id": null
+    },
+    {
+      "collection_id": "ks:city:topeka:charter-ordinances",
+      "corrected_urls": 0,
+      "document_count": 41,
+      "held_for_review": 0,
+      "ingest_path_available": true,
+      "ingest_slice": "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/charter-ordinances.ingest-slice.jsonl",
+      "ingest_slice_gaps": [],
+      "ingest_slice_rows": 41,
+      "manifest": "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/charter-ordinances.manifest.jsonl",
+      "name": "Topeka Charter Ordinances",
+      "origins": {
+        "retained_split": 41
+      },
+      "review_manifest": "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/charter-ordinances.review.jsonl",
+      "review_reasons": {},
+      "slug": "charter-ordinances",
+      "vector_store_id": null
+    },
+    {
+      "collection_id": "ks:city:topeka:resolutions",
+      "corrected_urls": 0,
+      "document_count": 542,
+      "held_for_review": 0,
+      "ingest_path_available": false,
+      "ingest_slice": null,
+      "ingest_slice_gaps": [],
+      "ingest_slice_rows": 0,
+      "manifest": "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/resolutions.manifest.jsonl",
+      "name": "Topeka Resolutions",
+      "origins": {
+        "acquisition": 542
+      },
+      "review_manifest": "/work/instances/ks-state-civics/vector-stores/topeka-municipal-code/destinations/resolutions.review.jsonl",
+      "review_reasons": {},
+      "slug": "resolutions",
+      "vector_store_id": null
+    }
+  ],
+  "issues": [],
+  "network_used": false,
+  "offline": true,
+  "passed": true,
+  "review_lane_note": "records carrying unresolved doubt are written to <slug>.review.jsonl and excluded from <slug>.manifest.jsonl, so the clean ingestion lane holds only settled documents",
+  "routing_checks": {
+    "claim_sweep_across_all_registered_collections": true,
+    "derived_from_url_rules": true,
+    "records_checked": 3635
+  },
+  "schema_version": "1.0",
+  "superseded_identities": [
+    {
+      "code": "SUPERSEDED_IDENTITY",
+      "detail": "held in the acquisition checkpoint but absent from the current worklist; the identity was superseded by a later discovery run and is excluded from ingestion",
+      "record": "ks:city:topeka:resolutions:resolution:resolution09828-a"
+    },
+    {
+      "code": "SUPERSEDED_IDENTITY",
+      "detail": "held in the acquisition checkpoint but absent from the current worklist; the identity was superseded by a later discovery run and is excluded from ingestion",
+      "record": "ks:city:topeka:resolutions:resolution:resolution9296a"
+    },
+    {
+      "code": "SUPERSEDED_IDENTITY",
+      "detail": "held in the acquisition checkpoint but absent from the current worklist; the identity was superseded by a later discovery run and is excluded from ingestion",
+      "record": "ks:city:topeka:resolutions:resolution:resolution9297a"
+    }
+  ],
+  "total_records": 3635
+}

@@ -1,0 +1,303 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1146,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "db7b53371c2df28438e255dcc8d0200f9498d389b3e742519a708814c420b754"
+    },
+    "structured": {
+      "block_count": 6,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "130d7aa3-e76c-557a-b36b-1b7625ad6f85",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:a10-9:section",
+      "sha256": "7ae52b30713d58e341a4956d8bc16b4f722cba85fb485c43ab3d45bd96e1f164",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 3209,
+      "char_count": 3205,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "bab2cd81310ad3186399f882ba4c9462b99959cb85081c4b79fdef91ee55a073"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A10-9 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "c8a2c408-a158-50c6-a98b-36741b979c21",
+          "convention": "utf8_char_offset",
+          "end": 251,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a10-9:block:0",
+          "start": 0
+        },
+        "quote": "(a) For attendance of witnesses, every subpoena issued by the court shall state the name of the court and the title of the action, and shall command each person to whom it is directed to attend and give testimony at a time and place therein specified.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a10-9:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A10-9 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "4a791018-839e-5723-afbc-b1fe0efc7237",
+          "convention": "utf8_char_offset",
+          "end": 534,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a10-9:block:1",
+          "start": 252
+        },
+        "quote": "(b) A subpoena may also command the person to whom it is directed to produce the books, papers, documents, or tangible things designated therein; but the court, upon motion made promptly and in any event at or before the time specified in the subpoena for compliance therewith, may:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a10-9:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A10-9 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "7279aa37-0a5c-5351-a429-9e98bf79448e",
+          "convention": "utf8_char_offset",
+          "end": 599,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a10-9:block:2",
+          "start": 535
+        },
+        "quote": "(1) Modify the subpoena if it is unreasonable and oppressive; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a10-9:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A10-9 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "f7d9cfaf-3d84-5786-95ed-e3556c9693de",
+          "convention": "utf8_char_offset",
+          "end": 793,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a10-9:block:3",
+          "start": 600
+        },
+        "quote": "(2) Condition denial of the motion upon the advancement by the person in whose behalf the subpoena is issued of the reasonable cost of producing the books, papers, documents or tangible things.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a10-9:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A10-9 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "c178cc15-071b-5aa2-b09a-349ea6bb6e8c",
+          "convention": "utf8_char_offset",
+          "end": 985,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a10-9:block:4",
+          "start": 794
+        },
+        "quote": "(c) Service. A subpoena may be served within the corporate limits of the city by an officer of the Topeka police department or by such other person as the municipal court judge may designate.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a10-9:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A10-9 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "bb5f9f22-b4bf-5b4b-83a7-34c14cc9dd58",
+          "convention": "utf8_char_offset",
+          "end": 1145,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a10-9:block:5",
+          "start": 986
+        },
+        "quote": "(d) Contempt. Failure by any person without adequate excuse to obey a subpoena served upon him may be deemed a contempt of the court. (C.O. 11 § 10, 12-31-67.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a10-9:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a10-9#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "7ca453a9dafac027acecd05964acbd8d157e491610ab391f4b791114b80cdee5",
+      "captured_at": "2026-08-28T04:58:48.911374Z",
+      "kind": "rendered_html_capture",
+      "value": "A10-9.7ca453a9dafa.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:a10-9@7ca453a9dafac027",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:A10-9",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:a10-9",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC A10-9",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/A10-9"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "A10-9",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Sec. A10-9. Subpoena – Form and issuance."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:58:48.911374Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "7ca453a9dafac027acecd05964acbd8d157e491610ab391f4b791114b80cdee5",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "7ca453a9dafac027acecd05964acbd8d157e491610ab391f4b791114b80cdee5",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "7ca453a9dafac027acecd05964acbd8d157e491610ab391f4b791114b80cdee5",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "bab2cd81310ad3186399f882ba4c9462b99959cb85081c4b79fdef91ee55a073",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "bab2cd81310ad3186399f882ba4c9462b99959cb85081c4b79fdef91ee55a073",
+        "output_sha256": "db7b53371c2df28438e255dcc8d0200f9498d389b3e742519a708814c420b754",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "bab2cd81310ad3186399f882ba4c9462b99959cb85081c4b79fdef91ee55a073",
+        "output_sha256": "7ae52b30713d58e341a4956d8bc16b4f722cba85fb485c43ab3d45bd96e1f164",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/A10-9",
+    "retained_original": {
+      "byte_count": 30372,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/A10-9.7ca453a9dafa.html",
+      "retrieved_at": "2026-08-28T04:58:48.911374Z",
+      "sha256": "7ca453a9dafac027acecd05964acbd8d157e491610ab391f4b791114b80cdee5"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

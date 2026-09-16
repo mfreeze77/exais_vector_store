@@ -1,0 +1,2979 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 515397,
+      "normalizations": [
+        {
+          "description": "Removed the ExAIS-added title and Source collection/Ordinance number/Official PDF lines prepended to the retained extraction; the same facts are carried in source.*.",
+          "name": "strip_exais_provenance_preamble"
+        },
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.md",
+      "sha256": "4149d0a7ed79a1c0b2624a4857c214f18776ca1ca5ba9c834157ac69fe9d7177"
+    },
+    "structured": {
+      "block_count": 181,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "961abbbe-b54e-5347-a855-b7b911633dd1",
+      "root_source_component_key": "ks:city:topeka:ordinances:ordinance:20636:document",
+      "sha256": "969e05d08c0707d60378b04a4c4f25a7400f2a6c01e34ffdea7e0e7cab4c4d69",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 516006,
+      "char_count": 515556,
+      "form": "retained_extraction_markdown",
+      "path": "verbatim.md",
+      "sha256": "c2ce3ef99ff2152b6b945fdbf3cf8540d749b36541fffe40123d0a0b8f35fbc5"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.md",
+        "unit": "unicode codepoint"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(Published in the Topeka Metro News February 16, 2026)",
+        "locator": {
+          "component_id": "971a1337-54e0-5b11-a242-ca62c1596d7b",
+          "convention": "utf8_char_offset",
+          "end": 148,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:0",
+          "start": 94
+        },
+        "quote": "(Published in the Topeka Metro News February 16, 2026)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "ORDINANCE NO. 20636",
+        "locator": {
+          "component_id": "6ee8a677-2766-5158-8515-e8e4277691bf",
+          "convention": "utf8_char_offset",
+          "end": 172,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:1",
+          "start": 153
+        },
+        "quote": "ORDINANCE NO. 20636",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "EXHIBIT A",
+        "locator": {
+          "component_id": "2f7139cc-14ec-52e0-b88c-18da6f890a33",
+          "convention": "utf8_char_offset",
+          "end": 1856,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:2",
+          "start": 1847
+        },
+        "quote": "EXHIBIT A",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Support",
+        "locator": {
+          "component_id": "1af079be-473f-59a5-9faf-801fc6dea361",
+          "convention": "utf8_char_offset",
+          "end": 1868,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:3",
+          "start": 1861
+        },
+        "quote": "Support",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Purpose",
+        "locator": {
+          "component_id": "faff1021-3680-5aef-8e77-210daff44ca0",
+          "convention": "utf8_char_offset",
+          "end": 1892,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:4",
+          "start": 1885
+        },
+        "quote": "Purpose",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Apple Developer Program License Agreement",
+        "locator": {
+          "component_id": "ee6907dc-9802-5ee6-825e-7d2d4551e1c1",
+          "convention": "utf8_char_offset",
+          "end": 2290,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:5",
+          "start": 2249
+        },
+        "quote": "Apple Developer Program License Agreement",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "1. Accepting this Agreement; Definitions",
+        "locator": {
+          "component_id": "12d958e2-78f8-580f-8faf-206d931a0f6f",
+          "convention": "utf8_char_offset",
+          "end": 5035,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:6",
+          "start": 4995
+        },
+        "quote": "1. Accepting this Agreement; Definitions",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "1.1 Acceptance",
+        "locator": {
+          "component_id": "990e5875-d5ce-56a8-994d-d9d50ce772cc",
+          "convention": "utf8_char_offset",
+          "end": 5054,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:7",
+          "start": 5040
+        },
+        "quote": "1.1 Acceptance",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2. Internal Use License and Restrictions",
+        "locator": {
+          "component_id": "280e2b6e-be78-5ab0-9a3a-3d4d5d9f55a8",
+          "convention": "utf8_char_offset",
+          "end": 41302,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:8",
+          "start": 41262
+        },
+        "quote": "2. Internal Use License and Restrictions",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2.1 Permitted Uses and Restrictions; Program Services",
+        "locator": {
+          "component_id": "d512862f-bb82-5c08-8d4a-9cfff14e9702",
+          "convention": "utf8_char_offset",
+          "end": 41360,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:9",
+          "start": 41307
+        },
+        "quote": "2.1 Permitted Uses and Restrictions; Program Services",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2.2 Authorized Test Units and Pre-Release Apple Software",
+        "locator": {
+          "component_id": "66ee8836-9f2f-5166-8122-3df32a2aaf14",
+          "convention": "utf8_char_offset",
+          "end": 46910,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:10",
+          "start": 46854
+        },
+        "quote": "2.2 Authorized Test Units and Pre-Release Apple Software",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2.4 Copies",
+        "locator": {
+          "component_id": "5905f461-220e-5208-8288-48890bb3111f",
+          "convention": "utf8_char_offset",
+          "end": 49993,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:11",
+          "start": 49983
+        },
+        "quote": "2.4 Copies",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2.5 Ownership",
+        "locator": {
+          "component_id": "3bfd7ad5-e136-5048-84f3-029cec62f108",
+          "convention": "utf8_char_offset",
+          "end": 50290,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:12",
+          "start": 50277
+        },
+        "quote": "2.5 Ownership",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2.10 Updates; No Support or Maintenance",
+        "locator": {
+          "component_id": "f9f2b009-fd66-55d9-b505-32191a2df20c",
+          "convention": "utf8_char_offset",
+          "end": 64298,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:13",
+          "start": 64259
+        },
+        "quote": "2.10 Updates; No Support or Maintenance",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3.3 Program Requirements",
+        "locator": {
+          "component_id": "7c9d06d0-26ca-5c9e-8381-27a3a9b16210",
+          "convention": "utf8_char_offset",
+          "end": 73516,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:14",
+          "start": 73492
+        },
+        "quote": "3.3 Program Requirements",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "C. Additional Features or Functionality",
+        "locator": {
+          "component_id": "225641f4-b768-5641-a82b-387aecec4d50",
+          "convention": "utf8_char_offset",
+          "end": 75807,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:15",
+          "start": 75768
+        },
+        "quote": "C. Additional Features or Functionality",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "D. Designated Container Areas, macOS Applications",
+        "locator": {
+          "component_id": "5cd05a13-17a2-5981-9237-4e89549f1ada",
+          "convention": "utf8_char_offset",
+          "end": 76147,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:16",
+          "start": 76098
+        },
+        "quote": "D. Designated Container Areas, macOS Applications",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "F. Multitasking",
+        "locator": {
+          "component_id": "35e718e7-bd97-5d82-be95-97d3927d2352",
+          "convention": "utf8_char_offset",
+          "end": 78215,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:17",
+          "start": 78200
+        },
+        "quote": "F. Multitasking",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "G. Documentation",
+        "locator": {
+          "component_id": "d0576aaf-08d2-5378-a7f6-0a097469e055",
+          "convention": "utf8_char_offset",
+          "end": 78343,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:18",
+          "start": 78327
+        },
+        "quote": "G. Documentation",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3.3.2 Regulatory Compliance",
+        "locator": {
+          "component_id": "8ca336de-8c61-57e9-98ff-187ed14d6fa9",
+          "convention": "utf8_char_offset",
+          "end": 78790,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:19",
+          "start": 78763
+        },
+        "quote": "3.3.2 Regulatory Compliance",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3.3.3 Data and Privacy",
+        "locator": {
+          "component_id": "4198d013-00f2-581d-9c71-004230f91e1b",
+          "convention": "utf8_char_offset",
+          "end": 80962,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:20",
+          "start": 80940
+        },
+        "quote": "3.3.3 Data and Privacy",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "A. Recordings",
+        "locator": {
+          "component_id": "589169b6-0940-5393-bd7a-665df42d2240",
+          "convention": "utf8_char_offset",
+          "end": 80980,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:21",
+          "start": 80967
+        },
+        "quote": "A. Recordings",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "B. Collection and Use of Data",
+        "locator": {
+          "component_id": "682c3287-bdb0-52e8-b5ac-fdb75ebd7c8e",
+          "convention": "utf8_char_offset",
+          "end": 81818,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:22",
+          "start": 81789
+        },
+        "quote": "B. Collection and Use of Data",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "C. Disclosures to Users",
+        "locator": {
+          "component_id": "e34266ca-a95e-5017-aff2-d7edf09cee67",
+          "convention": "utf8_char_offset",
+          "end": 83574,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:23",
+          "start": 83551
+        },
+        "quote": "C. Disclosures to Users",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "D. Legal and Other Requirements",
+        "locator": {
+          "component_id": "08c11891-a70c-5e01-ab32-39ccf3bcac08",
+          "convention": "utf8_char_offset",
+          "end": 84699,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:24",
+          "start": 84668
+        },
+        "quote": "D. Legal and Other Requirements",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "F. Location and Maps; User Consents",
+        "locator": {
+          "component_id": "9ced2ccb-5ff5-52d2-b1f5-988856244c89",
+          "convention": "utf8_char_offset",
+          "end": 89343,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:25",
+          "start": 89308
+        },
+        "quote": "F. Location and Maps; User Consents",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "H. HealthKit APIs; Motion &amp; Fitness APIs; Journaling Suggestions APIs",
+        "locator": {
+          "component_id": "e291d8ee-e039-53fc-8b55-89300fe7acb6",
+          "convention": "utf8_char_offset",
+          "end": 95751,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:26",
+          "start": 95678
+        },
+        "quote": "H. HealthKit APIs; Motion &amp; Fitness APIs; Journaling Suggestions APIs",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3.3.4 Content Rights and Licensing",
+        "locator": {
+          "component_id": "cd701775-ac81-5468-9d21-5cf2c74466da",
+          "convention": "utf8_char_offset",
+          "end": 107858,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:27",
+          "start": 107824
+        },
+        "quote": "3.3.4 Content Rights and Licensing",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "A. Content and Materials",
+        "locator": {
+          "component_id": "5092deac-7168-5dbc-a020-efc935669dcb",
+          "convention": "utf8_char_offset",
+          "end": 107887,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:28",
+          "start": 107863
+        },
+        "quote": "A. Content and Materials",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:28#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "B. Spotlight-Image-Search Service",
+        "locator": {
+          "component_id": "1405a455-bf9b-518f-b87e-e40e69056725",
+          "convention": "utf8_char_offset",
+          "end": 110925,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:29",
+          "start": 110892
+        },
+        "quote": "B. Spotlight-Image-Search Service",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:29#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "A. Game Center",
+        "locator": {
+          "component_id": "21087567-0685-5955-9279-502e52691bf8",
+          "convention": "utf8_char_offset",
+          "end": 116045,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:30",
+          "start": 116031
+        },
+        "quote": "A. Game Center",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:30#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "B. Single Sign-On API",
+        "locator": {
+          "component_id": "5bf008b0-fe91-5708-ba6e-93702ed1a37e",
+          "convention": "utf8_char_offset",
+          "end": 116248,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:31",
+          "start": 116227
+        },
+        "quote": "B. Single Sign-On API",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:31#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "C. TV App API",
+        "locator": {
+          "component_id": "de0fddcf-f7fc-52b3-95a1-6e7bb83dcf38",
+          "convention": "utf8_char_offset",
+          "end": 119322,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:32",
+          "start": 119309
+        },
+        "quote": "C. TV App API",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:32#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3.3.7 Infrastructure Technologies",
+        "locator": {
+          "component_id": "13ed776b-69e0-5522-98f1-c0da244a8672",
+          "convention": "utf8_char_offset",
+          "end": 125130,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:33",
+          "start": 125097
+        },
+        "quote": "3.3.7 Infrastructure Technologies",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:33#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "A. MFi Accessories",
+        "locator": {
+          "component_id": "88c8ee78-46d2-5a71-a6d3-5fa359f32aba",
+          "convention": "utf8_char_offset",
+          "end": 125153,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:34",
+          "start": 125135
+        },
+        "quote": "A. MFi Accessories",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:34#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "B. Cellular Network",
+        "locator": {
+          "component_id": "7b371ec3-c40a-5c7f-b279-59dacddff5cf",
+          "convention": "utf8_char_offset",
+          "end": 125713,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:35",
+          "start": 125694
+        },
+        "quote": "B. Cellular Network",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:35#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "D. iCloud",
+        "locator": {
+          "component_id": "921f700c-dea6-5740-b974-0b1154e7132a",
+          "convention": "utf8_char_offset",
+          "end": 127217,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:36",
+          "start": 127208
+        },
+        "quote": "D. iCloud",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:36#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "E. Extensions",
+        "locator": {
+          "component_id": "cb061be2-692b-59f9-a1a3-cb103363f702",
+          "convention": "utf8_char_offset",
+          "end": 127505,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:37",
+          "start": 127492
+        },
+        "quote": "E. Extensions",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:37#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "F. DeviceCheck APIs",
+        "locator": {
+          "component_id": "b02c1f8c-f9cb-54d7-ac42-0960c5cee646",
+          "convention": "utf8_char_offset",
+          "end": 129746,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:38",
+          "start": 129727
+        },
+        "quote": "F. DeviceCheck APIs",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:38#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "G. Wi-Fi Aware Framework",
+        "locator": {
+          "component_id": "023aa1af-fe4c-5051-bde5-ab1afff41cbd",
+          "convention": "utf8_char_offset",
+          "end": 130603,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:39",
+          "start": 130579
+        },
+        "quote": "G. Wi-Fi Aware Framework",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:39#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "I. Default Dialer APIs",
+        "locator": {
+          "component_id": "9a444176-b438-5d60-8205-8141d21b7ab9",
+          "convention": "utf8_char_offset",
+          "end": 132299,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:40",
+          "start": 132277
+        },
+        "quote": "I. Default Dialer APIs",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:40#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "A. Xcode Cloud",
+        "locator": {
+          "component_id": "b70b0d5c-6685-53f3-8bf3-175c8d5e471f",
+          "convention": "utf8_char_offset",
+          "end": 132852,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:41",
+          "start": 132838
+        },
+        "quote": "A. Xcode Cloud",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:41#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "C. Partially Immersive Experience",
+        "locator": {
+          "component_id": "eed71f9e-1e8a-5453-9d86-ac55a24f12a8",
+          "convention": "utf8_char_offset",
+          "end": 135175,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:42",
+          "start": 135142
+        },
+        "quote": "C. Partially Immersive Experience",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:42#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "E. Shallow Depth &amp; Pressure",
+        "locator": {
+          "component_id": "22745f76-de39-51d2-af10-b3ebcd148614",
+          "convention": "utf8_char_offset",
+          "end": 136107,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:43",
+          "start": 136076
+        },
+        "quote": "E. Shallow Depth &amp; Pressure",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:43#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "H. EnergyKit",
+        "locator": {
+          "component_id": "437e55cb-ff91-5ad3-88f2-94bb172f59f7",
+          "convention": "utf8_char_offset",
+          "end": 137756,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:44",
+          "start": 137744
+        },
+        "quote": "H. EnergyKit",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:44#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "I. Foundation Models Framework",
+        "locator": {
+          "component_id": "3a5d6cd5-28fb-5516-b0fc-02311908a25a",
+          "convention": "utf8_char_offset",
+          "end": 137968,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:45",
+          "start": 137938
+        },
+        "quote": "I. Foundation Models Framework",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:45#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3.3.9 Transactions and Passes",
+        "locator": {
+          "component_id": "821ae67d-b053-5d50-9150-c7834ab5c95f",
+          "convention": "utf8_char_offset",
+          "end": 138589,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:46",
+          "start": 138560
+        },
+        "quote": "3.3.9 Transactions and Passes",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:46#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "A. In-App Purchase API",
+        "locator": {
+          "component_id": "7f793a9e-f2a8-556a-b376-1fab45cb3f43",
+          "convention": "utf8_char_offset",
+          "end": 138616,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:47",
+          "start": 138594
+        },
+        "quote": "A. In-App Purchase API",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:47#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "B. Wallet",
+        "locator": {
+          "component_id": "14022770-d4df-5633-aead-dae42e6ee43a",
+          "convention": "utf8_char_offset",
+          "end": 138851,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:48",
+          "start": 138842
+        },
+        "quote": "B. Wallet",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:48#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "D. Tap to Pay APIs",
+        "locator": {
+          "component_id": "bb7a0827-24bb-5233-8c77-23867da6cf9d",
+          "convention": "utf8_char_offset",
+          "end": 145565,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:49",
+          "start": 145547
+        },
+        "quote": "D. Tap to Pay APIs",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:49#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3.3.10 Other Services or Software",
+        "locator": {
+          "component_id": "e63669ed-fc00-5566-8423-362a9f85871c",
+          "convention": "utf8_char_offset",
+          "end": 150752,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:50",
+          "start": 150719
+        },
+        "quote": "3.3.10 Other Services or Software",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:50#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "A. Additional Services or Pre-Release Software",
+        "locator": {
+          "component_id": "160bf70f-2f89-5e0e-87b3-4d4c059a9aef",
+          "convention": "utf8_char_offset",
+          "end": 150803,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:51",
+          "start": 150757
+        },
+        "quote": "A. Additional Services or Pre-Release Software",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:51#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "5. Apple Certificates; Revocation",
+        "locator": {
+          "component_id": "3dc3e4c6-3690-59b9-a694-ed5ceb684fc7",
+          "convention": "utf8_char_offset",
+          "end": 154411,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:52",
+          "start": 154378
+        },
+        "quote": "5. Apple Certificates; Revocation",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:52#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "5.1 Certificate Requirements",
+        "locator": {
+          "component_id": "127d1009-b1d6-5157-bfec-247d0f386988",
+          "convention": "utf8_char_offset",
+          "end": 154444,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:53",
+          "start": 154416
+        },
+        "quote": "5.1 Certificate Requirements",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:53#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "5.2 Relying Party Certificates",
+        "locator": {
+          "component_id": "21893302-3345-52e3-8ed2-d79055d0406c",
+          "convention": "utf8_char_offset",
+          "end": 159370,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:54",
+          "start": 159340
+        },
+        "quote": "5.2 Relying Party Certificates",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:54#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "5.3 Notarized Applications for macOS",
+        "locator": {
+          "component_id": "37e9322a-0920-533e-84cd-74d81629a11a",
+          "convention": "utf8_char_offset",
+          "end": 160319,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:55",
+          "start": 160283
+        },
+        "quote": "5.3 Notarized Applications for macOS",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:55#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "6.2 App Thinning and Bundled Resources",
+        "locator": {
+          "component_id": "d885bc13-f469-57b2-bf0a-871a0ac47265",
+          "convention": "utf8_char_offset",
+          "end": 169088,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:56",
+          "start": 169050
+        },
+        "quote": "6.2 App Thinning and Bundled Resources",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:56#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "6.4 iOS Application Widgets on CarPlay",
+        "locator": {
+          "component_id": "4ccc3d0d-a388-5b03-9ef3-0353629b356a",
+          "convention": "utf8_char_offset",
+          "end": 171844,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:57",
+          "start": 171806
+        },
+        "quote": "6.4 iOS Application Widgets on CarPlay",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:57#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "6.6 Improving Your Application",
+        "locator": {
+          "component_id": "741d5e6c-e1b9-5277-bf38-88d42bb405ad",
+          "convention": "utf8_char_offset",
+          "end": 174015,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:58",
+          "start": 173985
+        },
+        "quote": "6.6 Improving Your Application",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:58#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "6.8 Compatibility Requirement with Current Shipping OS Version",
+        "locator": {
+          "component_id": "9d28e1cc-cf5a-5106-a033-e298e5a8d95d",
+          "convention": "utf8_char_offset",
+          "end": 177098,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:59",
+          "start": 177036
+        },
+        "quote": "6.8 Compatibility Requirement with Current Shipping OS Version",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:59#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "6.9 Selection by Apple for Distribution",
+        "locator": {
+          "component_id": "4dfb7ebb-31fd-5055-b730-43bece2448c1",
+          "convention": "utf8_char_offset",
+          "end": 177729,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:60",
+          "start": 177690
+        },
+        "quote": "6.9 Selection by Apple for Distribution",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:60#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "7. Distribution of Applications and Libraries",
+        "locator": {
+          "component_id": "fc391aaa-21ef-55e4-a3ec-a8ac3335060c",
+          "convention": "utf8_char_offset",
+          "end": 179272,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:61",
+          "start": 179227
+        },
+        "quote": "7. Distribution of Applications and Libraries",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:61#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Applications:",
+        "locator": {
+          "component_id": "22dac2be-e569-5256-830b-2c524d3d5998",
+          "convention": "utf8_char_offset",
+          "end": 179290,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:62",
+          "start": 179277
+        },
+        "quote": "Applications:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:62#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "7.1 Delivery of Free Licensed Applications via the App Store or Custom App Distribution",
+        "locator": {
+          "component_id": "ee9491c9-9aeb-5f11-be17-7d5be98f81e7",
+          "convention": "utf8_char_offset",
+          "end": 179930,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:63",
+          "start": 179843
+        },
+        "quote": "7.1 Delivery of Free Licensed Applications via the App Store or Custom App Distribution",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:63#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "7.3 Distribution on Registered Devices (Ad Hoc Distribution)",
+        "locator": {
+          "component_id": "ef68fd90-b9a4-568a-a783-4c8f2396e32b",
+          "convention": "utf8_char_offset",
+          "end": 182928,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:64",
+          "start": 182868
+        },
+        "quote": "7.3 Distribution on Registered Devices (Ad Hoc Distribution)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:64#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "7.4 TestFlight Distribution",
+        "locator": {
+          "component_id": "05dddf01-058c-54be-a785-3f6dd498c53a",
+          "convention": "utf8_char_offset",
+          "end": 184751,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:65",
+          "start": 184724
+        },
+        "quote": "7.4 TestFlight Distribution",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:65#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "A. Internal Distribution to Authorized Developers and App Store Connect Users",
+        "locator": {
+          "component_id": "330c32f2-49e6-56ba-9b1d-0ea679fdd2b2",
+          "convention": "utf8_char_offset",
+          "end": 184833,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:66",
+          "start": 184756
+        },
+        "quote": "A. Internal Distribution to Authorized Developers and App Store Connect Users",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:66#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "B. External Distribution to Beta Testers",
+        "locator": {
+          "component_id": "4cc3de11-5aa3-5373-b644-c246e25a62ba",
+          "convention": "utf8_char_offset",
+          "end": 185519,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:67",
+          "start": 185479
+        },
+        "quote": "B. External Distribution to Beta Testers",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:67#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "C. Use of TestFlight Information",
+        "locator": {
+          "component_id": "455f74c8-bdb5-54df-a9d1-3c13f642582e",
+          "convention": "utf8_char_offset",
+          "end": 187660,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:68",
+          "start": 187628
+        },
+        "quote": "C. Use of TestFlight Information",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:68#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "7.6 No Other Distribution Authorized Under this Agreement",
+        "locator": {
+          "component_id": "30442198-a6c2-541d-946c-6b5c7653aa96",
+          "convention": "utf8_char_offset",
+          "end": 190240,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:69",
+          "start": 190183
+        },
+        "quote": "7.6 No Other Distribution Authorized Under this Agreement",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:69#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "7.7 Icon and Widget Customization",
+        "locator": {
+          "component_id": "56a7b2ea-fc23-50cb-881f-17e4a9028c42",
+          "convention": "utf8_char_offset",
+          "end": 191434,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:70",
+          "start": 191401
+        },
+        "quote": "7.7 Icon and Widget Customization",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:70#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "8. Program Fees",
+        "locator": {
+          "component_id": "655a4ecd-5ac9-5963-9f46-e396f38ef7d3",
+          "convention": "utf8_char_offset",
+          "end": 193118,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:71",
+          "start": 193103
+        },
+        "quote": "8. Program Fees",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:71#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "9.2 Obligations Regarding Apple Confidential Information",
+        "locator": {
+          "component_id": "c8d277e8-c207-55c0-b8cf-59a5c729a137",
+          "convention": "utf8_char_offset",
+          "end": 195927,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:72",
+          "start": 195871
+        },
+        "quote": "9.2 Obligations Regarding Apple Confidential Information",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:72#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "9.4 Press Releases and Other Publicity",
+        "locator": {
+          "component_id": "ff726a0e-7c3f-540a-87cc-d4144edb34e3",
+          "convention": "utf8_char_offset",
+          "end": 198881,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:73",
+          "start": 198843
+        },
+        "quote": "9.4 Press Releases and Other Publicity",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:73#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "10. Indemnification",
+        "locator": {
+          "component_id": "64ba831b-faf7-5d6f-bf79-ffa4f7eef9cd",
+          "convention": "utf8_char_offset",
+          "end": 199159,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:74",
+          "start": 199140
+        },
+        "quote": "10. Indemnification",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:74#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "11. Term and Termination",
+        "locator": {
+          "component_id": "b4816ccd-a65c-53fa-9b1b-46b379e02125",
+          "convention": "utf8_char_offset",
+          "end": 202508,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:75",
+          "start": 202484
+        },
+        "quote": "11. Term and Termination",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:75#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "11.1 Term",
+        "locator": {
+          "component_id": "1193232d-44db-5793-a23f-d2d490089b1e",
+          "convention": "utf8_char_offset",
+          "end": 202522,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:76",
+          "start": 202513
+        },
+        "quote": "11.1 Term",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:76#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "11.3 Effect of Termination",
+        "locator": {
+          "component_id": "aacd43a5-d549-5ca7-a748-00cb52bbcf63",
+          "convention": "utf8_char_offset",
+          "end": 204990,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:77",
+          "start": 204964
+        },
+        "quote": "11.3 Effect of Termination",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:77#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "12. NO WARRANTY",
+        "locator": {
+          "component_id": "3159ba9a-c022-5f20-9784-1bbe1b7c642a",
+          "convention": "utf8_char_offset",
+          "end": 207507,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:78",
+          "start": 207492
+        },
+        "quote": "12. NO WARRANTY",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:78#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "14. General Legal Terms",
+        "locator": {
+          "component_id": "7777464a-094c-52d5-9754-feff40585bfd",
+          "convention": "utf8_char_offset",
+          "end": 212340,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:79",
+          "start": 212317
+        },
+        "quote": "14. General Legal Terms",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:79#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "14.1 Third Party Notices",
+        "locator": {
+          "component_id": "32c58df1-c959-5e52-bfcb-41199dcef6d3",
+          "convention": "utf8_char_offset",
+          "end": 212369,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:80",
+          "start": 212345
+        },
+        "quote": "14.1 Third Party Notices",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:80#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "14.2 Consent to Collection and Use of Data",
+        "locator": {
+          "component_id": "9c3870cc-5168-5bbf-a2a0-eb951e2ae3cd",
+          "convention": "utf8_char_offset",
+          "end": 212757,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:81",
+          "start": 212715
+        },
+        "quote": "14.2 Consent to Collection and Use of Data",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:81#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "A. Pre-Release Versions of iOS, watchOS, tvOS, visionOS, iPadOS, and macOS",
+        "locator": {
+          "component_id": "dd0ef540-49bd-518a-b1c1-d9aab5d1acf3",
+          "convention": "utf8_char_offset",
+          "end": 212836,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:82",
+          "start": 212762
+        },
+        "quote": "A. Pre-Release Versions of iOS, watchOS, tvOS, visionOS, iPadOS, and macOS",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:82#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "B. Other Pre-Release Apple Software and Services",
+        "locator": {
+          "component_id": "bee6bc36-dfeb-511c-b1d9-4b8ff8cbc874",
+          "convention": "utf8_char_offset",
+          "end": 214733,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:83",
+          "start": 214685
+        },
+        "quote": "B. Other Pre-Release Apple Software and Services",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:83#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "C. Device Deployment Services",
+        "locator": {
+          "component_id": "1e75d13e-9886-50c2-bbae-27f5d6307faf",
+          "convention": "utf8_char_offset",
+          "end": 215694,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:84",
+          "start": 215665
+        },
+        "quote": "C. Device Deployment Services",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:84#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "14.3 Assignment; Relationship of the Parties",
+        "locator": {
+          "component_id": "ab9ce194-f842-5bd7-8f5d-51cc70fe7583",
+          "convention": "utf8_char_offset",
+          "end": 218473,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:85",
+          "start": 218429
+        },
+        "quote": "14.3 Assignment; Relationship of the Parties",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:85#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "14.6 Severability",
+        "locator": {
+          "component_id": "4f1c2420-6468-54dc-bb3b-5ab4bad6dad2",
+          "convention": "utf8_char_offset",
+          "end": 220820,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:86",
+          "start": 220803
+        },
+        "quote": "14.6 Severability",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:86#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "14.11 Entire Agreement; Governing Language",
+        "locator": {
+          "component_id": "9f83c822-356d-5355-90cd-f1add7561f90",
+          "convention": "utf8_char_offset",
+          "end": 230192,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:87",
+          "start": 230150
+        },
+        "quote": "14.11 Entire Agreement; Governing Language",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:87#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Attachment 1",
+        "locator": {
+          "component_id": "740a7f05-89b2-5878-88ee-12b617cb4ab6",
+          "convention": "utf8_char_offset",
+          "end": 232654,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:88",
+          "start": 232642
+        },
+        "quote": "Attachment 1",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:88#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Additional Terms for Apple Push Notification Service and Local Notifications",
+        "locator": {
+          "component_id": "1ce598dc-1cf1-550d-9373-9168514994af",
+          "convention": "utf8_char_offset",
+          "end": 232755,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:89",
+          "start": 232679
+        },
+        "quote": "Additional Terms for Apple Push Notification Service and Local Notifications",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:89#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2. Additional Requirements",
+        "locator": {
+          "component_id": "4dcbecca-f5a6-5d4d-818f-e88134603fb1",
+          "convention": "utf8_char_offset",
+          "end": 234620,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:90",
+          "start": 234594
+        },
+        "quote": "2. Additional Requirements",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:90#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3. Additional Terms for Website Push IDs",
+        "locator": {
+          "component_id": "81af1d11-3532-564a-bcc5-7fd7747ea4b6",
+          "convention": "utf8_char_offset",
+          "end": 237329,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:91",
+          "start": 237289
+        },
+        "quote": "3. Additional Terms for Website Push IDs",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:91#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "4. Delivery by the APN or via Local Notifications",
+        "locator": {
+          "component_id": "1281e2a9-48d7-5ed7-8e02-a9268b2492aa",
+          "convention": "utf8_char_offset",
+          "end": 238676,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:92",
+          "start": 238627
+        },
+        "quote": "4. Delivery by the APN or via Local Notifications",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:92#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "6. Additional Liability Disclaimer",
+        "locator": {
+          "component_id": "f9f18df1-6e1d-5ec4-92a2-6b7d0eac4dba",
+          "convention": "utf8_char_offset",
+          "end": 243086,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:93",
+          "start": 243052
+        },
+        "quote": "6. Additional Liability Disclaimer",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:93#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Attachment 2",
+        "locator": {
+          "component_id": "af8710c0-214d-5d42-ad6f-d32e831449f3",
+          "convention": "utf8_char_offset",
+          "end": 243403,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:94",
+          "start": 243391
+        },
+        "quote": "Attachment 2",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:94#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "1. Use of the In-App Purchase API",
+        "locator": {
+          "component_id": "80b172af-d836-541e-a428-1fe1144069ea",
+          "convention": "utf8_char_offset",
+          "end": 243514,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:95",
+          "start": 243481
+        },
+        "quote": "1. Use of the In-App Purchase API",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:95#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2. Additional Restrictions",
+        "locator": {
+          "component_id": "d1765cc0-a96f-5ee6-9fc6-0fb712d22400",
+          "convention": "utf8_char_offset",
+          "end": 245876,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:96",
+          "start": 245850
+        },
+        "quote": "2. Additional Restrictions",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:96#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3. Your Responsibilities",
+        "locator": {
+          "component_id": "f52cc252-d9b4-5990-8a96-2bbbf0c52128",
+          "convention": "utf8_char_offset",
+          "end": 248807,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:97",
+          "start": 248783
+        },
+        "quote": "3. Your Responsibilities",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:97#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "4. Apple Services",
+        "locator": {
+          "component_id": "46121284-83d5-5fa8-b1ac-0ad500b5b6a5",
+          "convention": "utf8_char_offset",
+          "end": 252063,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:98",
+          "start": 252046
+        },
+        "quote": "4. Apple Services",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:98#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "6. Use of Digital Certificates for In-App Purchase",
+        "locator": {
+          "component_id": "6ea48a66-0717-5c7d-8061-65ae0b5307c3",
+          "convention": "utf8_char_offset",
+          "end": 254702,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:99",
+          "start": 254652
+        },
+        "quote": "6. Use of Digital Certificates for In-App Purchase",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:99#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "8. Indemnification",
+        "locator": {
+          "component_id": "40a2d3f4-9a90-50fa-9066-889bf1c06280",
+          "convention": "utf8_char_offset",
+          "end": 256749,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:100",
+          "start": 256731
+        },
+        "quote": "8. Indemnification",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:100#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Attachment 3",
+        "locator": {
+          "component_id": "53827458-3f1d-5b7f-b5f6-c7161631735c",
+          "convention": "utf8_char_offset",
+          "end": 257267,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:101",
+          "start": 257255
+        },
+        "quote": "Attachment 3",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:101#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Additional Terms for the Game Center Service",
+        "locator": {
+          "component_id": "65042781-6c71-504b-a96c-257502c1872e",
+          "convention": "utf8_char_offset",
+          "end": 257336,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:102",
+          "start": 257292
+        },
+        "quote": "Additional Terms for the Game Center Service",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:102#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "1. Use of the Game Center service",
+        "locator": {
+          "component_id": "6f950450-1b84-59af-9278-5b2218712097",
+          "convention": "utf8_char_offset",
+          "end": 257517,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:103",
+          "start": 257484
+        },
+        "quote": "1. Use of the Game Center service",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:103#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2. Additional Restrictions",
+        "locator": {
+          "component_id": "cf6db70e-7a14-5e97-952f-23a8e19f647f",
+          "convention": "utf8_char_offset",
+          "end": 259928,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:104",
+          "start": 259902
+        },
+        "quote": "2. Additional Restrictions",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:104#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3. Your Acknowledgements",
+        "locator": {
+          "component_id": "d4b2883b-e4e9-57cf-9d0d-9e2e80d72242",
+          "convention": "utf8_char_offset",
+          "end": 262492,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:105",
+          "start": 262468
+        },
+        "quote": "3. Your Acknowledgements",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:105#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "1. Use of iCloud",
+        "locator": {
+          "component_id": "8fbe01bd-c0dc-5efd-8285-d7a8ee9da300",
+          "convention": "utf8_char_offset",
+          "end": 264517,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:106",
+          "start": 264501
+        },
+        "quote": "1. Use of iCloud",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:106#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3. Your Acknowledgements",
+        "locator": {
+          "component_id": "e477a9e9-c56b-548b-96bb-abc55816c89c",
+          "convention": "utf8_char_offset",
+          "end": 271299,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:107",
+          "start": 271275
+        },
+        "quote": "3. Your Acknowledgements",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:107#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "4. Additional Liability Disclaimer",
+        "locator": {
+          "component_id": "992d7e4e-19df-5998-a548-c3cbd342d5be",
+          "convention": "utf8_char_offset",
+          "end": 279798,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:108",
+          "start": 279764
+        },
+        "quote": "4. Additional Liability Disclaimer",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:108#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2. Pass Distribution; Marketing Permissions",
+        "locator": {
+          "component_id": "7921ea2c-abd1-51bf-9f8c-c520b98c9762",
+          "convention": "utf8_char_offset",
+          "end": 281432,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:109",
+          "start": 281389
+        },
+        "quote": "2. Pass Distribution; Marketing Permissions",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:109#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "4. Appleʼs Right to Review Your Pass; Revocation",
+        "locator": {
+          "component_id": "f0466396-caba-5f18-84a3-591078853d3a",
+          "convention": "utf8_char_offset",
+          "end": 284995,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:110",
+          "start": 284947
+        },
+        "quote": "4. Appleʼs Right to Review Your Pass; Revocation",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:110#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Attachment 6",
+        "locator": {
+          "component_id": "a16a2427-ca03-578b-9e93-4a4fb44d8f09",
+          "convention": "utf8_char_offset",
+          "end": 286743,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:111",
+          "start": 286731
+        },
+        "quote": "Attachment 6",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:111#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Additional Terms for the use of the Apple Maps Service",
+        "locator": {
+          "component_id": "d5d15303-bb1a-5b55-9cd6-500fb629c87a",
+          "convention": "utf8_char_offset",
+          "end": 286822,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:112",
+          "start": 286768
+        },
+        "quote": "Additional Terms for the use of the Apple Maps Service",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:112#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "1. Use of the Maps Service",
+        "locator": {
+          "component_id": "d141631a-6e03-557c-9076-aaad8cb8f282",
+          "convention": "utf8_char_offset",
+          "end": 287197,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:113",
+          "start": 287171
+        },
+        "quote": "1. Use of the Maps Service",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:113#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3. Your Acknowledgements",
+        "locator": {
+          "component_id": "a52407ca-63af-5e63-a512-2aa8867f44af",
+          "convention": "utf8_char_offset",
+          "end": 291930,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:114",
+          "start": 291906
+        },
+        "quote": "3. Your Acknowledgements",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:114#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Attachment 7",
+        "locator": {
+          "component_id": "efc5483b-76bd-5eb7-b54a-91932c20fc49",
+          "convention": "utf8_char_offset",
+          "end": 294981,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:115",
+          "start": 294969
+        },
+        "quote": "Attachment 7",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:115#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(to the Agreement) Additional Terms for Safari Extensions",
+        "locator": {
+          "component_id": "3581fc4f-8f23-540e-aa3a-f1aa28b2549a",
+          "convention": "utf8_char_offset",
+          "end": 295043,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:116",
+          "start": 294986
+        },
+        "quote": "(to the Agreement) Additional Terms for Safari Extensions",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:116#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "1.1 Safari Extension Requirements",
+        "locator": {
+          "component_id": "ec5fcbc0-6a31-5d6b-8933-f384a14ba4eb",
+          "convention": "utf8_char_offset",
+          "end": 295213,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:117",
+          "start": 295180
+        },
+        "quote": "1.1 Safari Extension Requirements",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:117#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3. Compliance",
+        "locator": {
+          "component_id": "cf7391ae-83ea-5761-b6fe-34fe25ef834d",
+          "convention": "utf8_char_offset",
+          "end": 302370,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:118",
+          "start": 302357
+        },
+        "quote": "3. Compliance",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:118#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "4. Additional Liability Disclaimer",
+        "locator": {
+          "component_id": "adbf0bd0-6bc6-5485-a5fc-8c1eff48f5d7",
+          "convention": "utf8_char_offset",
+          "end": 302947,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:119",
+          "start": 302913
+        },
+        "quote": "4. Additional Liability Disclaimer",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:119#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Attachment 10",
+        "locator": {
+          "component_id": "b2c96cce-165a-5ada-830e-593693671083",
+          "convention": "utf8_char_offset",
+          "end": 307490,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:120",
+          "start": 307477
+        },
+        "quote": "Attachment 10",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:120#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "1. Use of MDM and Configuration Profiles",
+        "locator": {
+          "component_id": "ec82538b-c35a-5e0e-927d-39b4d27f0510",
+          "convention": "utf8_char_offset",
+          "end": 307591,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:121",
+          "start": 307551
+        },
+        "quote": "1. Use of MDM and Configuration Profiles",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:121#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2. Additional Requirements For In-House Deployment",
+        "locator": {
+          "component_id": "c1d33224-2c18-5e56-9518-82ff44946fb6",
+          "convention": "utf8_char_offset",
+          "end": 309310,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:122",
+          "start": 309260
+        },
+        "quote": "2. Additional Requirements For In-House Deployment",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:122#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(to the Agreement)",
+        "locator": {
+          "component_id": "19578ebf-7761-5d40-bbca-5c4be24c2eef",
+          "convention": "utf8_char_offset",
+          "end": 314669,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:123",
+          "start": 314651
+        },
+        "quote": "(to the Agreement)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:123#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Additional Terms for the use of EnergyKit",
+        "locator": {
+          "component_id": "0f9a2675-3030-5e1e-a80c-6c076a6bcb78",
+          "convention": "utf8_char_offset",
+          "end": 314715,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:124",
+          "start": 314674
+        },
+        "quote": "Additional Terms for the use of EnergyKit",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:124#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Schedule 1",
+        "locator": {
+          "component_id": "bcedb3e4-c182-5726-8f2b-dc37d454f879",
+          "convention": "utf8_char_offset",
+          "end": 317275,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:125",
+          "start": 317265
+        },
+        "quote": "Schedule 1",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:125#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "1. Appointment of Agent",
+        "locator": {
+          "component_id": "8eda9cf8-5103-5567-9a26-c3f6427e0d25",
+          "convention": "utf8_char_offset",
+          "end": 317303,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:126",
+          "start": 317280
+        },
+        "quote": "1. Appointment of Agent",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:126#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2. Delivery of the Licensed Applications to Apple",
+        "locator": {
+          "component_id": "48f0a4ff-398e-5333-acef-33832362b07d",
+          "convention": "utf8_char_offset",
+          "end": 326652,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:127",
+          "start": 326603
+        },
+        "quote": "2. Delivery of the Licensed Applications to Apple",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:127#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "4. Content Restrictions and Software Rating",
+        "locator": {
+          "component_id": "5d938df9-d330-54ae-ae7e-8afcc7c8a613",
+          "convention": "utf8_char_offset",
+          "end": 334528,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:128",
+          "start": 334485
+        },
+        "quote": "4. Content Restrictions and Software Rating",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:128#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "5. Responsibility and Liability",
+        "locator": {
+          "component_id": "6d39196a-5e46-50e7-aef5-65cbbb9f05dd",
+          "convention": "utf8_char_offset",
+          "end": 338547,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:129",
+          "start": 338516
+        },
+        "quote": "5. Responsibility and Liability",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:129#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Canada",
+        "locator": {
+          "component_id": "1be983a8-f01f-516b-9cb3-fd452d63f0a3",
+          "convention": "utf8_char_offset",
+          "end": 341982,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:130",
+          "start": 341976
+        },
+        "quote": "Canada",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:130#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "United States",
+        "locator": {
+          "component_id": "27dec7c9-55c9-5483-b7b3-1e682e33e0ef",
+          "convention": "utf8_char_offset",
+          "end": 343434,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:131",
+          "start": 343421
+        },
+        "quote": "United States",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:131#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "EXHIBIT B",
+        "locator": {
+          "component_id": "a7e3e3d2-0b28-5704-807f-9eaa85ac6438",
+          "convention": "utf8_char_offset",
+          "end": 347962,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:132",
+          "start": 347953
+        },
+        "quote": "EXHIBIT B",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:132#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(to Schedule 1)",
+        "locator": {
+          "component_id": "e5640e0d-c85b-5310-97e0-794343abab2f",
+          "convention": "utf8_char_offset",
+          "end": 347982,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:133",
+          "start": 347967
+        },
+        "quote": "(to Schedule 1)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:133#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Instructions for Minimum Terms of Developerʼs",
+        "locator": {
+          "component_id": "52c2927a-8b82-5495-8f0e-802702bc3a47",
+          "convention": "utf8_char_offset",
+          "end": 348032,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:134",
+          "start": 347987
+        },
+        "quote": "Instructions for Minimum Terms of Developerʼs",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:134#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "End-User License Agreement",
+        "locator": {
+          "component_id": "76ea3434-b78f-59a4-91c5-61abd42ed666",
+          "convention": "utf8_char_offset",
+          "end": 348063,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:135",
+          "start": 348037
+        },
+        "quote": "End-User License Agreement",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:135#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "1. DEFINITIONS:",
+        "locator": {
+          "component_id": "d50a20e3-d99d-5afe-9b7a-035c9de3aed9",
+          "convention": "utf8_char_offset",
+          "end": 353648,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:136",
+          "start": 353633
+        },
+        "quote": "1. DEFINITIONS:",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:136#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3. Redress Options Pursuant to P2B and DSA Regulations",
+        "locator": {
+          "component_id": "775d789c-e62b-5500-b8b5-9bea6f0d8a21",
+          "convention": "utf8_char_offset",
+          "end": 369638,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:137",
+          "start": 369584
+        },
+        "quote": "3. Redress Options Pursuant to P2B and DSA Regulations",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:137#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Centre for Effective Dispute Resolution P2B Panel of Mediators",
+        "locator": {
+          "component_id": "7a8deb50-101c-58fb-803b-252f5884d030",
+          "convention": "utf8_char_offset",
+          "end": 371951,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:138",
+          "start": 371889
+        },
+        "quote": "Centre for Effective Dispute Resolution P2B Panel of Mediators",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:138#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Schedule 2",
+        "locator": {
+          "component_id": "eb64a620-c01d-55db-87d4-37433a06e42d",
+          "convention": "utf8_char_offset",
+          "end": 372049,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:139",
+          "start": 372039
+        },
+        "quote": "Schedule 2",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:139#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "1. Appointment of Agent and Commissionaire",
+        "locator": {
+          "component_id": "b2a05854-9c66-5863-a3ac-52d4a3911a92",
+          "convention": "utf8_char_offset",
+          "end": 372096,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:140",
+          "start": 372054
+        },
+        "quote": "1. Appointment of Agent and Commissionaire",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:140#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3. Delivery of the Licensed Applications to EndUsers",
+        "locator": {
+          "component_id": "9584438d-cf90-5a9b-a628-a0f611f31519",
+          "convention": "utf8_char_offset",
+          "end": 383681,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:141",
+          "start": 383629
+        },
+        "quote": "3. Delivery of the Licensed Applications to EndUsers",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:141#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "5. Content Restrictions and Software Rating",
+        "locator": {
+          "component_id": "1c0e4c9d-ecd2-52d7-aa17-c8ac49d64b81",
+          "convention": "utf8_char_offset",
+          "end": 410756,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:142",
+          "start": 410713
+        },
+        "quote": "5. Content Restrictions and Software Rating",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:142#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "7. Termination",
+        "locator": {
+          "component_id": "45b79c92-93e1-5b7e-a4eb-7bed49b622ac",
+          "convention": "utf8_char_offset",
+          "end": 416996,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:143",
+          "start": 416982
+        },
+        "quote": "7. Termination",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:143#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Schedule 3",
+        "locator": {
+          "component_id": "2e499479-7882-5ae5-8078-e8ed88d69024",
+          "convention": "utf8_char_offset",
+          "end": 420535,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:144",
+          "start": 420525
+        },
+        "quote": "Schedule 3",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:144#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "1. Appointment of Agent and Commissionaire",
+        "locator": {
+          "component_id": "2dd91c7b-090c-5412-ba56-0643d2e39449",
+          "convention": "utf8_char_offset",
+          "end": 421776,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:145",
+          "start": 421734
+        },
+        "quote": "1. Appointment of Agent and Commissionaire",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:145#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3. Delivery of the Custom Applications to End-Users",
+        "locator": {
+          "component_id": "e3370f88-3306-5920-a1a2-ac43473ab720",
+          "convention": "utf8_char_offset",
+          "end": 433274,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:146",
+          "start": 433223
+        },
+        "quote": "3. Delivery of the Custom Applications to End-Users",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:146#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "4. Ownership and End-User Licensing",
+        "locator": {
+          "component_id": "651cc45f-b594-5d55-9cf2-4c32a5940f0a",
+          "convention": "utf8_char_offset",
+          "end": 448388,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:147",
+          "start": 448353
+        },
+        "quote": "4. Ownership and End-User Licensing",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:147#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "6. Responsibility and Liability",
+        "locator": {
+          "component_id": "f405f3f1-1d30-58e7-a4bd-fef8b8de8a1f",
+          "convention": "utf8_char_offset",
+          "end": 454610,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:148",
+          "start": 454579
+        },
+        "quote": "6. Responsibility and Liability",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:148#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "8. Legal Consequences",
+        "locator": {
+          "component_id": "59aed35e-b8e4-5de3-82c9-d27cfb1a3549",
+          "convention": "utf8_char_offset",
+          "end": 460972,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:149",
+          "start": 460951
+        },
+        "quote": "8. Legal Consequences",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:149#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "EXHIBIT A",
+        "locator": {
+          "component_id": "a431facf-a3c0-595e-8557-459b736904aa",
+          "convention": "utf8_char_offset",
+          "end": 461278,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:150",
+          "start": 461269
+        },
+        "quote": "EXHIBIT A",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:150#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "1. Apple as Agent",
+        "locator": {
+          "component_id": "2b8d35c0-8d2f-57a1-bbd0-630ebabd1e53",
+          "convention": "utf8_char_offset",
+          "end": 461300,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:151",
+          "start": 461283
+        },
+        "quote": "1. Apple as Agent",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:151#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2. Apple as Commissionaire",
+        "locator": {
+          "component_id": "aa62fd48-43dd-56d0-8d78-6ea4f7c00199",
+          "convention": "utf8_char_offset",
+          "end": 463576,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:152",
+          "start": 463550
+        },
+        "quote": "2. Apple as Commissionaire",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:152#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "EXHIBIT B",
+        "locator": {
+          "component_id": "d0230779-20f9-5995-ab27-2782f5023d3e",
+          "convention": "utf8_char_offset",
+          "end": 465926,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:153",
+          "start": 465917
+        },
+        "quote": "EXHIBIT B",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:153#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "1.2.2 Goods and Services Tax (GST)",
+        "locator": {
+          "component_id": "1bf75a5a-199a-53c0-8e0c-b7fa5e20c234",
+          "convention": "utf8_char_offset",
+          "end": 472451,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:154",
+          "start": 472417
+        },
+        "quote": "1.2.2 Goods and Services Tax (GST)",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:154#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "2. BRAZIL",
+        "locator": {
+          "component_id": "7e632614-2100-582e-aab9-ab0de3d81596",
+          "convention": "utf8_char_offset",
+          "end": 477044,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:155",
+          "start": 477035
+        },
+        "quote": "2. BRAZIL",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:155#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Delivery of Licensed and Custom Applications to End-Users and Custom App Distribution Customers in Brazil",
+        "locator": {
+          "component_id": "701cacf8-11a5-5672-a861-e57b7253d8bd",
+          "convention": "utf8_char_offset",
+          "end": 477154,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:156",
+          "start": 477049
+        },
+        "quote": "Delivery of Licensed and Custom Applications to End-Users and Custom App Distribution Customers in Brazil",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:156#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(A) General",
+        "locator": {
+          "component_id": "ac28b3a9-0494-533c-a600-7d44ae5f00e4",
+          "convention": "utf8_char_offset",
+          "end": 477334,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:157",
+          "start": 477323
+        },
+        "quote": "(A) General",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:157#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(C) Resident Developers",
+        "locator": {
+          "component_id": "cc9b058e-ced8-5dbb-a3d2-580b57695e08",
+          "convention": "utf8_char_offset",
+          "end": 480929,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:158",
+          "start": 480906
+        },
+        "quote": "(C) Resident Developers",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:158#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3.2 GST/HST",
+        "locator": {
+          "component_id": "ce860fe7-537e-5ef1-9df6-1d9acde4f275",
+          "convention": "utf8_char_offset",
+          "end": 482377,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:159",
+          "start": 482366
+        },
+        "quote": "3.2 GST/HST",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:159#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "5. JAPAN",
+        "locator": {
+          "component_id": "a0022ae9-b5c8-524f-9614-807d9d88a900",
+          "convention": "utf8_char_offset",
+          "end": 487881,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:160",
+          "start": 487873
+        },
+        "quote": "5. JAPAN",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:160#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(A) Japan Developers - Delivery of Licensed and Custom Applications to End-Users in Japan",
+        "locator": {
+          "component_id": "62df4a51-79de-5e2d-ac1d-1c3fe2364b4b",
+          "convention": "utf8_char_offset",
+          "end": 487975,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:161",
+          "start": 487886
+        },
+        "quote": "(A) Japan Developers - Delivery of Licensed and Custom Applications to End-Users in Japan",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:161#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "(B) Japan Developers - Delivery of Licensed and Custom Applications to End-Users and Custom App Distribution Customers O",
+        "locator": {
+          "component_id": "c150c57d-a2ec-5a7d-8bd0-0757de202d3d",
+          "convention": "utf8_char_offset",
+          "end": 488865,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:162",
+          "start": 488733
+        },
+        "quote": "(B) Japan Developers - Delivery of Licensed and Custom Applications to End-Users and Custom App Distribution Customers Outside Japan",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:162#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "7. MALAYSIA",
+        "locator": {
+          "component_id": "206eb2e7-98c5-5439-b509-ed073f091e87",
+          "convention": "utf8_char_offset",
+          "end": 491317,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:163",
+          "start": 491306
+        },
+        "quote": "7. MALAYSIA",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:163#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Malaysian Developers - Delivery of Licensed and Custom Applications to End-Users and Custom App Distribution Customers i",
+        "locator": {
+          "component_id": "9553269c-d117-5902-bd56-4fa45b2c1415",
+          "convention": "utf8_char_offset",
+          "end": 491463,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:164",
+          "start": 491322
+        },
+        "quote": "Malaysian Developers - Delivery of Licensed and Custom Applications to End-Users and Custom App Distribution Customers in or outside Malaysia",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:164#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "9. NEW ZEALAND",
+        "locator": {
+          "component_id": "12a9fb15-0603-5ee8-8a49-dce5e1bc5ed3",
+          "convention": "utf8_char_offset",
+          "end": 493153,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:165",
+          "start": 493139
+        },
+        "quote": "9. NEW ZEALAND",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:165#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "9.1 General",
+        "locator": {
+          "component_id": "480a4275-4d06-5a0c-9b1d-200c35683ba6",
+          "convention": "utf8_char_offset",
+          "end": 493169,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:166",
+          "start": 493158
+        },
+        "quote": "9.1 General",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:166#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "9.2 Delivery of Licensed and Custom Applications to EndUsers and Custom App Distribution Customers in New Zealand",
+        "locator": {
+          "component_id": "67514ecc-b093-57a2-b829-0465e02c6f8b",
+          "convention": "utf8_char_offset",
+          "end": 493497,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:167",
+          "start": 493384
+        },
+        "quote": "9.2 Delivery of Licensed and Custom Applications to EndUsers and Custom App Distribution Customers in New Zealand",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:167#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "9.2.1 General",
+        "locator": {
+          "component_id": "0d490060-f742-51af-9297-8f57fe9311aa",
+          "convention": "utf8_char_offset",
+          "end": 493663,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:168",
+          "start": 493650
+        },
+        "quote": "9.2.1 General",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:168#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "9.3 New Zealand Developers - Delivery of Licensed and Custom Applications to End-Users and Custom App Distribution Custo",
+        "locator": {
+          "component_id": "0c3df399-f578-5427-9a40-a6a4f2cc4371",
+          "convention": "utf8_char_offset",
+          "end": 496230,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:169",
+          "start": 496086
+        },
+        "quote": "9.3 New Zealand Developers - Delivery of Licensed and Custom Applications to End-Users and Custom App Distribution Customers Outside New Zealand",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:169#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "11. SINGAPORE",
+        "locator": {
+          "component_id": "4f7eb20e-1202-562e-86e8-2a56469a4b58",
+          "convention": "utf8_char_offset",
+          "end": 497940,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:170",
+          "start": 497927
+        },
+        "quote": "11. SINGAPORE",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:170#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Singapore Developers - Delivery of Licensed and Custom Applications to End-Users and Custom App Distribution Customers i",
+        "locator": {
+          "component_id": "7563cfd1-0327-5318-b716-1a54deb9d7e3",
+          "convention": "utf8_char_offset",
+          "end": 498087,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:171",
+          "start": 497945
+        },
+        "quote": "Singapore Developers - Delivery of Licensed and Custom Applications to End-Users and Custom App Distribution Customers in or outside Singapore",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:171#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "14. UNITED STATES",
+        "locator": {
+          "component_id": "f996e192-5c58-5bef-84c7-13b468a1120e",
+          "convention": "utf8_char_offset",
+          "end": 500768,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:172",
+          "start": 500751
+        },
+        "quote": "14. UNITED STATES",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:172#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Delivery of Licensed and Custom Applications to End-Users in the United States",
+        "locator": {
+          "component_id": "e1c23ad5-954c-5b6f-9042-b7237910524a",
+          "convention": "utf8_char_offset",
+          "end": 500851,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:173",
+          "start": 500773
+        },
+        "quote": "Delivery of Licensed and Custom Applications to End-Users in the United States",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:173#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "16. VIETNAM",
+        "locator": {
+          "component_id": "358fec6c-0437-5434-9fe5-ea8597fbf96c",
+          "convention": "utf8_char_offset",
+          "end": 503514,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:174",
+          "start": 503503
+        },
+        "quote": "16. VIETNAM",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:174#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Delivery of Licensed and Custom Applications to End-Users in Vietnam",
+        "locator": {
+          "component_id": "3390ad6d-4828-57fd-9a3e-af8e8e84c00b",
+          "convention": "utf8_char_offset",
+          "end": 503587,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:175",
+          "start": 503519
+        },
+        "quote": "Delivery of Licensed and Custom Applications to End-Users in Vietnam",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:175#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "EXHIBIT D",
+        "locator": {
+          "component_id": "1b7f7d0d-a07e-54ff-8067-be64a785fc6e",
+          "convention": "utf8_char_offset",
+          "end": 503804,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:176",
+          "start": 503795
+        },
+        "quote": "EXHIBIT D",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:176#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Instructions for Minimum Terms of Developerʼs End-User License Agreement",
+        "locator": {
+          "component_id": "a26ef8c0-473f-5240-a866-f43f21a4a522",
+          "convention": "utf8_char_offset",
+          "end": 503881,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:177",
+          "start": 503809
+        },
+        "quote": "Instructions for Minimum Terms of Developerʼs End-User License Agreement",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:177#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "EXHIBIT E",
+        "locator": {
+          "component_id": "a35e7933-ea17-5753-9357-02b79d8c3a62",
+          "convention": "utf8_char_offset",
+          "end": 508859,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:178",
+          "start": 508850
+        },
+        "quote": "EXHIBIT E",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:178#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "Additional App Store Terms",
+        "locator": {
+          "component_id": "d52d2e48-399e-5f80-b3b2-026116f2ce3b",
+          "convention": "utf8_char_offset",
+          "end": 508890,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:179",
+          "start": 508864
+        },
+        "quote": "Additional App Store Terms",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:179#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "3. Redress Options Pursuant to P2B and DSA Regulations",
+        "locator": {
+          "component_id": "362e37b2-4d72-55fb-910e-d76a226a7d7b",
+          "convention": "utf8_char_offset",
+          "end": 512759,
+          "source_component_key": "ks:city:topeka:ordinances:ordinance:20636:heading:180",
+          "start": 512705
+        },
+        "quote": "3. Redress Options Pursuant to P2B and DSA Regulations",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636:heading:180#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "PDF page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636#page",
+        "unavailable_reason": "the retained extraction carries no page boundary markers, so no PDF page number is known for any span; markdown line numbers are not page numbers and are never converted into one"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publication line",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 147,
+          "start": 94
+        },
+        "quote": "(Published in the Topeka Metro News February 16, 2026",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636#published",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.30.010 citation",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 385,
+          "start": 377
+        },
+        "quote": "3.30.010",
+        "ref_id": "ks:city:topeka:ordinances:ordinance:20636#cites:3.30.010",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "ecbb93c83b519c544a51aca281e9fb81825c0086dd23a5f9c8ec00d9d96a92c9",
+      "captured_at": "2026-08-27T21:48:44+00:00",
+      "kind": "retained_publisher_pdf",
+      "value": "20636.pdf"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:ordinances",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:ordinances:ordinance:20636@ecbb93c83b519c54",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "topeka-ordinance:48507986f67080e84be6eeb1",
+        "note": "id in manifests/ordinances.jsonl",
+        "system": "topeka_ordinance_seed_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:ordinances:ordinance:20636",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "20636",
+        "scope": "document",
+        "url": "https://files.topeka.gov/community/ordinances/2026/Ordinance20636.pdf"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:ordinances:ordinance:20636#published",
+        "kind": "published",
+        "note": "publication line printed on the instrument; not a certification of effective date",
+        "precision": "day",
+        "value": "February 16, 2026"
+      }
+    ],
+    "document_subtype": "ordinance",
+    "document_type": "ordinance",
+    "extraction_quality": {
+      "grade": "degraded",
+      "limitations": [
+        {
+          "affects": "evidence",
+          "code": "no_page_coordinates",
+          "description": "The retained Markdown has no page boundaries, so page-level citation into the original PDF is unavailable for this document."
+        },
+        {
+          "affects": "readable_text",
+          "code": "margin_line_numbers_in_text",
+          "description": "40 standalone numeric lines are present; these are the PDF's margin line numbering rendered as body text. They are retained rather than stripped, because removing them risks deleting real numbers from the instrument."
+        }
+      ],
+      "usable_text": true
+    },
+    "publisher_number": "20636",
+    "relationships": [
+      {
+        "basis": "TMC-shaped citation matched in the extracted text of this instrument",
+        "evidence_ref": "ks:city:topeka:ordinances:ordinance:20636#cites:3.30.010",
+        "note": "textual citation only. It is not evidence that this instrument amended that section; the publisher's own ordinance-history row on the code side carries that claim",
+        "predicate": "cites_code_section",
+        "resolved": false,
+        "target": {
+          "collection_id": "ks:city:topeka:municipal-code",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:municipal-code:tmc:3.30.010"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "no_page_coordinates",
+        "margin_line_numbers_in_text"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "review_needed"
+    },
+    "status": {
+      "basis": "the publisher lists this instrument in its official adopted Topeka Ordinances library and the document carries an enacting clause",
+      "evidence_ref": "ks:city:topeka:ordinances:ordinance:20636#published",
+      "value": "adopted"
+    },
+    "title": "20636"
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "publisher PDF retained and hash-verified against the manifest",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "retained Markdown present and non-empty",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "flattened redline markup needs a human read against the PDF",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-27T21:48:44+00:00",
+      "connector_entrypoint": "scripts/release/topeka-ordinances-collect.py",
+      "connector_revision": "observed-2026-08-27",
+      "method": "official_city_document_center_download"
+    },
+    "extractor": {
+      "mode": "remote_pdf_to_markdown",
+      "name": "marker",
+      "version": "runpod-hosted-2026-08"
+    },
+    "lineage": [
+      {
+        "input_sha256": "ecbb93c83b519c544a51aca281e9fb81825c0086dd23a5f9c8ec00d9d96a92c9",
+        "note": "publisher PDF retained unmodified; input and output are the same bytes",
+        "output_sha256": "ecbb93c83b519c544a51aca281e9fb81825c0086dd23a5f9c8ec00d9d96a92c9",
+        "step": "download",
+        "tool": "scripts/release/topeka-ordinances-collect.py",
+        "tool_version": "observed-2026-08-27"
+      },
+      {
+        "input_sha256": "ecbb93c83b519c544a51aca281e9fb81825c0086dd23a5f9c8ec00d9d96a92c9",
+        "note": "Markdown produced by the bounded remote extraction path",
+        "output_sha256": "c2ce3ef99ff2152b6b945fdbf3cf8540d749b36541fffe40123d0a0b8f35fbc5",
+        "step": "extract",
+        "tool": "marker",
+        "tool_version": "runpod-hosted-2026-08"
+      },
+      {
+        "input_sha256": "c2ce3ef99ff2152b6b945fdbf3cf8540d749b36541fffe40123d0a0b8f35fbc5",
+        "output_sha256": "4149d0a7ed79a1c0b2624a4857c214f18776ca1ca5ba9c834157ac69fe9d7177",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "c2ce3ef99ff2152b6b945fdbf3cf8540d749b36541fffe40123d0a0b8f35fbc5",
+        "output_sha256": "969e05d08c0707d60378b04a4c4f25a7400f2a6c01e34ffdea7e0e7cab4c4d69",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.gov/community/ordinances/index.php",
+    "official_url": "https://files.topeka.gov/community/ordinances/2026/Ordinance20636.pdf",
+    "retained_original": {
+      "byte_count": 1854797,
+      "local_path": null,
+      "media_type": "application/pdf",
+      "reference_uri": "seed://topeka-ordinances/raw/pdfs/20636.pdf",
+      "retrieved_at": "2026-08-27T21:48:44+00:00",
+      "sha256": "ecbb93c83b519c544a51aca281e9fb81825c0086dd23a5f9c8ec00d9d96a92c9"
+    },
+    "source_schema_version": "topeka_ordinance_seed_v1"
+  }
+}

@@ -1,0 +1,223 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 476,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "638ff498c8972c6b91a9cd767834165bc2dca59ffe2ca0480acaf620d3481f38"
+    },
+    "structured": {
+      "block_count": 1,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "1e3d3f1e-8fbf-5269-99f6-dc05d84e8e8e",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.65.170:section",
+      "sha256": "c0768db876e02b18dc3dad33d9d35e3ed88c24b86d331142d51aa2f72a46264b",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 1568,
+      "char_count": 1564,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "953309b526b1fded0444ae8810cace39c1062b2839469a7d3049df1455d9eefe"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.65.170 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "b46ded49-99f5-5835-8c9e-e2c64227a33c",
+          "convention": "utf8_char_offset",
+          "end": 475,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.65.170:block:0",
+          "start": 0
+        },
+        "quote": "Except for passengers requesting the share-a-ride program, no passenger shall be grouped with another passenger without the expressed consent of the first and second passengers who enter the taxicab; provided, however, that in time of emergency or during inclement weather, the taxicab business licensee may authorize taxicab drivers to group passengers without the consent of the first and second passengers who enter the taxicab. (Code 1981 § 46-42.4. Code 1995 § 154-124.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.65.170:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.65.170#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "06cae2f0151d86f08b145b679170aea3048982eb7a37f97023d5a84b81703a6e",
+      "captured_at": "2026-08-28T04:19:00.197483Z",
+      "kind": "rendered_html_capture",
+      "value": "10.65.170.06cae2f0151d.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.65.170@06cae2f0151d86f0",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.65.170",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.65.170",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.65.170",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.65.170"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.65.170",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Grouping of passengers."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:19:00.197483Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "06cae2f0151d86f08b145b679170aea3048982eb7a37f97023d5a84b81703a6e",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "06cae2f0151d86f08b145b679170aea3048982eb7a37f97023d5a84b81703a6e",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "06cae2f0151d86f08b145b679170aea3048982eb7a37f97023d5a84b81703a6e",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "953309b526b1fded0444ae8810cace39c1062b2839469a7d3049df1455d9eefe",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "953309b526b1fded0444ae8810cace39c1062b2839469a7d3049df1455d9eefe",
+        "output_sha256": "638ff498c8972c6b91a9cd767834165bc2dca59ffe2ca0480acaf620d3481f38",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "953309b526b1fded0444ae8810cace39c1062b2839469a7d3049df1455d9eefe",
+        "output_sha256": "c0768db876e02b18dc3dad33d9d35e3ed88c24b86d331142d51aa2f72a46264b",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.65.170",
+    "retained_original": {
+      "byte_count": 27939,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.65.170.06cae2f0151d.html",
+      "retrieved_at": "2026-08-28T04:19:00.197483Z",
+      "sha256": "06cae2f0151d86f08b145b679170aea3048982eb7a37f97023d5a84b81703a6e"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

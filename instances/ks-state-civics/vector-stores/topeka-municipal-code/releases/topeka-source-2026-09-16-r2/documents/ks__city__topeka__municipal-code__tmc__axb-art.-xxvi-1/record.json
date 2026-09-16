@@ -1,0 +1,257 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1249,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "4c6bde2e35e73cbda85d1d7c464f4ffacb9d7768fa85bca6ec7ea2a537cd01c7"
+    },
+    "structured": {
+      "block_count": 1,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "c86f96a8-77a2-5ca1-a1f7-c1b84c4a56a0",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:axb-art.-xxvi-1:section",
+      "sha256": "48e986de7bf0f69d5b0948b155e10170b723bd2bdec0babbb49b44a9e090f702",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 3230,
+      "char_count": 3210,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "c8bfc7eb52db2271738e8eae981f651349d25cdfa23ef888ecfffb89cac63b20"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC AxB Art. XXVI § 1 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "e208319a-9386-56fa-94ec-8e40dbca63bc",
+          "convention": "utf8_char_offset",
+          "end": 1248,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:axb-art.-xxvi-1:block:0",
+          "start": 0
+        },
+        "quote": "Pursuant to K.S.A. 12-2001 , as amended, a Contract Franchise Ordinance is hereby granted to Sage Telecom, Inc., a telecommunications local exchange service provider providing local exchange service hereinafter referred to as “Local Provider” within the City of Topeka, Kansas (“City”), subject to the provisions contained hereafter. The initial term of this Contract Franchise Ordinance shall be for a period of two (2) years beginning August 1, 2007, and ending July 31, 2009. Thereafter, this Contract Franchise Ordinance will automatically renew for additional one (1) year terms, unless either party notifies the other party of its intent to terminate the Contract Franchise Ordinance at least ninety (90) days before the termination of the then current term. The additional term shall be deemed a continuation of this Contract Franchise Ordinance and not as a new Contract Franchise Ordinance or amendment. Pursuant to K.S.A. 12-2001(b)(2) , as amended, under no circumstances shall this Contract Franchise Ordinance exceed twenty (20) years from the effective date of the Contract Franchise Ordinance. Compensation for said Contract Franchise Ordinance shall be established pursuant to Section 3 of this ordinance. (Ord. 18947 § 1, 8-14-07.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xxvi-1:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xxvi-1#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 18947",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1246,
+          "start": 1223
+        },
+        "quote": "Ord. 18947 § 1, 8-14-07",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xxvi-1#history:18947",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "c0dc98b5f11843fd9ba8c3b4ecab73b43963a3bd9ecce258d58a1f38230d8980",
+      "captured_at": "2026-08-28T05:07:49.765314Z",
+      "kind": "rendered_html_capture",
+      "value": "AxB_ArtXXVI_1.c0dc98b5f118.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xxvi-1@c0dc98b5f11843fd",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:AxB_ArtXXVI_1",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xxvi-1",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC AxB Art. XXVI § 1",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/AxB_ArtXXVI_1"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xxvi-1#history:18947",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "8-14-07"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "AxB Art. XXVI § 1",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xxvi-1#history:18947",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:18947"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xxvi-1#history:18947",
+      "value": "adopted"
+    },
+    "title": "Section 1. [Generally.]"
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T05:07:49.765314Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "c0dc98b5f11843fd9ba8c3b4ecab73b43963a3bd9ecce258d58a1f38230d8980",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "c0dc98b5f11843fd9ba8c3b4ecab73b43963a3bd9ecce258d58a1f38230d8980",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "c0dc98b5f11843fd9ba8c3b4ecab73b43963a3bd9ecce258d58a1f38230d8980",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "c8bfc7eb52db2271738e8eae981f651349d25cdfa23ef888ecfffb89cac63b20",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "c8bfc7eb52db2271738e8eae981f651349d25cdfa23ef888ecfffb89cac63b20",
+        "output_sha256": "4c6bde2e35e73cbda85d1d7c464f4ffacb9d7768fa85bca6ec7ea2a537cd01c7",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "c8bfc7eb52db2271738e8eae981f651349d25cdfa23ef888ecfffb89cac63b20",
+        "output_sha256": "48e986de7bf0f69d5b0948b155e10170b723bd2bdec0babbb49b44a9e090f702",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/AxB_ArtXXVI_1",
+    "retained_original": {
+      "byte_count": 27871,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/AxB_ArtXXVI_1.c0dc98b5f118.html",
+      "retrieved_at": "2026-08-28T05:07:49.765314Z",
+      "sha256": "c0dc98b5f11843fd9ba8c3b4ecab73b43963a3bd9ecce258d58a1f38230d8980"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

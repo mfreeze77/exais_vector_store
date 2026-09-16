@@ -1,0 +1,497 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 2707,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "5cb1532147086db330ea683e7f110e401f189efe0fa232a5913bd25bb61f4b5c"
+    },
+    "structured": {
+      "block_count": 16,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "0c872525-0a8d-58bf-85eb-a029a26a584b",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:section",
+      "sha256": "cfbc6686cbb4d360287218fc7e56351defbfc584097d986eb7c4610fe0714426",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 6988,
+      "char_count": 6985,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "0a552d2948d1a5810d01e7111b84dc4ef7c8dd8958901058eb682c5020b7c373"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "60520e12-37da-5c3d-bdfb-cc4381ff6dea",
+          "convention": "utf8_char_offset",
+          "end": 374,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:0",
+          "start": 0
+        },
+        "quote": "(a) The buffer, including wetlands and floodplains, shall be managed to enhance and maximize the unique value of these resources. Management includes specific limitations on alteration of the natural conditions of these resources. The following practices and activities are prohibited within the buffer, except with written approval by the Director of Utilities or designee:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "0c582688-4040-5c1d-991d-1cf7daeb87a4",
+          "convention": "utf8_char_offset",
+          "end": 579,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:1",
+          "start": 375
+        },
+        "quote": "(1) Clearing of existing vegetation; provided, however, this prohibition shall not prevent a property owner from trimming or cutting overgrown vegetation, removing dead vegetation or replacing vegetation.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "5d71581b-458b-530b-87d8-25473e0030f9",
+          "convention": "utf8_char_offset",
+          "end": 639,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:2",
+          "start": 580
+        },
+        "quote": "(2) Grading, stripping, or other soil-disturbing practices.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "df29722f-8f9b-5e68-8c85-0d8f3d6acd4d",
+          "convention": "utf8_char_offset",
+          "end": 663,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:3",
+          "start": 640
+        },
+        "quote": "(3) Filling or dumping.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "44f48e91-de5c-5362-b8a2-d103f21f2df6",
+          "convention": "utf8_char_offset",
+          "end": 736,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:4",
+          "start": 664
+        },
+        "quote": "(4) Draining the buffer area by ditching, underdrains, or other systems.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "6bd2f50c-dc77-53c2-a0ff-0362b0f3343d",
+          "convention": "utf8_char_offset",
+          "end": 933,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:5",
+          "start": 737
+        },
+        "quote": "(5) Use, storage, or application of pesticides, except for the spot spraying of noxious weeds or nonnative species consistent with recommendations of the Shawnee County Soil Conservation District.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "cbba2507-45fe-5c1f-b7c7-aa1f705fd21b",
+          "convention": "utf8_char_offset",
+          "end": 990,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:6",
+          "start": 934
+        },
+        "quote": "(6) Housing, grazing, or other maintenance of livestock.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "75e0d622-b3e0-58e8-b41e-e99d69d05efc",
+          "convention": "utf8_char_offset",
+          "end": 1080,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:7",
+          "start": 991
+        },
+        "quote": "(7) Storage or operation of motorized vehicles, except for maintenance and emergency use.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "8f692288-93d6-5399-be98-ec64ac271a1a",
+          "convention": "utf8_char_offset",
+          "end": 1275,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:8",
+          "start": 1081
+        },
+        "quote": "(b) The following structures, practices, and activities are permitted in the buffer, with specific design or maintenance features, subject to the review of the Director of Utilities or designee:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "04cf25f2-2ead-5cd9-9f71-0bd0e3a056fe",
+          "convention": "utf8_char_offset",
+          "end": 1326,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:9",
+          "start": 1276
+        },
+        "quote": "(1) Pedestrian bridges, foot paths, and utilities.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "2e1934d9-17c1-547c-be34-b251902b8e19",
+          "convention": "utf8_char_offset",
+          "end": 1418,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:10",
+          "start": 1327
+        },
+        "quote": "(2) Stream restoration projects, facilities and activities are permitted within the buffer.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "b700432b-ba6e-5ba7-a1bf-f473780aacc9",
+          "convention": "utf8_char_offset",
+          "end": 1507,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:11",
+          "start": 1419
+        },
+        "quote": "(3) Water quality monitoring and stream gauging reading are permitted within the buffer.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "4ff936c6-7ddf-5dba-9f17-b0d119459403",
+          "convention": "utf8_char_offset",
+          "end": 1613,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:12",
+          "start": 1508
+        },
+        "quote": "(4) Individual trees within the buffer may be removed with prior approval from the Director of Utilities.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "c09a91d3-2419-5113-b884-813eddc8a3a3",
+          "convention": "utf8_char_offset",
+          "end": 1917,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:13",
+          "start": 1614
+        },
+        "quote": "(c) Fences constructed within the buffer zone must be of an open, split rail or wood plank type design. Metal fencing may be added but only as an attachment to an acceptable wood fence design. Added metal fencing may not exceed the height of the wood fence. Screening material of any kind is prohibited.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "12ca55df-4d5c-524d-983b-90a8918db367",
+          "convention": "utf8_char_offset",
+          "end": 2648,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:14",
+          "start": 1918
+        },
+        "quote": "(d) Stream Buffer Easement. The owner of the project shall secure all the necessary easements on a permanent basis, including a stream buffer easement for the stream buffer area included in the project design. The stream buffer easement shall provide for access to the buffer at reasonable times for periodic inspection by the City or its contractor or agent and shall require the property owner to ensure that the stream buffer is maintained in proper working condition to meet design standards and any other provisions established by this chapter. All easements shall be shown on the recorded plat granted by separate, recorded instrument and shall run with the land until they are lawfully released. (Ord. 20262 § 19, 10-6-20.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 17.10.060 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "330a4beb-beaa-5eb5-ba1e-57156f243699",
+          "convention": "utf8_char_offset",
+          "end": 2706,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:17.10.060:block:15",
+          "start": 2649
+        },
+        "quote": "Cross References: Public Works Department, TMC 2.20.100 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20262",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2646,
+          "start": 2622
+        },
+        "quote": "Ord. 20262 § 19, 10-6-20",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:17.10.060#history:20262",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "8b220e7923c7892af43e6ec95e694ac8db18849b6353ec595bd85947edaeb420",
+      "captured_at": "2026-08-28T04:44:56.484929Z",
+      "kind": "rendered_html_capture",
+      "value": "17.10.060.8b220e7923c7.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:17.10.060@8b220e7923c7892a",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:17.10.060",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:17.10.060",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 17.10.060",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/17.10.060"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:17.10.060#history:20262",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "10-6-20"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "17.10.060",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:17.10.060#history:20262",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20262"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:17.10.060#history:20262",
+      "value": "adopted"
+    },
+    "title": "Buffer establishment, management, and maintenance."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:44:56.484929Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "8b220e7923c7892af43e6ec95e694ac8db18849b6353ec595bd85947edaeb420",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "8b220e7923c7892af43e6ec95e694ac8db18849b6353ec595bd85947edaeb420",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "8b220e7923c7892af43e6ec95e694ac8db18849b6353ec595bd85947edaeb420",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "0a552d2948d1a5810d01e7111b84dc4ef7c8dd8958901058eb682c5020b7c373",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "0a552d2948d1a5810d01e7111b84dc4ef7c8dd8958901058eb682c5020b7c373",
+        "output_sha256": "5cb1532147086db330ea683e7f110e401f189efe0fa232a5913bd25bb61f4b5c",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "0a552d2948d1a5810d01e7111b84dc4ef7c8dd8958901058eb682c5020b7c373",
+        "output_sha256": "cfbc6686cbb4d360287218fc7e56351defbfc584097d986eb7c4610fe0714426",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/17.10.060",
+    "retained_original": {
+      "byte_count": 32828,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/17.10.060.8b220e7923c7.html",
+      "retrieved_at": "2026-08-28T04:44:56.484929Z",
+      "sha256": "8b220e7923c7892af43e6ec95e694ac8db18849b6353ec595bd85947edaeb420"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

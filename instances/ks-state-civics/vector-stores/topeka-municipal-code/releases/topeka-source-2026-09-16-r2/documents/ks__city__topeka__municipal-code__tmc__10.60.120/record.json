@@ -1,0 +1,401 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 2421,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "7c4bfdb649105ccd0395b9f096ae8009b68010e9414cf821ba153a16c7214082"
+    },
+    "structured": {
+      "block_count": 10,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "9b65532d-a277-5b19-85d4-c721b12e754d",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.120:section",
+      "sha256": "35a2c28e6dacc1429c492685df47dcef22417635cffb30fb77ebff63143b4aba",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 6126,
+      "char_count": 6063,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "35b11328594ffa027d072de62c139bf004d2f962eb75410b65c3a8a1af05ba4d"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.120 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "b0b02a33-465c-508f-b6ab-6bbff4edf0d6",
+          "convention": "utf8_char_offset",
+          "end": 84,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.120:block:0",
+          "start": 0
+        },
+        "quote": "(a) Definitions. For purposes of this section the following definitions shall apply:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.120:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.120 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "06a729f9-cc03-555f-b838-c0478aa3dfb4",
+          "convention": "utf8_char_offset",
+          "end": 178,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.120:block:1",
+          "start": 85
+        },
+        "quote": "(1) “Driveway” is a paved or graveled area that is intended for off-street vehicular parking.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.120:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.120 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "71225f16-87b6-5956-8de2-8918c5ae7684",
+          "convention": "utf8_char_offset",
+          "end": 401,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.120:block:2",
+          "start": 179
+        },
+        "quote": "(2) “Park” or “parking” shall mean the standing of a vehicle or machinery on or over a paved or graveled area, whether occupied or not, other than temporarily for the purpose of loading or unloading property or passengers.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.120:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.120 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "9431230c-0fe3-5908-ade0-1d7185f3f667",
+          "convention": "utf8_char_offset",
+          "end": 955,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.120:block:3",
+          "start": 402
+        },
+        "quote": "(3) “Paved or graveled area” shall mean (i) an area comprised of a solid, permanent surface constructed of asphalt, concrete, stone, brick or other similar material of sufficient dimension to accommodate the entire vehicle or machinery, with no overhang onto dirt or grass; or (ii) an area comprised of a loose aggregation of rock fragments (e.g., gravel) thick enough to prevent grass, weeds and dirt from permeating or penetrating through and of sufficient dimension to accommodate the entire vehicle or machinery, with no overhang onto dirt or grass.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.120:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.120 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "46ea3ada-3f7c-5536-b622-0b4f2b51fa5d",
+          "convention": "utf8_char_offset",
+          "end": 1324,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.120:block:4",
+          "start": 956
+        },
+        "quote": "(4) “Vehicle or machinery” shall mean a machine propelled by power (other than human power) that is designed to travel along the ground by use of wheels, treads, runners or slides and transport persons or property. “Vehicle or machinery” shall include, without limitation, automobiles, trucks, trailers, recreational vehicles, motorcycles, boats, campers, or tractors.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.120:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.120 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "15f343aa-dd66-51a0-87c2-84d1a182dd64",
+          "convention": "utf8_char_offset",
+          "end": 1365,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.120:block:5",
+          "start": 1325
+        },
+        "quote": "(b) Prohibitions – Enforcement – Waiver.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.120:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.120 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "0b9358ce-69e0-5e21-85d3-bee544995d67",
+          "convention": "utf8_char_offset",
+          "end": 1819,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.120:block:6",
+          "start": 1366
+        },
+        "quote": "(1) It shall be unlawful for any person to park, or allow to be parked, any such vehicle or machinery on the back yard of a residential lot for more than three months, or on any other part of a residential lot for any period of time, unless on a paved or graveled area or on a driveway, as defined by subsections (a)(1) and (a)(3) of this section. Such paved or graveled area or driveway must be maintained free of vegetation, debris and standing water.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.120:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.120 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "433927f1-7f1b-5f7b-bf4a-43f9aa1cadf7",
+          "convention": "utf8_char_offset",
+          "end": 2051,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.120:block:7",
+          "start": 1820
+        },
+        "quote": "(2) In addition to law enforcement officers, property maintenance inspectors shall also have the authority to issue a uniform complaint and notice to appear for violations of this section, as provided in TMC 2.40.130 and 2.40.210 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.120:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.120 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "462e82ae-4db7-5050-b5c3-bdcb8b22e5c1",
+          "convention": "utf8_char_offset",
+          "end": 2362,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.120:block:8",
+          "start": 2052
+        },
+        "quote": "(3) The Governing Body may, by resolution, waive the provisions of subsection (b)(1) of this section for properties within a designated area requested by an event sponsor and identified in the resolution in order to accommodate a special event approved pursuant to Chapter 12.70 TMC. (Ord. 20494 § 1, 6-11-24.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.120:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 10.60.120 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "009f0ed6-1fe0-5fd8-93f9-efab356766b4",
+          "convention": "utf8_char_offset",
+          "end": 2420,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:10.60.120:block:9",
+          "start": 2363
+        },
+        "quote": "Cross References: City Council – Mayor, Chapter 2.15 TMC.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.120:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.120#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20494",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2360,
+          "start": 2337
+        },
+        "quote": "Ord. 20494 § 1, 6-11-24",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:10.60.120#history:20494",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "c6a5aefba21c4578bdf59e68718863dff6ad0841b6847b111231fe71705d7999",
+      "captured_at": "2026-08-28T04:16:17.756871Z",
+      "kind": "rendered_html_capture",
+      "value": "10.60.120.c6a5aefba21c.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:10.60.120@c6a5aefba21c4578",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:10.60.120",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:10.60.120",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 10.60.120",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/10.60.120"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.60.120#history:20494",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "6-11-24"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "10.60.120",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.60.120#history:20494",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20494"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:10.60.120#history:20494",
+      "value": "adopted"
+    },
+    "title": "Parking of vehicles on residential property."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:16:17.756871Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "c6a5aefba21c4578bdf59e68718863dff6ad0841b6847b111231fe71705d7999",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "c6a5aefba21c4578bdf59e68718863dff6ad0841b6847b111231fe71705d7999",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "c6a5aefba21c4578bdf59e68718863dff6ad0841b6847b111231fe71705d7999",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "35b11328594ffa027d072de62c139bf004d2f962eb75410b65c3a8a1af05ba4d",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "35b11328594ffa027d072de62c139bf004d2f962eb75410b65c3a8a1af05ba4d",
+        "output_sha256": "7c4bfdb649105ccd0395b9f096ae8009b68010e9414cf821ba153a16c7214082",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "35b11328594ffa027d072de62c139bf004d2f962eb75410b65c3a8a1af05ba4d",
+        "output_sha256": "35a2c28e6dacc1429c492685df47dcef22417635cffb30fb77ebff63143b4aba",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/10.60.120",
+    "retained_original": {
+      "byte_count": 33332,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/10.60.120.c6a5aefba21c.html",
+      "retrieved_at": "2026-08-28T04:16:17.756871Z",
+      "sha256": "c6a5aefba21c4578bdf59e68718863dff6ad0841b6847b111231fe71705d7999"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

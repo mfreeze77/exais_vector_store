@@ -1,0 +1,929 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 7960,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "0f10a7ecdd7638f00eabab533cfa80ba7acbdbdaa99f66cc4566a162bb640226"
+    },
+    "structured": {
+      "block_count": 43,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "4bc5b7bc-a8c6-50e5-a727-f8c64ff7a974",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:section",
+      "sha256": "849a9b0b1230ef4179aea04fc16d92b5e5923d455d23e4790541ecbd50fc3132",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 18930,
+      "char_count": 18835,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "5efb4e80bf7de82ab88020ac0039d54709a3385e35eb7a1148431cbf83bb4b61"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "d2298e1d-f83f-5a1a-9a23-a8870823cbc4",
+          "convention": "utf8_char_offset",
+          "end": 227,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:0",
+          "start": 0
+        },
+        "quote": "Prior to any use or development within the planned unit development district, the district shall be established in accordance with the provisions of this division, including the approval of all plans set forth in the procedure.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "b2be4a9f-3d8f-532a-bb69-29b5473a05fb",
+          "convention": "utf8_char_offset",
+          "end": 962,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:1",
+          "start": 228
+        },
+        "quote": "(a) Application to Amend to the District. Except as set forth by this division, a petition to reclassify property to the planned unit development district shall be as established in Chapter 18.245 TMC, Amendments, and include like contents. Additionally, the application shall include the specified number of copies of the planned unit development master plan which shall consist of the following documents, information and graphics unless determined to be unnecessary by the Planning Director. The Planning Director may waive the submittal of the master plan in circumstances where the conditions of approval, restrictions, and limitations of the planned unit development can be addressed in the ordinance reclassifying the property.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "2ef4237f-eec6-5ae3-8531-35859d2d412a",
+          "convention": "utf8_char_offset",
+          "end": 1088,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:2",
+          "start": 963
+        },
+        "quote": "(1) Legal description of the proposed district in its entirety, total acreage, and planned unit development name/designation.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "aa15b028-42de-5adc-892a-957abd2725b7",
+          "convention": "utf8_char_offset",
+          "end": 1174,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:3",
+          "start": 1089
+        },
+        "quote": "(2) Legal description of each proposed use group category with corresponding acreage.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "49580b34-0367-5c1d-a23d-85597025ff92",
+          "convention": "utf8_char_offset",
+          "end": 1938,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:4",
+          "start": 1175
+        },
+        "quote": "(3) The site plan shall identify the name of the planned unit development in large, bold letters centered across the top of all plan sheets; the general location and arrangement of all existing structures; the proposed traffic circulation pattern within the development; the approximate location of proposed and existing major streets and major pedestrian and bicycle routes, including major points of access; the areas to be developed for parking; the points of ingress and egress including access streets where required; the relationship of abutting land uses and zoning districts; proposed types of signage; proposed lots and blocks, if any; proposed public or common open space, if any, including parks, playgrounds, school sites, and recreational facilities.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "07163bca-3637-5b04-b5b9-0f16cdfde18b",
+          "convention": "utf8_char_offset",
+          "end": 2422,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:5",
+          "start": 1939
+        },
+        "quote": "(4) The site plan of the development shall be at a minimum scale of one inch equals 50 feet, composed of one or more sheets with an outer dimension of 24 inches by 36 inches. A single-line border shall be provided around all plan sheets measuring exactly one inch from the edge of the sheet except along the left side of the sheet which line shall measure exactly two inches from the edge. The scale, north point and most recent date of preparation shall be so indicated on the plan.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "92184ddf-51e6-5127-b9eb-0ba0651c6340",
+          "convention": "utf8_char_offset",
+          "end": 2523,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:6",
+          "start": 2423
+        },
+        "quote": "(5) Graphically reflect the geographic location and designation of each use group category proposed.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "6cb90c9b-7dd5-5e31-a81c-58f134e05841",
+          "convention": "utf8_char_offset",
+          "end": 2763,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:7",
+          "start": 2524
+        },
+        "quote": "(6) The anticipated density, number, maximum height and type of residential units; and floor area, maximum height and types of business, commercial and industrial use presented in tabular form in comparison to minimum applicable standards.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "722d7cd7-3915-5090-8ac2-12cae5ebdc87",
+          "convention": "utf8_char_offset",
+          "end": 3137,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:8",
+          "start": 2764
+        },
+        "quote": "(7) Existing topographical character of the land at a contour appropriate with the scale of the project; all watercourses, floodplains, unique natural features, including wildlife areas and vegetative cover, and recognized historical sites and structures. Further, all existing streets, alleys, easements, utility lines, and existing land use shall be included on the plan.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "aa358d8f-9557-5544-bb17-7f40507edcd9",
+          "convention": "utf8_char_offset",
+          "end": 3278,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:9",
+          "start": 3138
+        },
+        "quote": "(8) Total land area, approximate location, and amount of open space included in the residential, business, commercial, and industrial areas.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "4b20f123-5c51-512f-bbce-2a698a59eb16",
+          "convention": "utf8_char_offset",
+          "end": 3580,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:10",
+          "start": 3279
+        },
+        "quote": "(9) When a planned development includes provisions for common open space, streets, utilities, drainageways or recreational facilities, a statement describing the provision that is to be made for the care and maintenance of such open space, streets, utilities, drainageways, or recreational facilities.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "5dcc79c8-96a9-593c-8c6b-c9c21afdb76e",
+          "convention": "utf8_char_offset",
+          "end": 3798,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:11",
+          "start": 3581
+        },
+        "quote": "(10) A preliminary plat of subdivision pursuant to the applicable ordinances, rules and regulations relating to subdivision approval; or a copy of the existing recorded plat which is appropriate for the intended plan.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "895990db-219e-50ec-8278-6601db55e3c6",
+          "convention": "utf8_char_offset",
+          "end": 4046,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:12",
+          "start": 3799
+        },
+        "quote": "(11) Area shown on the site plan shall extend beyond the property lines of the proposal to include a survey of the area within 150 feet of the proposal, exclusive of public right-of-way, at the same scale as the proposal and include the following:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "c7764029-252b-5ccd-9139-8d7d9f7b1763",
+          "convention": "utf8_char_offset",
+          "end": 4134,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:13",
+          "start": 4047
+        },
+        "quote": "(i) Land uses, location of principal structures, and major existing landscape features.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "02d03739-0223-54ae-9216-dc7af9ba444f",
+          "convention": "utf8_char_offset",
+          "end": 4167,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:14",
+          "start": 4135
+        },
+        "quote": "(ii) Traffic circulation system.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "4aef8380-436a-597d-baf9-11f8d3543594",
+          "convention": "utf8_char_offset",
+          "end": 4233,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:15",
+          "start": 4168
+        },
+        "quote": "(iii) General topographical mapping at same scale as master plan.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "038cd2cd-e23d-5155-9561-856524290a58",
+          "convention": "utf8_char_offset",
+          "end": 4580,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:16",
+          "start": 4234
+        },
+        "quote": "(12) Traffic impact analysis as defined by this division; provided, however, if in the opinion of the Public Works Director, upon determination at preapplication conference that the intensity and scope of the requested planned unit development is of such nature that said impact analysis is not warranted, the Director may waive said requirement.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "a8d1731f-adb4-56d8-88bc-cadb9573309b",
+          "convention": "utf8_char_offset",
+          "end": 4798,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:17",
+          "start": 4581
+        },
+        "quote": "(13) A development phasing schedule including the sequence for each phase, approximate size in areas of each phase, and proposed phasing of construction of public improvements, recreation, and common open space areas.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "8e6cfb18-4865-5271-93c3-99cc883ab7a8",
+          "convention": "utf8_char_offset",
+          "end": 4876,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:18",
+          "start": 4799
+        },
+        "quote": "(14) One 11-by-17-inch reproducible electronic and paper copy of master plan.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "87419516-4357-58c6-a080-777c9d304128",
+          "convention": "utf8_char_offset",
+          "end": 4972,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:19",
+          "start": 4877
+        },
+        "quote": "(15) Indicate “Book,” “Page,” “Date,” and “Time” in upper right-hand corner of all plan sheets.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "6d116255-ef20-5307-8251-dac540948b23",
+          "convention": "utf8_char_offset",
+          "end": 5081,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:20",
+          "start": 4973
+        },
+        "quote": "(16) Immediately below the “Book,” “Page,” “Date” and “Time” entries, provide the following signature block:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "3ddcea74-fd8c-54b1-9735-a03b0d3b05ee",
+          "convention": "utf8_char_offset",
+          "end": 5172,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:21",
+          "start": 5082
+        },
+        "quote": "Recorded With The Shawnee County Register of Deeds: (Registrar’s Name) – Register of Deeds",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "714fd681-fb05-5812-82c1-7110df67f176",
+          "convention": "utf8_char_offset",
+          "end": 5228,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:22",
+          "start": 5173
+        },
+        "quote": "(17) Include the following statement on the plan sheet:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "80fc13df-0d13-5fa1-a598-4f8a0324d55f",
+          "convention": "utf8_char_offset",
+          "end": 5588,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:23",
+          "start": 5229
+        },
+        "quote": "This Planned Unit Development (PUD) Master Plan has been reviewed and approved in accordance with the provisions of Chapter 18.190 of the Comprehensive Zoning Regulations of the City of Topeka and Shawnee County, Kansas, and may be amended only as prescribed in TMC 18.190.070 and as set forth on this document or as may subsequently be approved and recorded.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "c9970d94-11f2-55a5-8049-3cd760690dd1",
+          "convention": "utf8_char_offset",
+          "end": 5711,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:24",
+          "start": 5589
+        },
+        "quote": "(18) Notarized owner’s certification of acceptance of conditions and restrictions set forth on the master plan as follows:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "28c39987-c347-5bbf-986d-4b1e9776c3b9",
+          "convention": "utf8_char_offset",
+          "end": 5835,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:25",
+          "start": 5712
+        },
+        "quote": "OWNER’S CERTIFICATE: (Type Name) agrees to comply with the conditions and restrictions as set forth on the master PUD plan.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 26",
+        "locator": {
+          "block_index": 26,
+          "component_id": "8c33e928-7ef4-5dff-820e-c79698a8d30c",
+          "convention": "utf8_char_offset",
+          "end": 5857,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:26",
+          "start": 5836
+        },
+        "quote": "In Testimony Whereof:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 27",
+        "locator": {
+          "block_index": 27,
+          "component_id": "da29449a-ec0c-59cd-816d-8e0e081b6f85",
+          "convention": "utf8_char_offset",
+          "end": 5991,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:27",
+          "start": 5858
+        },
+        "quote": "The Owner(s) of the above described property, (Type Name), have signed these presents this ________ day of ________, (Year) ________.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 28",
+        "locator": {
+          "block_index": 28,
+          "component_id": "646eac53-2cff-59ba-962f-6d320dfbb0dd",
+          "convention": "utf8_char_offset",
+          "end": 6035,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:28",
+          "start": 5992
+        },
+        "quote": "(Type Name and Title) (Type Name and Title)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:28#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 29",
+        "locator": {
+          "block_index": 29,
+          "component_id": "f8a6bb64-0eac-5ca3-aa48-dd41a8f1a503",
+          "convention": "utf8_char_offset",
+          "end": 6230,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:29",
+          "start": 6036
+        },
+        "quote": "Be it remembered that on this ________ date of ________, A.D. ________ (Year) before me, a notary public in and for said County and State come ________, Owner(s) of the above described property.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:29#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 30",
+        "locator": {
+          "block_index": 30,
+          "component_id": "022a041a-bf5a-5140-a443-5d5e37003899",
+          "convention": "utf8_char_offset",
+          "end": 6315,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:30",
+          "start": 6231
+        },
+        "quote": "I hereby set my hand and affix my notarial seal the day and year last written above.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:30#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 31",
+        "locator": {
+          "block_index": 31,
+          "component_id": "aea510b0-81e9-584f-9cef-7e4b63574742",
+          "convention": "utf8_char_offset",
+          "end": 6350,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:31",
+          "start": 6316
+        },
+        "quote": "____________________ Notary Public",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:31#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 32",
+        "locator": {
+          "block_index": 32,
+          "component_id": "fe5df929-90bc-531b-ad05-248db7bd7e1d",
+          "convention": "utf8_char_offset",
+          "end": 6381,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:32",
+          "start": 6351
+        },
+        "quote": "My Commission Expires:________",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:32#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 33",
+        "locator": {
+          "block_index": 33,
+          "component_id": "93493c13-a484-5b60-b0f1-4ae351952e5c",
+          "convention": "utf8_char_offset",
+          "end": 6494,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:33",
+          "start": 6382
+        },
+        "quote": "(19) Notarized certification of master PUD plan approval by the secretary to the Planning Commission as follows:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:33#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 34",
+        "locator": {
+          "block_index": 34,
+          "component_id": "828c5b8c-3608-5751-89c8-1d9d282cd3ba",
+          "convention": "utf8_char_offset",
+          "end": 6537,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:34",
+          "start": 6495
+        },
+        "quote": "Certification of Master PUD Plan Approval:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:34#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 35",
+        "locator": {
+          "block_index": 35,
+          "component_id": "847990ac-c769-58c8-92a8-a196e12ef73d",
+          "convention": "utf8_char_offset",
+          "end": 6571,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:35",
+          "start": 6538
+        },
+        "quote": "(Planning Director’s Name) (Date)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:35#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 36",
+        "locator": {
+          "block_index": 36,
+          "component_id": "98065dff-e35e-5546-8e07-51961f4ca767",
+          "convention": "utf8_char_offset",
+          "end": 6604,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:36",
+          "start": 6572
+        },
+        "quote": "Secretary to Planning Commission",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:36#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 37",
+        "locator": {
+          "block_index": 37,
+          "component_id": "bcf373f6-3d7a-520b-acaf-5a8f7fa717de",
+          "convention": "utf8_char_offset",
+          "end": 6952,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:37",
+          "start": 6605
+        },
+        "quote": "Be it remembered that on this ________ date of ________, A.D. ________ (Year), before me, the undersigned, a notary public in and for said County and State came (Planning Director’s Name) who is personally known to me to be the same person who executed the within instrument of writing, and such person duly acknowledged the execution of the same.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:37#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 38",
+        "locator": {
+          "block_index": 38,
+          "component_id": "d3ff2b01-0623-5ba2-9a96-45fdc846639b",
+          "convention": "utf8_char_offset",
+          "end": 7057,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:38",
+          "start": 6953
+        },
+        "quote": "In Witness Whereof, I hereby set my hand and affix my notarial seal the day and year last written above.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:38#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 39",
+        "locator": {
+          "block_index": 39,
+          "component_id": "5cfda84e-be71-550b-a0f2-1df492582fe0",
+          "convention": "utf8_char_offset",
+          "end": 7092,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:39",
+          "start": 7058
+        },
+        "quote": "____________________ Notary Public",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:39#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 40",
+        "locator": {
+          "block_index": 40,
+          "component_id": "8482547f-77a2-570a-b7b6-89cbc6579bcf",
+          "convention": "utf8_char_offset",
+          "end": 7123,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:40",
+          "start": 7093
+        },
+        "quote": "My Commission Expires:________",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:40#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 41",
+        "locator": {
+          "block_index": 41,
+          "component_id": "c941c38b-4c11-5a6c-8837-19ec3950e19b",
+          "convention": "utf8_char_offset",
+          "end": 7769,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:41",
+          "start": 7124
+        },
+        "quote": "(b) Action on the Petition and Master Plan of the Planned Unit Development Plan by the Planning Commission and Governing Body. Upon filing of a petition to amend a district to the planned unit development district as set forth in Chapter 18.245 TMC, Amendments, and as further provided by this division, the Planning Commission shall review, consider, and act on the petition in a like manner and procedure as provided in Chapter 18.245 TMC. The appropriate Governing Body shall consider such proposal upon report and recommendation by the Planning Commission also in a like procedure as provided in Chapter 18.245 TMC. (Ord. 19997 § 3, 5-3-16.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:41#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.190.050 block 42",
+        "locator": {
+          "block_index": 42,
+          "component_id": "c735aaa8-4587-5ab2-8d7e-6ab2f073f172",
+          "convention": "utf8_char_offset",
+          "end": 7959,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.190.050:block:42",
+          "start": 7770
+        },
+        "quote": "Cross References: City Council – Mayor, Chapter 2.15 TMC; Planning and Development Department, TMC 2.20.080 ; Public Works Department, TMC 2.20.100 ; Planning Commission, Chapter 2.225 TMC.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050:block:42#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19997",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 7767,
+          "start": 7745
+        },
+        "quote": "Ord. 19997 § 3, 5-3-16",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.190.050#history:19997",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "07808c04f6cdb915444e5b11074da7b6ee43551ac110983a82f343cbc1d6a5b6",
+      "captured_at": "2026-08-28T04:52:50.549470Z",
+      "kind": "rendered_html_capture",
+      "value": "18.190.050.07808c04f6cd.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:18.190.050@07808c04f6cdb915",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:18.190.050",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:18.190.050",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 18.190.050",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/18.190.050"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.190.050#history:19997",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "5-3-16"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "18.190.050",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.190.050#history:19997",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19997"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.190.050#history:19997",
+      "value": "adopted"
+    },
+    "title": "Procedure for securing approval of a planned development and the establishment of a planned development district."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:52:50.549470Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "07808c04f6cdb915444e5b11074da7b6ee43551ac110983a82f343cbc1d6a5b6",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "07808c04f6cdb915444e5b11074da7b6ee43551ac110983a82f343cbc1d6a5b6",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "07808c04f6cdb915444e5b11074da7b6ee43551ac110983a82f343cbc1d6a5b6",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "5efb4e80bf7de82ab88020ac0039d54709a3385e35eb7a1148431cbf83bb4b61",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "5efb4e80bf7de82ab88020ac0039d54709a3385e35eb7a1148431cbf83bb4b61",
+        "output_sha256": "0f10a7ecdd7638f00eabab533cfa80ba7acbdbdaa99f66cc4566a162bb640226",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "5efb4e80bf7de82ab88020ac0039d54709a3385e35eb7a1148431cbf83bb4b61",
+        "output_sha256": "849a9b0b1230ef4179aea04fc16d92b5e5923d455d23e4790541ecbd50fc3132",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/18.190.050",
+    "retained_original": {
+      "byte_count": 43596,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/18.190.050.07808c04f6cd.html",
+      "retrieved_at": "2026-08-28T04:52:50.549470Z",
+      "sha256": "07808c04f6cdb915444e5b11074da7b6ee43551ac110983a82f343cbc1d6a5b6"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

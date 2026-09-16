@@ -1,0 +1,271 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1263,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "6e902720ccb19cac3439b95663183cc3bd37f80be547d959a5c7db2094b40bde"
+    },
+    "structured": {
+      "block_count": 4,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "a74eee74-c222-5f8e-b088-1a4f82bfebd1",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:a12-16:section",
+      "sha256": "678470c0fc8ec11feea8f09a29e63168bf8d933a49d1dfeb078ce3aae6ac83f2",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 3255,
+      "char_count": 3253,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "6cd75d658ceb6729b992ad9ed96ad35697704346a8aa317886ff8f2f13f02da8"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A12-16 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "fd58f993-67c6-5c19-bc6b-e9e339fe18b0",
+          "convention": "utf8_char_offset",
+          "end": 78,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a12-16:block:0",
+          "start": 0
+        },
+        "quote": "Cross References: Sidewalk construction and maintenance, TMC 12.35.010 et seq.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a12-16:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A12-16 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "04711713-d13c-5a97-abe2-30a88d8bf83d",
+          "convention": "utf8_char_offset",
+          "end": 117,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a12-16:block:1",
+          "start": 79
+        },
+        "quote": "State Law References: K.S.A. 13-1017 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a12-16:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A12-16 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "75911fee-cf7a-53e0-b945-3df2cd1c9802",
+          "convention": "utf8_char_offset",
+          "end": 574,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a12-16:block:2",
+          "start": 118
+        },
+        "quote": "That the governing body of the City of Topeka, Kansas, may by resolution adopted by the governing body and published for three consecutive days in the official city newspaper, determine the necessity for construction, reconstruction and repair of sidewalks and the reconstruction of curbs, gutters, curb cuts, curb cutbacks and driveways having become in bad repair, dangerous or abandoned on each and any of the streets and other public ways of said city.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a12-16:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC A12-16 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "d2a522e7-8cfa-5ac7-a660-4cee5dee51cb",
+          "convention": "utf8_char_offset",
+          "end": 1262,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:a12-16:block:3",
+          "start": 575
+        },
+        "quote": "Such resolution shall find and declare the necessity of the sidewalk or sidewalks and the reconstruction of curbs, gutters, curb cuts, curb cutbacks and driveways described therein to be constructed or reconstructed or repaired for public use and shall order such sidewalk or sidewalks and the reconstruction of curbs, gutters, curb cuts, curb cutbacks and driveways to be constructed, reconstructed or repaired, and shall order and direct the city engineer to prepare and submit plans and specifications for the construction, reconstruction or repair of such sidewalk or sidewalks and the reconstruction of curbs, gutters, curb cuts, curb cutbacks and driveways. (C.O. 17 § 2, 1-30-71.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a12-16:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:a12-16#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "c573895dff6e2c24f78457a61b1ff7683320006468dbb6d5c2a52eceaa5107db",
+      "captured_at": "2026-08-28T04:59:11.999094Z",
+      "kind": "rendered_html_capture",
+      "value": "A12-16.c573895dff6e.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:a12-16@c573895dff6e2c24",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:A12-16",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:a12-16",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC A12-16",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/A12-16"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "A12-16",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Sec. A12-16. Resolution."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:59:11.999094Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "c573895dff6e2c24f78457a61b1ff7683320006468dbb6d5c2a52eceaa5107db",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "c573895dff6e2c24f78457a61b1ff7683320006468dbb6d5c2a52eceaa5107db",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "c573895dff6e2c24f78457a61b1ff7683320006468dbb6d5c2a52eceaa5107db",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "6cd75d658ceb6729b992ad9ed96ad35697704346a8aa317886ff8f2f13f02da8",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "6cd75d658ceb6729b992ad9ed96ad35697704346a8aa317886ff8f2f13f02da8",
+        "output_sha256": "6e902720ccb19cac3439b95663183cc3bd37f80be547d959a5c7db2094b40bde",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "6cd75d658ceb6729b992ad9ed96ad35697704346a8aa317886ff8f2f13f02da8",
+        "output_sha256": "678470c0fc8ec11feea8f09a29e63168bf8d933a49d1dfeb078ce3aae6ac83f2",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/A12-16",
+    "retained_original": {
+      "byte_count": 30423,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/A12-16.c573895dff6e.html",
+      "retrieved_at": "2026-08-28T04:59:11.999094Z",
+      "sha256": "c573895dff6e2c24f78457a61b1ff7683320006468dbb6d5c2a52eceaa5107db"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

@@ -1,0 +1,623 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 6700,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "bfe3b03093010228834c0057549632ab3575993e868272c8344cd08cc0e8b0e6"
+    },
+    "structured": {
+      "block_count": 26,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 19,
+      "path": "structured.json",
+      "root_component_id": "a045ee52-c61a-5d1e-ab88-c0e602bf166c",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:section",
+      "sha256": "951ca0ce5c80745262ef9001c6ae44cbb61bcb9a20ceb7a47c1f19d6e3397d92",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 16134,
+      "char_count": 15902,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "751d58c93a4406dbb636ce7d78a8f73a3b16bda065d5ba403be19ff66651a1d1"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "9dc2ab36-c36c-5ff7-b0a8-31ce4171e57a",
+          "convention": "utf8_char_offset",
+          "end": 188,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:0",
+          "start": 0
+        },
+        "quote": "The following words, terms and phrases, when used in this chapter, shall have the meanings ascribed to them in this section, except where the context clearly indicates a different meaning:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "758637fe-5df1-5265-ac80-12620b02b4c9",
+          "convention": "utf8_char_offset",
+          "end": 836,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:1",
+          "start": 189
+        },
+        "quote": "“Alarm system” means an assembly of equipment and devices, or a single device such as a solid state unit which plugs directly into a 110-volt AC line, arranged to signal the presence of a hazard requiring urgent attention and to which police are expected to respond. The term “alarm system” shall include the terms “burglar alarm systems,” and “holdup alarm systems.” Fire alarm systems and alarm systems which monitor temperature, humidity or any other condition not directly related to the detection of an unauthorized intrusion into a premises or an attempted robbery at a premises are specifically excluded from the provisions of this chapter.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "23ee238c-0e63-54ce-8581-e85086101d22",
+          "convention": "utf8_char_offset",
+          "end": 1671,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:2",
+          "start": 837
+        },
+        "quote": "“Alarm user” means any person on whose premises an alarm system is maintained within the City, except for alarm systems on motor vehicles or proprietary systems. If, however, an alarm system on a motor vehicle is connected with an alarm system at a premises (other than a proprietary system), the person using such system is an alarm user. Also excluded from this definition and from the coverage of this chapter are persons who use alarm systems to alert or signal persons within the premises in which the alarm system is located, of an attempted unauthorized intrusion or holdup attempt. If such a system, however, employs an audible signal emitting sounds or a flashing light or beacon designed to signal persons outside the premises, such system shall be within the definition of alarm system and shall be subject to this chapter.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "238d22aa-d25e-58f7-ab08-a5ac15840081",
+          "convention": "utf8_char_offset",
+          "end": 1985,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:3",
+          "start": 1672
+        },
+        "quote": "“Answering service” means a telephone answering service providing among its services the service of receiving on a continuous basis, through trained employees, emergency signals from alarm systems, and thereafter immediately relaying the message by live voice to the communication center of the Police Department.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "4a2260bc-b534-57bd-83e9-db6fa12e3446",
+          "convention": "utf8_char_offset",
+          "end": 2267,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:4",
+          "start": 1986
+        },
+        "quote": "“Automatic dialing device” means any alarm system which automatically sends over regular telephone lines, by direct connection or otherwise, a prerecorded voice message or coded signal indicating the existence of the emergency situation that the alarm system is designed to detect.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "c81fb3c8-8592-5a94-9e0d-e49c6ada885f",
+          "convention": "utf8_char_offset",
+          "end": 2385,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:5",
+          "start": 2268
+        },
+        "quote": "“Bank Protection Act” refers to United States Public Law 90-389 (Bank Protection Act of 1968), or amendments thereto.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "8fd8c2b3-37c2-5132-a2e2-43bbfc238495",
+          "convention": "utf8_char_offset",
+          "end": 2515,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:6",
+          "start": 2386
+        },
+        "quote": "“Burglar alarm system” refers to an alarm system signaling an entry or attempted entry into the premises protected by the system.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "31be974d-a036-50b6-a0ff-2f8063b8fc7f",
+          "convention": "utf8_char_offset",
+          "end": 2992,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:7",
+          "start": 2516
+        },
+        "quote": "“Central station” means any facility, central station, modified central station or answering service operated by any person engaged in the occupation of selling, renting, leasing, installing, maintaining, operating or repairing an alarm system, which facility is manned at all times by operators employed to receive, record and validate alarm signals transmitted to such facility and to relay information about such signals to the Police Department by a direct telephone line.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "7ec7cc02-800e-5bbe-bb54-bb167722c65d",
+          "convention": "utf8_char_offset",
+          "end": 3193,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:8",
+          "start": 2993
+        },
+        "quote": "“Direct connection” means an alarm system which has the capability of transmitting system signals to and receiving them at an agency maintained by the City; for example, a police communication center.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "1a2e4472-5bf7-55e5-aec6-bf96b7e7ef5d",
+          "convention": "utf8_char_offset",
+          "end": 3392,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:9",
+          "start": 3194
+        },
+        "quote": "“Direct line” means a telephone line leading from a central station to the communication center of the Police Department that is for use only to report emergency signals on a person-to-person basis.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "720af8eb-0746-578c-bc38-344fc9190f1b",
+          "convention": "utf8_char_offset",
+          "end": 3702,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:10",
+          "start": 3393
+        },
+        "quote": "“False alarm” means an alarm signal eliciting a response by the police where an emergency situation does not in fact exist, but does not include an alarm caused by violent conditions of nature or other extraordinary circumstances not reasonably subject to control by the alarm business operator or alarm user.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "acd07337-5947-5dd9-90ff-094dfb10cb8c",
+          "convention": "utf8_char_offset",
+          "end": 3795,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:11",
+          "start": 3703
+        },
+        "quote": "“Holdup alarm system” refers to an alarm system signaling a robbery or an attempted robbery.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "52b66ada-332c-5dc0-88c0-d4739a02e286",
+          "convention": "utf8_char_offset",
+          "end": 4077,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:12",
+          "start": 3796
+        },
+        "quote": "“Interconnect” means to connect an alarm system to a voice grade telephone line, either directly or through a mechanical device that utilizes a standard telephone, for the purpose of using the telephone line to transmit an emergency message upon the activation of the alarm system.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "ceef5cd9-6922-51e9-b6b4-f94e9d355d11",
+          "convention": "utf8_char_offset",
+          "end": 4265,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:13",
+          "start": 4078
+        },
+        "quote": "“Local alarm system” means a signaling system which when activated causes an audible or visual signaling device to be activated in or on the premises within which the system is installed.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "7886ec64-8353-55f3-86a7-cc0800824c25",
+          "convention": "utf8_char_offset",
+          "end": 4496,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:14",
+          "start": 4266
+        },
+        "quote": "“Modified central station” means an office to which remote alarm and supervisory signaling devices are connected, where operators supervise the circuits. Such modified central stations are not listed by Underwriters’ Laboratories.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "1379eac4-4595-53c6-bc24-1fc877881512",
+          "convention": "utf8_char_offset",
+          "end": 4658,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:15",
+          "start": 4497
+        },
+        "quote": "“Person” means any person, firm, partnership, association, corporation, company or organization of any kind. It does not, however, include a governmental agency.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "e117bd21-2c0e-5014-9028-dd25a5034e1b",
+          "convention": "utf8_char_offset",
+          "end": 4783,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:16",
+          "start": 4659
+        },
+        "quote": "“Police” or “Police Department” means the publicly supported Police Department of the City, or any authorized agent thereof.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "bfd7d316-9bb2-5e84-9123-8d1960a3d32a",
+          "convention": "utf8_char_offset",
+          "end": 4869,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:17",
+          "start": 4784
+        },
+        "quote": "“Police Chief” means the Chief of Police of the City, or a designated representative.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "13d13443-6e49-513b-8679-ce48c86b6dd6",
+          "convention": "utf8_char_offset",
+          "end": 5295,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:18",
+          "start": 4870
+        },
+        "quote": "“Primary trunk line” means a telephone line leading directly into the communication center of the Police Department that is for the purpose of handling emergency calls on a person-to-person basis, and which is identified as such as a specific number included among the emergency numbers listed in the telephone directory issued by the telephone company and covering the service area within the Police Department jurisdiction.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "647a2598-588d-599d-8ce3-7a258a4843af",
+          "convention": "utf8_char_offset",
+          "end": 5777,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:19",
+          "start": 5296
+        },
+        "quote": "“Proprietary system” means an alarm system sounding or recording alarm and supervisory signals to a control center located within the protected premises, the control center being under the supervision of the proprietor of the premises. If a proprietary system includes a signal line connected directly or by means of any automatic dialing device to a police communication center, a central station, modified central station or answering service, it thereby becomes an alarm system.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "7e2fcfcb-acfb-54f4-bd96-37ba638acfd4",
+          "convention": "utf8_char_offset",
+          "end": 6058,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:20",
+          "start": 5778
+        },
+        "quote": "“Remote signaling system” means an alarm signaling system which when activated by an alarm device transmits a signal from an alarm signaling device to a central location, other than the Police Department, where appropriate action is taken to investigate and respond to the signal.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "3c20b6ee-5a17-5457-9e33-6941915595f5",
+          "convention": "utf8_char_offset",
+          "end": 6109,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:21",
+          "start": 6059
+        },
+        "quote": "“Shall” is always mandatory, not merely directory.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "b7b062b1-5e79-5ec9-b4e1-669c53b0346c",
+          "convention": "utf8_char_offset",
+          "end": 6247,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:22",
+          "start": 6110
+        },
+        "quote": "“Signal line” means the transmission line through which the signal passes from one of the elements of the signal transmission to another.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "b3ab0102-b80b-5024-befc-c23548e59e20",
+          "convention": "utf8_char_offset",
+          "end": 6517,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:23",
+          "start": 6248
+        },
+        "quote": "“Special trunk line” means a telephone line leading into the communication center of the Police Department and having the primary purpose of handling emergency signals or messages originating either directly or through a central location from automatic dialing devices.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "f4496e91-d406-59ee-b3de-202906b231e3",
+          "convention": "utf8_char_offset",
+          "end": 6643,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:24",
+          "start": 6518
+        },
+        "quote": "“Telephone company” means the utility that furnishes telephone services to the City. (Code 1981 § 34-141. Code 1995 § 62-91.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 8.05.010 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "3f157487-b917-59f1-978c-92de5ad5fbf0",
+          "convention": "utf8_char_offset",
+          "end": 6699,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:8.05.010:block:25",
+          "start": 6644
+        },
+        "quote": "Cross References: Definitions generally, TMC 1.10.020 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:8.05.010#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "26a81cdba63958a0f9c0e47ee4baa443297f6946e59e67321bc5fa51a38797a1",
+      "captured_at": "2026-08-28T04:02:51.933341Z",
+      "kind": "rendered_html_capture",
+      "value": "8.05.010.26a81cdba639.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:8.05.010@26a81cdba63958a0",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:8.05.010",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:8.05.010",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 8.05.010",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/8.05.010"
+      }
+    ],
+    "dates": [],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "8.05.010",
+    "relationships": [],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": null,
+      "value": "adopted"
+    },
+    "title": "Definitions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:02:51.933341Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "26a81cdba63958a0f9c0e47ee4baa443297f6946e59e67321bc5fa51a38797a1",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "26a81cdba63958a0f9c0e47ee4baa443297f6946e59e67321bc5fa51a38797a1",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "26a81cdba63958a0f9c0e47ee4baa443297f6946e59e67321bc5fa51a38797a1",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "751d58c93a4406dbb636ce7d78a8f73a3b16bda065d5ba403be19ff66651a1d1",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "751d58c93a4406dbb636ce7d78a8f73a3b16bda065d5ba403be19ff66651a1d1",
+        "output_sha256": "bfe3b03093010228834c0057549632ab3575993e868272c8344cd08cc0e8b0e6",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "751d58c93a4406dbb636ce7d78a8f73a3b16bda065d5ba403be19ff66651a1d1",
+        "output_sha256": "951ca0ce5c80745262ef9001c6ae44cbb61bcb9a20ceb7a47c1f19d6e3397d92",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/8.05.010",
+    "retained_original": {
+      "byte_count": 39155,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/8.05.010.26a81cdba639.html",
+      "retrieved_at": "2026-08-28T04:02:51.933341Z",
+      "sha256": "26a81cdba63958a0f9c0e47ee4baa443297f6946e59e67321bc5fa51a38797a1"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

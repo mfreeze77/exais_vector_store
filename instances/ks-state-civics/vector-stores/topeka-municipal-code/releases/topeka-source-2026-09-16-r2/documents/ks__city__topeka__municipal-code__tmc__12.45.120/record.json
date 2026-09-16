@@ -1,0 +1,689 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 4403,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "dd3e756ede4b9417be15c0327b955549ad909e6f89788fe73123f7329970e48c"
+    },
+    "structured": {
+      "block_count": 28,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "f90a9d0f-6600-590d-aa2d-5e082654c417",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:section",
+      "sha256": "d363fea617fa0a1520f49f079f04a4c25d2feac236e598fd0b139307d42fe543",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 11050,
+      "char_count": 11009,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "56a8cc58b38978ea39ee7577880907f7e9330ff00fd1b8e66fff69d06a50907f"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "80b9d905-3c6b-5e3d-a28b-29550de11740",
+          "convention": "utf8_char_offset",
+          "end": 127,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:0",
+          "start": 0
+        },
+        "quote": "(a) No contractor licensed by the City, its employee, agent or subcontractor shall cause, permit or allow any of the following:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "2276d9b0-290d-52de-901a-2aca64d53aaa",
+          "convention": "utf8_char_offset",
+          "end": 165,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:1",
+          "start": 128
+        },
+        "quote": "(1) Fail to obtain the proper permit;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "c7bba86d-ca16-5d76-b5f9-d09ab7c7891d",
+          "convention": "utf8_char_offset",
+          "end": 231,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:2",
+          "start": 166
+        },
+        "quote": "(2) Fail to complete all work within the specified permit limits;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "f8839750-f731-539b-b438-b59d3d50d03d",
+          "convention": "utf8_char_offset",
+          "end": 375,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:3",
+          "start": 232
+        },
+        "quote": "(3) Fail to restore the right-of-way or easement to the same condition that existed prior to commencement of the work authorized by the permit;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "44a77410-1309-5ed6-ae09-a87b0752a51e",
+          "convention": "utf8_char_offset",
+          "end": 583,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:4",
+          "start": 376
+        },
+        "quote": "(4) Fail to establish traffic control in accordance with the Manual of Uniform Traffic Control, current City-approved edition, or such other rule, regulation, or restriction promulgated by the City Engineer;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "25ea1270-6d11-5a4c-b867-84831460b15e",
+          "convention": "utf8_char_offset",
+          "end": 722,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:5",
+          "start": 584
+        },
+        "quote": "(5) Fail to notify the City of Topeka, Engineering Division construction management, of the commencement of work authorized by the permit;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "af7c1eaf-ce25-5a74-8e70-8a4bc52d55ea",
+          "convention": "utf8_char_offset",
+          "end": 856,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:6",
+          "start": 723
+        },
+        "quote": "(6) Fail to execute work in accordance with the City of Topeka Standard Technical Specifications and Detail Drawings, latest edition;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "713a1e16-eb2d-53d1-b1ff-f9f44af46520",
+          "convention": "utf8_char_offset",
+          "end": 936,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:7",
+          "start": 857
+        },
+        "quote": "(7) To remove or interfere with any traffic control device in the right-of-way;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "edea7ad6-34a4-5c1a-a371-f10185c4a93f",
+          "convention": "utf8_char_offset",
+          "end": 1046,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:8",
+          "start": 937
+        },
+        "quote": "(8) To cut, damage or break any curb, gutter or sidewalk unless authorized under a permit issued by the City;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "055a13d8-0c05-5707-92a0-2e0e7f22fb71",
+          "convention": "utf8_char_offset",
+          "end": 1108,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:9",
+          "start": 1047
+        },
+        "quote": "(9) To interfere with traffic in violation of TMC 12.45.080 ;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "d446419d-2b5a-5fdb-b035-33de49527a9e",
+          "convention": "utf8_char_offset",
+          "end": 1282,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:10",
+          "start": 1109
+        },
+        "quote": "(10) To hinder or obstruct the repair or construction of any public improvement or other work in the City’s right-of-way pursuant to any permit issued under this article; or",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "718ef7c4-b44b-52ec-a741-c44938da447f",
+          "convention": "utf8_char_offset",
+          "end": 1342,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:11",
+          "start": 1283
+        },
+        "quote": "(11) Fail to remove an existing obsolete driveway approach.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "e5caa1da-ef28-5080-94d3-f1f4a589ba66",
+          "convention": "utf8_char_offset",
+          "end": 1346,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:12",
+          "start": 1343
+        },
+        "quote": "(b)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "bff5ef25-c84e-5b53-a5bd-41249445cf85",
+          "convention": "utf8_char_offset",
+          "end": 1350,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:13",
+          "start": 1347
+        },
+        "quote": "(1)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "814f58fa-4f7c-51e6-abf0-ceeea831f991",
+          "convention": "utf8_char_offset",
+          "end": 1701,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:14",
+          "start": 1351
+        },
+        "quote": "(i) In the event that a contractor, its employee, agent or subcontractor shall cause, permit or allow any acts prohibited in subsection (a) of this section, the contractor shall be served with a notice of the violation and given a 30-day period in which to remedy the violation or reimburse the City for the cost of repairing the defective condition.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "fd90274d-8354-5454-be69-414974bdd615",
+          "convention": "utf8_char_offset",
+          "end": 2107,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:15",
+          "start": 1702
+        },
+        "quote": "(ii) Upon receipt of a notice of violation issued by the Public Works Director, the contractor shall have 10 days to file a written notice of appeal of the notice of violation with the Public Works Director. An administrative hearing shall be set within 10 days of the receipt of the appeal. Any enforcement of the notice shall be stayed until the hearing before the City’s Administrative Hearing Officer.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "fa498a41-d15c-5ad4-b042-4f45cb5f9660",
+          "convention": "utf8_char_offset",
+          "end": 2111,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:16",
+          "start": 2108
+        },
+        "quote": "(2)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "9968c43a-b40f-5ea6-9216-bd02fc0e1020",
+          "convention": "utf8_char_offset",
+          "end": 2358,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:17",
+          "start": 2112
+        },
+        "quote": "(i) In the event that a contractor, its employee, agent or subcontractor, shall cause, permit or allow any acts prohibited in subsection (a) of this section and fail to remedy the violation, the contractor’s license shall be suspended as follows:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "1be94a1c-da3e-5118-93cc-abdf5a19197d",
+          "convention": "utf8_char_offset",
+          "end": 2508,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:18",
+          "start": 2359
+        },
+        "quote": "(A) Upon the first violation of subsection (a) of this section, the contractor’s license will be suspended by the Public Works Director for one week.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "ee623dfa-4552-5c84-aae3-1a51083fafbd",
+          "convention": "utf8_char_offset",
+          "end": 2644,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:19",
+          "start": 2509
+        },
+        "quote": "(B) Upon the second violation of subsection (a) of this section, the contractor’s license shall be suspended for a period of one month.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "4951a4bd-9c74-51ec-bd88-aed5120cbad3",
+          "convention": "utf8_char_offset",
+          "end": 2778,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:20",
+          "start": 2645
+        },
+        "quote": "(C) Upon the third violation of subsection (a) of this section, the contractor’s license shall be suspended for a period of one year.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "6c28162f-122c-5392-aad6-3a65ee72ad79",
+          "convention": "utf8_char_offset",
+          "end": 2927,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:21",
+          "start": 2779
+        },
+        "quote": "(D) Upon a fourth or subsequent violation of subsection (a) of this section, the contractor’s license shall be suspended for a period of five years.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "0584ab61-5bc1-508f-ac41-93ce1352a42f",
+          "convention": "utf8_char_offset",
+          "end": 3333,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:22",
+          "start": 2928
+        },
+        "quote": "(ii) Upon receipt of a notice of suspension issued by the Public Works Director, the contractor shall have 10 days to file a written notice of appeal of the license suspension with the Public Works Director. An administrative hearing shall be set within 10 days of the receipt of the appeal. The suspension of the license shall be stayed until the hearing before the City’s Administrative Hearing Officer.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "9e80f4c0-500f-56bc-9a7b-84dceb7b72aa",
+          "convention": "utf8_char_offset",
+          "end": 3469,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:23",
+          "start": 3334
+        },
+        "quote": "(iii) During the period of any license suspension, a contractor may not apply for or obtain any building or right-of-way access permit.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "90a1825c-252a-5f7d-8ef8-dc90a39ba9ca",
+          "convention": "utf8_char_offset",
+          "end": 3760,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:24",
+          "start": 3470
+        },
+        "quote": "(iv) The contractor whose license is suspended shall only be eligible to apply for or obtain a building or right-of-way access permit after completion of the term of suspension and correcting the defective condition or reimbursing the City for the cost of repairing the defective condition.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "8324b5e5-6bab-532b-93bc-702dcffe6822",
+          "convention": "utf8_char_offset",
+          "end": 4067,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:25",
+          "start": 3761
+        },
+        "quote": "(c) Provided, however, a contractor performing work for the City under contract shall be given notice of a breach of performance and an opportunity to cure as set forth in the contract documents prior to issuance of a notice of violation and/or suspension of the contractor’s license under this subsection.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 26",
+        "locator": {
+          "block_index": 26,
+          "component_id": "940a3af9-0b44-5a65-adc0-05538a650673",
+          "convention": "utf8_char_offset",
+          "end": 4344,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:26",
+          "start": 4068
+        },
+        "quote": "(d) Provided, however, entities holding a valid franchise agreement with the City shall be given notice of violation and an opportunity to cure in accordance with the franchise agreement prior to enforcement under this section. (Ord. 18916 § 10, 6-26-07. Code 1995 § 130-164.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 12.45.120 block 27",
+        "locator": {
+          "block_index": 27,
+          "component_id": "7c1ac303-fec5-55a1-ab27-0e2dee23a3e5",
+          "convention": "utf8_char_offset",
+          "end": 4402,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:12.45.120:block:27",
+          "start": 4345
+        },
+        "quote": "Cross References: Public Works Department, TMC 2.20.100 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120:block:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 18916",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 4321,
+          "start": 4297
+        },
+        "quote": "Ord. 18916 § 10, 6-26-07",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:12.45.120#history:18916",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "7bd13a8f6066123dc166ce4a175ef75bb049dda2faadcf02489b617d19c1779f",
+      "captured_at": "2026-08-28T04:23:30.768710Z",
+      "kind": "rendered_html_capture",
+      "value": "12.45.120.7bd13a8f6066.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:12.45.120@7bd13a8f6066123d",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:12.45.120",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:12.45.120",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 12.45.120",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/12.45.120"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.45.120#history:18916",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "6-26-07"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "12.45.120",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.45.120#history:18916",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:18916"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:12.45.120#history:18916",
+      "value": "adopted"
+    },
+    "title": "Suspension or revocation of license."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:23:30.768710Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "7bd13a8f6066123dc166ce4a175ef75bb049dda2faadcf02489b617d19c1779f",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "7bd13a8f6066123dc166ce4a175ef75bb049dda2faadcf02489b617d19c1779f",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "7bd13a8f6066123dc166ce4a175ef75bb049dda2faadcf02489b617d19c1779f",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "56a8cc58b38978ea39ee7577880907f7e9330ff00fd1b8e66fff69d06a50907f",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "56a8cc58b38978ea39ee7577880907f7e9330ff00fd1b8e66fff69d06a50907f",
+        "output_sha256": "dd3e756ede4b9417be15c0327b955549ad909e6f89788fe73123f7329970e48c",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "56a8cc58b38978ea39ee7577880907f7e9330ff00fd1b8e66fff69d06a50907f",
+        "output_sha256": "d363fea617fa0a1520f49f079f04a4c25d2feac236e598fd0b139307d42fe543",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/12.45.120",
+    "retained_original": {
+      "byte_count": 39121,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/12.45.120.7bd13a8f6066.html",
+      "retrieved_at": "2026-08-28T04:23:30.768710Z",
+      "sha256": "7bd13a8f6066123dc166ce4a175ef75bb049dda2faadcf02489b617d19c1779f"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

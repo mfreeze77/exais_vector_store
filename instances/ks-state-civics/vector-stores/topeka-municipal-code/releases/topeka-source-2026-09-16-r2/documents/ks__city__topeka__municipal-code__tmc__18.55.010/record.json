@@ -1,0 +1,801 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 7698,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "441f7ed35fcb14518452da815a6b3aab7e1c90eca3b0e6e02b4ed112ddb0e2dd"
+    },
+    "structured": {
+      "block_count": 35,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 24,
+      "path": "structured.json",
+      "root_component_id": "9dc2946b-ea53-588e-9159-ab439e17309b",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:section",
+      "sha256": "b3dbb2a22c9953662b76b326dc746d85af5c8275556494239924b076ffcf710c",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 19028,
+      "char_count": 18805,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "6c476e17f02348104505f0893fd16457e3528ff543d452cbff7b32160f4bc255"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "b6815168-8e3f-597b-b89f-6a5af1d4c795",
+          "convention": "utf8_char_offset",
+          "end": 286,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:0",
+          "start": 0
+        },
+        "quote": "“Abandonment” means the relinquishment of property, or a cessation of the use of the property, for a period of one year (365 calendar days) or longer by the owner with the intention neither of transferring rights to the property to another owner nor of resuming the use of the property.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "b376b13c-5af9-56fc-88a8-1328f65c9eac",
+          "convention": "utf8_char_offset",
+          "end": 427,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:1",
+          "start": 287
+        },
+        "quote": "“Abutting” means having property or district lines in common; e.g., two lots are abutting if they have at least one property line in common.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "62f8db5e-5695-575b-a329-442f903fdd2e",
+          "convention": "utf8_char_offset",
+          "end": 588,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:2",
+          "start": 428
+        },
+        "quote": "“Accessory building coverage ratio” means the cumulative area for the footprints of all accessory buildings compared to the footprint of the principal building.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "9969bda9-2ee5-587d-830c-2afdea8040d5",
+          "convention": "utf8_char_offset",
+          "end": 1018,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:3",
+          "start": 589
+        },
+        "quote": "“Accessory building or use” means a building or use which: (1) is subordinate to and serves a principal building or principal use; (2) is subordinate in area, extent, or purpose to the principal building or principal use served; (3) contributes to the comfort, convenience, or necessity of occupants of the principal building or principal use; and (4) is located on the same zoning lot as the principal building or principal use.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "6df14f1f-3650-54dd-be1f-fdf792160cb0",
+          "convention": "utf8_char_offset",
+          "end": 1315,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:4",
+          "start": 1019
+        },
+        "quote": "“Accessory dwelling unit” or ADU means a single dwelling unit that is incidental to, subordinate to, and located on the same zoning lot as the principal building. The ADU may either be integrated into or added on to the principal dwelling or established as a detached accessory dwelling building.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "4f76f193-c574-522a-802f-f94c9f29b9e8",
+          "convention": "utf8_char_offset",
+          "end": 1455,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:5",
+          "start": 1316
+        },
+        "quote": "“Addition” means any construction which increases the size of a building such as a porch, attached garage or carport or a new room or wing.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "137fe215-b365-5eec-8282-05feb5dde0be",
+          "convention": "utf8_char_offset",
+          "end": 1510,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:6",
+          "start": 1456
+        },
+        "quote": "“Adjacent” means nearby, but not necessarily touching.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "b804e821-28f0-51f2-b537-ceee52268cb7",
+          "convention": "utf8_char_offset",
+          "end": 1815,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:7",
+          "start": 1511
+        },
+        "quote": "“Adult motion picture theater” means an enclosed building used for presenting filmed material distinguished or characterized by an emphasis on matter depicting, describing or relating to “specified sexual activities” or “specified anatomical areas” (as defined herein) for observation by patrons therein.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "36ec57d9-118d-5ee3-97c9-e1ddf7ed8b2d",
+          "convention": "utf8_char_offset",
+          "end": 2590,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:8",
+          "start": 1816
+        },
+        "quote": "“Agriculture” means land devoted to the production of plants, animals, fish, or horticultural products, including but not limited to: forages, grains and feed crops; dairy animals and dairy products; poultry and poultry products; beef, cattle, sheep, swine and horses; aquaculture; trees and forest products; fruits, nuts and berries; vegetables; or nursery, floral, ornamental and greenhouse products. Land devoted to agricultural use shall not include those lands which are used for recreational purposes; suburban residential acreages, rural homesites or farm homesites and yard plots whose primary function is for residential or recreational purposes even though such properties may produce or maintain some of those plants or animals listed in the foregoing definition.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "3fc9a9b0-fbdc-5b4d-8ca9-e56f5c6e874e",
+          "convention": "utf8_char_offset",
+          "end": 2695,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:9",
+          "start": 2591
+        },
+        "quote": "“Alley” means a public thoroughfare which affords only a secondary means of access to abutting property.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "ff2cce04-036d-5880-ae21-e8c4e5915e24",
+          "convention": "utf8_char_offset",
+          "end": 3078,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:10",
+          "start": 2696
+        },
+        "quote": "“Alteration” means any change or rearrangement in the supporting members of an existing building, such as bearing walls, columns, beams, girders or interior partitions, as well as any change in doors or windows, or any enlargement to or diminution of a building or structure, whether horizontally or vertically, or the moving of a building or structure from one location to another.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "bfbfb1c1-babd-5758-8766-9dcc5414c243",
+          "convention": "utf8_char_offset",
+          "end": 3240,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:11",
+          "start": 3079
+        },
+        "quote": "“Animal care and services, type I” means a facility where medical and/or pet grooming services are provided within an enclosed building to common household pets.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "4efa3d4a-a165-52da-83a1-a1848259d3bf",
+          "convention": "utf8_char_offset",
+          "end": 3462,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:12",
+          "start": 3241
+        },
+        "quote": "“Animal care and services, type II” means a facility where the following services are provided for animals: (1) medical services within an enclosed building; (2) pet day care; and (3) indoor kenneling for overnight stays.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "7523f3d3-c42d-547a-85c7-5b9d59557418",
+          "convention": "utf8_char_offset",
+          "end": 3650,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:13",
+          "start": 3463
+        },
+        "quote": "“Antenna” means an exterior apparatus designed for transmitting or receiving television, AM/FM radio, digital, microwave, cellular, telephone or similar forms of electronic communication.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "07a846b8-ba27-5c37-be43-f0a7ec57ce85",
+          "convention": "utf8_char_offset",
+          "end": 4010,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:14",
+          "start": 3651
+        },
+        "quote": "“Apartment hotel” means a building designed for or containing both apartments or suites of rooms, which caters primarily to tenants with flexible occupancy duration needs. Incidental businesses may be conducted only as a service for persons residing therein, provided there is no entrance to such place(s) of business except from the interior of the building.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "d8c6894c-154e-5ad7-9e00-a7a140138fcb",
+          "convention": "utf8_char_offset",
+          "end": 4029,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:15",
+          "start": 4011
+        },
+        "quote": "Area. See “tract.”",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "f1199ed4-9153-5614-a83b-aae4959e6f24",
+          "convention": "utf8_char_offset",
+          "end": 4747,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:16",
+          "start": 4030
+        },
+        "quote": "“Artisan manufacturing” means the production and assembly of finished products or component parts, typically by hand, and including design, processing, fabrication, assembly, treatment, and packaging of finished products. Typical artisan manufacturing trades include, but are not limited to: food and bakery products; nonalcoholic beverages; printmaking; leather products; jewelry and clothing/apparel; metal work; woodwork; furniture; and glass or ceramic production. Artisan manufacturing differs from other forms of manufacturing as it is substantially limited in the scale of production and is controlled in a manner such that it shall not cause noise, odor, or detectable vibration onto any neighboring property.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "7762be05-3e64-5090-a17f-34cd0f88a02a",
+          "convention": "utf8_char_offset",
+          "end": 5410,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:17",
+          "start": 4748
+        },
+        "quote": "“Assisted living facility” means a facility caring for six or more individuals unrelated to the administrator, operator or owner who, by choice or due to functional impairment, may need personal care and/or supervised nursing care to compensate for activities of daily living limitations. The facility includes individual living units or apartments for residents and provides or coordinates a range of services including personal care or supervised nursing care on a 24-hour-a-day basis for the support of resident independence. Skilled nursing services are typically provided on an intermittent or limited term basis, or if limited in scope, on a regular basis.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "23740a2f-961a-544b-8c95-1c0f67213ce4",
+          "convention": "utf8_char_offset",
+          "end": 5495,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:18",
+          "start": 5411
+        },
+        "quote": "“Automobile or vehicle car wash” means a facility for the washing of motor vehicles.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "2d70f27a-ab6f-58f3-93ba-83de285d7ab9",
+          "convention": "utf8_char_offset",
+          "end": 5880,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:19",
+          "start": 5496
+        },
+        "quote": "“Automobile wrecking and/or salvage yard” means an area not enclosed within a building which is maintained, operated, or used for the storing, keeping, buying, or selling of junk as defined in Chapter 5.135 TMC where motor vehicles, heavy appliances, or machinery not in operable condition is disassembled, dismantled, junked, stored, wrecked, or parts thereof are bought and/or sold.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "d101b1be-bac5-5492-9a4a-7cb7a8983d0a",
+          "convention": "utf8_char_offset",
+          "end": 5908,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:20",
+          "start": 5881
+        },
+        "quote": "Automotive Service Station.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "2fe553c3-a9d2-55b3-96e8-c3fecafc3025",
+          "convention": "utf8_char_offset",
+          "end": 6195,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:21",
+          "start": 5909
+        },
+        "quote": "“Type 1” means a facility which dispenses automotive fuels and oil together with the retail sales of incidental merchandise such as packaged beer, nonalcoholic beverages, ice, candy, cigarettes, snacks and convenience packaged foods. (Also known as “convenience stores with gas pumps.”)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "fb13636d-f530-5e42-aa89-88de03bb96bf",
+          "convention": "utf8_char_offset",
+          "end": 6559,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:22",
+          "start": 6196
+        },
+        "quote": "“Type 2” means a facility which dispenses automotive fuels and oil together with replacement automotive parts such as fan belts, hoses, sparkplugs, tires and tubes, ignition parts, batteries, shock absorbers, fuses, etc., including incidental merchandise as defined above. Minor automotive services shall be permitted, which includes minor repair and replacement.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 23",
+        "locator": {
+          "block_index": 23,
+          "component_id": "1aa99a66-0305-5745-8d14-2a99676ce9c0",
+          "convention": "utf8_char_offset",
+          "end": 6576,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:23",
+          "start": 6560
+        },
+        "quote": "(i) Lubrication.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:23#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 24",
+        "locator": {
+          "block_index": 24,
+          "component_id": "25d14bad-e0a5-529b-bc7e-6c5981752fad",
+          "convention": "utf8_char_offset",
+          "end": 6594,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:24",
+          "start": 6577
+        },
+        "quote": "(ii) Tire repair.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:24#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 25",
+        "locator": {
+          "block_index": 25,
+          "component_id": "2501dbb9-1794-530a-b698-0e21145c27a2",
+          "convention": "utf8_char_offset",
+          "end": 6634,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:25",
+          "start": 6595
+        },
+        "quote": "(iii) Brake repair and wheel balancing.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:25#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 26",
+        "locator": {
+          "block_index": 26,
+          "component_id": "97a61cd5-ec7d-546a-a13e-79c4e7d5d847",
+          "convention": "utf8_char_offset",
+          "end": 6674,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:26",
+          "start": 6635
+        },
+        "quote": "(iv) Muffler and exhaust system repair.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:26#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 27",
+        "locator": {
+          "block_index": 27,
+          "component_id": "3202f6b2-44b7-5f40-91d3-785ec18ed2ae",
+          "convention": "utf8_char_offset",
+          "end": 6706,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:27",
+          "start": 6675
+        },
+        "quote": "(v) Shock absorber replacement.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:27#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 28",
+        "locator": {
+          "block_index": 28,
+          "component_id": "1932bbd2-8ea6-5b15-a72e-7405fbd45702",
+          "convention": "utf8_char_offset",
+          "end": 6740,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:28",
+          "start": 6707
+        },
+        "quote": "(vi) Engine adjustment (tune-up).",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:28#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 29",
+        "locator": {
+          "block_index": 29,
+          "component_id": "6042f494-9ac7-5c47-a362-432d1deb4767",
+          "convention": "utf8_char_offset",
+          "end": 6882,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:29",
+          "start": 6741
+        },
+        "quote": "(vii) Replacement of pumps, cooling systems, generators, alternators, wires, starters, air conditioners, bearings, and other similar devices.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:29#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 30",
+        "locator": {
+          "block_index": 30,
+          "component_id": "c830cd09-7c76-5ec2-92af-748fc7868468",
+          "convention": "utf8_char_offset",
+          "end": 6903,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:30",
+          "start": 6883
+        },
+        "quote": "(viii) Radio repair.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:30#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 31",
+        "locator": {
+          "block_index": 31,
+          "component_id": "2d7597ec-3d81-5267-848c-3c596b06fda1",
+          "convention": "utf8_char_offset",
+          "end": 6927,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:31",
+          "start": 6904
+        },
+        "quote": "(ix) Glass replacement.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:31#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 32",
+        "locator": {
+          "block_index": 32,
+          "component_id": "12f381c7-d198-5c9c-8fa2-4674c49df3c9",
+          "convention": "utf8_char_offset",
+          "end": 7147,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:32",
+          "start": 6928
+        },
+        "quote": "(x) And other similar repair and replacement services normally deemed to be emergency and convenience services; however, the same shall not include drive train units such as the engine, transmission or drive components.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:32#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 33",
+        "locator": {
+          "block_index": 33,
+          "component_id": "d22cd75d-7e8f-5b90-a034-b963a254f8b1",
+          "convention": "utf8_char_offset",
+          "end": 7387,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:33",
+          "start": 7148
+        },
+        "quote": "“Type 3” means a facility which may include those uses defined in types 1 and 2, and specifically includes repair, rebuilding and replacement of drive train units of automobiles, pickup trucks, street vans, motorcycles and racing vehicles.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:33#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 18.55.010 block 34",
+        "locator": {
+          "block_index": 34,
+          "component_id": "bff5983d-961e-5000-ad35-ba0c4ba431bf",
+          "convention": "utf8_char_offset",
+          "end": 7697,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:18.55.010:block:34",
+          "start": 7388
+        },
+        "quote": "“Awning” means a roof-like cover that projects from the wall of a building to shield a doorway, walkway, or window from inclement weather or the sun. Awnings are often made of fabric or flexible material supported by a rigid frame and may be retracted into the face of the building. (Ord. 20500 § 1, 7-30-24.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010:block:34#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20500",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 7695,
+          "start": 7672
+        },
+        "quote": "Ord. 20500 § 1, 7-30-24",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:18.55.010#history:20500",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "1038020a0ae01fbd0afe2f5361beebc96f67c75e548ae5e02da70a227c5a8761",
+      "captured_at": "2026-08-28T04:49:04.381357Z",
+      "kind": "rendered_html_capture",
+      "value": "18.55.010.1038020a0ae0.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:18.55.010@1038020a0ae01fbd",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:18.55.010",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:18.55.010",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 18.55.010",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/18.55.010"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.55.010#history:20500",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "7-30-24"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "18.55.010",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.55.010#history:20500",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20500"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:18.55.010#history:20500",
+      "value": "adopted"
+    },
+    "title": "“A” definitions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T04:49:04.381357Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "1038020a0ae01fbd0afe2f5361beebc96f67c75e548ae5e02da70a227c5a8761",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "1038020a0ae01fbd0afe2f5361beebc96f67c75e548ae5e02da70a227c5a8761",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "1038020a0ae01fbd0afe2f5361beebc96f67c75e548ae5e02da70a227c5a8761",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "6c476e17f02348104505f0893fd16457e3528ff543d452cbff7b32160f4bc255",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "6c476e17f02348104505f0893fd16457e3528ff543d452cbff7b32160f4bc255",
+        "output_sha256": "441f7ed35fcb14518452da815a6b3aab7e1c90eca3b0e6e02b4ed112ddb0e2dd",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "6c476e17f02348104505f0893fd16457e3528ff543d452cbff7b32160f4bc255",
+        "output_sha256": "b3dbb2a22c9953662b76b326dc746d85af5c8275556494239924b076ffcf710c",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/18.55.010",
+    "retained_original": {
+      "byte_count": 40611,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/18.55.010.1038020a0ae0.html",
+      "retrieved_at": "2026-08-28T04:49:04.381357Z",
+      "sha256": "1038020a0ae01fbd0afe2f5361beebc96f67c75e548ae5e02da70a227c5a8761"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

@@ -1,0 +1,545 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 2714,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "7424a8e22c2c798b98cadc29edd376511dc6a1f5265dadfae8236bbc09626a7d"
+    },
+    "structured": {
+      "block_count": 17,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "ce3f5298-cc9f-520b-8154-99d53978c564",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:section",
+      "sha256": "ebe2473c27725a141d5f25318c81cea1fb7853feffc9004d8503d3258e659e57",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 7111,
+      "char_count": 7089,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "5ad5ba6724f7e08758dd89dd68d84612d14b14039eb8b0eb1bd14d4c6c058189"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "48555799-0ce6-52fc-a5aa-c849b3efe6df",
+          "convention": "utf8_char_offset",
+          "end": 432,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:0",
+          "start": 0
+        },
+        "quote": "The City will consider granting tax exemptions only upon a clear and factual showing of direct economic benefit to the City through advancement of its economic development goals, including the creation of additional jobs and the stimulation of additional private investment. The City Council, in determining the amount and term of exemption to be granted, shall consider various factors including, but not limited to, the following:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "6a796c04-40a4-5bbd-8f1f-bf3273cec2af",
+          "convention": "utf8_char_offset",
+          "end": 548,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:1",
+          "start": 433
+        },
+        "quote": "(a) The assessed valuation of the property in relation to the economic benefit to the City of increased employment.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "048396ae-135a-51b7-8649-e9594d34d13b",
+          "convention": "utf8_char_offset",
+          "end": 714,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:2",
+          "start": 549
+        },
+        "quote": "(b) The gain in tax revenue which may result from the new or expanded business, including the increase in the property tax base upon the expiration of the exemption.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "7ba86486-d0bc-5c6a-bee3-0c87f47ea5a1",
+          "convention": "utf8_char_offset",
+          "end": 843,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:3",
+          "start": 715
+        },
+        "quote": "(c) The contribution that the new or expanded business will make towards increased employment and earnings within the community.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "e77b2887-6e81-52e0-878a-d8066749d1e5",
+          "convention": "utf8_char_offset",
+          "end": 955,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:4",
+          "start": 844
+        },
+        "quote": "(d) The number of new jobs created directly by the business in relation to the amount of tax exemption granted.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "2fa625de-1b06-5663-9095-302e7be81ebc",
+          "convention": "utf8_char_offset",
+          "end": 1058,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:5",
+          "start": 956
+        },
+        "quote": "(e) The kinds of jobs created in relation to the type of skills available from the local labor market.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "846733b8-92ca-537b-a23f-03614157edce",
+          "convention": "utf8_char_offset",
+          "end": 1164,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:6",
+          "start": 1059
+        },
+        "quote": "(f) The utilization by the business of labor skills and abilities of unemployed persons in the community.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "5e1a13a6-1e99-54dc-b909-5ece0531f217",
+          "convention": "utf8_char_offset",
+          "end": 1275,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:7",
+          "start": 1165
+        },
+        "quote": "(g) The degree to which the business improves the diversification of the economy of the City and its environs.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "3e2e849d-536c-59a4-9d64-9a893366159f",
+          "convention": "utf8_char_offset",
+          "end": 1431,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:8",
+          "start": 1276
+        },
+        "quote": "(h) The degree to which the ultimate market products are outside the community, recognizing that outside markets bring in “new money” to the local economy.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "f61c60fb-334e-5dca-8669-362ea562bce0",
+          "convention": "utf8_char_offset",
+          "end": 1515,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:9",
+          "start": 1432
+        },
+        "quote": "(i) The potential of the business for future expansion and additional job creation.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "b64e15eb-9094-50c7-8d70-fa3212e6abdf",
+          "convention": "utf8_char_offset",
+          "end": 1707,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:10",
+          "start": 1516
+        },
+        "quote": "(j) The beneficial impacts the business may have by creating any other new jobs and businesses, including the utilization of local products or other materials and substances in manufacturing.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "78045565-0822-5606-8f51-78c41d748d85",
+          "convention": "utf8_char_offset",
+          "end": 1890,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:11",
+          "start": 1708
+        },
+        "quote": "(k) The beneficial economic impact the business will have on a particular area of the City, including designated enterprise zones and areas of needed revitalization or redevelopment.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "94cf9928-16dc-5116-acd7-aceb77b65469",
+          "convention": "utf8_char_offset",
+          "end": 2082,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:12",
+          "start": 1891
+        },
+        "quote": "(l) The compatibility of the location of the business with land use and development plans of the City and the availability of existing infrastructure facilities and essential public services.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "a6344fe3-db06-5c95-8e14-d3bf50eab89b",
+          "convention": "utf8_char_offset",
+          "end": 2262,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:13",
+          "start": 2083
+        },
+        "quote": "(m) The extent to which additional direct or indirect public costs to the City and to other local units would be necessary, such as the cost of the extension of public facilities.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "2e4b2559-d36c-5c2a-99de-2dea9ce2abc6",
+          "convention": "utf8_char_offset",
+          "end": 2582,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:14",
+          "start": 2263
+        },
+        "quote": "(n) The extent to which the economic and employment benefits of the tax exemption accrue to the residents and taxpayers of those taxing subdivisions which indirectly subsidize the business as a result of the foregone tax revenue. (Ord. 17270 § 8, 6-2-98; Ord. 16349 § 8, 7-23-91. Code 1981 § 42-38. Code 1995 § 138-83.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "c11b5bc8-b464-5286-9ba3-7504214dfd1f",
+          "convention": "utf8_char_offset",
+          "end": 2640,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:15",
+          "start": 2583
+        },
+        "quote": "Cross References: City Council – Mayor, Chapter 2.15 TMC.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 3.55.080 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "3a651866-4740-58b9-be36-105ffc38c63b",
+          "convention": "utf8_char_offset",
+          "end": 2713,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:3.55.080:block:16",
+          "start": 2641
+        },
+        "quote": "State Law References: Conditions for granting exemption, K.S.A. 79-251 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 17270",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2516,
+          "start": 2494
+        },
+        "quote": "Ord. 17270 § 8, 6-2-98",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080#history:17270",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 16349",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 2541,
+          "start": 2518
+        },
+        "quote": "Ord. 16349 § 8, 7-23-91",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:3.55.080#history:16349",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "aeb09650634fb81275a2ae13288d2e4dd7dac2186f051339afcb2269d88e2e11",
+      "captured_at": "2026-08-28T03:47:00.931516Z",
+      "kind": "rendered_html_capture",
+      "value": "3.55.080.aeb09650634f.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:3.55.080@aeb09650634fb812",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:3.55.080",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:3.55.080",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 3.55.080",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/3.55.080"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:3.55.080#history:17270",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "6-2-98"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:3.55.080#history:16349",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "7-23-91"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "3.55.080",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:3.55.080#history:17270",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:17270"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:3.55.080#history:16349",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:16349"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:3.55.080#history:17270",
+      "value": "adopted"
+    },
+    "title": "Standards for determining benefits."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T03:47:00.931516Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "aeb09650634fb81275a2ae13288d2e4dd7dac2186f051339afcb2269d88e2e11",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "aeb09650634fb81275a2ae13288d2e4dd7dac2186f051339afcb2269d88e2e11",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "aeb09650634fb81275a2ae13288d2e4dd7dac2186f051339afcb2269d88e2e11",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "5ad5ba6724f7e08758dd89dd68d84612d14b14039eb8b0eb1bd14d4c6c058189",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "5ad5ba6724f7e08758dd89dd68d84612d14b14039eb8b0eb1bd14d4c6c058189",
+        "output_sha256": "7424a8e22c2c798b98cadc29edd376511dc6a1f5265dadfae8236bbc09626a7d",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "5ad5ba6724f7e08758dd89dd68d84612d14b14039eb8b0eb1bd14d4c6c058189",
+        "output_sha256": "ebe2473c27725a141d5f25318c81cea1fb7853feffc9004d8503d3258e659e57",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/3.55.080",
+    "retained_original": {
+      "byte_count": 32754,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/3.55.080.aeb09650634f.html",
+      "retrieved_at": "2026-08-28T03:47:00.931516Z",
+      "sha256": "aeb09650634fb81275a2ae13288d2e4dd7dac2186f051339afcb2269d88e2e11"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

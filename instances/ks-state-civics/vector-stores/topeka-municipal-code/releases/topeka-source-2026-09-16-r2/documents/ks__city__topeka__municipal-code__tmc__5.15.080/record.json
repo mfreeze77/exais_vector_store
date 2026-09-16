@@ -1,0 +1,609 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 4138,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "10b1b8e7cf1b5d946ae2b014ff41b71b5c06b48716556bed776d976b49c626be"
+    },
+    "structured": {
+      "block_count": 23,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "4b87a9d2-db7e-56d5-8840-ea93fb8dc4ce",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:section",
+      "sha256": "2055f02d7a5526a1d734280ff4f592732ea2e4c384f5efefca55a77838406277",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 10250,
+      "char_count": 10237,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "a5fb22cba7b33573d6e36324e3512fc4d199698e2f6a88e6438e8359eb896b12"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "23d50a90-e6c5-5740-90d8-1d5cf2d91db7",
+          "convention": "utf8_char_offset",
+          "end": 297,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:0",
+          "start": 0
+        },
+        "quote": "(a) The Police Chief, after notice and a hearing, may revoke or suspend an alarm business license issued hereunder if, after investigation, the Police Chief determines that the licensee, or if the licensee is an organization, any of its officers, directors, partners, associates or employees, has:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "d56c7b55-9e58-5341-a8c4-345c12afd3ef",
+          "convention": "utf8_char_offset",
+          "end": 446,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:1",
+          "start": 298
+        },
+        "quote": "(1) Made any false statement or given any false information in connection with an application for a license or a renewal or a reinstatement thereof;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "24948103-9048-5400-9791-7b8e0289bed8",
+          "convention": "utf8_char_offset",
+          "end": 481,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:2",
+          "start": 447
+        },
+        "quote": "(2) Violated any provision hereof;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "13618e31-d9f8-58f8-a561-2a1f5107d25a",
+          "convention": "utf8_char_offset",
+          "end": 570,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:3",
+          "start": 482
+        },
+        "quote": "(3) Committed any act which would be grounds for denial of an application for a license;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 4",
+        "locator": {
+          "block_index": 4,
+          "component_id": "369c1491-6215-5883-9b8b-2d114356875a",
+          "convention": "utf8_char_offset",
+          "end": 804,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:4",
+          "start": 571
+        },
+        "quote": "(4) Failed to report to the Chief of Police, within five business days, any charge, arrest, judgment, conviction, sentencing or diversion for a criminal act set forth in this article that constitutes a reason for denial of a license.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:4#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 5",
+        "locator": {
+          "block_index": 5,
+          "component_id": "4c98de22-799d-5470-bbc9-dd71c6fd442e",
+          "convention": "utf8_char_offset",
+          "end": 936,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:5",
+          "start": 805
+        },
+        "quote": "(b) If the Police Chief revokes an alarm business license under the provisions of this section, the following procedure will apply:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:5#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 6",
+        "locator": {
+          "block_index": 6,
+          "component_id": "bb4681cd-2608-5396-b05c-ff487f7ee660",
+          "convention": "utf8_char_offset",
+          "end": 1084,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:6",
+          "start": 937
+        },
+        "quote": "(1) The Police Chief shall send to the licensee by certified mail, return receipt requested, written notice of the revocation, which shall include:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:6#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 7",
+        "locator": {
+          "block_index": 7,
+          "component_id": "55825f5b-7029-5787-ae9e-5f18255c9b27",
+          "convention": "utf8_char_offset",
+          "end": 1111,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:7",
+          "start": 1085
+        },
+        "quote": "(i) Reason for revocation;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:7#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 8",
+        "locator": {
+          "block_index": 8,
+          "component_id": "b371220b-d97f-52b0-9f8c-8ca267da4194",
+          "convention": "utf8_char_offset",
+          "end": 1155,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:8",
+          "start": 1112
+        },
+        "quote": "(ii) Effective time and date of revocation;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:8#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 9",
+        "locator": {
+          "block_index": 9,
+          "component_id": "7590348f-8ab1-5272-ab92-de1f593060b2",
+          "convention": "utf8_char_offset",
+          "end": 1247,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:9",
+          "start": 1156
+        },
+        "quote": "(iii) A statement regarding any action which may be taken so the license may be reinstated;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:9#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 10",
+        "locator": {
+          "block_index": 10,
+          "component_id": "634b241c-e928-54c6-95a7-ef051b51c2b9",
+          "convention": "utf8_char_offset",
+          "end": 1335,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:10",
+          "start": 1248
+        },
+        "quote": "(iv) The date by which the licensee must surrender the license to the Police Chief; and",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:10#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 11",
+        "locator": {
+          "block_index": 11,
+          "component_id": "d4c49135-10fa-56d3-87f3-a3cadacfb1a6",
+          "convention": "utf8_char_offset",
+          "end": 1453,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:11",
+          "start": 1336
+        },
+        "quote": "(v) A statement of the right to reconsideration of, and appeal from, the revocation and the procedure to be followed.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:11#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 12",
+        "locator": {
+          "block_index": 12,
+          "component_id": "1a2eca52-b027-5804-9d9b-f8cf2befa24c",
+          "convention": "utf8_char_offset",
+          "end": 1787,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:12",
+          "start": 1454
+        },
+        "quote": "(2) The licensee may request reconsideration of the revocation by the Police Chief by filing a written request for a hearing within 10 days after receipt of the notice of revocation. The filing of the request for hearing shall stay the action of the Police Chief in revoking the license until the City Manager makes a final decision.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:12#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 13",
+        "locator": {
+          "block_index": 13,
+          "component_id": "b9c9b490-8ed6-58cf-aa85-394613a004b7",
+          "convention": "utf8_char_offset",
+          "end": 1895,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:13",
+          "start": 1788
+        },
+        "quote": "(3) If a request for hearing is not made within the 10 days, the action of the Police Chief shall be final.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:13#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 14",
+        "locator": {
+          "block_index": 14,
+          "component_id": "85063338-8726-5fc0-a976-6e1494d7c2ab",
+          "convention": "utf8_char_offset",
+          "end": 2224,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:14",
+          "start": 1896
+        },
+        "quote": "(4) The City Manager shall serve as Hearing Officer on a reconsideration of a notice of revocation under this section and shall consider evidence presented by any interested person. The City Manager shall make a decision on the basis of a preponderance of the credible evidence presented at the hearing, which shall be recorded.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:14#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 15",
+        "locator": {
+          "block_index": 15,
+          "component_id": "f2b5445c-1c09-5741-9bb5-f70e4b4536f5",
+          "convention": "utf8_char_offset",
+          "end": 2569,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:15",
+          "start": 2225
+        },
+        "quote": "(5) The City Manager shall render a decision within 10 days of the hearing and that decision shall affirm, reverse or modify the action of the Police Chief. The City Manager shall send to the licensee by certified mail, return receipt requested, written notice of the decision with a copy to the Police Chief. This written notice shall include:",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:15#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 16",
+        "locator": {
+          "block_index": 16,
+          "component_id": "1c31429a-7951-5ba7-813b-032ad515420e",
+          "convention": "utf8_char_offset",
+          "end": 2719,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:16",
+          "start": 2570
+        },
+        "quote": "(i) If the action of the Police Chief is affirmed: the reason for such and date by which the licensee must surrender the license to the Police Chief;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:16#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 17",
+        "locator": {
+          "block_index": 17,
+          "component_id": "7d76b118-16d1-539c-aad5-b44fa0b23b15",
+          "convention": "utf8_char_offset",
+          "end": 2800,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:17",
+          "start": 2720
+        },
+        "quote": "(ii) If the action of the Police Chief is reversed: the reason for the reversal;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:17#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 18",
+        "locator": {
+          "block_index": 18,
+          "component_id": "7a40e077-bbb5-51b7-8b01-4b1f5f9975dd",
+          "convention": "utf8_char_offset",
+          "end": 2930,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:18",
+          "start": 2801
+        },
+        "quote": "(iii) If the action of the Police Chief is modified: the reason for the modification decision and the extent of the modification;",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:18#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 19",
+        "locator": {
+          "block_index": 19,
+          "component_id": "e06b6d14-685a-596c-8dd5-a61a6b75e773",
+          "convention": "utf8_char_offset",
+          "end": 3042,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:19",
+          "start": 2931
+        },
+        "quote": "(iv) The right of the licensee to appeal the decision of the Hearing Officer to the Governing Body of the City.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:19#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 20",
+        "locator": {
+          "block_index": 20,
+          "component_id": "4de722ca-20a5-53ac-a4ba-c8f569be3e2b",
+          "convention": "utf8_char_offset",
+          "end": 3682,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:20",
+          "start": 3043
+        },
+        "quote": "(6) In the event a licensee desires to appeal the decision of the City Manager to the Governing Body of the City, notice of such appeal shall be filed with the City Clerk within 10 days of the issuance of the City Manager’s opinion. Upon receipt of such notice, the City Clerk shall notify the City Manager who shall prepare the record of the hearing to include the transcript and exhibits and forward said record to the City Clerk within 10 days. The Governing Body of the City shall review the record so presented and either affirm or reverse the action of the City Manager. All such appeals to the Governing Body shall be on the record.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:20#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 21",
+        "locator": {
+          "block_index": 21,
+          "component_id": "b20e38c9-387d-500a-a231-254a61beca05",
+          "convention": "utf8_char_offset",
+          "end": 4018,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:21",
+          "start": 3683
+        },
+        "quote": "(c) If a license is revoked under this section, the licensee may be issued a new license if the reason for revocation is removed, the Police Chief is notified in writing of such removal, and the former licensee follows the procedure set forth herein for applying for an original license. (Ord. 19370 § 22, 3-23-10. Code 1995 § 30-457.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:21#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 5.15.080 block 22",
+        "locator": {
+          "block_index": 22,
+          "component_id": "ecb1746e-9149-5338-a4c0-c84b701d89e3",
+          "convention": "utf8_char_offset",
+          "end": 4137,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:5.15.080:block:22",
+          "start": 4019
+        },
+        "quote": "Cross References: City Council – Mayor, Chapter 2.15 TMC; City Clerk, TMC 2.20.010 ; Police Department, TMC 2.20.090 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080:block:22#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 19370",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 3996,
+          "start": 3972
+        },
+        "quote": "Ord. 19370 § 22, 3-23-10",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:5.15.080#history:19370",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "781da4778635c5e857965d2d64268cbd73bb91f8a0154844ae4633c9e47e38e8",
+      "captured_at": "2026-08-28T03:49:17.294023Z",
+      "kind": "rendered_html_capture",
+      "value": "5.15.080.781da4778635.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:5.15.080@781da4778635c5e8",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:5.15.080",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:5.15.080",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 5.15.080",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/5.15.080"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.15.080#history:19370",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "3-23-10"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "5.15.080",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.15.080#history:19370",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:19370"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:5.15.080#history:19370",
+      "value": "adopted"
+    },
+    "title": "Revocation or suspension of license."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T03:49:17.294023Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "781da4778635c5e857965d2d64268cbd73bb91f8a0154844ae4633c9e47e38e8",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "781da4778635c5e857965d2d64268cbd73bb91f8a0154844ae4633c9e47e38e8",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "781da4778635c5e857965d2d64268cbd73bb91f8a0154844ae4633c9e47e38e8",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "a5fb22cba7b33573d6e36324e3512fc4d199698e2f6a88e6438e8359eb896b12",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "a5fb22cba7b33573d6e36324e3512fc4d199698e2f6a88e6438e8359eb896b12",
+        "output_sha256": "10b1b8e7cf1b5d946ae2b014ff41b71b5c06b48716556bed776d976b49c626be",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "a5fb22cba7b33573d6e36324e3512fc4d199698e2f6a88e6438e8359eb896b12",
+        "output_sha256": "2055f02d7a5526a1d734280ff4f592732ea2e4c384f5efefca55a77838406277",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/5.15.080",
+    "retained_original": {
+      "byte_count": 37126,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/5.15.080.781da4778635.html",
+      "retrieved_at": "2026-08-28T03:49:17.294023Z",
+      "sha256": "781da4778635c5e857965d2d64268cbd73bb91f8a0154844ae4633c9e47e38e8"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

@@ -1,0 +1,289 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 1498,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "035cd87f30a800eca3ac630d13458d976f331ba9c9f73ec46ac5529450e9ca20"
+    },
+    "structured": {
+      "block_count": 3,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "de73dc90-6188-5c24-8fc3-707792537127",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:axb-art.-xiii-2-6:section",
+      "sha256": "29ccf20f4131d3da6fdf54a6b1d18c6e77f0151ddbf2e266d39fe2a47e3abcd5",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 3884,
+      "char_count": 3867,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "9180d5fd883b8fbb29e23288a20689285350bb3b9fceb7c2e0a9f83e8a615403"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC AxB Art. XIII § 2 § 6 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "4dd1ffac-37f6-5d57-b455-24d2578cca28",
+          "convention": "utf8_char_offset",
+          "end": 1001,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:axb-art.-xiii-2-6:block:0",
+          "start": 0
+        },
+        "quote": "(1) All Providers using the Public Right-of-Way for the transportation, distribution, or sale of natural gas or Other Energy, whether through their own Distribution Facilities, through the Distribution Facilities of a Franchised Entity, or through the Distribution Facilities of another, shall report or register such use with the City’s Director of Finance on such forms as are established and furnished by the City’s Director of Finance and subject to such administrative fees necessary to cover the costs of the effective administration of the ordinance as established by the City’s Director of Finance. Such registration shall include the name, address, and agent for the Provider and shall include such information on the method and means of transportation, distribution, or sale to Consumers as may be reasonably required by the City for enforcement of this Ordinance. The City shall have access to and the right to examine and audit such records necessary to verify the payment of compensation.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xiii-2-6:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC AxB Art. XIII § 2 § 6 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "8f33b6fb-6fa9-5196-9c9f-347088e88d20",
+          "convention": "utf8_char_offset",
+          "end": 1184,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:axb-art.-xiii-2-6:block:1",
+          "start": 1002
+        },
+        "quote": "(2) Franchised Entities may serve as the agent for Providers using the Distribution System of the Franchised Entity for the purposes of reporting and collection under this Ordinance.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xiii-2-6:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC AxB Art. XIII § 2 § 6 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "54cb9c88-d4a1-55e6-844c-d7b1c3ff16b2",
+          "convention": "utf8_char_offset",
+          "end": 1497,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:axb-art.-xiii-2-6:block:2",
+          "start": 1185
+        },
+        "quote": "(3) Franchised Entities with a current and effective franchise and any Provider which reports and pays a sum equal to the fees calculated by Section 4(2) to the City through a Franchised Entity shall be exempt from the separate reporting and registration requirements of the ordinance. (Ord. 18296 § 6, 7-20-04.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xiii-2-6:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xiii-2-6#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 18296",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 1495,
+          "start": 1472
+        },
+        "quote": "Ord. 18296 § 6, 7-20-04",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xiii-2-6#history:18296",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "885505d49a9be5e53e49983aba885e8f0005721cd31deca2bd1db8f7e5a9d60e",
+      "captured_at": "2026-08-28T05:04:20.883767Z",
+      "kind": "rendered_html_capture",
+      "value": "AxB_ArtXIII_2_6.885505d49a9b.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xiii-2-6@885505d49a9be5e5",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:AxB_ArtXIII_2_6",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:axb-art.-xiii-2-6",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC AxB Art. XIII § 2 § 6",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/AxB_ArtXIII_2_6"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xiii-2-6#history:18296",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "7-20-04"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "AxB Art. XIII § 2 § 6",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xiii-2-6#history:18296",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:18296"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:axb-art.-xiii-2-6#history:18296",
+      "value": "adopted"
+    },
+    "title": "Section 6. Reporting and collection provisions."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T05:04:20.883767Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "885505d49a9be5e53e49983aba885e8f0005721cd31deca2bd1db8f7e5a9d60e",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "885505d49a9be5e53e49983aba885e8f0005721cd31deca2bd1db8f7e5a9d60e",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "885505d49a9be5e53e49983aba885e8f0005721cd31deca2bd1db8f7e5a9d60e",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "9180d5fd883b8fbb29e23288a20689285350bb3b9fceb7c2e0a9f83e8a615403",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "9180d5fd883b8fbb29e23288a20689285350bb3b9fceb7c2e0a9f83e8a615403",
+        "output_sha256": "035cd87f30a800eca3ac630d13458d976f331ba9c9f73ec46ac5529450e9ca20",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "9180d5fd883b8fbb29e23288a20689285350bb3b9fceb7c2e0a9f83e8a615403",
+        "output_sha256": "29ccf20f4131d3da6fdf54a6b1d18c6e77f0151ddbf2e266d39fe2a47e3abcd5",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/AxB_ArtXIII_2_6",
+    "retained_original": {
+      "byte_count": 30794,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/AxB_ArtXIII_2_6.885505d49a9b.html",
+      "retrieved_at": "2026-08-28T05:04:20.883767Z",
+      "sha256": "885505d49a9be5e53e49983aba885e8f0005721cd31deca2bd1db8f7e5a9d60e"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}

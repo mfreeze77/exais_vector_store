@@ -1,0 +1,369 @@
+{
+  "content": {
+    "normalized_text": {
+      "char_count": 646,
+      "normalizations": [
+        {
+          "description": "Leading/trailing blank lines collapsed to exactly one terminal LF. This is the same class of transformation that separates the STO extraction's manifest hash from its on-disk hash, so it is always recorded rather than absorbed.",
+          "name": "trim_terminal_whitespace_to_single_lf"
+        }
+      ],
+      "path": "normalized.txt",
+      "sha256": "df819a1dae077dcd04d835caf491d1c7c4fe194e8625e05d54755f1bfd42330a"
+    },
+    "structured": {
+      "block_count": 4,
+      "component_schema": "exais.workbench_component.v1",
+      "definition_count": 0,
+      "path": "structured.json",
+      "root_component_id": "92f92efa-d600-59ce-8135-072ad29d713a",
+      "root_source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.120:section",
+      "sha256": "903453270a4f3d16732cb1880917d5db15a5fee94e66da5a54db3c90f201ad01",
+      "table_count": 0
+    },
+    "verbatim": {
+      "byte_count": 2319,
+      "char_count": 2304,
+      "form": "parser_section_record_json",
+      "path": "verbatim.json",
+      "sha256": "41fe6cc96646591eec9e299567e148d343a5a6cc5d330c23267352a56244bae4"
+    }
+  },
+  "evidence": {
+    "coordinate_conventions": [
+      {
+        "applies_to": "normalized_text",
+        "name": "utf8_char_offset",
+        "note": "half-open [start, end); end is exclusive",
+        "origin": "0 at the first character of normalized.txt",
+        "unit": "unicode codepoint"
+      },
+      {
+        "applies_to": "structured",
+        "name": "block_ordinal",
+        "origin": "0 at the first block of the section",
+        "unit": "parser block index"
+      }
+    ],
+    "references": [
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.120 block 0",
+        "locator": {
+          "block_index": 0,
+          "component_id": "29f43ec0-f6ea-57b1-a66d-86ff19385920",
+          "convention": "utf8_char_offset",
+          "end": 293,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.120:block:0",
+          "start": 0
+        },
+        "quote": "The City Manager may employ law enforcement officers who shall have power to execute all process issued by any Municipal Judge within the State and delivered to him or her for that purpose, to detain persons, to place them in custody, and to arrest them, pursuant to the terms of this article.",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.120:block:0#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.120 block 1",
+        "locator": {
+          "block_index": 1,
+          "component_id": "40014a57-b42b-5dc4-8d66-1b28e503f7ab",
+          "convention": "utf8_char_offset",
+          "end": 531,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.120:block:1",
+          "start": 294
+        },
+        "quote": "The powers of law enforcement officers with respect to the code of criminal procedure shall not be reduced by this Code. (Ord. 20206 § 9, 9-10-19; Ord. 18477 § 9, 7-12-05; Ord. 17666 § 11, 3-27-01. Code 1995 § 50-46. Formerly 2.110.120.)",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.120:block:1#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.120 block 2",
+        "locator": {
+          "block_index": 2,
+          "component_id": "1fde1f29-b7ab-5824-ad22-2c174c268e71",
+          "convention": "utf8_char_offset",
+          "end": 583,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.120:block:2",
+          "start": 532
+        },
+        "quote": "Cross References: Police Department, TMC 2.20.090 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.120:block:2#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "TMC 2.40.120 block 3",
+        "locator": {
+          "block_index": 3,
+          "component_id": "e7367e2f-3fb0-54a3-ae37-d79ad0b753fd",
+          "convention": "utf8_char_offset",
+          "end": 645,
+          "source_component_key": "ks:city:topeka:municipal-code:tmc:2.40.120:block:3",
+          "start": 584
+        },
+        "quote": "State Law References: Similar State statute, K.S.A. 12-4111 .",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.120:block:3#text",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "retained_original",
+        "availability": "unavailable",
+        "label": "page coordinates",
+        "locator": null,
+        "quote": null,
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.120#page",
+        "unavailable_reason": "the retained original is a rendered HTML page; it has no page coordinate space and none may be inferred from block ordinals or line numbers"
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 20206",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 439,
+          "start": 416
+        },
+        "quote": "Ord. 20206 § 9, 9-10-19",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.120#history:20206",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 18477",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 464,
+          "start": 441
+        },
+        "quote": "Ord. 18477 § 9, 7-12-05",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.120#history:18477",
+        "unavailable_reason": null
+      },
+      {
+        "artifact": "normalized_text",
+        "availability": "available",
+        "label": "publisher ordinance-history row for Ordinance 17666",
+        "locator": {
+          "convention": "utf8_char_offset",
+          "end": 490,
+          "start": 466
+        },
+        "quote": "Ord. 17666 § 11, 3-27-01",
+        "ref_id": "ks:city:topeka:municipal-code:tmc:2.40.120#history:17666",
+        "unavailable_reason": null
+      }
+    ],
+    "source_revision": {
+      "artifact_sha256": "71884b414fe61dc89955a2bd624cb709f5fde6641418e350e6276a2355bf97e3",
+      "captured_at": "2026-08-28T03:09:02.561927Z",
+      "kind": "rendered_html_capture",
+      "value": "2.40.120.71884b414fe6.html"
+    }
+  },
+  "identity": {
+    "collection_id": "ks:city:topeka:municipal-code",
+    "component_id_namespace": "ec077a53-0b40-5f21-b1fe-a62094d2476b",
+    "document_version_id": "ks:city:topeka:municipal-code:tmc:2.40.120@71884b414fe61dc8",
+    "jurisdiction_aliases": [
+      "ks-topeka"
+    ],
+    "jurisdiction_key": "ks:city:topeka",
+    "legacy_ids": [
+      {
+        "id": "ks-topeka:tmc:2.40.120",
+        "note": "node id in sections.jsonl",
+        "system": "topeka_code_scraper_v1"
+      }
+    ],
+    "prior_version_id": null,
+    "source_document_id": "ks:city:topeka:municipal-code:tmc:2.40.120",
+    "supersedes": [],
+    "version_ordinal": 1
+  },
+  "meaning": {
+    "citations": [
+      {
+        "label": "TMC 2.40.120",
+        "scope": "document",
+        "url": "https://topeka.municipal.codes/TMC/2.40.120"
+      }
+    ],
+    "dates": [
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:2.40.120#history:20206",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "9-10-19"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:2.40.120#history:18477",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "7-12-05"
+      },
+      {
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:2.40.120#history:17666",
+        "kind": "ordinance_history_date",
+        "note": "publisher-printed history date in m-d-yy form; not independently verified against the ordinance",
+        "precision": "day",
+        "value": "3-27-01"
+      }
+    ],
+    "document_subtype": null,
+    "document_type": "code_section",
+    "extraction_quality": {
+      "grade": "good",
+      "limitations": [],
+      "usable_text": true
+    },
+    "publisher_number": "2.40.120",
+    "relationships": [
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:2.40.120#history:20206",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:20206"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:2.40.120#history:18477",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:18477"
+        }
+      },
+      {
+        "basis": "publisher ordinance-history row on the code section page",
+        "evidence_ref": "ks:city:topeka:municipal-code:tmc:2.40.120#history:17666",
+        "note": "the row evidences that the publisher attributes this section to that ordinance; it is not itself proof that the ordinance PDF has been retained or reviewed",
+        "predicate": "amended_by",
+        "resolved": true,
+        "target": {
+          "collection_id": "ks:city:topeka:ordinances",
+          "kind": "source_document_id",
+          "value": "ks:city:topeka:ordinances:ordinance:17666"
+        }
+      }
+    ],
+    "review": {
+      "notes": [
+        "structured parse not compared against the publisher page by a human reviewer"
+      ],
+      "reviewed_at": null,
+      "reviewer": null,
+      "status": "unreviewed"
+    },
+    "status": {
+      "basis": "the publisher serves this section as current text of the codified Topeka Municipal Code and prints an ordinance-history attribution for it",
+      "evidence_ref": "ks:city:topeka:municipal-code:tmc:2.40.120#history:20206",
+      "value": "adopted"
+    },
+    "title": "Law enforcement officers – Employment – Powers."
+  },
+  "readiness": {
+    "acquisition": {
+      "detail": "rendered capture retained and hash-verified",
+      "state": "complete"
+    },
+    "artifact_publication": {
+      "detail": "record and artifacts written to this bundle",
+      "state": "complete"
+    },
+    "extraction": {
+      "detail": "parser record retained; text and blocks present",
+      "state": "complete"
+    },
+    "graph": {
+      "detail": "graph edges not built or loaded for this release",
+      "state": "pending"
+    },
+    "review": {
+      "detail": "no human legal review recorded",
+      "state": "pending"
+    },
+    "validation": {
+      "detail": "validated by jurisdiction-release-validate.py",
+      "state": "complete"
+    },
+    "vector_indexing": {
+      "detail": "not ingested through the ExAIS API in this release",
+      "state": "pending"
+    }
+  },
+  "schema": "exais.jurisdiction.source_document.v1",
+  "schema_version": "1.0.0",
+  "source": {
+    "acquisition": {
+      "acquired_at": "2026-08-28T03:09:02.561927Z",
+      "connector_entrypoint": "scripts/release/topeka-code-ingest.py",
+      "connector_revision": "combined-full-corpus-20260828-v2",
+      "method": "playwright_rendered_capture"
+    },
+    "extractor": {
+      "mode": "playwright_html_parse",
+      "name": "topeka-code-scraper",
+      "version": "0.1.1"
+    },
+    "lineage": [
+      {
+        "input_sha256": "71884b414fe61dc89955a2bd624cb709f5fde6641418e350e6276a2355bf97e3",
+        "note": "rendered HTML retained unmodified; input and output are the same bytes",
+        "output_sha256": "71884b414fe61dc89955a2bd624cb709f5fde6641418e350e6276a2355bf97e3",
+        "step": "capture",
+        "tool": "scripts/release/topeka-code-ingest.py",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "71884b414fe61dc89955a2bd624cb709f5fde6641418e350e6276a2355bf97e3",
+        "note": "parser section record, canonical JSON",
+        "output_sha256": "41fe6cc96646591eec9e299567e148d343a5a6cc5d330c23267352a56244bae4",
+        "step": "parse",
+        "tool": "topeka-code-scraper",
+        "tool_version": "0.1.1"
+      },
+      {
+        "input_sha256": "41fe6cc96646591eec9e299567e148d343a5a6cc5d330c23267352a56244bae4",
+        "output_sha256": "df819a1dae077dcd04d835caf491d1c7c4fe194e8625e05d54755f1bfd42330a",
+        "step": "normalize",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      },
+      {
+        "input_sha256": "41fe6cc96646591eec9e299567e148d343a5a6cc5d330c23267352a56244bae4",
+        "output_sha256": "903453270a4f3d16732cb1880917d5db15a5fee94e66da5a54db3c90f201ad01",
+        "step": "structure",
+        "tool": "scripts/release/topeka-source-release-export.py",
+        "tool_version": "1.0.0"
+      }
+    ],
+    "listing_url": "https://topeka.municipal.codes/TMC",
+    "official_url": "https://topeka.municipal.codes/TMC/2.40.120",
+    "retained_original": {
+      "byte_count": 29557,
+      "local_path": null,
+      "media_type": "text/html",
+      "reference_uri": "seed://topeka-codified-code/raw/2.40.120.71884b414fe6.html",
+      "retrieved_at": "2026-08-28T03:09:02.561927Z",
+      "sha256": "71884b414fe61dc89955a2bd624cb709f5fde6641418e350e6276a2355bf97e3"
+    },
+    "source_schema_version": "topeka_municipal_code_v1"
+  }
+}
