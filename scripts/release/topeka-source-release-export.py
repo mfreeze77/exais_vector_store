@@ -1380,6 +1380,53 @@ def resolve_selection(
     raise SystemExit(f"unknown selector kind {kind!r}")
 
 
+def load_baseline(previous_manifest: Path | None, released_state: Path | None) -> dict[str, str]:
+    """Version last published per document, cumulative state winning."""
+    baseline: dict[str, str] = {}
+    if previous_manifest and previous_manifest.exists():
+        payload = json.loads(previous_manifest.read_text(encoding="utf-8"))
+        baseline = {
+            entry["source_document_id"]: entry["document_version_id"]
+            for entry in payload.get("documents", [])
+        }
+    if released_state and released_state.exists():
+        with released_state.open("r", encoding="utf-8") as handle:
+            for line in handle:
+                if line.strip():
+                    row = json.loads(line)
+                    baseline[row["source_document_id"]] = row["document_version_id"]
+    return baseline
+
+
+def finalize_versions(documents: list[BuiltDocument], baseline: dict[str, str]) -> None:
+    """Stamp prior_version_id and version_ordinal before anything is hashed.
+
+    These fields are part of the record that gets written, so they are part of
+    what the record hashes to. Fingerprinting before stamping them compares one
+    record and writes another: a retry of a release containing a revised
+    document then sees "different content" against bytes it produced itself, and
+    allocates a duplicate release instead of recognising its own work.
+    """
+    for built in documents:
+        identity = built.record["identity"]
+        prior = baseline.get(identity["source_document_id"])
+        if prior is not None and prior != identity["document_version_id"]:
+            identity["prior_version_id"] = prior
+            identity["version_ordinal"] = 2
+
+
+def planned_inventory_of(documents: list[BuiltDocument]) -> str:
+    """The inventory fingerprint of these records exactly as they will be written."""
+    return inventory_fingerprint([
+        {
+            "source_document_id": built.record["identity"]["source_document_id"],
+            "document_version_id": built.record["identity"]["document_version_id"],
+            "payload_sha256": payload_fingerprint(built.record),
+        }
+        for built in documents
+    ])
+
+
 def allocate_free_release(
     documents: list[BuiltDocument], *, release_id: str, output_dir: Path
 ) -> tuple[str, Path]:
@@ -1389,14 +1436,7 @@ def allocate_free_release(
     at the bytes it was published with, which is what makes an old receipt still
     checkable.
     """
-    planned = inventory_fingerprint([
-        {
-            "source_document_id": built.record["identity"]["source_document_id"],
-            "document_version_id": built.record["identity"]["document_version_id"],
-            "payload_sha256": payload_fingerprint(built.record),
-        }
-        for built in documents
-    ])
+    planned = planned_inventory_of(documents)
     candidate_id, candidate_dir = release_id, output_dir
     for attempt in range(1, 1000):
         manifest = candidate_dir / "release-manifest.json"
@@ -1482,26 +1522,12 @@ def write_bundle(
     # The baseline must be the same cumulative state the selection step used, or
     # the two disagree about what "changed" means: a document published two
     # releases ago and revised now would export as new.
-    previous_versions: dict[str, str] = {}
-    if previous:
-        previous_versions = {
-            entry["source_document_id"]: entry["document_version_id"] for entry in previous.get("documents", [])
-        }
-    if released_state and released_state.exists():
-        with released_state.open("r", encoding="utf-8") as handle:
-            for line in handle:
-                if line.strip():
-                    row = json.loads(line)
-                    previous_versions[row["source_document_id"]] = row["document_version_id"]
+    previous_versions = load_baseline(previous_manifest, released_state)
 
-    planned_inventory = inventory_fingerprint([
-        {
-            "source_document_id": built.record["identity"]["source_document_id"],
-            "document_version_id": built.record["identity"]["document_version_id"],
-            "payload_sha256": payload_fingerprint(built.record),
-        }
-        for built in documents
-    ])
+    # Records must be finalized before they are hashed, and the same fingerprint
+    # then drives allocation, the immutability comparison and the write.
+    finalize_versions(documents, previous_versions)
+    planned_inventory = planned_inventory_of(documents)
     if existing_inventory is not None and existing_inventory != planned_inventory:
         raise SystemExit(
             f"refusing to overwrite release {release_id!r} at {output_dir}: it already holds a "
@@ -1538,14 +1564,13 @@ def write_bundle(
         target = output_dir / "documents" / document_dir_name(doc_id)
         (target / "files").mkdir(parents=True, exist_ok=True)
 
-        prior = previous_versions.get(doc_id)
+        # Classification only; the identity fields were finalized before hashing.
+        prior = record["identity"]["prior_version_id"] or previous_versions.get(doc_id)
         if prior is None:
             new.append(doc_id)
         elif prior == version_id:
             unchanged.append(doc_id)
         else:
-            record["identity"]["prior_version_id"] = prior
-            record["identity"]["version_ordinal"] = 2
             changed.append({
                 "source_document_id": doc_id,
                 "prior_version_id": prior,
@@ -1851,6 +1876,9 @@ def main() -> int:
             raise SystemExit(f"{doc_id} selected twice; a release may not carry duplicate active documents")
         seen[doc_id] = built.record["identity"]["document_version_id"]
 
+    # Finalize here too, so allocation compares the record that will be written
+    # rather than a pre-stamp version of it.
+    finalize_versions(documents, load_baseline(args.previous_manifest, args.released_state))
     if args.on_conflict == "allocate":
         release_id, args.output_dir = allocate_free_release(
             documents, release_id=release_id, output_dir=args.output_dir

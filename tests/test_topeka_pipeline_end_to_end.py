@@ -570,3 +570,103 @@ def test_an_identical_re_export_does_not_touch_a_single_byte(tmp_path):
     assert after == before, "an identical retry must be a no-op on disk"
     assert (bundle / "release-manifest.json").stat().st_mtime_ns == manifest_mtime
     assert "unchanged" in result.stdout
+
+
+def test_a_retry_after_an_interrupted_ledger_update_reuses_the_same_release(tmp_path):
+    """Crash between validate and ledger, then restart. The release must be reused.
+
+    This is the recovery path that matters: the bundle is on disk and valid, but
+    the ledger never learned about it. A restart that allocates a fresh id
+    instead of recognising its own work leaves two identical releases and a
+    ledger that still points at the older version.
+    """
+    instance = tmp_path / "instances" / "ks-state-civics" / "vector-stores" / "topeka-municipal-code"
+    releases = instance / "releases"
+    ledger_path = releases / "released-state.jsonl"
+
+    def ledger_version() -> str | None:
+        if not ledger_path.exists():
+            return None
+        for line in ledger_path.read_text(encoding="utf-8").splitlines():
+            if line.strip() and json.loads(line)["source_document_id"] == NEW:
+                return json.loads(line)["document_version_id"]
+        return None
+
+    # 1. publish the original
+    first_sha = _stage_docx(tmp_path, "the original body text")
+    assert run_refresh(tmp_path, "daily").returncode == 0
+    assert ledger_version().endswith(first_sha[:16])
+
+    # 2. publish a revision, then simulate the crash: the bundle and its
+    #    validation exist, but the ledger update never happened.
+    second_sha = _stage_docx(tmp_path, "a materially different revised body")
+    assert run_refresh(tmp_path, "daily").returncode == 0
+    allocated = releases / "daily-002"
+    assert (allocated / "release-manifest.json").exists()
+
+    # Roll the ledger back to what it held before the crash: the document is
+    # still recorded, at its previous version.
+    rows = []
+    for line in ledger_path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        if row["source_document_id"] == NEW:
+            row = {**row, "document_version_id": f"{NEW}@{first_sha[:16]}"}
+            row.pop("prior_version_id", None)
+            row.pop("prior_release_id", None)
+        rows.append(row)
+    ledger_path.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in rows), encoding="utf-8"
+    )
+    assert ledger_version().endswith(first_sha[:16]), "the ledger is back to pre-crash state"
+    before = {
+        path.relative_to(allocated).as_posix(): sha(path.read_bytes())
+        for path in sorted(allocated.rglob("*")) if path.is_file()
+    }
+
+    # 3. restart
+    assert run_refresh(tmp_path, "daily").returncode == 0
+    assert not (releases / "daily-003").exists(), "the retry must reuse daily-002, not duplicate it"
+    after = {
+        path.relative_to(allocated).as_posix(): sha(path.read_bytes())
+        for path in sorted(allocated.rglob("*")) if path.is_file()
+    }
+    assert after == before, "the reused release must not be rewritten"
+    assert ledger_version().endswith(second_sha[:16]), "the retry must finish the ledger update"
+
+    # 4. and then go quiet
+    assert run_refresh(tmp_path, "daily").returncode == 0
+    assert not (releases / "daily-003").exists()
+    assert ledger_version().endswith(second_sha[:16])
+
+
+def test_an_explicit_retry_against_the_allocated_id_is_recognised(tmp_path):
+    """Re-exporting a revised document into the id that already holds it is a no-op."""
+    pipeline = Pipeline(tmp_path)
+    baseline = tmp_path / "ledger.jsonl"
+    bundle = pipeline.releases / "rel"
+
+    first_selection = _one_document_selection(tmp_path, pipeline, "original text", "a")
+    assert pipeline.run("topeka-source-release-export.py", "--selection", first_selection,
+                        "--output-dir", bundle, "--release-id", "rel",
+                        "--bundle-kind", "fixture").returncode == 0
+    assert pipeline.run("topeka-release-ledger.py", "--manifest", bundle / "release-manifest.json",
+                        "--ledger", baseline).returncode == 0
+
+    revised = _one_document_selection(tmp_path, pipeline, "revised text, different", "b")
+    second = pipeline.releases / "rel2"
+    assert pipeline.run("topeka-source-release-export.py", "--selection", revised,
+                        "--output-dir", second, "--release-id", "rel2",
+                        "--released-state", baseline, "--bundle-kind", "fixture").returncode == 0
+    manifest = json.loads((second / "release-manifest.json").read_text(encoding="utf-8"))
+    assert manifest["update"]["outcomes"]["changed"], "this release carries a revised document"
+    before = sha((second / "release-manifest.json").read_bytes())
+
+    # The explicit retry: same selection, same baseline, same id.
+    retry = pipeline.run("topeka-source-release-export.py", "--selection", revised,
+                         "--output-dir", second, "--release-id", "rel2",
+                         "--released-state", baseline, "--bundle-kind", "fixture")
+    assert retry.returncode == 0, retry.stdout + retry.stderr
+    assert "unchanged" in retry.stdout
+    assert sha((second / "release-manifest.json").read_bytes()) == before
