@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from extraction_budget import Budget, estimate_for
 from svs_common.marker_client import MarkerRunpodClient, extract_markdown
 from topeka_pipeline_common import ORDINANCE_SEED, read_jsonl, safe_filename, sha256_bytes, sha256_text, utc_now, write_json, write_jsonl
 
@@ -324,8 +325,23 @@ async def extract_rows(
     poll_interval_sec: int | None = None,
     timeout_seconds: int | None = None,
     attempts: int | None = None,
+    budget: Budget | None = None,
 ) -> dict[str, Any]:
     selected = rows[offset : offset + limit if limit > 0 else None]
+
+    # Enforce the spend cap before a single document is sent. The cap is in
+    # pages because that is the billing unit, and it is applied here rather than
+    # described in a plan, so an authorized stage cannot quietly overrun.
+    budget = budget or Budget.unlimited()
+    if budget.enforced:
+        admitted: list[dict[str, Any]] = []
+        for row in selected:
+            pdf_path = find_pdf(row, manifest_path=manifest_path, pdf_dir=pdf_dir)
+            pages, basis = estimate_for(pdf_path) if pdf_path else (0, "pdf_missing")
+            identifier = first_text(row, "ordinance_number", "id") or str(pdf_path)
+            if budget.admit(identifier, pages, basis=basis):
+                admitted.append(row)
+        selected = admitted
     semaphore = asyncio.Semaphore(max(1, concurrency))
     results: list[dict[str, Any]] = []
 
@@ -400,6 +416,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--allow-failures", action="store_true")
     parser.add_argument("--min-markdown-chars", type=int, default=50)
+    parser.add_argument("--max-pages", type=int, default=0,
+                        help="enforced spend cap in pages, the provider's billing unit. A document "
+                             "whose estimate would exceed what remains is refused, not truncated.")
+    parser.add_argument("--max-documents", type=int, default=0,
+                        help="second, coarser cap so a badly wrong page estimate cannot run away")
     parser.add_argument("--attempts", type=int)
     parser.add_argument("--retry-backoff-seconds", type=int)
     parser.add_argument("--poll-interval-sec", type=int)
@@ -431,6 +452,7 @@ def main() -> None:
             report_path=report_path,
             offset=args.offset,
             limit=args.limit,
+            budget=Budget(max_pages=args.max_pages, max_documents=args.max_documents),
             concurrency=args.concurrency,
             client=client,
             force=args.force,

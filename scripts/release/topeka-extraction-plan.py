@@ -24,6 +24,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from extraction_budget import pdf_page_estimate  # noqa: E402
 from jurisdiction_release_contract import ROOT  # noqa: E402
 
 INSTANCE = ROOT / "instances" / "ks-state-civics" / "vector-stores" / "topeka-municipal-code"
@@ -48,9 +49,7 @@ FORMAT_PATHS: dict[str, dict[str, Any]] = {
     },
 }
 
-_PAGE = re.compile(rb"/Type\s*/Page[^s]")
-_COUNT = re.compile(rb"/Type\s*/Pages\b[^>]{0,200}?/Count\s+(\d+)")
-_COUNT_FIRST = re.compile(rb"/Count\s+(\d+)[^>]{0,200}?/Type\s*/Pages\b")
+
 
 
 def utc_now() -> str:
@@ -62,28 +61,6 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
         return []
     with path.open("r", encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]
-
-
-def pdf_page_estimate(payload: bytes) -> tuple[int, str]:
-    """Approximate page count from the raw PDF, with how it was derived.
-
-    Two independent readings, because each fails differently: the page tree's
-    ``/Count`` is authoritative when present but hides inside object streams,
-    while counting ``/Type /Page`` objects works on uncompressed files and
-    undercounts compressed ones. The larger wins, and the basis travels with the
-    number so nobody reads an estimate as a measurement.
-    """
-    counts = [int(match) for match in _COUNT.findall(payload)]
-    counts += [int(match) for match in _COUNT_FIRST.findall(payload)]
-    by_count = max(counts) if counts else 0
-    by_objects = len(_PAGE.findall(payload))
-    if by_count >= max(by_objects, 1):
-        return max(by_count, 1), "page_tree_count"
-    if by_objects:
-        return by_objects, "page_object_scan"
-    # Neither reading worked: the structure is fully compressed. Fall back to a
-    # size heuristic and say so, rather than claiming one page.
-    return max(1, round(len(payload) / 45_000)), "byte_size_heuristic"
 
 
 def already_extracted(seed: Path, extraction: Path) -> set[str]:
