@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -259,27 +260,52 @@ def build_report(
     selected_count: int,
     results: list[dict[str, Any]],
     dry_run: bool,
+    budget: "Budget | None" = None,
+    requested_count: int | None = None,
 ) -> dict[str, Any]:
     by_status: dict[str, int] = {}
     for result in results:
         status = str(result.get("status") or "unknown")
         by_status[status] = by_status.get(status, 0) + 1
     failed = [result for result in results if result.get("status") == "failed"]
-    complete = len(results) == selected_count and not failed
-    return {
-        "schema_version": "1.0",
+    refused = len(budget.refused) if budget else 0
+    requested = selected_count if requested_count is None else requested_count
+    # A run that the budget cut short is NOT complete. Reporting "complete" with
+    # selected_count 0 made a fully-refused run indistinguishable from a clean
+    # one, which is the worst possible reading of a spend cap.
+    complete = len(results) == selected_count and not failed and not refused
+    if dry_run:
+        status = "pending"
+    elif complete:
+        status = "complete"
+    elif refused and not failed and len(results) == selected_count:
+        status = "capped"
+    else:
+        status = "incomplete"
+    report = {
+        "schema_version": "1.1",
         "artifact": "topeka_ordinance_pdf_extraction",
         "dry_run": dry_run,
-        "status": "complete" if complete else "pending" if dry_run else "incomplete",
+        "status": status,
         "manifest": str(manifest_path),
         "extracted_dir": str(extracted_dir),
+        "requested_count": requested,
         "selected_count": selected_count,
+        "refused_by_budget_count": refused,
         "result_count": len(results),
         "status_counts": by_status,
         "failure_count": len(failed),
         "failures": failed[:25],
         "updated_at": utc_now(),
     }
+    if budget is not None:
+        report["budget"] = budget.as_dict()
+    if refused:
+        report["remaining_after_cap"] = (
+            f"{refused} document(s) were refused by the spend cap and were not extracted. "
+            "Raise the cap or run a further authorized stage to finish them."
+        )
+    return report
 
 
 def write_checkpoint(
@@ -291,6 +317,8 @@ def write_checkpoint(
     selected_count: int,
     results: list[dict[str, Any]],
     dry_run: bool,
+    budget: "Budget | None" = None,
+    requested_count: int | None = None,
 ) -> None:
     ordered = sorted(results, key=lambda item: int(item.get("index") or 0))
     write_jsonl(output_manifest, ordered)
@@ -302,6 +330,8 @@ def write_checkpoint(
             selected_count=selected_count,
             results=ordered,
             dry_run=dry_run,
+            budget=budget,
+            requested_count=requested_count,
         ),
     )
 
@@ -333,6 +363,7 @@ async def extract_rows(
     # pages because that is the billing unit, and it is applied here rather than
     # described in a plan, so an authorized stage cannot quietly overrun.
     budget = budget or Budget.unlimited()
+    requested_count = len(selected)
     if budget.enforced:
         admitted: list[dict[str, Any]] = []
         for row in selected:
@@ -373,8 +404,13 @@ async def extract_rows(
             selected_count=0,
             results=[],
             dry_run=dry_run,
+            budget=budget,
+            requested_count=requested_count,
         )
-        return build_report(manifest_path=manifest_path, extracted_dir=extracted_dir, selected_count=0, results=[], dry_run=dry_run)
+        return build_report(
+            manifest_path=manifest_path, extracted_dir=extracted_dir, selected_count=0,
+            results=[], dry_run=dry_run, budget=budget, requested_count=requested_count,
+        )
 
     for completed in asyncio.as_completed(tasks):
         result = await completed
@@ -388,6 +424,8 @@ async def extract_rows(
             selected_count=len(selected),
             results=results,
             dry_run=dry_run,
+            budget=budget,
+            requested_count=requested_count,
         )
 
     report = build_report(
@@ -396,6 +434,8 @@ async def extract_rows(
         selected_count=len(selected),
         results=results,
         dry_run=dry_run,
+        budget=budget,
+        requested_count=requested_count,
     )
     if report["failure_count"] and not allow_failures:
         raise SystemExit(2)
@@ -421,6 +461,11 @@ def parse_args() -> argparse.Namespace:
                              "whose estimate would exceed what remains is refused, not truncated.")
     parser.add_argument("--max-documents", type=int, default=0,
                         help="second, coarser cap so a badly wrong page estimate cannot run away")
+    parser.add_argument("--max-spend", type=float, default=0.0,
+                        help="hard limit in currency; needs --unit-price-per-page to be meaningful")
+    parser.add_argument("--unit-price-per-page", type=float, default=0.0,
+                        help="the provider's rate, from the operator. No default: this repository "
+                             "records no rate card.")
     parser.add_argument("--attempts", type=int)
     parser.add_argument("--retry-backoff-seconds", type=int)
     parser.add_argument("--poll-interval-sec", type=int)
@@ -452,7 +497,14 @@ def main() -> None:
             report_path=report_path,
             offset=args.offset,
             limit=args.limit,
-            budget=Budget(max_pages=args.max_pages, max_documents=args.max_documents),
+            budget=Budget(
+                max_pages=args.max_pages,
+                max_documents=args.max_documents,
+                max_spend=args.max_spend,
+                unit_price_per_page=args.unit_price_per_page,
+                # Every attempt may be billed, so the cap reserves the worst case.
+                attempts=args.attempts or int(os.environ.get("MARKER_MAX_ATTEMPTS") or 1),
+            ),
             concurrency=args.concurrency,
             client=client,
             force=args.force,
