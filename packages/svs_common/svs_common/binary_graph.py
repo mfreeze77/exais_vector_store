@@ -208,12 +208,27 @@ def binary_graph_path(
     source_node = function_node_id(vector_store_id, source_binary_sha256, source_function_id)
     target_node = function_node_id(vector_store_id, target_binary_sha256, target_function_id)
     if source_node == target_node:
+        row = db.execute(
+            text("""
+            SELECT id, node_type, label, attributes
+            FROM graph_nodes
+            WHERE tenant_id=:tenant_id AND business_instance_id=:biz_id
+              AND vector_store_id=:store_id AND id=:node_id AND node_type='function'
+            LIMIT 1
+            """),
+            {
+                "tenant_id": principal.tenant_id,
+                "biz_id": principal.business_instance_id,
+                "store_id": vector_store_id,
+                "node_id": source_node,
+            },
+        ).mappings().first()
         return {
             "object": "binary.graph_path",
             "vector_store_id": vector_store_id,
-            "found": True,
-            "hops": 0,
-            "nodes": [source_node],
+            "found": row is not None,
+            "hops": 0 if row is not None else None,
+            "nodes": [dict(row)] if row is not None else [],
             "edges": [],
         }
 
