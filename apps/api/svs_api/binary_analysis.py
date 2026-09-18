@@ -99,7 +99,7 @@ def binary_analysis_router(get_principal, get_db):
 
     @router.get("/capabilities", response_model=BinaryCapabilitiesResponse)
     def capabilities(principal=Depends(get_principal)):
-        ensure_scope(principal, "retrieval:read")
+        ensure_scope(principal, ["retrieval:read", "vector_stores:write"], any_of=True)
         return {
             "object": "binary.capabilities",
             "semantic_mode": "ghidra_binary_v1",
