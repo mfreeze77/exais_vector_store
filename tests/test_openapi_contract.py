@@ -73,6 +73,11 @@ get /metrics
 get /api/v1/vectorization/modes
 get /api/v1/models/registry
 get /api/v1/retrieval/profiles
+get /api/v1/binary/capabilities
+post /api/v1/binary/graph/build
+post /api/v1/binary/graph/diff
+post /api/v1/binary/path
+post /api/v1/binary/neighborhood
 get /v1/experts
 get /v1/experts/{expert_id}
 post /v1/experts/{expert_id}/messages
@@ -189,8 +194,8 @@ def test_every_documented_operation_uses_named_request_and_success_components():
         for method in path_item
         if method in HTTP_METHODS
     }
-    assert len(spec['paths']) == 64
-    assert len(components) == 157
+    assert len(spec['paths']) == 69
+    assert len(components) == 169
     assert operations == EXPECTED_OPERATIONS
 
     request_media: set[tuple[str, str, str]] = set()
