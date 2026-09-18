@@ -7,6 +7,7 @@ from typing import Any, Literal
 from .query_planner import KANSAS_CIVICS_LEGAL_PROFILE_ID
 from .grant_graph import GRANT_CORPUS_KIND, GRANT_GRAPH_HANDLER_ID, GRANT_RELATIONS
 from .fiscal_graph import FISCAL_CORPUS_KIND, FISCAL_GRAPH_HANDLER_ID, FISCAL_RELATIONS
+from .binary_records import BINARY_CORPUS_KIND, BINARY_GRAPH_HANDLER_ID, BINARY_FUNCTION_RELATIONS
 
 
 SearchLensKind = Literal["semantic", "graph"]
@@ -49,6 +50,26 @@ SEARCH_LENS_REGISTRY: tuple[SearchLensDefinition, ...] = (
         description="Default hybrid semantic and sparse text search with source citations.",
         kind="semantic",
         input_schema=_object_schema({}),
+    ),
+    SearchLensDefinition(
+        id="binary_relationships",
+        label="Binary Function Relationships",
+        description="One-hop expansion from Ghidra function hits through calls and cross-version function relationships.",
+        kind="graph",
+        corpus_kinds=(BINARY_CORPUS_KIND,),
+        requires_graph=True,
+        graph_profile_id=BINARY_GRAPH_HANDLER_ID,
+        handler_id=BINARY_GRAPH_HANDLER_ID,
+        relation_types=BINARY_FUNCTION_RELATIONS,
+        input_schema=_object_schema({
+            "relationship": {"type": "string", "enum": ["all", *BINARY_FUNCTION_RELATIONS]},
+            "function_id": {"type": "string", "description": "Optional exact Ghidra function identity."},
+            "binary_sha256": {"type": "string", "description": "Optional exact binary SHA-256."},
+        }),
+        caveats=(
+            "Normal retrieval expansion is deliberately one hop; use the explicit binary path API for two- or three-hop questions.",
+            "Static call relationships and decompiler output do not prove runtime reachability or branch execution.",
+        ),
     ),
     SearchLensDefinition(
         id="grant_evidence",
@@ -209,6 +230,7 @@ def infer_expert_search_lens_id(query: str, allowed_lens_ids: list[str] | tuple[
     allowed = {normalize_search_lens_id(value) for value in allowed_lens_ids}
     text = " ".join(str(query or "").lower().split())
     candidates: tuple[tuple[str, tuple[str, ...]], ...] = (
+        ("binary_relationships", ("call graph", "caller", "callee", "calls ", "similar function", "changed function", "binary diff", "function relationship")),
         ("court_citator", ("cited by", "cites ", "citation history", "citator", "precedent", "related authority")),
         ("court_procedural_history", ("procedural history", "same docket", "earlier opinion", "later opinion")),
         ("municipal_code_history", ("ordinance history", "amendment history", "amended by", "adopted by", "ordinance number")),
@@ -235,6 +257,8 @@ def corpus_kind_for_vector_store(attributes: dict[str, Any] | None, query_planne
         or corpus in {"topeka_municipal_code", "topeka-code", "topeka_code"}
     ):
         return TOPEKA_CORPUS_KIND
+    if source_collection == "ghidra-binary-analysis" or corpus in {BINARY_CORPUS_KIND, "ghidra_binary", "binary"}:
+        return BINARY_CORPUS_KIND
     if corpus == FISCAL_CORPUS_KIND:
         return FISCAL_CORPUS_KIND
     if query_planner_profile_id == KANSAS_CIVICS_LEGAL_PROFILE_ID:
