@@ -297,6 +297,42 @@ def code_symbol_chunks(code: str, max_tokens: int = 900, overlap_tokens: int = 8
             ordinal += 1
     return chunks
 
+def ghidra_binary_chunks(content: str, max_tokens: int = 2400, overlap_tokens: int = 80) -> list[ParsedChunk]:
+    """Chunk a canonical Ghidra export by function while preserving binary identity."""
+    from .binary_records import function_semantic_text, parse_ghidra_export
+
+    export = parse_ghidra_export(content)
+    chunks: list[ParsedChunk] = []
+    for function in export.functions:
+        rendered = function_semantic_text(export.binary, function)
+        parts = split_oversized(rendered, max_tokens=max_tokens, overlap_tokens=overlap_tokens)
+        for part_index, part in enumerate(parts, start=1):
+            chunks.append(ParsedChunk(
+                ordinal=len(chunks),
+                text=part,
+                heading_path=[export.binary.name, function.name],
+                token_count=estimate_tokens(part),
+                metadata={
+                    'chunker': 'ghidra_binary_chunks',
+                    'content_type': 'ghidra_function',
+                    'binary_schema_version': export.schema_version,
+                    'binary_sha256': export.binary.sha256,
+                    'binary_name': export.binary.name,
+                    'ghidra_version': export.ghidra_version,
+                    'binary_function_id': function.id,
+                    'function_name': function.name,
+                    'address': function.address,
+                    'signature': function.signature,
+                    'namespace': function.namespace,
+                    'decompilation_sha256': function.decompilation_sha256,
+                    'function_part': part_index,
+                    'function_parts': len(parts),
+                    'text_hash': sha256_text(part),
+                },
+            ))
+    return chunks
+
+
 def structured_record_chunks(content: str, max_records_per_chunk: int = 25) -> list[ParsedChunk]:
     """Object/row-aware chunker for JSON, JSONL, and CSV.
 
@@ -605,6 +641,8 @@ def choose_chunker(mode: str, *, attributes: dict[str, Any] | None = None):
         return pdf_markdown_external_chunks
     if mode == 'code_repo_v1':
         return code_symbol_chunks
+    if mode == 'ghidra_binary_v1':
+        return ghidra_binary_chunks
     if mode in {'tables_csv_json_v1', 'structured_json_v1'}:
         return structured_record_chunks
     if mode == 'logs_errors_v1':
