@@ -111,6 +111,8 @@ from svs_common.users import (
 from svs_common.security import ExpertInteractionSensitiveDataError
 from svs_common.cell_graph import CellGraphProfile, cell_graph_profile_for_store
 from svs_common.grant_graph import GRANT_CORPUS_KIND, expand_grant_graph, validate_grant_graph
+from svs_common.binary_records import BINARY_CORPUS_KIND, validate_binary_graph
+from svs_common.binary_graph import expand_binary_graph
 from svs_common.fiscal_graph import (
     FISCAL_CORPUS_KIND, expand_fiscal_graph, fiscal_search_run_id,
     guard_fiscal_graph_generation, validate_fiscal_graph, validate_fiscal_graph_bindings,
@@ -213,7 +215,9 @@ logging.basicConfig(level=os.getenv('SVS_LOG_LEVEL', 'INFO').upper())
 app = FastAPI(title='exai_vector_store API', version=settings.svs_product_version)
 
 from .statecivics_candidates import candidate_router
+from .binary_analysis import binary_analysis_router
 app.include_router(candidate_router(get_request_principal, db_for_principal))
+app.include_router(binary_analysis_router(get_request_principal, db_for_principal))
 
 
 def _openai_response_stream_event_schema_ref() -> dict[str, Any]:
@@ -2820,6 +2824,10 @@ def load_vector_store_graph(
             if cell_profile is None:
                 raise ValueError('Grant graph load requires an explicitly bound cell profile')
             validate_grant_graph(req, vector_store_id)
+        elif corpus_kind_for_vector_store(attrs, None) == BINARY_CORPUS_KIND:
+            if cell_profile is None:
+                raise ValueError('Binary graph load requires an explicitly bound cell profile')
+            validate_binary_graph(req, vector_store_id)
         elif corpus_kind_for_vector_store(attrs, None) == FISCAL_CORPUS_KIND:
             # Serialize generation checks with other scoped loads/store updates.
             db.execute(text('''
@@ -3125,7 +3133,7 @@ def _topeka_graphrag_enabled() -> bool:
 def _cell_graph_profile_or_503(
     attrs: dict[str, Any], principal: Principal, vector_store_id: str,
 ) -> CellGraphProfile | None:
-    if corpus_kind_for_vector_store(attrs, None) not in {GRANT_CORPUS_KIND, FISCAL_CORPUS_KIND}:
+    if corpus_kind_for_vector_store(attrs, None) not in {GRANT_CORPUS_KIND, FISCAL_CORPUS_KIND, BINARY_CORPUS_KIND}:
         return None
     try:
         return cell_graph_profile_for_store(principal, vector_store_id, attrs)
@@ -3143,6 +3151,8 @@ def _graphrag_enabled_for_vector_store(
     if corpus_kind == TOPEKA_CORPUS_KIND:
         return _topeka_graphrag_enabled()
     if corpus_kind == GRANT_CORPUS_KIND:
+        return bool(cell_profile and cell_profile.enabled)
+    if corpus_kind == BINARY_CORPUS_KIND:
         return bool(cell_profile and cell_profile.enabled)
     if corpus_kind == FISCAL_CORPUS_KIND:
         if not cell_profile or not cell_profile.enabled:
@@ -4496,6 +4506,20 @@ async def _openai_vector_store_search_page(
             expansion_limit = min(expansion_limit, req.graph_expansion_limit)
         try:
             additions, graph_metadata_by_chunk_id, graph_summary = expand_grant_graph(
+                db, principal, vector_store_id, chunks,
+                filters=base_filters, relation_types=graph_relation_types,
+                limit=expansion_limit, hydrate=retrieval._hydrate_and_acl,
+            )
+        except ValueError as exc:
+            raise OpenAICompatError(str(exc)) from exc
+        graph_summary['cell_profile_id'] = cell_profile.profile_id
+        chunks = _interleave_graph_expansion_chunks(chunks, additions)
+    elif graph_lens and corpus_kind == BINARY_CORPUS_KIND and cell_profile:
+        expansion_limit = cell_profile.max_expansions
+        if req.graph_expansion_limit is not None:
+            expansion_limit = min(expansion_limit, req.graph_expansion_limit)
+        try:
+            additions, graph_metadata_by_chunk_id, graph_summary = expand_binary_graph(
                 db, principal, vector_store_id, chunks,
                 filters=base_filters, relation_types=graph_relation_types,
                 limit=expansion_limit, hydrate=retrieval._hydrate_and_acl,
