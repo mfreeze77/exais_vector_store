@@ -58,6 +58,22 @@ modes:
     default_security_level: 2
     status: production_lite
 
+  ghidra_binary_v1:
+    label: Ghidra binary analysis
+    description: Function-level semantic indexing for canonical Ghidra/PyGhidra exports with exact binary and function identity.
+    parser: ghidra_export_json_v1
+    normalizer: ghidra_function_semantic_v1
+    tokenizer: model_specific_code_counter_v1
+    chunker: ghidra_function_record_chunker_v1
+    metadata_extractor: ghidra_binary_metadata_v1
+    embedding_profile: voyage_code_3_or_qwen3_code_v1
+    sparse_profile: opensearch_code_bm25_ngram_v1
+    reranker_profile: qwen3_reranker_code_v1
+    retrieval_profile: hybrid_code_symbol_rrf_v2
+    eval_profile: binary_function_search_v1
+    default_security_level: 3
+    status: production_lite
+
   tables_csv_json_v1:
     label: Tables / CSV / JSON
     description: Row/object-aware embeddings with schema summaries and exact lookup indexes.
