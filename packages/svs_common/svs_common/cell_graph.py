@@ -16,6 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from .grant_graph import GRANT_CORPUS_KIND, GRANT_GRAPH_HANDLER_ID
 from .fiscal_graph import FISCAL_CORPUS_KIND, FISCAL_GRAPH_HANDLER_ID
+from .binary_records import BINARY_CORPUS_KIND, BINARY_GRAPH_HANDLER_ID
 from .schemas import Principal
 
 
@@ -42,6 +43,7 @@ class CellGraphProfile(BaseModel):
 GRAPH_HANDLERS = {
     GRANT_GRAPH_HANDLER_ID: GRANT_CORPUS_KIND,
     FISCAL_GRAPH_HANDLER_ID: FISCAL_CORPUS_KIND,
+    BINARY_GRAPH_HANDLER_ID: BINARY_CORPUS_KIND,
 }
 
 
